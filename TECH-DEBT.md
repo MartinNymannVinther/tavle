@@ -41,10 +41,11 @@ those rules; it has not been run against them.
 direct package entries, because `pnpm install --lockfile-only` needs the
 registry and the registry was not reachable. `pnpm install
 --frozen-lockfile` reported the lockfile up to date after the edit, which
-is the check that matters, but the transitive entries those three
-packages pulled in may still be listed. The first `pnpm install` on a
-connected machine will rewrite the lockfile; commit that rewrite on its
-own so the diff is readable.
+is the check that matters, and the first `pnpm install` on a connected
+machine agreed and rewrote nothing. The transitive entries those three
+packages pulled in may still be listed as orphans; `pnpm dedupe` on a
+connected machine is the one-line way to find out, committed on its own
+so the diff is readable.
 
 ### The cumulative flow reads one seed row per card older than the window
 

@@ -11,10 +11,18 @@
 # Two things are deliberate here. The passwords are required rather than
 # defaulted: a fallback of "the role name as its own password" is worse
 # than a failure, because it works. And they are passed to psql as
-# variables and quoted with format(%L) inside the DO block rather than
+# variables and quoted with format(%L) inside the database rather than
 # pasted into SQL by the shell, so a password containing a quote breaks
 # nothing and injects nothing. scripts/ensure-roles.ts does the same and
 # says why.
+#
+# The statements are built with a plain SELECT and run with \gexec rather
+# than inside a DO block: psql interpolates :'var' only outside quoted
+# literals, and a DO body is one big dollar-quoted literal. An earlier
+# version put the variables inside the block, which Postgres read as a
+# syntax error, and the container died on the first start with nothing
+# but "exited (3)" to show for it. tests/meta/postgres-init.test.ts runs
+# this script for real so that cannot come back.
 set -euo pipefail
 
 : "${TAVLE_APP_PASSWORD:?set TAVLE_APP_PASSWORD}"
@@ -23,22 +31,19 @@ set -euo pipefail
 psql -v ON_ERROR_STOP=1 \
   --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" \
   -v app_pw="$TAVLE_APP_PASSWORD" -v auth_pw="$TAVLE_AUTH_PASSWORD" <<'EOSQL'
-  DO $$
-  DECLARE
-    v_app_pw text := :'app_pw';
-    v_auth_pw text := :'auth_pw';
-  BEGIN
-    IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'tavle_app') THEN
-      EXECUTE format('ALTER ROLE tavle_app LOGIN PASSWORD %L', v_app_pw);
-    ELSE
-      EXECUTE format('CREATE ROLE tavle_app LOGIN PASSWORD %L', v_app_pw);
-    END IF;
+SELECT format(
+  CASE WHEN EXISTS (SELECT FROM pg_roles WHERE rolname = 'tavle_app')
+    THEN 'ALTER ROLE tavle_app LOGIN PASSWORD %L'
+    ELSE 'CREATE ROLE tavle_app LOGIN PASSWORD %L'
+  END,
+  :'app_pw')
+\gexec
 
-    IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'tavle_auth') THEN
-      EXECUTE format('ALTER ROLE tavle_auth LOGIN PASSWORD %L', v_auth_pw);
-    ELSE
-      EXECUTE format('CREATE ROLE tavle_auth LOGIN PASSWORD %L', v_auth_pw);
-    END IF;
-  END
-  $$;
+SELECT format(
+  CASE WHEN EXISTS (SELECT FROM pg_roles WHERE rolname = 'tavle_auth')
+    THEN 'ALTER ROLE tavle_auth LOGIN PASSWORD %L'
+    ELSE 'CREATE ROLE tavle_auth LOGIN PASSWORD %L'
+  END,
+  :'auth_pw')
+\gexec
 EOSQL
