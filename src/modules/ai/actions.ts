@@ -3,6 +3,7 @@
 import { getLocale } from "next-intl/server";
 import { z } from "zod";
 import { requireOrgContext } from "@/core/auth/guard";
+import type { EnablerType } from "@/core/db/schema";
 import { fail, ok, type Result } from "@/core/result";
 import { action, found } from "@/modules/boards/action-helpers";
 import { recordEvent } from "@/modules/boards/events";
@@ -10,6 +11,7 @@ import { cardInWorkspace, laneCards, laneFor, placeCard } from "@/modules/boards
 import { boardInWorkspace } from "@/modules/boards/read";
 import { id, shortText } from "@/modules/boards/validation";
 import { updateChecklist } from "@/modules/boards/write-card-details";
+import { cardThemeIds } from "@/modules/boards/structure/write-card-placement";
 import { createCard, updateCard } from "@/modules/boards/write-cards";
 import { saveSummary } from "@/modules/boards/write-sprints";
 import { proposeCardDraft, proposeCardSplit, proposeSprintSummary } from "./features";
@@ -157,6 +159,14 @@ export async function applySplitAction(raw: unknown): Promise<Result<string>> {
           estimate: piece.estimate,
           priority: original.priority as "low" | "normal" | "high" | "urgent",
           assigneeUserId: original.assigneeUserId,
+          // The pieces stay where the original belongs: same feature, same
+          // area, same themes, same kind. A split changes the size, not the place.
+          featureId: original.featureId,
+          areaId: original.areaId,
+          themeIds: await cardThemeIds(tx, original.id),
+          kind: original.kind as "business" | "enabler",
+          enablerType: original.enablerType as EnablerType | null,
+          bug: original.bug,
         },
         "ai",
       );

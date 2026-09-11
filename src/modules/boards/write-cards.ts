@@ -1,5 +1,5 @@
-import { eq, sql } from "drizzle-orm";
-import { boards, cardLabels, cards, users, type Card, type Priority } from "@/core/db/schema";
+import { eq } from "drizzle-orm";
+import { cards, type Card, type EnablerType, type Kind, type Priority } from "@/core/db/schema";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 import { recordEvent, type ActorKind } from "./events";
 import {
@@ -9,19 +9,26 @@ import {
   firstColumn,
   joiningSort,
   laneFor,
+  nextNumber,
   placeCard,
 } from "./lanes";
+import { memberInWorkspace } from "./members";
 import { boardInWorkspace } from "./read";
+import { inheritedFrom, resolveNew } from "./structure/inherit";
+import { itemInBoard } from "./structure/items";
+import { assertPlaced, enablerTypeFor, RuleViolation } from "./structure/rules";
+import { setCardThemes } from "./structure/write-card-placement";
+import { activeAreaInBoard, activeThemesInBoard } from "./structure/write-lists";
 import { clocksFor, enterColumn, recordTransition } from "./transitions";
-import { labelsInBoard } from "./write-card-details";
 
 /**
  * Card mutations, one transaction each when called from an action and
  * composable inside a larger one (the demo seed and the AI apply several
  * in one). Every function resolves the card inside the active workspace
  * first; a card id from another workspace is simply not found. The
- * checklist and labels live in write-card-details, archiving and
- * deleting in write-card-lifecycle.
+ * checklist lives in write-card-details, archiving and deleting in
+ * write-card-lifecycle, and the card's place in the backlog structure in
+ * structure/write-card-placement.
  */
 
 export type NewCardInput = {
@@ -34,31 +41,16 @@ export type NewCardInput = {
   priority?: Priority;
   dueDate?: string | null;
   assigneeUserId?: string | null;
-  labelIds?: string[];
+  /** The feature the card is part of; area, themes and kind are inherited from it unless given. */
+  featureId?: string | null;
+  areaId?: string | null;
+  themeIds?: string[];
+  kind?: Kind;
+  enablerType?: EnablerType | null;
+  bug?: boolean;
+  acceptance?: string;
   atTop?: boolean;
 };
-
-/** A member of the workspace, or null; the members policy makes anyone else invisible. */
-async function memberName(tx: AppTransaction, userId: string | null | undefined) {
-  if (!userId) return null;
-  const [row] = await tx
-    .select({ id: users.id, name: users.name })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
-  return row ?? null;
-}
-
-/** The next number on the board, taken inside the transaction so it is gapless. */
-async function nextCardNumber(tx: AppTransaction, boardId: string): Promise<number> {
-  const [row] = await tx
-    .update(boards)
-    .set({ nextCardNumber: sql`${boards.nextCardNumber} + 1` })
-    .where(eq(boards.id, boardId))
-    .returning({ next: boards.nextCardNumber });
-  if (!row) throw new Error("notFound");
-  return row.next - 1;
-}
 
 export async function createCard(
   tx: AppTransaction,
@@ -73,8 +65,21 @@ export async function createCard(
     : await firstColumn(tx, board.id);
   if (!column) throw new Error("notFound");
   const sprintId = board.mode === "scrum" ? (input.sprintId ?? null) : null;
-  const assignee = await memberName(tx, input.assigneeUserId);
-  const number = await nextCardNumber(tx, board.id);
+  const assignee = await memberInWorkspace(tx, input.assigneeUserId);
+  // Rule 1 and 3 of the structure: a parent is a feature on this board, and
+  // a card without one needs an area. What the caller left out is the
+  // parent's.
+  let feature = null;
+  if (input.featureId) {
+    feature = await itemInBoard(tx, board.id, "feature", input.featureId);
+    if (!feature) throw new RuleViolation("parentLevel");
+    if (feature.state === "closed") throw new RuleViolation("itemClosed");
+  }
+  const got = resolveNew(input, feature ? await inheritedFrom(tx, feature) : null);
+  const area = await activeAreaInBoard(tx, board.id, got.areaId);
+  const themes = await activeThemesInBoard(tx, board.id, got.themeIds);
+  assertPlaced(feature?.id ?? null, area?.id ?? null);
+  const number = await nextNumber(tx, board.id);
   const sort = await joiningSort(
     tx,
     laneFor(board.mode, { boardId: board.id, columnId: column.id, sprintId }),
@@ -96,18 +101,22 @@ export async function createCard(
       estimate: input.estimate ?? null,
       priority: input.priority ?? "normal",
       dueDate: input.dueDate ?? null,
+      featureId: feature?.id ?? null,
+      areaId: area?.id ?? null,
+      kind: got.kind,
+      enablerType: enablerTypeFor(got.kind, input.enablerType),
+      bug: input.bug ?? false,
+      acceptance: input.acceptance ?? "",
       createdBy: ctx.userId,
       ...clocks,
     })
     .returning();
-  const labelRows = await labelsInBoard(tx, board.id, input.labelIds ?? []);
-  if (labelRows.length > 0) {
-    await tx
-      .insert(cardLabels)
-      .values(
-        labelRows.map((label) => ({ orgId: ctx.orgId, cardId: card!.id, labelId: label.id })),
-      );
-  }
+  await setCardThemes(
+    tx,
+    ctx.orgId,
+    card!.id,
+    themes.map((t) => t.id),
+  );
   await recordTransition(tx, ctx, card!, null, column);
   await recordEvent(
     tx,
@@ -163,12 +172,16 @@ export async function moveCard(
 export type CardUpdate = {
   title?: string;
   description?: string;
+  acceptance?: string;
   estimate?: number | null;
   priority?: Priority;
   dueDate?: string | null;
   assigneeUserId?: string | null;
   blocked?: boolean;
   blockedReason?: string;
+  bug?: boolean;
+  kind?: Kind;
+  enablerType?: EnablerType | null;
   expectedUpdatedAt?: string;
 };
 
@@ -200,6 +213,43 @@ export async function updateCard(
     patch.description = input.description;
     changed.push("description");
   }
+  if (input.acceptance !== undefined && input.acceptance !== card.acceptance) {
+    patch.acceptance = input.acceptance;
+    changed.push("acceptance");
+  }
+  if (input.kind !== undefined || input.enablerType !== undefined) {
+    const kind = input.kind ?? (card.kind as Kind);
+    const enablerType =
+      input.enablerType !== undefined
+        ? enablerTypeFor(kind, input.enablerType)
+        : enablerTypeFor(
+            kind,
+            kind === "enabler" ? (card.enablerType as EnablerType | null) : null,
+          );
+    if (kind !== card.kind || enablerType !== card.enablerType) {
+      patch.kind = kind;
+      patch.enablerType = enablerType;
+      await recordEvent(
+        tx,
+        ctx,
+        card.boardId,
+        "card.kind",
+        { key, title: card.title, kind, enablerType: enablerType ?? "" },
+        { cardId: card.id, actor },
+      );
+    }
+  }
+  if (input.bug !== undefined && input.bug !== card.bug) {
+    patch.bug = input.bug;
+    await recordEvent(
+      tx,
+      ctx,
+      card.boardId,
+      input.bug ? "card.bug" : "card.notBug",
+      { key, title: card.title },
+      { cardId: card.id, actor },
+    );
+  }
   if (input.priority !== undefined && input.priority !== card.priority) {
     patch.priority = input.priority;
     changed.push("priority");
@@ -220,7 +270,7 @@ export async function updateCard(
     );
   }
   if (input.assigneeUserId !== undefined && input.assigneeUserId !== card.assigneeUserId) {
-    const member = await memberName(tx, input.assigneeUserId);
+    const member = await memberInWorkspace(tx, input.assigneeUserId);
     if (input.assigneeUserId && !member) return null;
     patch.assigneeUserId = member?.id ?? null;
     await recordEvent(

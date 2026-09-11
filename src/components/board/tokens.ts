@@ -1,29 +1,30 @@
-import type { LabelColor, Priority } from "@/core/db/schema";
+import type { Priority, ThemeColor } from "@/core/db/schema";
 
 /**
  * The few colours a board uses, all of them the family's tokens. Meaning
- * never rests on colour alone: every label carries its name, every
+ * never rests on colour alone: every theme carries its name, every
  * priority its word, every column its count.
  */
 
-export const LABEL_STYLE: Record<LabelColor, string> = {
-  moss: "bg-success-tint text-success",
-  amber: "bg-warning-tint text-[color:var(--chart-4)]",
-  rose: "bg-warning-tint text-destructive",
-  sky: "bg-accent text-[color:var(--chart-2)]",
-  plum: "bg-accent text-[color:var(--chart-5)]",
-  slate: "bg-muted text-secondary-foreground",
+/**
+ * A theme's colour on the roadmap and as the dot on its chip. Eight
+ * values from the 2a palette, greens and clays and greys, because the
+ * family has no other hues and a roadmap in eight garish colours is not
+ * this product.
+ */
+export const THEME_SWATCH: Record<ThemeColor, string> = {
+  moss: "var(--primary)",
+  sage: "var(--chart-2)",
+  clay: "var(--chart-4)",
+  rust: "var(--destructive)",
+  sand: "var(--chart-3)",
+  stone: "var(--label)",
+  ink: "var(--foreground)",
+  forest: "var(--primary-active)",
 };
 
-/** A swatch for the label editor, where the colour is the thing being chosen. */
-export const LABEL_SWATCH: Record<LabelColor, string> = {
-  moss: "var(--success)",
-  amber: "var(--chart-4)",
-  rose: "var(--destructive)",
-  sky: "var(--chart-2)",
-  plum: "var(--chart-5)",
-  slate: "var(--label)",
-};
+export const themeSwatch = (color: string) =>
+  THEME_SWATCH[color as ThemeColor] ?? THEME_SWATCH.moss;
 
 export const PRIORITY_ORDER: Priority[] = ["urgent", "high", "normal", "low"];
 

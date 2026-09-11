@@ -15,8 +15,20 @@ export type EventType =
   | "column.created"
   | "column.updated"
   | "column.deleted"
-  | "label.created"
-  | "label.deleted"
+  | "theme.created"
+  | "theme.activated"
+  | "theme.deactivated"
+  | "area.created"
+  | "area.activated"
+  | "area.deactivated"
+  | "item.created"
+  | "item.updated"
+  | "item.moved"
+  | "item.placed"
+  | "item.closed"
+  | "item.reopened"
+  | "item.reviewed"
+  | "item.deleted"
   | "card.created"
   | "card.moved"
   | "card.updated"
@@ -25,7 +37,11 @@ export type EventType =
   | "card.estimated"
   | "card.blocked"
   | "card.unblocked"
-  | "card.labels"
+  | "card.parent"
+  | "card.placed"
+  | "card.kind"
+  | "card.bug"
+  | "card.notBug"
   | "card.checklist"
   | "card.sprint"
   | "card.backlog"
@@ -51,12 +67,13 @@ export async function recordEvent(
   boardId: string,
   type: EventType,
   payload: Record<string, unknown> = {},
-  options: { cardId?: string | null; actor?: ActorKind } = {},
+  options: { cardId?: string | null; itemId?: string | null; actor?: ActorKind } = {},
 ): Promise<void> {
   await tx.insert(events).values({
     orgId: ctx.orgId,
     boardId,
     cardId: options.cardId ?? null,
+    itemId: options.itemId ?? null,
     type,
     payload,
     actorKind: options.actor ?? "user",
@@ -69,6 +86,15 @@ export async function recentBoardEvents(tx: AppTransaction, boardId: string, lim
     .select()
     .from(events)
     .where(eq(events.boardId, boardId))
+    .orderBy(desc(events.createdAt))
+    .limit(limit);
+}
+
+export async function itemEvents(tx: AppTransaction, itemId: string, limit = 60) {
+  return tx
+    .select()
+    .from(events)
+    .where(eq(events.itemId, itemId))
     .orderBy(desc(events.createdAt))
     .limit(limit);
 }

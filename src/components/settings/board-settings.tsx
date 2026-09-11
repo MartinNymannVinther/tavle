@@ -17,14 +17,15 @@ import {
   updateBoardAction,
 } from "@/modules/boards/actions-boards";
 import { useRouter } from "@/i18n/navigation";
+import { AreasEditor } from "./areas-editor";
 import { ColumnsEditor } from "./columns-editor";
-import { LabelsEditor } from "./labels-editor";
+import { ThemesEditor } from "./themes-editor";
 
 /**
  * Everything about the board that is not a card: its name and words,
- * its columns, its labels, and the way out. Members can read it all;
- * owners and admins can change it, because the shape of the board is
- * the team's agreement, not one person's.
+ * its columns, the two closed lists of the structure, and the way out.
+ * Members can read it all; owners and admins can change it, because the
+ * shape of the board is the team's agreement, not one person's.
  */
 export function BoardSettings({ full, canManage }: { full: BoardFull; canManage: boolean }) {
   const t = useTranslations("boardSettings");
@@ -34,10 +35,12 @@ export function BoardSettings({ full, canManage }: { full: BoardFull; canManage:
   const [name, setName] = useState(board.name);
   const [description, setDescription] = useState(board.description);
   const [length, setLength] = useState(String(board.sprintLengthDays));
+  const [reviewDays, setReviewDays] = useState(String(board.epicReviewDays));
   const dirty =
     name !== board.name ||
     description !== board.description ||
-    Number(length) !== board.sprintLengthDays;
+    Number(length) !== board.sprintLengthDays ||
+    Number(reviewDays) !== board.epicReviewDays;
 
   return (
     <div className="flex flex-col gap-5">
@@ -56,6 +59,7 @@ export function BoardSettings({ full, canManage }: { full: BoardFull; canManage:
                   name,
                   description,
                   sprintLengthDays: Number(length) || 14,
+                  epicReviewDays: Number(reviewDays) || 180,
                 }),
               );
             }}
@@ -101,6 +105,20 @@ export function BoardSettings({ full, canManage }: { full: BoardFull; canManage:
                   />
                 </Field>
               )}
+              <Field>
+                <FieldLabel htmlFor="board-settings-review">{t("about.reviewDays")}</FieldLabel>
+                <Input
+                  id="board-settings-review"
+                  type="number"
+                  min={7}
+                  max={730}
+                  value={reviewDays}
+                  onChange={(e) => setReviewDays(e.target.value)}
+                  disabled={!canManage}
+                  className="w-24"
+                />
+                <p className="text-meta text-[0.72rem]">{t("about.reviewDaysHint")}</p>
+              </Field>
             </FieldGroup>
             {canManage && (
               <div>
@@ -130,11 +148,33 @@ export function BoardSettings({ full, canManage }: { full: BoardFull; canManage:
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("labels.title")}</CardTitle>
-          <CardDescription>{t("labels.body")}</CardDescription>
+          <CardTitle>{t("themes.title")}</CardTitle>
+          <CardDescription>{t("themes.body")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <LabelsEditor boardId={board.id} labels={full.labels} canManage={canManage} run={run} />
+          <ThemesEditor
+            boardId={board.id}
+            themes={full.themes}
+            members={full.members}
+            canManage={canManage}
+            run={run}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("areas.title")}</CardTitle>
+          <CardDescription>{t("areas.body")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AreasEditor
+            boardId={board.id}
+            areas={full.areas}
+            members={full.members}
+            canManage={canManage}
+            run={run}
+          />
         </CardContent>
       </Card>
 

@@ -4,9 +4,10 @@ import type { Result } from "@/core/result";
 import { action, found } from "./action-helpers";
 import { addComment, deleteComment } from "./comments";
 import { cardInWorkspace } from "./lanes";
+import { CardPlacementSchema } from "./structure/validation";
+import { placeCardInStructure } from "./structure/write-card-placement";
 import {
   CardIdSchema,
-  CardLabelsSchema,
   CardMoveSchema,
   CardUpdateSchema,
   ChecklistSchema,
@@ -14,7 +15,7 @@ import {
   NewCardSchema,
   NewCommentSchema,
 } from "./validation";
-import { setCardLabels, updateChecklist } from "./write-card-details";
+import { updateChecklist } from "./write-card-details";
 import { archiveCard, deleteCard, restoreCard } from "./write-card-lifecycle";
 import { createCard, moveCard, updateCard } from "./write-cards";
 
@@ -59,9 +60,10 @@ export async function updateChecklistAction(raw: unknown): Promise<Result<string
   });
 }
 
-export async function setCardLabelsAction(raw: unknown): Promise<Result<string>> {
-  return action(CardLabelsSchema, raw, async (tx, ctx, input, touch) => {
-    const card = found(await setCardLabels(tx, ctx, input.cardId, input.labelIds));
+/** The card's feature, area and themes (rules 1, 3 and inheritance of the structure). */
+export async function placeCardAction(raw: unknown): Promise<Result<string>> {
+  return action(CardPlacementSchema, raw, async (tx, ctx, input, touch) => {
+    const card = found(await placeCardInStructure(tx, ctx, input));
     touch(card.boardId);
     return card.boardId;
   });

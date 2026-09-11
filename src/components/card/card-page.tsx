@@ -13,6 +13,7 @@ import {
 import { Link, useRouter } from "@/i18n/navigation";
 import { ActivityList } from "./activity-list";
 import { AiPanel } from "./ai-panel";
+import { CardAcceptance } from "./card-acceptance";
 import { CardDescription } from "./card-description";
 import { CardSidePanel } from "./card-side-panel";
 import { CardTitle } from "./card-title";
@@ -39,7 +40,8 @@ export function CardPage({
   const format = useFormatter();
   const router = useRouter();
   const { run } = useBoardActions();
-  const { card, board, columns, labels, sprints, members, comments, events } = full;
+  const { card, board, columns, themes, areas, features, sprints, members, comments, events } =
+    full;
   const column = columns.find((c) => c.id === card.columnId);
 
   return (
@@ -71,6 +73,7 @@ export function CardPage({
       <div className="grid gap-8 @3xl:grid-cols-[minmax(0,1fr)_18rem]">
         <div className="flex min-w-0 flex-col gap-8">
           <CardDescription card={card} run={run} />
+          <CardAcceptance card={card} run={run} />
           <ChecklistEditor card={card} run={run} />
           <AiPanel card={card} boardId={board.id} available={aiAvailable} run={run} />
           <CommentsPanel
@@ -85,8 +88,11 @@ export function CardPage({
         <aside className="flex flex-col gap-6 @3xl:sticky @3xl:top-6 @3xl:self-start">
           <CardSidePanel
             card={card}
+            boardKey={board.key}
             columns={columns}
-            labels={labels}
+            themes={themes}
+            areas={areas}
+            features={features}
             sprints={sprints}
             members={members}
             scrum={board.mode === "scrum"}

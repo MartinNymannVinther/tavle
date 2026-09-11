@@ -4,12 +4,19 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import type { Label } from "@/core/db/schema";
 import type { CardView, Member } from "@/modules/boards/types";
+import type { StructureLookup } from "./card-chips";
 
-export type Filters = { text: string; assignee: string; labelId: string };
+export type Filters = {
+  text: string;
+  assignee: string;
+  themeId: string;
+  areaId: string;
+  /** "", "business", "enabler" or "bug". */
+  kind: string;
+};
 
-export const NO_FILTERS: Filters = { text: "", assignee: "", labelId: "" };
+export const NO_FILTERS: Filters = { text: "", assignee: "", themeId: "", areaId: "", kind: "" };
 
 /** Which cards pass the filter bar. A blank bar passes everything. */
 export function applyFilters(cards: CardView[], filters: Filters): CardView[] {
@@ -23,28 +30,41 @@ export function applyFilters(cards: CardView[], filters: Filters): CardView[] {
       card.assigneeUserId !== filters.assignee
     )
       return false;
-    if (filters.labelId && !card.labelIds.includes(filters.labelId)) return false;
+    if (filters.themeId === "none" && card.themeIds.length > 0) return false;
+    if (filters.themeId && filters.themeId !== "none" && !card.themeIds.includes(filters.themeId))
+      return false;
+    if (filters.areaId === "none" && card.areaId) return false;
+    if (filters.areaId && filters.areaId !== "none" && card.areaId !== filters.areaId) return false;
+    if (filters.kind === "bug" && !card.bug) return false;
+    if ((filters.kind === "business" || filters.kind === "enabler") && card.kind !== filters.kind)
+      return false;
     return true;
   });
 }
 
+export function hasFilters(filters: Filters): boolean {
+  return Object.values(filters).some(Boolean);
+}
+
 /**
- * Narrowing the board down: a word in the title, one person, one label.
- * Client state only; a filter is a way of looking, not a thing to share.
+ * Narrowing the board down: a word in the title, one person, one theme,
+ * one area, one kind or the bugs. Client state only; a filter is a way
+ * of looking, not a thing to share.
  */
 export function BoardFilters({
   filters,
   onChange,
   members,
-  labels,
+  structure,
 }: {
   filters: Filters;
   onChange: (filters: Filters) => void;
   members: Member[];
-  labels: Label[];
+  structure: StructureLookup;
 }) {
   const t = useTranslations("boards.filters");
-  const active = filters.text || filters.assignee || filters.labelId;
+  const themes = structure.themes.filter((theme) => theme.active);
+  const areas = structure.areas.filter((area) => area.active);
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Input
@@ -60,7 +80,7 @@ export function BoardFilters({
         value={filters.assignee}
         onChange={(event) => onChange({ ...filters, assignee: event.target.value })}
         aria-label={t("assignee")}
-        className="w-44"
+        className="w-40"
       >
         <option value="">{t("anyone")}</option>
         <option value="unassigned">{t("unassigned")}</option>
@@ -70,23 +90,53 @@ export function BoardFilters({
           </option>
         ))}
       </NativeSelect>
-      {labels.length > 0 && (
+      {themes.length > 0 && (
         <NativeSelect
           variant="sm"
-          value={filters.labelId}
-          onChange={(event) => onChange({ ...filters, labelId: event.target.value })}
-          aria-label={t("label")}
+          value={filters.themeId}
+          onChange={(event) => onChange({ ...filters, themeId: event.target.value })}
+          aria-label={t("theme")}
           className="w-40"
         >
-          <option value="">{t("anyLabel")}</option>
-          {labels.map((label) => (
-            <option key={label.id} value={label.id}>
-              {label.name}
+          <option value="">{t("anyTheme")}</option>
+          <option value="none">{t("noTheme")}</option>
+          {themes.map((theme) => (
+            <option key={theme.id} value={theme.id}>
+              {theme.name}
             </option>
           ))}
         </NativeSelect>
       )}
-      {active && (
+      {areas.length > 1 && (
+        <NativeSelect
+          variant="sm"
+          value={filters.areaId}
+          onChange={(event) => onChange({ ...filters, areaId: event.target.value })}
+          aria-label={t("area")}
+          className="w-40"
+        >
+          <option value="">{t("anyArea")}</option>
+          <option value="none">{t("noArea")}</option>
+          {areas.map((area) => (
+            <option key={area.id} value={area.id}>
+              {area.name}
+            </option>
+          ))}
+        </NativeSelect>
+      )}
+      <NativeSelect
+        variant="sm"
+        value={filters.kind}
+        onChange={(event) => onChange({ ...filters, kind: event.target.value })}
+        aria-label={t("kind")}
+        className="w-36"
+      >
+        <option value="">{t("anyKind")}</option>
+        <option value="business">{t("business")}</option>
+        <option value="enabler">{t("enabler")}</option>
+        <option value="bug">{t("bugs")}</option>
+      </NativeSelect>
+      {hasFilters(filters) && (
         <Button type="button" variant="ghost" size="sm" onClick={() => onChange(NO_FILTERS)}>
           {t("clear")}
         </Button>

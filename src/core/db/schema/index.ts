@@ -8,5 +8,6 @@
  */
 export * from "./foundation";
 export * from "./boards";
+export * from "./structure";
 export * from "./ai";
 export * from "./demo";

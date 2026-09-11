@@ -1,4 +1,4 @@
-import type { BoardMode, ColumnCategory, LabelColor } from "@/core/db/schema";
+import type { BoardMode, ColumnCategory } from "@/core/db/schema";
 
 /**
  * What a new board starts with. Column names are the Danish words a team
@@ -25,11 +25,5 @@ export const DEFAULT_COLUMNS: Record<BoardMode, ColumnSeed[]> = {
     { name: "Færdig", category: "done", wipLimit: null },
   ],
 };
-
-export const DEFAULT_LABELS: Array<{ name: string; color: LabelColor }> = [
-  { name: "Fejl", color: "rose" },
-  { name: "Forbedring", color: "moss" },
-  { name: "Teknisk gæld", color: "amber" },
-];
 
 export const DEFAULT_SPRINT_LENGTH_DAYS = 14;

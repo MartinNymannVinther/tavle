@@ -1,0 +1,107 @@
+import type { Theme } from "@/core/db/schema";
+import { todayInCopenhagen } from "@/core/dates";
+import type { BoardFull, ItemView } from "../types";
+import { compareQuarters, nextQuarter, quarterOf, quartersBetween, reviewDue } from "./rules";
+
+/**
+ * The roadmap: epics on a line of quarters, coloured by their first
+ * theme. An open epic runs from the quarter it was created in to its
+ * target quarter; a closed one to the quarter it closed in, and only the
+ * last few of those are shown. An open epic without a target is not
+ * drawn — it is listed underneath as unplanned, because a bar with no end
+ * is the kind of dishonesty a roadmap exists to avoid.
+ */
+
+export type RoadmapRow = {
+  epic: ItemView;
+  theme: Theme | null;
+  startQuarter: string;
+  endQuarter: string;
+  reviewDue: boolean;
+  openStories: number;
+  doneStories: number;
+  /** Features under the epic, open and closed. */
+  features: number;
+};
+
+export type Roadmap = {
+  quarters: string[];
+  current: string;
+  rows: RoadmapRow[];
+  unplanned: RoadmapRow[];
+};
+
+const CLOSED_QUARTERS_SHOWN = 2;
+const QUARTERS_AHEAD = 3;
+
+export function roadmap(full: BoardFull, now: Date = new Date()): Roadmap {
+  const today = todayInCopenhagen(now);
+  const current = quarterOf(today);
+  const themeOf = new Map(full.themes.map((t) => [t.id, t]));
+  const category = new Map(full.columns.map((c) => [c.id, c.category]));
+  const featuresOf = new Map<string, string[]>();
+  for (const item of full.items) {
+    if (item.level === "feature" && item.parentId) {
+      featuresOf.set(item.parentId, [...(featuresOf.get(item.parentId) ?? []), item.id]);
+    }
+  }
+  const oldestShown = shift(current, -CLOSED_QUARTERS_SHOWN);
+
+  const rows: RoadmapRow[] = [];
+  const unplanned: RoadmapRow[] = [];
+  for (const epic of full.items.filter((i) => i.level === "epic")) {
+    const featureIds = featuresOf.get(epic.id) ?? [];
+    const stories = full.cards.filter((c) => c.featureId && featureIds.includes(c.featureId));
+    const done = stories.filter((c) => category.get(c.columnId) === "done").length;
+    const endQuarter =
+      epic.state === "closed"
+        ? quarterOf((epic.closedAt ?? epic.updatedAt).toISOString().slice(0, 10))
+        : epic.targetQuarter;
+    const row: RoadmapRow = {
+      epic,
+      theme: epic.themeIds[0] ? (themeOf.get(epic.themeIds[0]) ?? null) : null,
+      startQuarter: quarterOf(epic.createdAt.toISOString().slice(0, 10)),
+      endQuarter: endQuarter ?? current,
+      reviewDue: reviewDue(epic, full.board.epicReviewDays, now),
+      openStories: stories.length - done,
+      doneStories: done,
+      features: featureIds.length,
+    };
+    if (epic.state === "closed" && compareQuarters(row.endQuarter, oldestShown) < 0) continue;
+    if (epic.state === "open" && !epic.targetQuarter) unplanned.push(row);
+    else rows.push(row);
+  }
+  // A bar never runs backwards: an epic created after its target quarter is drawn in the target.
+  for (const row of rows) {
+    if (compareQuarters(row.startQuarter, row.endQuarter) > 0) row.startQuarter = row.endQuarter;
+  }
+  rows.sort(
+    (a, b) =>
+      compareQuarters(a.endQuarter, b.endQuarter) ||
+      compareQuarters(a.startQuarter, b.startQuarter) ||
+      a.epic.sort - b.epic.sort,
+  );
+
+  const first = rows.reduce(
+    (min, r) => (compareQuarters(r.startQuarter, min) < 0 ? r.startQuarter : min),
+    oldestShown,
+  );
+  const last = rows.reduce(
+    (max, r) => (compareQuarters(r.endQuarter, max) > 0 ? r.endQuarter : max),
+    shift(current, QUARTERS_AHEAD),
+  );
+  return { quarters: quartersBetween(first, last), current, rows, unplanned };
+}
+
+function shift(quarter: string, by: number): string {
+  let q = quarter;
+  if (by >= 0) for (let i = 0; i < by; i += 1) q = nextQuarter(q);
+  else for (let i = 0; i > by; i -= 1) q = previousQuarter(q);
+  return q;
+}
+
+function previousQuarter(quarter: string): string {
+  const year = Number(quarter.slice(0, 4));
+  const q = Number(quarter.slice(6));
+  return q === 1 ? `${year - 1}-Q4` : `${year}-Q${q - 1}`;
+}

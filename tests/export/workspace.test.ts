@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Pool } from "pg";
 import { withOrgContext, type OrgContext } from "@/core/db/tenant";
+import { boardAreas } from "@/modules/boards/read";
 import { createBoard } from "@/modules/boards/write-boards";
 import { createCard } from "@/modules/boards/write-cards";
 import { exportFileName, exportToJson, exportToXlsx } from "@/modules/export/format";
@@ -29,8 +30,10 @@ beforeAll(async () => {
         name: `Tavle ${ctx.orgId}`,
         key: "EXP",
         mode: "kanban",
+        firstArea: "Alt",
       });
-      await createCard(tx, ctx, { boardId: board.id, title: `Kort i ${ctx.orgId}` });
+      const areaId = (await boardAreas(tx, board.id))[0]!.id;
+      await createCard(tx, ctx, { boardId: board.id, title: `Kort i ${ctx.orgId}`, areaId });
     });
   }
 });

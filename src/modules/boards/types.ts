@@ -1,12 +1,14 @@
 import type {
+  Area,
+  BacklogItem,
   Board,
   BoardEvent,
   BoardMode,
   Card,
   Column,
   Comment,
-  Label,
   Sprint,
+  Theme,
 } from "@/core/db/schema";
 
 export type { Result } from "@/core/result";
@@ -22,16 +24,22 @@ export type Member = { userId: string; name: string; email: string; role: string
 
 export type CardView = Card & {
   assigneeName: string | null;
-  labelIds: string[];
+  themeIds: string[];
   checklistDone: number;
   checklistTotal: number;
   commentCount: number;
 };
 
+/** An epic or a feature with its themes resolved to ids. */
+export type ItemView = BacklogItem & { themeIds: string[] };
+
 export type BoardFull = {
   board: Board;
   columns: Column[];
-  labels: Label[];
+  themes: Theme[];
+  areas: Area[];
+  /** Every epic and feature of the board, open and closed; closed ones still name a card's parent. */
+  items: ItemView[];
   /** Every card that is not archived, backlog included on a Scrum board. */
   cards: CardView[];
   sprints: Sprint[];
@@ -45,7 +53,10 @@ export type CardFull = {
   card: CardView;
   board: Board;
   columns: Column[];
-  labels: Label[];
+  themes: Theme[];
+  areas: Area[];
+  /** The board's features, open ones and the card's own, for the parent select. */
+  features: ItemView[];
   /** Planned and active sprints a card can be moved to. */
   sprints: Sprint[];
   members: Member[];

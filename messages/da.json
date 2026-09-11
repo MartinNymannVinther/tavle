@@ -495,7 +495,9 @@
       "sprints": "Sprints",
       "insight": "Indsigt",
       "settings": "Indstillinger",
-      "archived": "arkiveret"
+      "archived": "arkiveret",
+      "roadmap": "Roadmap",
+      "overview": "Overblik"
     },
     "list": {
       "title": "Tavler",
@@ -519,7 +521,10 @@
       "kanbanHint": "Et løbende flow med kolonner og en grænse for hvor meget der må være i gang. Ingen sprints.",
       "scrumHint": "Arbejdet planlægges i sprints fra en backlog. Tavlen viser den sprint der kører.",
       "submit": "Opret tavle",
-      "cancel": "Annuller"
+      "cancel": "Annuller",
+      "firstArea": "Første område",
+      "firstAreaPlaceholder": "Betalinger",
+      "firstAreaHint": "Den del af produktet tavlen handler om. Kort uden forælder skal høre til et område, så tavlen starter med ét, som I selv navngiver. Flere kan tilføjes under indstillinger."
     },
     "view": {
       "noSprintTitle": "Ingen sprint i gang",
@@ -542,16 +547,28 @@
       "placeholder": "Hvad skal der laves?",
       "label": "Nyt kort",
       "add": "Tilføj",
-      "cancel": "Annuller"
+      "cancel": "Annuller",
+      "where": "Hører til",
+      "partOfFeature": "Del af feature",
+      "noParentInArea": "Uden forælder, i område"
     },
     "filters": {
       "search": "Søg i kort",
       "assignee": "Ansvarlig",
       "anyone": "Alle",
       "unassigned": "Uden ansvarlig",
-      "label": "Label",
-      "anyLabel": "Alle labels",
-      "clear": "Ryd"
+      "clear": "Ryd",
+      "theme": "Tema",
+      "anyTheme": "Alle temaer",
+      "noTheme": "Uden tema",
+      "area": "Område",
+      "anyArea": "Alle områder",
+      "noArea": "Uden område",
+      "kind": "Art",
+      "anyKind": "Business og enabler",
+      "business": "Business",
+      "enabler": "Enabler",
+      "bugs": "Kun fejl"
     },
     "sprint": {
       "kicker": "{start} – {end}",
@@ -581,6 +598,66 @@
       "unauthorized": "Du er ikke logget ind længere.",
       "forbidden": "Det kræver at du er ejer eller administrator af arbejdsrummet.",
       "generic": "Det gik galt. Prøv igen."
+    },
+    "structure": {
+      "bug": "Fejl",
+      "bugFlag": "Det er en fejl",
+      "kind": {
+        "business": "Business",
+        "enabler": "Enabler"
+      },
+      "kindLabel": "Art",
+      "enablerTypeLabel": "Enabler-type",
+      "enablerType": {
+        "architecture": "Arkitektur",
+        "infrastructure": "Infrastruktur",
+        "exploration": "Udforskning",
+        "compliance": "Compliance",
+        "none": "Ingen undertype"
+      },
+      "partOf": "Del af {key} · {title}",
+      "level": {
+        "epic": "Epic",
+        "feature": "Feature"
+      },
+      "epic": "Epic",
+      "feature": "Feature",
+      "looksLikeTheme": "Det ligner et tema, ikke et resultat",
+      "forReview": "Til revision",
+      "up": "Flyt op",
+      "down": "Flyt ned",
+      "noParent": "Uden forælder",
+      "area": "Område",
+      "areaRequired": "påkrævet uden forælder",
+      "noArea": "Intet område",
+      "inactive": "deaktiveret",
+      "themes": "Temaer",
+      "applyToChildren": "Opdatér også børnene, når område eller temaer ændres",
+      "targetQuarter": "Målkvartal",
+      "noQuarter": "Intet mål endnu"
+    },
+    "rules": {
+      "parentLevel": "En forælder er altid præcis ét niveau op: en feature hører til en epic, et kort til en feature, på samme tavle.",
+      "needsArea": "Uden forælder skal der vælges et område.",
+      "doneWhenRequired": "Skriv hvornår det er færdigt. Kan det ikke blive færdigt, er det et tema eller et område.",
+      "enablerTypeOnly": "En enabler-type kan kun sættes, når arten er Enabler.",
+      "openChildren": "Der er stadig åbne børn. Tag stilling til hver af dem først.",
+      "itemClosed": "Den er lukket. Genåbn den først, hvis den skal have mere.",
+      "inactiveCategory": "Det tema eller område er deaktiveret og kan ikke sættes på nyt arbejde.",
+      "themeLimit": "Listen er lukket ved otte temaer. Et niende er nok et område, eller en epic.",
+      "notAChild": "Det hører ikke til under det, der lukkes."
+    },
+    "itemForm": {
+      "newEpic": "Ny epic",
+      "newFeature": "Ny feature",
+      "title": "Titel",
+      "titlePlaceholder": "Kunder kan betale med MobilePay",
+      "titleHint": "Formulér det som noget, der kan opnås. Temaer og områder er navneord; det her er et resultat.",
+      "doneWhen": "Færdig når",
+      "doneWhenPlaceholder": "80 % af betalingerne i checkout kan gennemføres med MobilePay i produktion",
+      "inherits": "Område og temaer arves fra epic'en og kan rettes bagefter.",
+      "create": "Opret",
+      "cancel": "Annuller"
     }
   },
   "cards": {
@@ -628,7 +705,6 @@
       "estimate": "Estimat",
       "priority": "Prioritet",
       "dueDate": "Deadline",
-      "labels": "Labels",
       "blocked": "Blokeret",
       "blockedReason": "Hvad venter kortet på?"
     },
@@ -676,6 +752,14 @@
       "deleteTitle": "Slet kortet?",
       "deleteBody": "{key} slettes med kommentarer og historik. Vil du kunne finde det igen, så arkivér det i stedet.",
       "deleteConfirm": "Slet kortet"
+    },
+    "acceptance": {
+      "title": "Acceptkriterier",
+      "write": "Skriv acceptkriterier",
+      "edit": "Redigér",
+      "placeholder": "Hvad skal være sandt, før kortet er færdigt? Én linje pr. kriterium.",
+      "save": "Gem",
+      "cancel": "Annuller"
     }
   },
   "backlog": {
@@ -714,6 +798,24 @@
       "create": "Planlæg",
       "save": "Gem",
       "cancel": "Annuller"
+    },
+    "showClosed": "Vis lukkede",
+    "newEpic": "Ny epic",
+    "newFeature": "Ny feature",
+    "grouping": {
+      "label": "Gruppér efter",
+      "hierarchy": "Hierarki",
+      "theme": "Tema",
+      "area": "Område",
+      "kind": "Art",
+      "none": "Uden"
+    },
+    "hierarchy": {
+      "featureCounts": "{backlog, plural, one {# i backlog} other {# i backlog}} · {open} i gang · {done} færdige",
+      "epicCounts": "{features, plural, one {# feature} other {# features}}",
+      "noParent": "Uden forælder",
+      "groupCount": "{count, plural, one {# kort} other {# kort}}",
+      "groupEmpty": "Ingen kort her."
     }
   },
   "sprints": {
@@ -806,7 +908,9 @@
       "name": "Navn",
       "description": "Beskrivelse",
       "sprintLength": "Sprintlængde i dage",
-      "save": "Gem"
+      "save": "Gem",
+      "reviewDays": "Epics til revision efter (dage)",
+      "reviewDaysHint": "En epic, der har været åben længere, markeres Til revision, indtil ejeren bekræfter at den stadig er et resultat."
     },
     "columns": {
       "title": "Kolonner",
@@ -830,25 +934,6 @@
       "doing": "I gang",
       "done": "Færdig"
     },
-    "labels": {
-      "title": "Labels",
-      "body": "Korte ord kortene kan mærkes med. Højst tyve pr. tavle.",
-      "name": "Navn",
-      "color": "Farve",
-      "placeholder": "Nyt label",
-      "add": "Tilføj",
-      "save": "Gem",
-      "delete": "Slet",
-      "empty": "Ingen labels.",
-      "colors": {
-        "moss": "Grøn",
-        "amber": "Gul",
-        "rose": "Rød",
-        "sky": "Blå",
-        "plum": "Lilla",
-        "slate": "Grå"
-      }
-    },
     "danger": {
       "title": "Arkivér eller slet",
       "body": "En arkiveret tavle forsvinder fra oversigten men beholder alt. Sletning fjerner tavlen med alle kort, kommentarer og historik.",
@@ -859,6 +944,47 @@
       "deleteTitle": "Slet {name}?",
       "deleteBody": "Alle kort, sprints, kommentarer og historik slettes. Det kan ikke fortrydes; eksportér først, hvis du er i tvivl.",
       "deleteConfirm": "Slet tavlen"
+    },
+    "themes": {
+      "title": "Temaer",
+      "body": "Hvorfor: den strategiske retning et item tjener. En lukket liste på fem til otte navneord med en ejer. Et tema bliver aldrig færdigt og slettes ikke, kun deaktiveres.",
+      "name": "Navn",
+      "color": "Farve",
+      "placeholder": "Nyt tema",
+      "owner": "Ejer",
+      "add": "Tilføj",
+      "save": "Gem",
+      "empty": "Ingen temaer endnu.",
+      "full": "Listen er lukket ved {max} aktive temaer.",
+      "inactive": "deaktiveret",
+      "deactivate": "Deaktivér",
+      "activate": "Aktivér igen",
+      "colors": {
+        "moss": "Mos",
+        "sage": "Salvie",
+        "clay": "Ler",
+        "rust": "Rust",
+        "sand": "Sand",
+        "stone": "Sten",
+        "ink": "Blæk",
+        "forest": "Skov"
+      }
+    },
+    "areas": {
+      "title": "Områder",
+      "body": "Hvor: den del af produktet et item rører, typisk moduler eller domæner. En lukket liste med ejer; et item har højst ét område, og et item uden forælder skal have ét.",
+      "name": "Navn",
+      "placeholder": "Nyt område",
+      "owner": "Ejer",
+      "add": "Tilføj",
+      "save": "Gem",
+      "inactive": "deaktiveret",
+      "deactivate": "Deaktivér",
+      "activate": "Aktivér igen",
+      "keepOne": "Tavlen skal have mindst ét aktivt område."
+    },
+    "lists": {
+      "noOwner": "Ingen ejer"
     }
   },
   "my": {
@@ -902,10 +1028,6 @@
       "updated": "Kolonnen {name} blev ændret",
       "deleted": "Kolonnen {name} blev slettet; kortene flyttet til {into}"
     },
-    "label": {
-      "created": "Labelet {name} blev tilføjet",
-      "deleted": "Labelet {name} blev slettet"
-    },
     "card": {
       "created": "{key} blev oprettet i {column}",
       "moved": "{key} blev flyttet til {column}",
@@ -915,14 +1037,18 @@
       "estimated": "{key} blev estimeret til {points} point",
       "blocked": "{key} blev blokeret: {reason}",
       "unblocked": "{key} er ikke længere blokeret",
-      "labels": "{key} fik labels: {labels}",
       "checklist": "Tjeklisten på {key} står på {done} af {total}",
       "sprint": "{key} blev lagt i {sprint}",
       "backlog": "{key} blev flyttet til backloggen",
       "archived": "{key} blev arkiveret",
       "restored": "{key} blev gendannet",
       "deleted": "{key} blev slettet",
-      "split": "{key} blev delt op i {into}"
+      "split": "{key} blev delt op i {into}",
+      "parent": "{key} blev lagt under {parent}",
+      "placed": "{key} fik område {area} og temaer {themes}",
+      "kind": "{key} blev sat til {kind} {enablerType}",
+      "bug": "{key} blev markeret som fejl",
+      "notBug": "{key} er ikke længere markeret som fejl"
     },
     "comment": {
       "added": "Kommentar på {key}",
@@ -938,6 +1064,26 @@
     },
     "ai": {
       "drafted": "AI skrev et udkast til {key} ({engine})"
+    },
+    "theme": {
+      "created": "Temaet {name} blev oprettet",
+      "activated": "Temaet {name} blev aktiveret igen",
+      "deactivated": "Temaet {name} blev deaktiveret"
+    },
+    "area": {
+      "created": "Området {name} blev oprettet",
+      "activated": "Området {name} blev aktiveret igen",
+      "deactivated": "Området {name} blev deaktiveret"
+    },
+    "item": {
+      "created": "{key} blev oprettet som {level}: {title}",
+      "updated": "{key} blev redigeret ({fields})",
+      "moved": "{key} blev flyttet til {parent}",
+      "placed": "{key} fik område {area} og temaer {themes}",
+      "closed": "{key} blev lukket",
+      "reopened": "{key} blev genåbnet",
+      "reviewed": "{key} blev bekræftet som stadig et resultat",
+      "deleted": "{key} blev slettet"
     }
   },
   "help": {
@@ -959,7 +1105,7 @@
       },
       "cards": {
         "title": "Kort",
-        "body": "Et kort skal bare have en titel for at findes. Klik på titlen for at åbne kortet: her sætter I ansvarlig, estimat, prioritet, deadline, labels og tjekliste, og skriver til hinanden i kommentarerne. Alt gemmes med det samme. Et blokeret kort får en rød kant, så det ikke bliver overset."
+        "body": "Et kort skal bare have en titel for at findes. Klik på titlen for at åbne kortet: her sætter I ansvarlig, estimat, prioritet, deadline, acceptkriterier og tjekliste, og vælger hvilken feature kortet er del af, eller hvilket område det hører til, og skriver til hinanden i kommentarerne. Alt gemmes med det samme. Et blokeret kort får en rød kant, så det ikke bliver overset."
       },
       "backlog": {
         "title": "Backloggen",
@@ -980,6 +1126,14 @@
       "data": {
         "title": "Dine data",
         "body": "Under Indstillinger → Data kan hele arbejdsrummet hentes som regneark og JSON med ét klik, og ejeren kan slette det helt. Det er jeres data, altid."
+      },
+      "structure": {
+        "title": "Epics, features, temaer og områder",
+        "body": "Backloggen har ét hierarki med tre niveauer: en epic er et resultat teamet kan nå på et til to kvartaler, en feature er en frigivelig skive af den, et kort er den mindste leverance og passer i ét sprint. Alle tre har en art, Business eller Enabler. Overblik og gruppering løses med to felter på det enkelte item: Tema svarer på hvorfor, Område på hvor. To tests afgør hvor noget hører hjemme, og værktøjet håndhæver dem: kan det blive færdigt, er det i hierarkiet; kan det aldrig blive færdigt, er det et tema eller et område. Har det præcis én forælder, er det hierarki; kan det høre til flere på én gang, er det en kategori."
+      },
+      "roadmap": {
+        "title": "Roadmap og overblik",
+        "body": "Roadmappet tegner epics på en linje af kvartaler, farvet efter deres første tema. En epic uden målkvartal tegnes ikke, den listes nedenunder. Overblikket viser hvor det åbne arbejde ligger pr. tema, område og art, enabler-andelen som ét tal, og fem mål på om strukturen holder: andelen uden forælder, epics til revision, items uden område, enabler-andelen, og temaer og områder ingen bruger."
       }
     },
     "abcTitle": "Tavlens ABC",
@@ -1027,5 +1181,92 @@
       }
     },
     "closing": "Værktøjet gør ikke teamet godt. Det gør de ti regler, og tavlen er der, så I kan se om I følger dem."
+  },
+  "items": {
+    "doneWhen": {
+      "title": "Færdig når",
+      "edit": "Redigér",
+      "write": "Skriv",
+      "placeholder": "Den betingelse der gør det færdigt",
+      "save": "Gem",
+      "cancel": "Annuller",
+      "empty": "Ikke skrevet endnu."
+    },
+    "page": {
+      "closed": "Lukket",
+      "reviewBody": "Denne epic har været åben i mere end {days} dage. Er den stadig et resultat, teamet arbejder hen imod, eller er den blevet et tema?",
+      "reviewConfirm": "Ja, stadig et resultat",
+      "created": "Oprettet {date}",
+      "reviewed": "Bekræftet {date}",
+      "closedAt": "Lukket {date}",
+      "reopen": "Genåbn",
+      "deleteTitle": "Slet for altid?",
+      "deleteBody": "{key} slettes. Det der ligger under, bliver stående uden forælder.",
+      "deleteConfirm": "Slet",
+      "delete": "Slet"
+    },
+    "children": {
+      "features": "{count, plural, =0 {Ingen features endnu} one {# feature} other {# features}}",
+      "stories": "Kort · {open} åbne · {done} færdige",
+      "newFeature": "Ny feature under denne",
+      "noFeatures": "Ingen features endnu. Opret den første, der kan frigives for sig.",
+      "storyCounts": "{open} åbne · {done} færdige",
+      "noStories": "Ingen kort endnu. Opret dem fra backloggen eller tavlen og vælg denne feature."
+    },
+    "close": {
+      "button": "Luk",
+      "title": "Luk {key}",
+      "body": "{count, plural, one {Der er ét åbent barn} other {Der er # åbne børn}}. Intet lukkes automatisk: vælg for hver, hvad der skal ske.",
+      "openStories": "{count, plural, one {# åbent kort} other {# åbne kort}}",
+      "decision": "Hvad skal der ske",
+      "actions": {
+        "close": "Luk",
+        "archive": "Arkivér",
+        "moveEpic": "Flyt til anden epic",
+        "moveFeature": "Flyt til anden feature",
+        "orphan": "Behold uden forælder"
+      },
+      "target": "Ny forælder",
+      "chooseTarget": "Vælg…",
+      "area": "Område",
+      "chooseArea": "Vælg område…",
+      "confirm": "Luk og gør sådan",
+      "cancel": "Annuller"
+    }
+  },
+  "roadmap": {
+    "title": "Roadmap",
+    "areaFilter": "Område",
+    "allAreas": "Alle områder",
+    "epic": "Epic",
+    "empty": "Ingen epics at tegne endnu. Giv en epic et målkvartal, så vises den her.",
+    "unplanned": "{count, plural, one {# epic uden målkvartal} other {# epics uden målkvartal}}",
+    "unplannedHint": "En epic uden mål tegnes ikke. Et roadmap, der viser bjælker uden ende, lyver.",
+    "counts": "{features, plural, one {# feature} other {# features}} · {done} af {total} kort færdige",
+    "closed": "Lukket"
+  },
+  "overview": {
+    "title": "Overblik",
+    "healthTitle": "Holder strukturen?",
+    "healthBody": "Fem mål på om backloggen bliver holdt: intet af det her er en karakter, men alt sammen er noget, man kan gøre noget ved.",
+    "parentless": "Uden forælder",
+    "parentlessHint": "{count} af {total} åbne features og kort",
+    "review": "Epics til revision",
+    "reviewHint": "Åbne længere end {days} dage uden bekræftelse",
+    "withoutArea": "Uden område",
+    "withoutAreaHint": "{count} af {total} åbne items",
+    "enablerShare": "Enabler-andel",
+    "byPoints": "af de åbne point",
+    "byCards": "af de åbne kort",
+    "idle": "Uden åbent arbejde",
+    "idleHint": "Temaer og områder ingen bruger",
+    "idleThemes": "Temaer uden åbne items: {names}",
+    "idleAreas": "Områder uden åbne items: {names}",
+    "byThemeTitle": "Pr. tema",
+    "byAreaTitle": "Pr. område",
+    "byKindTitle": "Pr. art",
+    "distributionBody": "{cards, plural, one {# åbent kort} other {# åbne kort}} · {points} point",
+    "none": "Uden",
+    "bucketValue": "{cards} kort · {points} point"
   }
 }

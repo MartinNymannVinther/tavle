@@ -1,5 +1,5 @@
 import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
-import { cards, columns, type Card, type Column } from "@/core/db/schema";
+import { boards, cards, columns, type Card, type Column } from "@/core/db/schema";
 import type { AppTransaction } from "@/core/db/tenant";
 import { placeInLane, sortAtEnd, sortAtTop, type Positioned } from "./ordering";
 
@@ -20,6 +20,21 @@ export class Conflict extends Error {
 /** Optimistic lock: the row must be the one the caller looked at. */
 export function assertFresh(row: { updatedAt: Date }, expectedUpdatedAt?: string) {
   if (expectedUpdatedAt && row.updatedAt.toISOString() !== expectedUpdatedAt) throw new Conflict();
+}
+
+/**
+ * The next number on the board, taken inside the transaction so it is
+ * gapless and never repeats. Cards, features and epics draw from the same
+ * counter: WEB-12 means one thing on the board, whatever its level.
+ */
+export async function nextNumber(tx: AppTransaction, boardId: string): Promise<number> {
+  const [row] = await tx
+    .update(boards)
+    .set({ nextCardNumber: sql`${boards.nextCardNumber} + 1` })
+    .where(eq(boards.id, boardId))
+    .returning({ next: boards.nextCardNumber });
+  if (!row) throw new Error("notFound");
+  return row.next - 1;
 }
 
 export async function cardInWorkspace(tx: AppTransaction, cardId: string): Promise<Card | null> {

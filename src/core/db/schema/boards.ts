@@ -1,43 +1,34 @@
 import { sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   date,
   doublePrecision,
   index,
   integer,
   jsonb,
   pgTable,
-  primaryKey,
   text,
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { domainId, organizations, users } from "./foundation";
+import { domainId, users } from "./foundation";
+import { areas, backlogItems } from "./structure";
+import { tenant, timestamps } from "./shared";
 
 /**
  * The product's data model: the few concepts a team board needs — board,
- * column, card, label, sprint, comment — plus what running one for real
- * needs: a record of every move a card makes (the metrics are computed
- * from it, never estimated) and a structured event log.
+ * column, card, sprint, comment — the backlog structure above the cards
+ * (epic and feature, which finish; theme and area, which never do; see
+ * docs/adr/0011) — plus what running one for real needs: a record of
+ * every move a card makes (the metrics are computed from it, never
+ * estimated) and a structured event log.
  *
  * Every table carries `org_id` with a cascading foreign key to the
  * workspace, so deleting a workspace deletes everything it owns, and RLS
  * keys on the same column. Dates are ISO strings (yyyy-mm-dd) in
  * Europe/Copenhagen; instants are timestamptz.
  */
-
-const tenant = () =>
-  text("org_id")
-    .notNull()
-    .references(() => organizations.id, { onDelete: "cascade" });
-
-const timestamps = {
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-};
 
 /** How a board is run: a continuous flow, or work committed in sprints. */
 export const BOARD_MODES = ["kanban", "scrum"] as const;
@@ -56,10 +47,6 @@ export type Priority = (typeof PRIORITIES)[number];
 
 export const SPRINT_STATES = ["planned", "active", "closed"] as const;
 export type SprintState = (typeof SPRINT_STATES)[number];
-
-/** The palette a label may use; the tokens are the family's, not new colours. */
-export const LABEL_COLORS = ["moss", "amber", "rose", "sky", "plum", "slate"] as const;
-export type LabelColor = (typeof LABEL_COLORS)[number];
 
 export type ChecklistItem = { id: string; title: string; done: boolean };
 
@@ -81,6 +68,8 @@ export const boards = pgTable(
     /** The next card number to hand out; bumped inside the insert's transaction, so numbers never repeat and never skip. */
     nextCardNumber: integer("next_card_number").notNull().default(1),
     nextSprintNumber: integer("next_sprint_number").notNull().default(1),
+    /** An epic open longer than this is marked for review until its owner confirms it is still a result. */
+    epicReviewDays: integer("epic_review_days").notNull().default(180),
     createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
     archivedAt: timestamp("archived_at", { withTimezone: true }),
     ...timestamps,
@@ -107,25 +96,6 @@ export const columns = pgTable(
     ...timestamps,
   },
   (t) => [index("columns_board_idx").on(t.boardId, t.sort)],
-);
-
-export const labels = pgTable(
-  "labels",
-  {
-    id: domainId("id"),
-    orgId: tenant(),
-    boardId: text("board_id")
-      .notNull()
-      .references(() => boards.id, { onDelete: "cascade" }),
-    name: text("name").notNull(),
-    color: text("color").notNull().default("slate"),
-    sort: integer("sort").notNull().default(0),
-    ...timestamps,
-  },
-  (t) => [
-    uniqueIndex("labels_board_name_uq").on(t.boardId, sql`lower(${t.name})`),
-    index("labels_board_idx").on(t.boardId, t.sort),
-  ],
 );
 
 export const sprints = pgTable(
@@ -172,6 +142,15 @@ export const cards = pgTable(
       .references(() => columns.id, { onDelete: "restrict" }),
     /** Scrum only: the sprint the card is committed to; null is the product backlog. */
     sprintId: text("sprint_id").references(() => sprints.id, { onDelete: "set null" }),
+    /** The feature this card is part of, or null; a card without a parent needs an area (docs/adr/0011). */
+    featureId: text("feature_id").references(() => backlogItems.id, { onDelete: "set null" }),
+    kind: text("kind").notNull().default("business"),
+    enablerType: text("enabler_type"),
+    areaId: text("area_id").references(() => areas.id, { onDelete: "set null" }),
+    /** A bug is a story with a flag, not a fourth level; it follows every story rule and can be counted. */
+    bug: boolean("bug").notNull().default(false),
+    /** Acceptance criteria, optional. */
+    acceptance: text("acceptance").notNull().default(""),
     number: integer("number").notNull(),
     title: text("title").notNull(),
     description: text("description").notNull().default(""),
@@ -198,21 +177,9 @@ export const cards = pgTable(
     index("cards_board_column_idx").on(t.boardId, t.columnId, t.sort),
     index("cards_sprint_idx").on(t.sprintId),
     index("cards_assignee_idx").on(t.assigneeUserId),
+    index("cards_feature_idx").on(t.featureId),
+    check("cards_enabler_type_ck", sql`${t.enablerType} is null or ${t.kind} = 'enabler'`),
   ],
-);
-
-export const cardLabels = pgTable(
-  "card_labels",
-  {
-    orgId: tenant(),
-    cardId: text("card_id")
-      .notNull()
-      .references(() => cards.id, { onDelete: "cascade" }),
-    labelId: text("label_id")
-      .notNull()
-      .references(() => labels.id, { onDelete: "cascade" }),
-  },
-  (t) => [primaryKey({ columns: [t.cardId, t.labelId] })],
 );
 
 export const comments = pgTable(
@@ -277,6 +244,8 @@ export const events = pgTable(
       .notNull()
       .references(() => boards.id, { onDelete: "cascade" }),
     cardId: text("card_id").references(() => cards.id, { onDelete: "cascade" }),
+    /** Set on events about an epic or a feature, so an item has an activity feed like a card. */
+    itemId: text("item_id").references(() => backlogItems.id, { onDelete: "cascade" }),
     type: text("type").notNull(),
     payload: jsonb("payload").$type<Record<string, unknown>>().notNull().default({}),
     /** user | ai | system */
@@ -287,12 +256,12 @@ export const events = pgTable(
   (t) => [
     index("events_board_idx").on(t.boardId, t.createdAt),
     index("events_card_idx").on(t.cardId, t.createdAt),
+    index("events_item_idx").on(t.itemId, t.createdAt),
   ],
 );
 
 export type Board = typeof boards.$inferSelect;
 export type Column = typeof columns.$inferSelect;
-export type Label = typeof labels.$inferSelect;
 export type Sprint = typeof sprints.$inferSelect;
 export type Card = typeof cards.$inferSelect;
 export type Comment = typeof comments.$inferSelect;

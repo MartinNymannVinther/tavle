@@ -3,11 +3,12 @@
 import { useTranslations } from "next-intl";
 import { CircleAlert, ListChecks, MessageSquare } from "lucide-react";
 import { formatDateDa } from "@/core/dates";
-import type { Column, Label, Priority } from "@/core/db/schema";
+import type { Column, Priority } from "@/core/db/schema";
 import type { CardView } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import { Initials, LabelChip, Points, PriorityMark } from "./bits";
+import { Initials, Points, PriorityMark } from "./bits";
+import { CardChips, PartOf, type StructureLookup } from "./card-chips";
 import { MoveMenu } from "./move-menu";
 
 /**
@@ -20,7 +21,7 @@ export function BoardCard({
   card,
   boardKey,
   boardId,
-  labels,
+  structure,
   columns,
   today,
   dragging,
@@ -32,7 +33,7 @@ export function BoardCard({
   card: CardView;
   boardKey: string;
   boardId: string;
-  labels: Label[];
+  structure: StructureLookup;
   columns: Column[];
   today: string;
   dragging: boolean;
@@ -44,9 +45,6 @@ export function BoardCard({
   const t = useTranslations("boards.card");
   const priorities = useTranslations("boards.priority");
   const overdue = Boolean(card.dueDate && card.dueDate < today && !card.doneAt);
-  const cardLabels = card.labelIds
-    .map((id) => labels.find((label) => label.id === id))
-    .filter((label): label is Label => Boolean(label));
   const href = `/boards/${boardId}/cards/${card.number}`;
 
   return (
@@ -86,16 +84,11 @@ export function BoardCard({
           >
             {card.title}
           </Link>
+          <PartOf featureId={card.featureId} structure={structure} boardKey={boardKey} />
         </div>
         <MoveMenu columns={columns} currentColumnId={card.columnId} onMove={onMove} href={href} />
       </div>
-      {cardLabels.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1">
-          {cardLabels.map((label) => (
-            <LabelChip key={label.id} label={label} />
-          ))}
-        </div>
-      )}
+      <CardChips card={card} structure={structure} />
       <div className="text-meta mt-2 flex items-center gap-2 text-[0.72rem]">
         {card.assigneeName ? (
           <Initials name={card.assigneeName} />

@@ -3,8 +3,9 @@
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { Initials, LabelChip, Points, PriorityMark } from "@/components/board/bits";
-import type { Label, Priority } from "@/core/db/schema";
+import { Initials, Points, PriorityMark } from "@/components/board/bits";
+import { CardChips, type StructureLookup } from "@/components/board/card-chips";
+import type { Priority } from "@/core/db/schema";
 import type { CardView } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -18,7 +19,7 @@ export function BacklogRow({
   card,
   boardKey,
   boardId,
-  labels,
+  structure,
   selected,
   onSelect,
   onMoveUp,
@@ -33,7 +34,7 @@ export function BacklogRow({
   card: CardView;
   boardKey: string;
   boardId: string;
-  labels: Label[];
+  structure: StructureLookup;
   selected: boolean;
   onSelect: (checked: boolean) => void;
   onMoveUp?: () => void;
@@ -47,9 +48,6 @@ export function BacklogRow({
 }) {
   const t = useTranslations("backlog.row");
   const priorities = useTranslations("boards.priority");
-  const cardLabels = card.labelIds
-    .map((id) => labels.find((label) => label.id === id))
-    .filter((label): label is Label => Boolean(label));
   return (
     <li
       draggable={draggable}
@@ -77,11 +75,7 @@ export function BacklogRow({
       >
         {card.title}
       </Link>
-      <span className="hidden items-center gap-1 sm:flex">
-        {cardLabels.slice(0, 2).map((label) => (
-          <LabelChip key={label.id} label={label} />
-        ))}
-      </span>
+      <CardChips card={card} structure={structure} className="hidden items-center gap-1 sm:flex" />
       {columnName && (
         <span className="text-meta hidden text-[0.72rem] md:inline">{columnName}</span>
       )}

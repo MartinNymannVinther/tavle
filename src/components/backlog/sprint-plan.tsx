@@ -3,7 +3,8 @@
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { formatDateDa } from "@/core/dates";
-import type { Label, Sprint } from "@/core/db/schema";
+import type { Sprint } from "@/core/db/schema";
+import type { StructureLookup } from "@/components/board/card-chips";
 import type { CardView } from "@/modules/boards/types";
 import { setCardsSprintAction, startSprintAction } from "@/modules/boards/actions-sprints";
 import { Link } from "@/i18n/navigation";
@@ -22,7 +23,7 @@ export function SprintPlan({
   cards,
   boardId,
   boardKey,
-  labels,
+  structure,
   columnNames,
   canStart,
   selected,
@@ -34,7 +35,7 @@ export function SprintPlan({
   cards: CardView[];
   boardId: string;
   boardKey: string;
-  labels: Label[];
+  structure: StructureLookup;
   columnNames: Map<string, string>;
   canStart: boolean;
   selected: Set<string>;
@@ -104,7 +105,7 @@ export function SprintPlan({
               card={card}
               boardKey={boardKey}
               boardId={boardId}
-              labels={labels}
+              structure={structure}
               selected={selected.has(card.id)}
               onSelect={(checked) => onSelect(card.id, checked)}
               columnName={active ? columnNames.get(card.columnId) : undefined}

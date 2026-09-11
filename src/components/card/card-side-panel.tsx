@@ -5,37 +5,40 @@ import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
-import { LabelChip } from "@/components/board/bits";
-import type { Column, Label, Priority, Sprint } from "@/core/db/schema";
+import type { Area, Column, Priority, Sprint, Theme } from "@/core/db/schema";
 import { PRIORITIES } from "@/core/db/schema";
-import type { CardView, Member } from "@/modules/boards/types";
-import {
-  moveCardAction,
-  setCardLabelsAction,
-  updateCardAction,
-} from "@/modules/boards/actions-cards";
+import type { CardView, ItemView, Member } from "@/modules/boards/types";
+import { moveCardAction, updateCardAction } from "@/modules/boards/actions-cards";
 import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
 import type { Run } from "@/components/board/use-board-actions";
 import { cn } from "@/lib/utils";
+import { PlacementFields } from "./placement-fields";
 
 /**
  * The card's facts, each a control that saves on change: where it is,
- * whose it is, how big, how urgent, when it is due, what it is tagged
- * with, and whether it is stuck. No save button, because every field is
- * one decision and nobody wants to remember to press a button after it.
+ * whose it is, how big, how urgent, when it is due, where it belongs in
+ * the structure, and whether it is stuck. No save button, because every
+ * field is one decision and nobody wants to remember to press a button
+ * after it.
  */
 export function CardSidePanel({
   card,
+  boardKey,
   columns,
-  labels,
+  themes,
+  areas,
+  features,
   sprints,
   members,
   scrum,
   run,
 }: {
   card: CardView;
+  boardKey: string;
   columns: Column[];
-  labels: Label[];
+  themes: Theme[];
+  areas: Area[];
+  features: ItemView[];
   sprints: Sprint[];
   members: Member[];
   scrum: boolean;
@@ -46,13 +49,6 @@ export function CardSidePanel({
   const [reason, setReason] = useState(card.blockedReason);
   const update = (fields: Record<string, unknown>) =>
     run(() => updateCardAction({ cardId: card.id, ...fields }));
-
-  function toggleLabel(labelId: string) {
-    const next = card.labelIds.includes(labelId)
-      ? card.labelIds.filter((id) => id !== labelId)
-      : [...card.labelIds, labelId];
-    void run(() => setCardLabelsAction({ cardId: card.id, labelIds: next }));
-  }
 
   const rowClass = "flex flex-col gap-1.5";
   const labelClass = "text-label text-[0.72rem] font-medium";
@@ -182,30 +178,14 @@ export function CardSidePanel({
         />
       </div>
 
-      {labels.length > 0 && (
-        <div className={rowClass}>
-          <span className={labelClass}>{t("labels")}</span>
-          <div className="flex flex-wrap gap-1.5">
-            {labels.map((label) => {
-              const on = card.labelIds.includes(label.id);
-              return (
-                <button
-                  key={label.id}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => toggleLabel(label.id)}
-                  className={cn(
-                    "focus-visible:ring-ring rounded-full ring-offset-1 transition focus-visible:ring-2 focus-visible:outline-none",
-                    !on && "opacity-45 hover:opacity-80",
-                  )}
-                >
-                  <LabelChip label={label} />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      <PlacementFields
+        card={card}
+        boardKey={boardKey}
+        themes={themes}
+        areas={areas}
+        features={features}
+        run={run}
+      />
 
       <div className={rowClass}>
         <label className="flex items-center gap-2 text-sm">

@@ -30,8 +30,28 @@ const TABLES: Array<{ table: string; row: (suffix: string) => Record<string, unk
     }),
   },
   {
-    table: "labels",
-    row: (s) => ({ id: `label_${s}`, board_id: `board_${s}`, name: `Label ${s}` }),
+    table: "themes",
+    row: (s) => ({ id: `theme_${s}`, board_id: `board_${s}`, name: `Tema ${s}` }),
+  },
+  {
+    table: "areas",
+    row: (s) => ({ id: `area_${s}`, board_id: `board_${s}`, name: `Område ${s}` }),
+  },
+  {
+    table: "backlog_items",
+    row: (s) => ({
+      id: `epic_${s}`,
+      board_id: `board_${s}`,
+      level: "epic",
+      number: 1,
+      title: `Epic ${s}`,
+      done_when: "når det virker",
+      area_id: `area_${s}`,
+    }),
+  },
+  {
+    table: "backlog_item_themes",
+    row: (s) => ({ item_id: `epic_${s}`, theme_id: `theme_${s}` }),
   },
   {
     table: "sprints",
@@ -50,11 +70,12 @@ const TABLES: Array<{ table: string; row: (suffix: string) => Record<string, unk
       id: `card_${s}`,
       board_id: `board_${s}`,
       column_id: `col_${s}`,
-      number: 1,
+      number: 2,
       title: `Kort ${s}`,
+      area_id: `area_${s}`,
     }),
   },
-  { table: "card_labels", row: (s) => ({ card_id: `card_${s}`, label_id: `label_${s}` }) },
+  { table: "card_themes", row: (s) => ({ card_id: `card_${s}`, theme_id: `theme_${s}` }) },
   { table: "comments", row: (s) => ({ card_id: `card_${s}`, text: `Kommentar ${s}` }) },
   {
     table: "card_transitions",

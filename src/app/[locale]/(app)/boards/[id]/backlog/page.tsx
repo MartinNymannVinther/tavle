@@ -12,12 +12,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") };
 }
 
-/** Planning: the backlog and the sprints, Scrum boards only. */
+/** The backlog in its structure, and on a Scrum board the sprints beside it. */
 export default async function BacklogPage({ params }: Params) {
   const context = await requireOrgContext();
   if (!context) redirect("/login");
   const { id } = await params;
   const full = await getBoardFull(context, id);
-  if (!full || full.board.mode !== "scrum") notFound();
+  if (!full) notFound();
   return <BacklogView full={full} />;
 }

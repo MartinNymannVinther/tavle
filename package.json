@@ -1,6 +1,6 @@
 {
   "name": "tavle",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "Open source Kanban and Scrum boards for small teams. Part of the Haij family.",
   "license": "AGPL-3.0-only",
   "private": true,

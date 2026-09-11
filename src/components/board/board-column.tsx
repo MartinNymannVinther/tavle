@@ -1,11 +1,12 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { Column, Label } from "@/core/db/schema";
+import type { Column } from "@/core/db/schema";
 import type { CardView } from "@/modules/boards/types";
 import { cn } from "@/lib/utils";
 import { BoardCard } from "./board-card";
-import { QuickAdd } from "./quick-add";
+import type { StructureLookup } from "./card-chips";
+import { QuickAdd, type Place } from "./quick-add";
 import { CATEGORY_DOT } from "./tokens";
 
 export type DropTarget = { columnId: string; index: number } | null;
@@ -21,7 +22,7 @@ export function BoardColumn({
   cards,
   boardKey,
   boardId,
-  labels,
+  structure,
   columns,
   today,
   dragId,
@@ -37,7 +38,7 @@ export function BoardColumn({
   cards: CardView[];
   boardKey: string;
   boardId: string;
-  labels: Label[];
+  structure: StructureLookup;
   columns: Column[];
   today: string;
   dragId: string | null;
@@ -47,7 +48,7 @@ export function BoardColumn({
   onDragEnd: () => void;
   onDrop: (columnId: string, index: number) => void;
   onMove: (cardId: string, columnId: string, index?: number) => void;
-  onAdd: (columnId: string, title: string) => Promise<boolean>;
+  onAdd: (columnId: string, title: string, place: Place) => Promise<boolean>;
 }) {
   const t = useTranslations("boards.column");
   const over = column.wipLimit !== null && cards.length > column.wipLimit;
@@ -113,7 +114,7 @@ export function BoardColumn({
               card={card}
               boardKey={boardKey}
               boardId={boardId}
-              labels={labels}
+              structure={structure}
               columns={columns}
               today={today}
               dragging={dragId === card.id}
@@ -139,7 +140,7 @@ export function BoardColumn({
         )}
       </div>
       <div className="pt-2">
-        <QuickAdd onAdd={(title) => onAdd(column.id, title)} />
+        <QuickAdd onAdd={(title, place) => onAdd(column.id, title, place)} structure={structure} />
       </div>
     </section>
   );

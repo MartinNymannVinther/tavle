@@ -35,17 +35,20 @@ const backlogTitles = async () =>
 beforeAll(async () => {
   admin = adminPool();
   ctx = await seedWorkspace(admin, "sprint_a");
-  const board = await run((tx) => createBoard(tx, ctx, { name: "App", key: "APP", mode: "scrum" }));
+  const board = await run((tx) =>
+    createBoard(tx, ctx, { name: "App", key: "APP", mode: "scrum", firstArea: "App" }),
+  );
   boardId = board.id;
   const full = (await getBoardFull(ctx, boardId))!;
   colId = Object.fromEntries(full.columns.map((c) => [c.category, c.id]));
+  const areaId = full.areas[0]!.id;
   for (const [title, estimate] of [
     ["Login", 3],
     ["Søgning", 5],
     ["Kurv", 8],
     ["Betaling", 13],
   ] as const) {
-    await run((tx) => createCard(tx, ctx, { boardId, title, estimate }));
+    await run((tx) => createCard(tx, ctx, { boardId, title, estimate, areaId }));
   }
 });
 
@@ -206,7 +209,7 @@ describe("a Scrum board", () => {
 
   it("refuses sprints on a Kanban board", async () => {
     const kanban = await run((tx) =>
-      createBoard(tx, ctx, { name: "Drift", key: "OPS", mode: "kanban" }),
+      createBoard(tx, ctx, { name: "Drift", key: "OPS", mode: "kanban", firstArea: "Drift" }),
     );
     const sprint = await run((tx) =>
       createSprint(tx, ctx, {

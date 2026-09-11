@@ -46,13 +46,14 @@ export function NewBoardDialog() {
   const [key, setKey] = useState("");
   const [keyTouched, setKeyTouched] = useState(false);
   const [mode, setMode] = useState<"kanban" | "scrum">("kanban");
+  const [firstArea, setFirstArea] = useState("");
   const [pending, setPending] = useState(false);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
     const ok = await run(
-      () => createBoardAction({ name, key, mode }),
+      () => createBoardAction({ name, key, mode, firstArea }),
       (boardId) => {
         setOpen(false);
         router.push(`/boards/${boardId}`);
@@ -112,6 +113,18 @@ export function NewBoardDialog() {
               />
               <FieldDescription>{t("keyHint", { key: key || "WEB" })}</FieldDescription>
             </Field>
+            <Field>
+              <FieldLabel htmlFor="board-first-area">{t("firstArea")}</FieldLabel>
+              <Input
+                id="board-first-area"
+                value={firstArea}
+                onChange={(event) => setFirstArea(event.target.value)}
+                required
+                maxLength={40}
+                placeholder={t("firstAreaPlaceholder")}
+              />
+              <FieldDescription>{t("firstAreaHint")}</FieldDescription>
+            </Field>
           </FieldGroup>
           <fieldset className="flex flex-col gap-2">
             <legend className="mb-2 text-sm font-medium">{t("modeLabel")}</legend>
@@ -141,7 +154,10 @@ export function NewBoardDialog() {
             ))}
           </fieldset>
           <DialogFooter>
-            <Button type="submit" disabled={pending || !name.trim() || key.length < 2}>
+            <Button
+              type="submit"
+              disabled={pending || !name.trim() || key.length < 2 || !firstArea.trim()}
+            >
               {t("submit")}
             </Button>
             <Button type="button" variant="ghost" onClick={() => setOpen(false)}>

@@ -1,24 +1,58 @@
-import type { Label, LabelColor, Priority } from "@/core/db/schema";
+import type { Priority, Theme } from "@/core/db/schema";
 import { cn } from "@/lib/utils";
-import { LABEL_STYLE, PRIORITY_MARK } from "./tokens";
+import { PRIORITY_MARK, themeSwatch } from "./tokens";
 
-/** A label as a small tinted pill; the name is always written out. */
-export function LabelChip({
-  label,
+const chip =
+  "inline-flex h-5 max-w-[11rem] items-center gap-1 truncate rounded-full px-2 text-[0.69rem] font-medium";
+
+/** A theme as a small pill with its colour as a dot; the name is always written out. */
+export function ThemeChip({
+  theme,
   className,
 }: {
-  label: Pick<Label, "name" | "color">;
+  theme: Pick<Theme, "name" | "color">;
+  className?: string;
+}) {
+  return (
+    <span className={cn(chip, "bg-muted text-secondary-foreground", className)}>
+      <span
+        aria-hidden
+        className="size-2 shrink-0 rounded-full"
+        style={{ background: themeSwatch(theme.color) }}
+      />
+      <span className="truncate">{theme.name}</span>
+    </span>
+  );
+}
+
+/** An area, plain: it answers where, and needs no colour to do it. */
+export function AreaChip({ name, className }: { name: string; className?: string }) {
+  return (
+    <span className={cn(chip, "bg-accent text-accent-foreground", className)}>
+      <span className="truncate">{name}</span>
+    </span>
+  );
+}
+
+/** The bug flag and the enabler kind, as words on a tint; a business story shows nothing. */
+export function FlagChip({
+  tone,
+  children,
+  className,
+}: {
+  tone: "bug" | "enabler";
+  children: React.ReactNode;
   className?: string;
 }) {
   return (
     <span
       className={cn(
-        "inline-flex h-5 max-w-[10rem] items-center truncate rounded-full px-2 text-[0.69rem] font-medium",
-        LABEL_STYLE[label.color as LabelColor] ?? LABEL_STYLE.slate,
+        chip,
+        tone === "bug" ? "bg-warning-tint text-warning" : "bg-secondary text-secondary-foreground",
         className,
       )}
     >
-      {label.name}
+      {children}
     </span>
   );
 }

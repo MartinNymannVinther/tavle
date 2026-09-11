@@ -23,6 +23,7 @@ export type Run = <T>(
 export function useBoardActions(): { run: Run; pending: boolean } {
   const router = useRouter();
   const t = useTranslations("boards.errors");
+  const rules = useTranslations("boards.rules");
   const [pending, startTransition] = useTransition();
 
   const run: Run = async (action, onDone) => {
@@ -42,6 +43,12 @@ export function useBoardActions(): { run: Run; pending: boolean } {
     if (result.error === "conflict") {
       toast.error(t("conflict"));
       startTransition(() => router.refresh());
+      return false;
+    }
+    // A refused rule of the backlog structure names itself, so the toast can
+    // say which field rather than "something".
+    if (result.error === "invalid" && result.detail) {
+      toast.error(rules.has(result.detail) ? rules(result.detail) : t("invalid"));
       return false;
     }
     toast.error(t(result.error));

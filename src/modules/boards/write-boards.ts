@@ -1,26 +1,26 @@
-import { and, asc, eq, sql } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import {
   boards,
   cards,
   columns,
-  labels,
   type Board,
   type BoardMode,
   type Column,
   type ColumnCategory,
-  type LabelColor,
 } from "@/core/db/schema";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
-import { DEFAULT_COLUMNS, DEFAULT_LABELS, DEFAULT_SPRINT_LENGTH_DAYS } from "./defaults";
+import { DEFAULT_COLUMNS, DEFAULT_SPRINT_LENGTH_DAYS } from "./defaults";
 import { recordEvent } from "./events";
 import { columnInBoard, columnsOf } from "./lanes";
 import { boardInWorkspace } from "./read";
+import { createArea } from "./structure/write-lists";
 import { enterColumn } from "./transitions";
 
 /**
- * Boards, their columns and their labels. A board starts with the columns
- * its mode needs and three labels most teams end up making anyway; all of
- * it is the team's to rename, reorder and remove afterwards.
+ * Boards and their columns. A board starts with the columns its mode
+ * needs and the one area the team named when creating it — never a
+ * "Diverse" of the tool's own making — and all of it is the team's to
+ * rename, reorder and remove afterwards.
  */
 
 export class KeyTaken extends Error {
@@ -33,7 +33,7 @@ export class KeyTaken extends Error {
 export async function createBoard(
   tx: AppTransaction,
   ctx: OrgContext,
-  input: { name: string; key: string; mode: BoardMode; description?: string },
+  input: { name: string; key: string; mode: BoardMode; description?: string; firstArea: string },
 ): Promise<Board> {
   const [taken] = await tx
     .select({ id: boards.id })
@@ -63,16 +63,8 @@ export async function createBoard(
       sort: i,
     })),
   );
-  await tx.insert(labels).values(
-    DEFAULT_LABELS.map((seed, i) => ({
-      orgId: ctx.orgId,
-      boardId: board!.id,
-      name: seed.name,
-      color: seed.color,
-      sort: i,
-    })),
-  );
   await recordEvent(tx, ctx, board!.id, "board.created", { name: input.name, mode: input.mode });
+  await createArea(tx, ctx, { boardId: board!.id, name: input.firstArea });
   return board!;
 }
 
@@ -80,7 +72,7 @@ export async function updateBoard(
   tx: AppTransaction,
   ctx: OrgContext,
   boardId: string,
-  input: { name: string; description: string; sprintLengthDays: number },
+  input: { name: string; description: string; sprintLengthDays: number; epicReviewDays: number },
 ): Promise<Board | null> {
   const board = await boardInWorkspace(tx, boardId);
   if (!board) return null;
@@ -207,62 +199,6 @@ export async function deleteColumn(
   return column;
 }
 
-/* ------------------------------ Labels ------------------------------ */
-
-export async function createLabel(
-  tx: AppTransaction,
-  ctx: OrgContext,
-  input: { boardId: string; name: string; color: LabelColor },
-) {
-  const board = await boardInWorkspace(tx, input.boardId);
-  if (!board) return null;
-  const [count] = await tx
-    .select({ n: sql<number>`count(*)::int` })
-    .from(labels)
-    .where(eq(labels.boardId, board.id));
-  if (Number(count?.n ?? 0) >= 20) throw new Error("invalid");
-  const [taken] = await tx
-    .select({ id: labels.id })
-    .from(labels)
-    .where(and(eq(labels.boardId, board.id), sql`lower(${labels.name}) = lower(${input.name})`))
-    .limit(1);
-  if (taken) throw new KeyTaken();
-  const [label] = await tx
-    .insert(labels)
-    .values({
-      orgId: ctx.orgId,
-      boardId: board.id,
-      name: input.name,
-      color: input.color,
-      sort: Number(count?.n ?? 0),
-    })
-    .returning();
-  await recordEvent(tx, ctx, board.id, "label.created", { name: input.name });
-  return label!;
-}
-
-export async function updateLabel(
-  tx: AppTransaction,
-  input: { labelId: string; name: string; color: LabelColor },
-) {
-  const [label] = await tx.select().from(labels).where(eq(labels.id, input.labelId)).limit(1);
-  if (!label) return null;
-  await tx
-    .update(labels)
-    .set({ name: input.name, color: input.color })
-    .where(eq(labels.id, label.id));
-  return label;
-}
-
-export async function deleteLabel(tx: AppTransaction, ctx: OrgContext, labelId: string) {
-  const [label] = await tx.select().from(labels).where(eq(labels.id, labelId)).limit(1);
-  if (!label) return null;
-  await tx.delete(labels).where(eq(labels.id, label.id));
-  await recordEvent(tx, ctx, label.boardId, "label.deleted", { name: label.name });
-  return label;
-}
-
-/** Columns of a board in display order, for pages that need them without the full view. */
 export async function boardColumns(tx: AppTransaction, boardId: string) {
   return tx.select().from(columns).where(eq(columns.boardId, boardId)).orderBy(asc(columns.sort));
 }

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { Initials, LabelChip, Points, PriorityMark } from "@/components/board/bits";
+import { FlagChip, Initials, Points, PriorityMark } from "@/components/board/bits";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireOrgContext } from "@/core/auth/guard";
 import { formatDateDa, todayInCopenhagen } from "@/core/dates";
 import type { Priority } from "@/core/db/schema";
-import { listMyCards } from "@/modules/boards/read";
+import { listMyCards } from "@/modules/boards/read-lists";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -75,7 +75,7 @@ export default async function MyCardsPage() {
                         label={priorities(card.priority)}
                       />
                       <Points estimate={card.estimate} />
-                      {card.blocked && <LabelChip label={{ name: t("blocked"), color: "rose" }} />}
+                      {card.blocked && <FlagChip tone="bug">{t("blocked")}</FlagChip>}
                       {card.dueDate && (
                         <span
                           className={cn(

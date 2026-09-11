@@ -10,6 +10,8 @@ import { placeInLane } from "@/modules/boards/ordering";
 import { Link } from "@/i18n/navigation";
 import { BoardColumn, type DropTarget } from "./board-column";
 import { applyFilters, BoardFilters, NO_FILTERS, type Filters } from "./board-filters";
+import { structureOf } from "./card-chips";
+import type { Place } from "./quick-add";
 import { SprintHeader } from "./sprint-header";
 import { useBoardActions } from "./use-board-actions";
 
@@ -34,7 +36,8 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
   const [dragId, setDragId] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<DropTarget>(null);
 
-  const { board, columns, labels, members, activeSprint } = full;
+  const { board, columns, members, activeSprint } = full;
+  const structure = structureOf(full);
   const scrum = board.mode === "scrum";
   const onBoard = scrum ? cards.filter((c) => c.sprintId === activeSprint?.id) : cards;
   const visible = applyFilters(onBoard, filters);
@@ -88,9 +91,15 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
     void move(id, columnId, filtered ? undefined : index);
   }
 
-  async function add(columnId: string, title: string) {
+  async function add(columnId: string, title: string, place: Place) {
     return run(() =>
-      createCardAction({ boardId: board.id, title, columnId, sprintId: activeSprint?.id ?? null }),
+      createCardAction({
+        boardId: board.id,
+        title,
+        columnId,
+        sprintId: activeSprint?.id ?? null,
+        ...place,
+      }),
     );
   }
 
@@ -131,7 +140,12 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
           run={run}
         />
       )}
-      <BoardFilters filters={filters} onChange={setFilters} members={members} labels={labels} />
+      <BoardFilters
+        filters={filters}
+        onChange={setFilters}
+        members={members}
+        structure={structure}
+      />
       <div className="-mx-5 overflow-x-auto px-5 pb-4 sm:-mx-7 sm:px-7 lg:-mx-8 lg:px-8">
         <div
           className="flex items-start gap-3"
@@ -144,7 +158,7 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
               cards={applyFilters(lane(column.id), filters)}
               boardKey={board.key}
               boardId={board.id}
-              labels={labels}
+              structure={structure}
               columns={columns}
               today={today}
               dragId={dragId}

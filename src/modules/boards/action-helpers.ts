@@ -5,6 +5,8 @@ import { withOrgContext, type AppTransaction, type OrgContext } from "@/core/db/
 import { fail, ok, type ActionError, type Result } from "@/core/result";
 import { Conflict } from "./lanes";
 import { canManage, roleOf } from "./members";
+import { RuleViolation } from "./structure/rules";
+import { NameTaken } from "./structure/write-lists";
 import { KeyTaken } from "./write-boards";
 import { SprintStateError } from "./write-sprints";
 
@@ -81,6 +83,7 @@ export async function action<S extends z.ZodType, T>(
     revalidateBoard(touched ?? (typeof fromPayload === "string" ? fromPayload : null));
     return ok(data);
   } catch (error) {
+    if (error instanceof RuleViolation) return fail("invalid", error.code);
     return fail(classify(error));
   }
 }
@@ -97,7 +100,9 @@ export async function withWorkspace<T>(fn: (ctx: OrgContext) => Promise<T>): Pro
 }
 
 function classify(error: unknown): ActionError {
-  if (error instanceof Conflict || error instanceof KeyTaken) return "conflict";
+  if (error instanceof Conflict || error instanceof KeyTaken || error instanceof NameTaken) {
+    return "conflict";
+  }
   if (error instanceof SprintStateError) return "conflict";
   if (error instanceof NotFound) return "notFound";
   if (error instanceof Forbidden) return "forbidden";

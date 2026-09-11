@@ -4,7 +4,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireOrgContext } from "@/core/auth/guard";
 import { formatDateDa } from "@/core/dates";
-import { listBoards } from "@/modules/boards/read";
+import { listBoards } from "@/modules/boards/read-lists";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { NewBoardDialog } from "./new-board-dialog";

@@ -495,7 +495,9 @@
       "sprints": "Sprints",
       "insight": "Insight",
       "settings": "Settings",
-      "archived": "archived"
+      "archived": "archived",
+      "roadmap": "Roadmap",
+      "overview": "Overview"
     },
     "list": {
       "title": "Boards",
@@ -519,7 +521,10 @@
       "kanbanHint": "A continuous flow with columns and a limit on how much may be in progress. No sprints.",
       "scrumHint": "Work is planned in sprints from a backlog. The board shows the sprint that is running.",
       "submit": "Create board",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "firstArea": "First area",
+      "firstAreaPlaceholder": "Payments",
+      "firstAreaHint": "The part of the product the board is about. Cards without a parent must belong to an area, so the board starts with one you name yourselves. More can be added under settings."
     },
     "view": {
       "noSprintTitle": "No sprint running",
@@ -542,16 +547,28 @@
       "placeholder": "What needs doing?",
       "label": "New card",
       "add": "Add",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "where": "Belongs to",
+      "partOfFeature": "Part of a feature",
+      "noParentInArea": "No parent, in area"
     },
     "filters": {
       "search": "Search cards",
       "assignee": "Assignee",
       "anyone": "Anyone",
       "unassigned": "Unassigned",
-      "label": "Label",
-      "anyLabel": "Any label",
-      "clear": "Clear"
+      "clear": "Clear",
+      "theme": "Theme",
+      "anyTheme": "All themes",
+      "noTheme": "No theme",
+      "area": "Area",
+      "anyArea": "All areas",
+      "noArea": "No area",
+      "kind": "Kind",
+      "anyKind": "Business and enabler",
+      "business": "Business",
+      "enabler": "Enabler",
+      "bugs": "Bugs only"
     },
     "sprint": {
       "kicker": "{start} – {end}",
@@ -581,6 +598,66 @@
       "unauthorized": "You are no longer signed in.",
       "forbidden": "That takes an owner or an admin of the workspace.",
       "generic": "That went wrong. Try again."
+    },
+    "structure": {
+      "bug": "Bug",
+      "bugFlag": "This is a bug",
+      "kind": {
+        "business": "Business",
+        "enabler": "Enabler"
+      },
+      "kindLabel": "Kind",
+      "enablerTypeLabel": "Enabler type",
+      "enablerType": {
+        "architecture": "Architecture",
+        "infrastructure": "Infrastructure",
+        "exploration": "Exploration",
+        "compliance": "Compliance",
+        "none": "No subtype"
+      },
+      "partOf": "Part of {key} · {title}",
+      "level": {
+        "epic": "Epic",
+        "feature": "Feature"
+      },
+      "epic": "Epic",
+      "feature": "Feature",
+      "looksLikeTheme": "This looks like a theme, not a result",
+      "forReview": "For review",
+      "up": "Move up",
+      "down": "Move down",
+      "noParent": "No parent",
+      "area": "Area",
+      "areaRequired": "required without a parent",
+      "noArea": "No area",
+      "inactive": "deactivated",
+      "themes": "Themes",
+      "applyToChildren": "Also update the children when the area or themes change",
+      "targetQuarter": "Target quarter",
+      "noQuarter": "No target yet"
+    },
+    "rules": {
+      "parentLevel": "A parent is always exactly one level up: a feature belongs to an epic, a card to a feature, on the same board.",
+      "needsArea": "Without a parent, an area must be chosen.",
+      "doneWhenRequired": "Say when it is done. If it cannot be finished, it is a theme or an area.",
+      "enablerTypeOnly": "An enabler type can only be set when the kind is Enabler.",
+      "openChildren": "There are still open children. Decide about each of them first.",
+      "itemClosed": "It is closed. Reopen it first if it is to take more.",
+      "inactiveCategory": "That theme or area is deactivated and cannot be set on new work.",
+      "themeLimit": "The list closes at eight themes. A ninth is probably an area, or an epic.",
+      "notAChild": "That does not belong under what is being closed."
+    },
+    "itemForm": {
+      "newEpic": "New epic",
+      "newFeature": "New feature",
+      "title": "Title",
+      "titlePlaceholder": "Customers can pay with MobilePay",
+      "titleHint": "Word it as something that can be achieved. Themes and areas are nouns; this is a result.",
+      "doneWhen": "Done when",
+      "doneWhenPlaceholder": "80 % of checkout payments can be completed with MobilePay in production",
+      "inherits": "Area and themes are inherited from the epic and can be changed afterwards.",
+      "create": "Create",
+      "cancel": "Cancel"
     }
   },
   "cards": {
@@ -628,7 +705,6 @@
       "estimate": "Estimate",
       "priority": "Priority",
       "dueDate": "Due date",
-      "labels": "Labels",
       "blocked": "Blocked",
       "blockedReason": "What is the card waiting for?"
     },
@@ -676,6 +752,14 @@
       "deleteTitle": "Delete the card?",
       "deleteBody": "{key} is deleted with its comments and history. Archive it instead if you may want to find it again.",
       "deleteConfirm": "Delete the card"
+    },
+    "acceptance": {
+      "title": "Acceptance criteria",
+      "write": "Write acceptance criteria",
+      "edit": "Edit",
+      "placeholder": "What must be true before the card is done? One line per criterion.",
+      "save": "Save",
+      "cancel": "Cancel"
     }
   },
   "backlog": {
@@ -714,6 +798,24 @@
       "create": "Plan",
       "save": "Save",
       "cancel": "Cancel"
+    },
+    "showClosed": "Show closed",
+    "newEpic": "New epic",
+    "newFeature": "New feature",
+    "grouping": {
+      "label": "Group by",
+      "hierarchy": "Hierarchy",
+      "theme": "Theme",
+      "area": "Area",
+      "kind": "Kind",
+      "none": "None"
+    },
+    "hierarchy": {
+      "featureCounts": "{backlog, plural, one {# in backlog} other {# in backlog}} · {open} in progress · {done} done",
+      "epicCounts": "{features, plural, one {# feature} other {# features}}",
+      "noParent": "No parent",
+      "groupCount": "{count, plural, one {# card} other {# cards}}",
+      "groupEmpty": "No cards here."
     }
   },
   "sprints": {
@@ -806,7 +908,9 @@
       "name": "Name",
       "description": "Description",
       "sprintLength": "Sprint length in days",
-      "save": "Save"
+      "save": "Save",
+      "reviewDays": "Epics for review after (days)",
+      "reviewDaysHint": "An epic open longer than this is marked For review until its owner confirms it is still a result."
     },
     "columns": {
       "title": "Columns",
@@ -830,25 +934,6 @@
       "doing": "In progress",
       "done": "Done"
     },
-    "labels": {
-      "title": "Labels",
-      "body": "Short words cards can be tagged with. At most twenty per board.",
-      "name": "Name",
-      "color": "Colour",
-      "placeholder": "New label",
-      "add": "Add",
-      "save": "Save",
-      "delete": "Delete",
-      "empty": "No labels.",
-      "colors": {
-        "moss": "Green",
-        "amber": "Yellow",
-        "rose": "Red",
-        "sky": "Blue",
-        "plum": "Purple",
-        "slate": "Grey"
-      }
-    },
     "danger": {
       "title": "Archive or delete",
       "body": "An archived board leaves the overview but keeps everything. Deleting removes the board with every card, comment and its history.",
@@ -859,6 +944,47 @@
       "deleteTitle": "Delete {name}?",
       "deleteBody": "Every card, sprint, comment and the history are deleted. This cannot be undone; export first if in doubt.",
       "deleteConfirm": "Delete the board"
+    },
+    "themes": {
+      "title": "Themes",
+      "body": "Why: the strategic direction an item serves. A closed list of five to eight nouns with an owner. A theme never finishes and is never deleted, only deactivated.",
+      "name": "Name",
+      "color": "Colour",
+      "placeholder": "New theme",
+      "owner": "Owner",
+      "add": "Add",
+      "save": "Save",
+      "empty": "No themes yet.",
+      "full": "The list closes at {max} active themes.",
+      "inactive": "deactivated",
+      "deactivate": "Deactivate",
+      "activate": "Activate again",
+      "colors": {
+        "moss": "Moss",
+        "sage": "Sage",
+        "clay": "Clay",
+        "rust": "Rust",
+        "sand": "Sand",
+        "stone": "Stone",
+        "ink": "Ink",
+        "forest": "Forest"
+      }
+    },
+    "areas": {
+      "title": "Areas",
+      "body": "Where: the part of the product an item touches, typically modules or domains. A closed list with an owner; an item has at most one area, and an item without a parent must have one.",
+      "name": "Name",
+      "placeholder": "New area",
+      "owner": "Owner",
+      "add": "Add",
+      "save": "Save",
+      "inactive": "deactivated",
+      "deactivate": "Deactivate",
+      "activate": "Activate again",
+      "keepOne": "The board needs at least one active area."
+    },
+    "lists": {
+      "noOwner": "No owner"
     }
   },
   "my": {
@@ -902,10 +1028,6 @@
       "updated": "The column {name} was changed",
       "deleted": "The column {name} was deleted; its cards moved to {into}"
     },
-    "label": {
-      "created": "The label {name} was added",
-      "deleted": "The label {name} was deleted"
-    },
     "card": {
       "created": "{key} was created in {column}",
       "moved": "{key} was moved to {column}",
@@ -915,14 +1037,18 @@
       "estimated": "{key} was estimated at {points} points",
       "blocked": "{key} was blocked: {reason}",
       "unblocked": "{key} is no longer blocked",
-      "labels": "{key} got labels: {labels}",
       "checklist": "The checklist on {key} stands at {done} of {total}",
       "sprint": "{key} was put in {sprint}",
       "backlog": "{key} was moved to the backlog",
       "archived": "{key} was archived",
       "restored": "{key} was restored",
       "deleted": "{key} was deleted",
-      "split": "{key} was split into {into}"
+      "split": "{key} was split into {into}",
+      "parent": "{key} was put under {parent}",
+      "placed": "{key} got area {area} and themes {themes}",
+      "kind": "{key} was set to {kind} {enablerType}",
+      "bug": "{key} was marked as a bug",
+      "notBug": "{key} is no longer marked as a bug"
     },
     "comment": {
       "added": "Comment on {key}",
@@ -938,6 +1064,26 @@
     },
     "ai": {
       "drafted": "AI drafted {key} ({engine})"
+    },
+    "theme": {
+      "created": "The theme {name} was created",
+      "activated": "The theme {name} was activated again",
+      "deactivated": "The theme {name} was deactivated"
+    },
+    "area": {
+      "created": "The area {name} was created",
+      "activated": "The area {name} was activated again",
+      "deactivated": "The area {name} was deactivated"
+    },
+    "item": {
+      "created": "{key} was created as {level}: {title}",
+      "updated": "{key} was edited ({fields})",
+      "moved": "{key} was moved under {parent}",
+      "placed": "{key} got area {area} and themes {themes}",
+      "closed": "{key} was closed",
+      "reopened": "{key} was reopened",
+      "reviewed": "{key} was confirmed as still a result",
+      "deleted": "{key} was deleted"
     }
   },
   "help": {
@@ -959,7 +1105,7 @@
       },
       "cards": {
         "title": "Cards",
-        "body": "A card only needs a title to exist. Click the title to open it: here you set the assignee, estimate, priority, due date, labels and checklist, and write to each other in the comments. Everything saves immediately. A blocked card gets a red edge so it is not overlooked."
+        "body": "A card only needs a title to exist. Click the title to open it: here you set the assignee, estimate, priority, due date, acceptance criteria and checklist, and choose which feature the card is part of, or which area it belongs to, and write to each other in the comments. Everything saves immediately. A blocked card gets a red edge so it is not overlooked."
       },
       "backlog": {
         "title": "The backlog",
@@ -980,6 +1126,14 @@
       "data": {
         "title": "Your data",
         "body": "Under Settings → Data the whole workspace can be downloaded as a spreadsheet and JSON with one click, and the owner can delete it entirely. It is your data, always."
+      },
+      "structure": {
+        "title": "Epics, features, themes and areas",
+        "body": "The backlog has one hierarchy with three levels: an epic is a result the team can reach in one or two quarters, a feature is a releasable slice of it, a card is the smallest deliverable and fits in one sprint. All three have a kind, Business or Enabler. Overview and grouping are handled by two fields on each item: Theme answers why, Area answers where. Two tests decide where something belongs, and the tool enforces them: if it can be finished, it is in the hierarchy; if it can never be finished, it is a theme or an area. If it has exactly one parent, it is hierarchy; if it can belong to several at once, it is a category."
+      },
+      "roadmap": {
+        "title": "Roadmap and overview",
+        "body": "The roadmap draws epics on a line of quarters, coloured by their first theme. An epic without a target quarter is not drawn; it is listed underneath. The overview shows where the open work sits by theme, area and kind, the enabler share as one number, and five measures of whether the structure holds: the share without a parent, epics for review, items without an area, the enabler share, and themes and areas nobody uses."
       }
     },
     "abcTitle": "The board's ABC",
@@ -1027,5 +1181,92 @@
       }
     },
     "closing": "The tool does not make the team good. The ten rules do, and the board is there so you can see whether you follow them."
+  },
+  "items": {
+    "doneWhen": {
+      "title": "Done when",
+      "edit": "Edit",
+      "write": "Write",
+      "placeholder": "The condition that makes it done",
+      "save": "Save",
+      "cancel": "Cancel",
+      "empty": "Not written yet."
+    },
+    "page": {
+      "closed": "Closed",
+      "reviewBody": "This epic has been open for more than {days} days. Is it still a result the team is working towards, or has it become a theme?",
+      "reviewConfirm": "Yes, still a result",
+      "created": "Created {date}",
+      "reviewed": "Confirmed {date}",
+      "closedAt": "Closed {date}",
+      "reopen": "Reopen",
+      "deleteTitle": "Delete for good?",
+      "deleteBody": "{key} will be deleted. What is under it stays, without a parent.",
+      "deleteConfirm": "Delete",
+      "delete": "Delete"
+    },
+    "children": {
+      "features": "{count, plural, =0 {No features yet} one {# feature} other {# features}}",
+      "stories": "Cards · {open} open · {done} done",
+      "newFeature": "New feature under this",
+      "noFeatures": "No features yet. Create the first one that can be released on its own.",
+      "storyCounts": "{open} open · {done} done",
+      "noStories": "No cards yet. Create them from the backlog or the board and choose this feature."
+    },
+    "close": {
+      "button": "Close",
+      "title": "Close {key}",
+      "body": "{count, plural, one {There is one open child} other {There are # open children}}. Nothing closes on its own: choose what happens to each.",
+      "openStories": "{count, plural, one {# open card} other {# open cards}}",
+      "decision": "What happens",
+      "actions": {
+        "close": "Close",
+        "archive": "Archive",
+        "moveEpic": "Move to another epic",
+        "moveFeature": "Move to another feature",
+        "orphan": "Keep without a parent"
+      },
+      "target": "New parent",
+      "chooseTarget": "Choose…",
+      "area": "Area",
+      "chooseArea": "Choose an area…",
+      "confirm": "Close and do this",
+      "cancel": "Cancel"
+    }
+  },
+  "roadmap": {
+    "title": "Roadmap",
+    "areaFilter": "Area",
+    "allAreas": "All areas",
+    "epic": "Epic",
+    "empty": "No epics to draw yet. Give an epic a target quarter and it shows up here.",
+    "unplanned": "{count, plural, one {# epic without a target quarter} other {# epics without a target quarter}}",
+    "unplannedHint": "An epic without a target is not drawn. A roadmap that shows bars without an end is lying.",
+    "counts": "{features, plural, one {# feature} other {# features}} · {done} of {total} cards done",
+    "closed": "Closed"
+  },
+  "overview": {
+    "title": "Overview",
+    "healthTitle": "Is the structure holding?",
+    "healthBody": "Five measures of whether the backlog is being kept: none of this is a grade, all of it is something that can be acted on.",
+    "parentless": "Without a parent",
+    "parentlessHint": "{count} of {total} open features and cards",
+    "review": "Epics for review",
+    "reviewHint": "Open longer than {days} days without confirmation",
+    "withoutArea": "Without an area",
+    "withoutAreaHint": "{count} of {total} open items",
+    "enablerShare": "Enabler share",
+    "byPoints": "of the open points",
+    "byCards": "of the open cards",
+    "idle": "Without open work",
+    "idleHint": "Themes and areas nobody uses",
+    "idleThemes": "Themes without open items: {names}",
+    "idleAreas": "Areas without open items: {names}",
+    "byThemeTitle": "By theme",
+    "byAreaTitle": "By area",
+    "byKindTitle": "By kind",
+    "distributionBody": "{cards, plural, one {# open card} other {# open cards}} · {points} points",
+    "none": "None",
+    "bucketValue": "{cards} cards · {points} points"
   }
 }

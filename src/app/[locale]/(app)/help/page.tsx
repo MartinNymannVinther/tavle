@@ -14,6 +14,8 @@ const HOW_TO = [
   "scrum",
   "cards",
   "backlog",
+  "structure",
+  "roadmap",
   "insight",
   "team",
   "ai",

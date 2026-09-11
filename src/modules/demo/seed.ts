@@ -12,6 +12,7 @@ import {
 } from "@/modules/boards/write-sprints";
 import { addComment } from "@/modules/boards/comments";
 import { columnsOf } from "@/modules/boards/lanes";
+import { closeSeeded, placement, seedStructure, type SeededStructure } from "./seed-structure";
 import { DEMO_DA, DEMO_EN, type DemoWords } from "./words";
 
 /**
@@ -35,19 +36,25 @@ export async function seedDemoWorkspace(
   const today = todayInCopenhagen();
   const day = (offset: number) => addDaysIso(today, offset);
 
-  const kanbanId = await seedKanban(tx, ctx, words);
-  await seedScrum(tx, ctx, words, day);
-  await shiftHistory(tx, ctx);
-  return kanbanId;
+  const kanban = await seedKanban(tx, ctx, words);
+  const scrum = await seedScrum(tx, ctx, words, day);
+  await shiftHistory(tx, ctx, [...kanban.seeded.aged, ...scrum.aged]);
+  return kanban.boardId;
 }
 
-async function seedKanban(tx: AppTransaction, ctx: OrgContext, words: DemoWords): Promise<string> {
+async function seedKanban(
+  tx: AppTransaction,
+  ctx: OrgContext,
+  words: DemoWords,
+): Promise<{ boardId: string; seeded: SeededStructure }> {
   const board = await createBoard(tx, ctx, {
     name: words.kanban.name,
     key: words.kanban.key,
     mode: "kanban",
     description: words.kanban.description,
+    firstArea: words.kanban.structure.areas[0]!,
   });
+  const seeded = await seedStructure(tx, ctx, board.id, words.kanban.structure);
   const columns = await columnsOf(tx, board.id);
   const col = (category: string) => columns.find((c) => c.category === category)!;
   const created: string[] = [];
@@ -61,6 +68,10 @@ async function seedKanban(tx: AppTransaction, ctx: OrgContext, words: DemoWords)
       dueDate:
         spec.dueOffset === undefined ? null : addDaysIso(todayInCopenhagen(), spec.dueOffset),
       assigneeUserId: i % 3 === 0 ? ctx.userId : null,
+      bug: spec.bug ?? false,
+      kind: spec.enabler ? "enabler" : undefined,
+      enablerType: spec.enabler ?? null,
+      ...placement(seeded, spec),
     });
     created.push(card.id);
     if (spec.column !== "backlog") await moveCard(tx, ctx, card.id, col(spec.column).id, undefined);
@@ -78,7 +89,8 @@ async function seedKanban(tx: AppTransaction, ctx: OrgContext, words: DemoWords)
   }
   const first = created[0];
   if (first) await addComment(tx, ctx, first, words.kanban.comment);
-  return board.id;
+  await closeSeeded(tx, ctx, seeded);
+  return { boardId: board.id, seeded };
 }
 
 async function seedScrum(
@@ -86,13 +98,15 @@ async function seedScrum(
   ctx: OrgContext,
   words: DemoWords,
   day: (offset: number) => string,
-): Promise<void> {
+): Promise<SeededStructure> {
   const board = await createBoard(tx, ctx, {
     name: words.scrum.name,
     key: words.scrum.key,
     mode: "scrum",
     description: words.scrum.description,
+    firstArea: words.scrum.structure.areas[0]!,
   });
+  const seeded = await seedStructure(tx, ctx, board.id, words.scrum.structure);
   const columns = await columnsOf(tx, board.id);
   const done = columns.find((c) => c.category === "done")!;
   const doing = columns.find((c) => c.category === "doing")!;
@@ -113,6 +127,10 @@ async function seedScrum(
         title: spec.title,
         estimate: spec.estimate,
         assigneeUserId: ctx.userId,
+        bug: spec.bug ?? false,
+        kind: spec.enabler ? "enabler" : undefined,
+        enablerType: spec.enabler ?? null,
+        ...placement(seeded, spec),
       });
       ids.push(card.id);
     }
@@ -140,6 +158,10 @@ async function seedScrum(
       estimate: spec.estimate,
       priority: spec.priority ?? "normal",
       assigneeUserId: spec.mine ? ctx.userId : null,
+      bug: spec.bug ?? false,
+      kind: spec.enabler ? "enabler" : undefined,
+      enablerType: spec.enabler ?? null,
+      ...placement(seeded, spec),
     });
     activeIds.push(card.id);
   }
@@ -153,7 +175,15 @@ async function seedScrum(
 
   // The backlog, in priority order, and a sprint already planned.
   for (const spec of words.scrum.backlog) {
-    await createCard(tx, ctx, { boardId: board.id, title: spec.title, estimate: spec.estimate });
+    await createCard(tx, ctx, {
+      boardId: board.id,
+      title: spec.title,
+      estimate: spec.estimate,
+      bug: spec.bug ?? false,
+      kind: spec.enabler ? "enabler" : undefined,
+      enablerType: spec.enabler ?? null,
+      ...placement(seeded, spec),
+    });
   }
   await createSprint(tx, ctx, {
     boardId: board.id,
@@ -162,6 +192,8 @@ async function seedScrum(
     startDate: day(10),
     endDate: day(23),
   });
+  await closeSeeded(tx, ctx, seeded);
+  return seeded;
 }
 
 /**
@@ -171,7 +203,11 @@ async function seedScrum(
  * sprint's done cards over its first days, so the burndown, the
  * throughput and the flow diagram have a past to draw.
  */
-async function shiftHistory(tx: AppTransaction, ctx: OrgContext): Promise<void> {
+async function shiftHistory(
+  tx: AppTransaction,
+  ctx: OrgContext,
+  aged: Array<{ id: string; days: number }>,
+): Promise<void> {
   // Closed sprints: cards done spread across the sprint's own days.
   await tx.execute(sql`
     with placed as (
@@ -251,5 +287,22 @@ async function shiftHistory(tx: AppTransaction, ctx: OrgContext): Promise<void> 
       started_at = s.start_date::timestamptz + interval '9 hours',
       closed_at = case when s.state = 'closed' then s.end_date::timestamptz + interval '16 hours' else null end
     where s.org_id = ${ctx.orgId} and s.state <> 'planned'
+  `);
+  // The structure: items were created before their cards, and one epic is
+  // made old enough to show the review mark; closed items closed with the
+  // second sprint.
+  await tx.execute(sql`
+    update backlog_items i set created_at = now() - interval '40 days' - (i.number * interval '1 hour')
+    where i.org_id = ${ctx.orgId}
+  `);
+  for (const epic of aged) {
+    await tx.execute(sql`
+      update backlog_items set created_at = now() - (${epic.days} * interval '1 day')
+      where id = ${epic.id} and org_id = ${ctx.orgId}
+    `);
+  }
+  await tx.execute(sql`
+    update backlog_items set closed_at = now() - interval '15 days'
+    where org_id = ${ctx.orgId} and state = 'closed'
   `);
 }

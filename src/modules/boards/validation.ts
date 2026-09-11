@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ISO_DATE } from "@/core/dates";
-import { BOARD_MODES, COLUMN_CATEGORIES, LABEL_COLORS, PRIORITIES } from "@/core/db/schema";
+import { BOARD_MODES, COLUMN_CATEGORIES, ENABLER_TYPES, KINDS, PRIORITIES } from "@/core/db/schema";
 
 /**
  * Input schemas for everything a page or the AI may write. Lengths are the
@@ -32,6 +32,8 @@ export const NewBoardSchema = z.object({
   key: boardKey,
   mode: z.enum(BOARD_MODES),
   description: shortText(500).optional(),
+  /** The board's first area, so rule 3 of the structure holds from the first card. */
+  firstArea: shortText(40).min(1),
 });
 
 export const BoardMetaSchema = z.object({
@@ -39,6 +41,7 @@ export const BoardMetaSchema = z.object({
   name: shortText(80).min(1),
   description: shortText(500),
   sprintLengthDays: z.number().int().min(1).max(60),
+  epicReviewDays: z.number().int().min(7).max(730),
 });
 
 export const BoardIdSchema = z.object({ boardId: id });
@@ -61,18 +64,6 @@ export const ColumnOrderSchema = z.object({ boardId: id, columnIds: z.array(id).
 
 export const ColumnDeleteSchema = z.object({ columnId: id, moveCardsTo: id });
 
-export const NewLabelSchema = z.object({
-  boardId: id,
-  name: shortText(30).min(1),
-  color: z.enum(LABEL_COLORS),
-});
-
-export const LabelUpdateSchema = z.object({
-  labelId: id,
-  name: shortText(30).min(1),
-  color: z.enum(LABEL_COLORS),
-});
-
 export const NewCardSchema = z.object({
   boardId: id,
   title: shortText(160).min(1),
@@ -85,7 +76,14 @@ export const NewCardSchema = z.object({
   priority: z.enum(PRIORITIES).optional(),
   dueDate: isoDate.nullable().optional(),
   assigneeUserId: id.nullable().optional(),
-  labelIds: z.array(id).max(10).optional(),
+  /** Its place in the structure; a card without a feature needs an area. */
+  featureId: id.nullable().optional(),
+  areaId: id.nullable().optional(),
+  themeIds: z.array(id).max(8).optional(),
+  kind: z.enum(KINDS).optional(),
+  enablerType: z.enum(ENABLER_TYPES).nullable().optional(),
+  bug: z.boolean().optional(),
+  acceptance: shortText(4000).optional(),
   /** Put the new card first in its lane rather than last. */
   atTop: z.boolean().optional(),
 });
@@ -101,6 +99,10 @@ export const CardUpdateSchema = z.object({
   assigneeUserId: id.nullable().optional(),
   blocked: z.boolean().optional(),
   blockedReason: shortText(300).optional(),
+  acceptance: shortText(4000).optional(),
+  bug: z.boolean().optional(),
+  kind: z.enum(KINDS).optional(),
+  enablerType: z.enum(ENABLER_TYPES).nullable().optional(),
   expectedUpdatedAt: z.string().optional(),
 });
 
@@ -117,8 +119,6 @@ export const ChecklistSchema = z.object({
   cardId: id,
   checklist: z.array(checklistItemSchema).max(50),
 });
-
-export const CardLabelsSchema = z.object({ cardId: id, labelIds: z.array(id).max(10) });
 
 export const CardSprintSchema = z.object({
   cardIds: z.array(id).min(1).max(100),

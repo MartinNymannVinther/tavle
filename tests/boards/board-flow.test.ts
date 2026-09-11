@@ -2,16 +2,18 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Pool } from "pg";
 import { sql } from "drizzle-orm";
 import { withOrgContext, type OrgContext } from "@/core/db/tenant";
-import { getBoardFull, getCardFull, listBoards, listMyCards } from "@/modules/boards/read";
+import { getBoardFull, getCardFull } from "@/modules/boards/read";
+import { listBoards, listMyCards } from "@/modules/boards/read-lists";
 import { addComment, deleteComment } from "@/modules/boards/comments";
 import {
   createBoard,
   createColumn,
-  createLabel,
   deleteColumn,
   updateColumn,
 } from "@/modules/boards/write-boards";
-import { setCardLabels, updateChecklist } from "@/modules/boards/write-card-details";
+import { updateChecklist } from "@/modules/boards/write-card-details";
+import { placeCardInStructure } from "@/modules/boards/structure/write-card-placement";
+import { createTheme } from "@/modules/boards/structure/write-lists";
 import { archiveCard, deleteCard, restoreCard } from "@/modules/boards/write-card-lifecycle";
 import { createCard, moveCard, updateCard } from "@/modules/boards/write-cards";
 import { Conflict } from "@/modules/boards/lanes";
@@ -30,6 +32,7 @@ let admin: Pool;
 let ctx: OrgContext;
 let other: OrgContext;
 let boardId: string;
+let areaId: string;
 let colId: Record<string, string>;
 
 const run = <T>(fn: Parameters<typeof withOrgContext<T>>[1], as = ctx) => withOrgContext(as, fn);
@@ -40,11 +43,12 @@ beforeAll(async () => {
   await seedMember(admin, ctx.orgId, "flow_a2");
   other = await seedWorkspace(admin, "flow_b");
   const board = await run((tx) =>
-    createBoard(tx, ctx, { name: "Webshop", key: "WEB", mode: "kanban" }),
+    createBoard(tx, ctx, { name: "Webshop", key: "WEB", mode: "kanban", firstArea: "Butik" }),
   );
   boardId = board.id;
   const full = (await getBoardFull(ctx, boardId))!;
   colId = Object.fromEntries(full.columns.map((c) => [c.category, c.id]));
+  areaId = full.areas[0]!.id;
 });
 
 afterAll(async () => {
@@ -52,24 +56,30 @@ afterAll(async () => {
 });
 
 describe("a Kanban board", () => {
-  it("starts with the default columns and labels", async () => {
+  it("starts with the default columns and the one area the team named", async () => {
     const full = (await getBoardFull(ctx, boardId))!;
     expect(full.columns.map((c) => c.category)).toEqual(["backlog", "todo", "doing", "done"]);
     expect(full.columns.find((c) => c.category === "doing")?.wipLimit).toBe(3);
-    expect(full.labels.map((l) => l.name)).toEqual(["Fejl", "Forbedring", "Teknisk gæld"]);
+    expect(full.areas.map((a) => a.name)).toEqual(["Butik"]);
+    expect(full.themes).toEqual([]);
+    expect(full.items).toEqual([]);
     expect(full.members.map((m) => m.userId).sort()).toEqual(["user_flow_a", "user_flow_a2"]);
   });
 
   it("refuses a second board with the same key in the workspace", async () => {
     await expect(
-      run((tx) => createBoard(tx, ctx, { name: "Igen", key: "WEB", mode: "kanban" })),
+      run((tx) =>
+        createBoard(tx, ctx, { name: "Igen", key: "WEB", mode: "kanban", firstArea: "Butik" }),
+      ),
     ).rejects.toThrow("conflict");
   });
 
   it("hands out card numbers without gaps or repeats, and lands new cards last", async () => {
-    const first = await run((tx) => createCard(tx, ctx, { boardId, title: "Første" }));
-    const second = await run((tx) => createCard(tx, ctx, { boardId, title: "Anden" }));
-    const top = await run((tx) => createCard(tx, ctx, { boardId, title: "Øverst", atTop: true }));
+    const first = await run((tx) => createCard(tx, ctx, { boardId, title: "Første", areaId }));
+    const second = await run((tx) => createCard(tx, ctx, { boardId, title: "Anden", areaId }));
+    const top = await run((tx) =>
+      createCard(tx, ctx, { boardId, title: "Øverst", areaId, atTop: true }),
+    );
     expect([first.number, second.number, top.number]).toEqual([1, 2, 3]);
     const full = (await getBoardFull(ctx, boardId))!;
     const backlog = full.cards.filter((c) => c.columnId === colId.backlog);
@@ -166,7 +176,7 @@ describe("a Kanban board", () => {
     expect(mine[0]).toMatchObject({ boardKey: "WEB", columnName: "I gang" });
   });
 
-  it("keeps a checklist and labels, dropping labels from other boards", async () => {
+  it("keeps a checklist and themes, refusing a theme from nowhere", async () => {
     const card = (await getCardFull(ctx, boardId, 2))!.card;
     await run((tx) =>
       updateChecklist(tx, ctx, card.id, [
@@ -174,13 +184,19 @@ describe("a Kanban board", () => {
         { id: "2", title: "Skriv kode", done: false },
       ]),
     );
-    const full = (await getBoardFull(ctx, boardId))!;
-    const fejl = full.labels.find((l) => l.name === "Fejl")!;
-    await run((tx) => setCardLabels(tx, ctx, card.id, [fejl.id, "not-a-label"]));
+    const theme = await run((tx) =>
+      createTheme(tx, ctx, { boardId, name: "Selvbetjening", color: "moss" }),
+    );
+    await expect(
+      run((tx) =>
+        placeCardInStructure(tx, ctx, { cardId: card.id, themeIds: [theme.id, "not-a-theme"] }),
+      ),
+    ).rejects.toThrow("notFound");
+    await run((tx) => placeCardInStructure(tx, ctx, { cardId: card.id, themeIds: [theme.id] }));
     const after = (await getCardFull(ctx, boardId, 2))!.card;
     expect(after.checklistDone).toBe(1);
     expect(after.checklistTotal).toBe(2);
-    expect(after.labelIds).toEqual([fejl.id]);
+    expect(after.themeIds).toEqual([theme.id]);
   });
 
   it("takes comments, and lets only the author or a manager remove them", async () => {
@@ -244,9 +260,9 @@ describe("a Kanban board", () => {
     expect(full.cards.find((c) => c.number === 1)?.columnId).toBe(colId.doing);
   });
 
-  it("refuses to add a label twice, case-insensitively", async () => {
+  it("refuses to add a theme twice, case-insensitively", async () => {
     await expect(
-      run((tx) => createLabel(tx, ctx, { boardId, name: "fejl", color: "sky" })),
+      run((tx) => createTheme(tx, ctx, { boardId, name: "selvbetjening", color: "clay" })),
     ).rejects.toThrow("conflict");
   });
 
@@ -260,7 +276,7 @@ describe("a Kanban board", () => {
     );
     expect(rows.rows[0]?.n).toBe(0);
     // The number is not reused: the next card is 4, not 3.
-    const next = await run((tx) => createCard(tx, ctx, { boardId, title: "Fjerde" }));
+    const next = await run((tx) => createCard(tx, ctx, { boardId, title: "Fjerde", areaId }));
     expect(next.number).toBe(4);
   });
 

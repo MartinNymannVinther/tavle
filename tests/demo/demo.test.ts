@@ -6,7 +6,8 @@ import {
   demoLandingUrl,
   isDemoWorkspace,
 } from "@/modules/demo/service";
-import { getBoardFull, listBoards } from "@/modules/boards/read";
+import { getBoardFull } from "@/modules/boards/read";
+import { listBoards } from "@/modules/boards/read-lists";
 import { boardInsight } from "@/modules/boards/metrics/read";
 import { adminPool } from "../helpers/db";
 
@@ -65,11 +66,37 @@ describe("a demo workspace", () => {
     expect(full.sprints.map((s) => s.state)).toEqual(["planned", "active", "closed", "closed"]);
     const closed = full.sprints.filter((s) => s.state === "closed");
     expect(closed.map((s) => s.completedPoints)).toEqual([19, 15]);
-    expect(full.cards.filter((c) => !c.sprintId)).toHaveLength(5 + 2);
+    // Six backlog cards plus the two carried over unfinished from the closed sprints.
+    expect(full.cards.filter((c) => !c.sprintId)).toHaveLength(6 + 2);
     const insight = (await boardInsight({ orgId, userId }, scrum.id))!;
     expect(insight.velocity.bars.map((b) => b.completed)).toEqual([15, 19]);
     expect(insight.activeBurndown?.committed).toBe(26);
     expect(insight.activeBurndown?.remainingNow).toBe(21);
+  });
+
+  it("has the structure above the cards: areas, themes, epics with features, one closed", async () => {
+    const boards = await listBoards({ orgId, userId });
+    const scrum = boards.find((b) => b.key === "APP")!;
+    const full = (await getBoardFull({ orgId, userId }, scrum.id))!;
+    expect(full.areas.map((a) => a.name)).toHaveLength(4);
+    expect(full.themes).toHaveLength(3);
+    const epics = full.items.filter((i) => i.level === "epic");
+    const features = full.items.filter((i) => i.level === "feature");
+    expect(epics).toHaveLength(4);
+    expect(features).toHaveLength(5);
+    expect(epics.filter((e) => e.state === "closed")).toHaveLength(1);
+    expect(features.filter((f) => f.state === "closed")).toHaveLength(1);
+    expect(features.every((f) => f.parentId)).toBe(true);
+    expect(full.cards.filter((c) => c.featureId).length).toBeGreaterThan(10);
+    expect(full.cards.every((c) => c.featureId || c.areaId)).toBe(true);
+    expect(full.cards.some((c) => c.bug)).toBe(true);
+    expect(full.cards.some((c) => c.kind === "enabler")).toBe(true);
+    // Every epic was made to look older than its cards; one Kanban epic is old enough for review.
+    const kanban = (await getBoardFull({ orgId, userId }, boardId))!;
+    const aged = kanban.items.filter(
+      (i) => i.level === "epic" && Date.now() - i.createdAt.getTime() > 180 * 86_400_000,
+    );
+    expect(aged).toHaveLength(1);
   });
 
   it("has a Kanban board whose numbers come from a past", async () => {
