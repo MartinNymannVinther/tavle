@@ -1,0 +1,151 @@
+"use client";
+
+import { useFormatter, useTranslations } from "next-intl";
+import { ConfirmButton } from "@/components/ui/confirm-button";
+import { Button } from "@/components/ui/button";
+import { useBoardActions } from "@/components/board/use-board-actions";
+import type { CardFull } from "@/modules/boards/types";
+import {
+  archiveCardAction,
+  deleteCardAction,
+  restoreCardAction,
+} from "@/modules/boards/actions-cards";
+import { Link, useRouter } from "@/i18n/navigation";
+import { ActivityList } from "./activity-list";
+import { AiPanel } from "./ai-panel";
+import { CardDescription } from "./card-description";
+import { CardSidePanel } from "./card-side-panel";
+import { CardTitle } from "./card-title";
+import { ChecklistEditor } from "./checklist-editor";
+import { CommentsPanel } from "./comments-panel";
+
+/**
+ * One card, whole. The words on the left, the facts on the right, the
+ * history at the bottom. Everything saves as it is changed; the two
+ * destructive things live at the very end behind a question.
+ */
+export function CardPage({
+  full,
+  currentUserId,
+  canManage,
+  aiAvailable,
+}: {
+  full: CardFull;
+  currentUserId: string;
+  canManage: boolean;
+  aiAvailable: boolean;
+}) {
+  const t = useTranslations("cards.page");
+  const format = useFormatter();
+  const router = useRouter();
+  const { run } = useBoardActions();
+  const { card, board, columns, labels, sprints, members, comments, events } = full;
+  const column = columns.find((c) => c.id === card.columnId);
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <p className="text-meta flex flex-wrap items-center gap-2 text-[0.78rem]">
+          <Link href={`/boards/${board.id}`} className="hover:text-foreground">
+            {board.name}
+          </Link>
+          <span aria-hidden>›</span>
+          <span className="tabular-nums">
+            {board.key}-{card.number}
+          </span>
+          {column && (
+            <>
+              <span aria-hidden>·</span>
+              <span>{column.name}</span>
+            </>
+          )}
+          {card.archivedAt && (
+            <span className="bg-warning-tint text-destructive rounded-full px-2 py-0.5 text-[0.69rem] font-medium">
+              {t("archived")}
+            </span>
+          )}
+        </p>
+        <CardTitle card={card} run={run} />
+      </div>
+
+      <div className="grid gap-8 @3xl:grid-cols-[minmax(0,1fr)_18rem]">
+        <div className="flex min-w-0 flex-col gap-8">
+          <CardDescription card={card} run={run} />
+          <ChecklistEditor card={card} run={run} />
+          <AiPanel card={card} boardId={board.id} available={aiAvailable} run={run} />
+          <CommentsPanel
+            cardId={card.id}
+            comments={comments}
+            currentUserId={currentUserId}
+            canManage={canManage}
+            run={run}
+          />
+          <ActivityList events={events} />
+        </div>
+        <aside className="flex flex-col gap-6 @3xl:sticky @3xl:top-6 @3xl:self-start">
+          <CardSidePanel
+            card={card}
+            columns={columns}
+            labels={labels}
+            sprints={sprints}
+            members={members}
+            scrum={board.mode === "scrum"}
+            run={run}
+          />
+          <div className="text-meta flex flex-col gap-1 text-[0.72rem]">
+            <p>
+              {t("created", { date: format.dateTime(card.createdAt, { dateStyle: "medium" }) })}
+            </p>
+            {card.startedAt && (
+              <p>
+                {t("started", { date: format.dateTime(card.startedAt, { dateStyle: "medium" }) })}
+              </p>
+            )}
+            {card.doneAt && (
+              <p>{t("done", { date: format.dateTime(card.doneAt, { dateStyle: "medium" }) })}</p>
+            )}
+          </div>
+          <div className="border-hairline flex flex-wrap gap-2 border-t pt-4">
+            {card.archivedAt ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => void run(() => restoreCardAction({ cardId: card.id }))}
+              >
+                {t("restore")}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  void run(
+                    () => archiveCardAction({ cardId: card.id }),
+                    () => router.push(`/boards/${board.id}`),
+                  )
+                }
+              >
+                {t("archive")}
+              </Button>
+            )}
+            <ConfirmButton
+              title={t("deleteTitle")}
+              body={t("deleteBody", { key: `${board.key}-${card.number}` })}
+              confirmLabel={t("deleteConfirm")}
+              onConfirm={() =>
+                run(
+                  () => deleteCardAction({ cardId: card.id }),
+                  () => router.push(`/boards/${board.id}`),
+                )
+              }
+            >
+              {t("delete")}
+            </ConfirmButton>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}
