@@ -13,6 +13,7 @@ import { applyFilters, BoardFilters, NO_FILTERS, type Filters } from "./board-fi
 import { structureOf } from "./card-chips";
 import type { Place } from "./quick-add";
 import { SprintHeader } from "./sprint-header";
+import { TypeLegend } from "./type-legend";
 import { useBoardActions } from "./use-board-actions";
 
 /**
@@ -176,6 +177,7 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
           ))}
         </div>
       </div>
+      <TypeLegend types={["feature", "bug", "enabler"]} />
     </div>
   );
 }

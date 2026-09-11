@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { applyFilters, NO_FILTERS, type Filters } from "@/components/board/board-filters";
 import { structureOf } from "@/components/board/card-chips";
 import { QuickAdd } from "@/components/board/quick-add";
+import { TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
 import type { BoardFull } from "@/modules/boards/types";
 import { createCardAction } from "@/modules/boards/actions-cards";
@@ -258,6 +259,7 @@ export function BacklogView({ full }: { full: BoardFull }) {
           </div>
         </div>
       </div>
+      <TypeLegend className="border-hairline border-t px-4 py-2" />
     </section>
   );
 

@@ -75,7 +75,7 @@ export default async function MyCardsPage() {
                         label={priorities(card.priority)}
                       />
                       <Points estimate={card.estimate} />
-                      {card.blocked && <FlagChip tone="bug">{t("blocked")}</FlagChip>}
+                      {card.blocked && <FlagChip tone="blocked">{t("blocked")}</FlagChip>}
                       {card.dueDate && (
                         <span
                           className={cn(

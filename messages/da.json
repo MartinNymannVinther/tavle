@@ -664,7 +664,8 @@
       "feature": "Feature",
       "card": "Kort",
       "bug": "Fejl",
-      "enabler": "Enabler"
+      "enabler": "Enabler",
+      "legend": "Symboler:"
     }
   },
   "cards": {
@@ -1206,7 +1207,11 @@
         "body": "Efter hver sprint, eller hver anden uge, ét spørgsmål: Hvad gør vi anderledes? Vælg én ting, gør den, og se på tallene. Store forandringer overlever sjældent en travl uge; små gør."
       }
     },
-    "closing": "Værktøjet gør ikke teamet godt. Det gør de ti regler, og tavlen er der, så I kan se om I følger dem."
+    "closing": "Værktøjet gør ikke teamet godt. Det gør de ti regler, og tavlen er der, så I kan se om I følger dem.",
+    "symbols": {
+      "title": "Symbolerne",
+      "body": "Hver slags ting har sit eget symbol, og det er det samme overalt: i backloggen, på kortet, på roadmappet og på tavlen. Et flag er en epic, en puslespilsbrik er en feature, en note er et kort, en bille er en fejl, og en skruenøgle er enabler-arbejde. Symbolet har altid sit ord med, når du holder musen over det, og siden viser en forklaring nederst, hvor symbolerne bruges."
+    }
   },
   "items": {
     "doneWhen": {

@@ -6,6 +6,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { ThemeChip } from "@/components/board/bits";
 import { themeSwatch } from "@/components/board/tokens";
 import { TypeIcon } from "@/components/board/type-icon";
+import { TypeLegend } from "@/components/board/type-legend";
 import { roadmap, type RoadmapRow } from "@/modules/boards/structure/roadmap";
 import type { BoardFull } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
@@ -125,6 +126,7 @@ export function RoadmapView({ full }: { full: BoardFull }) {
           </ul>
         </section>
       )}
+      <TypeLegend types={["epic"]} />
     </div>
   );
 }

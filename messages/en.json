@@ -664,7 +664,8 @@
       "feature": "Feature",
       "card": "Card",
       "bug": "Bug",
-      "enabler": "Enabler"
+      "enabler": "Enabler",
+      "legend": "Symbols:"
     }
   },
   "cards": {
@@ -1206,7 +1207,11 @@
         "body": "After every sprint, or every other week, one question: what do we do differently? Pick one thing, do it, and look at the numbers. Big changes rarely survive a busy week; small ones do."
       }
     },
-    "closing": "The tool does not make the team good. The ten rules do, and the board is there so you can see whether you follow them."
+    "closing": "The tool does not make the team good. The ten rules do, and the board is there so you can see whether you follow them.",
+    "symbols": {
+      "title": "The symbols",
+      "body": "Every kind of thing has its own symbol, the same everywhere: in the backlog, on the card, on the roadmap and on the board. A flag is an epic, a puzzle piece a feature, a note a card, a bug a bug, and a wrench enabler work. The symbol always carries its word when you hover it, and a page that uses the symbols explains them at the bottom."
+    }
   },
   "items": {
     "doneWhen": {

@@ -37,14 +37,15 @@ export function AreaChip({ name, className }: { name: string; className?: string
 
 /**
  * The bug flag and the enabler kind, as the type's symbol and its word on
- * a tint; a business story shows nothing.
+ * a tint; a business story shows nothing. "Blocked" is a state, not a
+ * kind, and carries the word alone.
  */
 export function FlagChip({
   tone,
   children,
   className,
 }: {
-  tone: "bug" | "enabler";
+  tone: "bug" | "enabler" | "blocked";
   children: React.ReactNode;
   className?: string;
 }) {
@@ -52,11 +53,13 @@ export function FlagChip({
     <span
       className={cn(
         chip,
-        tone === "bug" ? "bg-warning-tint text-warning" : "bg-secondary text-secondary-foreground",
+        tone === "enabler"
+          ? "bg-secondary text-secondary-foreground"
+          : "bg-warning-tint text-warning",
         className,
       )}
     >
-      <TypeGlyph type={tone} />
+      {tone !== "blocked" && <TypeGlyph type={tone} />}
       {children}
     </span>
   );

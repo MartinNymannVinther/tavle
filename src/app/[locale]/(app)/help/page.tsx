@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { TypeLegend } from "@/components/board/type-legend";
 import { ABC_FIGURES } from "./abc-figures";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -43,6 +44,11 @@ export default async function HelpPage() {
           <p className="mt-1.5 text-[15px] leading-relaxed">{t(`howTo.${key}.body`)}</p>
         </section>
       ))}
+      <section>
+        <h3 className="text-primary mt-5 text-[15px] font-semibold">{t("symbols.title")}</h3>
+        <p className="mt-1.5 text-[15px] leading-relaxed">{t("symbols.body")}</p>
+        <TypeLegend className="mt-3" />
+      </section>
 
       <h2 className="mt-10 text-xl font-semibold">{t("abcTitle")}</h2>
       <p className="text-meta mt-1.5 text-sm">{t("abcIntro")}</p>

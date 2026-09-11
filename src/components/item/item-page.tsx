@@ -8,6 +8,7 @@ import { ActivityList } from "@/components/card/activity-list";
 import { StructureFields } from "@/components/card/placement-fields";
 import { quarterOptions } from "@/components/backlog/quarters";
 import { TypeIcon } from "@/components/board/type-icon";
+import { TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
 import {
   confirmReviewAction,
@@ -203,6 +204,7 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
               </ConfirmButton>
             )}
           </div>
+          <TypeLegend types={["epic", "feature", "card", "bug"]} />
         </aside>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 import { Button } from "@/components/ui/button";
 import { TypeIcon } from "@/components/board/type-icon";
+import { TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
 import type { CardFull } from "@/modules/boards/types";
 import {
@@ -152,6 +153,7 @@ export function CardPage({
               {t("delete")}
             </ConfirmButton>
           </div>
+          <TypeLegend types={["card", "bug", "enabler"]} />
         </aside>
       </div>
     </div>
