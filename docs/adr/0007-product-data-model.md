@@ -1,6 +1,7 @@
 # ADR 0007: The product's data model — six concepts and a record of moves
 
-Status: accepted · Date: 2026-09-11
+Status: accepted · Date: 2026-09-11 · Amended by ADR 0011 (labels removed;
+epics, features, themes and areas added above the cards)
 
 ## Context
 

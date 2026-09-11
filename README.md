@@ -3,11 +3,13 @@
 Tavle ([tavle.haij.dk](https://tavle.haij.dk)) is an open source board for
 Kanban and Scrum teams of two to fifteen: the product team, the ops team,
 the association's app project. Cards in columns with WIP limits, or a
-backlog and sprints, and the numbers a team wants to see — burndown,
-velocity, throughput, cycle time, cumulative flow — computed from what
-actually happened to the cards, never from an estimate. An AI can finish
-writing a card, suggest a split and tell the sprint's story; every one of
-those is a proposal a person edits and says yes to.
+backlog and sprints; one backlog structure — epics, features and cards
+that finish, themes and areas that never do — that holds when the team
+grows; and the numbers a team wants to see — burndown, velocity,
+throughput, cycle time, cumulative flow — computed from what actually
+happened to the cards, never from an estimate. An AI can finish writing a
+card, suggest a split and tell the sprint's story; every one of those is
+a proposal a person edits and says yes to.
 
 Tavle is one tool in the [Haij](https://haij.dk) family and stands on the
 Haij foundation, taken by way of [Ajour](https://github.com/MartinNymannVinther/ajour):
@@ -17,16 +19,17 @@ Decisions and their trade-offs live in [docs/adr](docs/adr/).
 
 ## Status
 
-Version 0.9: complete as a product, not yet run in anger. What it holds:
+Version 0.10: complete as a product, not yet run in anger. What it holds:
 the foundation (auth with passkeys and TOTP, workspaces separated in the
 database, admission by application, the audit log, CI, Docker), boards in
-two modes, cards with everything a card needs, the backlog with sprint
-planning and one sprint at a time, the insight page, my cards, inviting
-colleagues into a workspace with a link, the three AI proposals, a demo
-with two boards in full swing, export and deletion, and the help page with
-the board's ABC. Dogma seven is the one still open: a real team runs a
-real board before Tavle goes in the window, and 1.0 is what that team
-leaves behind.
+two modes, cards with everything a card needs, the backlog structure with
+its eleven rules enforced by the tool, the backlog with sprint planning
+and one sprint at a time, the roadmap, the overview, the insight page, my
+cards, inviting colleagues into a workspace with a link, the three AI
+proposals, a demo with two boards in full swing, export and deletion, and
+the help page with the board's ABC. Dogma seven is the one still open: a
+real team runs a real board before Tavle goes in the window, and 1.0 is
+what that team leaves behind.
 
 What that means for you: the code is public and you are welcome to run it,
 read it, report what you find and send changes. The instance at
@@ -50,10 +53,27 @@ board shows only that sprint until you close it. Closing writes the
 velocity down and carries the unfinished cards to the top of the backlog
 or into the next sprint.
 
-**A card needs only a title to exist.** Open it for the rest: assignee,
-estimate, priority, due date, labels, a checklist, comments, and the
-history of everything that happened to it. Every field saves as it is
-changed. A blocked card gets a red edge and a reason.
+**A card needs only a title and a place to exist.** Open it for the rest:
+assignee, estimate, priority, due date, acceptance criteria, a checklist,
+comments, and the history of everything that happened to it. Every field
+saves as it is changed. A blocked card gets a red edge and a reason; a
+bug is a card with a flag.
+
+**One backlog structure, and the tool keeps it.** Above the cards sit
+features and epics, each of which says when it is done and closes when
+that is reached; a card belongs to at most one feature, a feature to at
+most one epic, and nothing sits above an epic. Everything else a team
+wants to know — why a thing is done, which part of the product it
+touches, whether it is business or enabler work — is a field on the
+item: themes (a closed list of five to eight, each with an owner), areas
+(a closed list with owners), the kind. Two tests decide what goes where
+and Tavle enforces them: can it be finished, then it is in the hierarchy;
+does it have exactly one parent, then it is in the hierarchy; otherwise
+it is a category. There is no "Diverse" epic and the tool will not make
+one: what has no parent is shown as exactly that. The backlog groups by
+hierarchy, theme, area or kind; the roadmap draws epics on quarters; the
+overview says how the open work is spread and whether the structure is
+being kept.
 
 **The numbers come from the record.** Every move a card makes is written
 down, so the insight page can say how many cards were finished per week,

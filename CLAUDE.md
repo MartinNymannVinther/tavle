@@ -1,8 +1,9 @@
 # CLAUDE.md — Tavle
 
 Tavle (tavle.haij.dk) is an open source board for Kanban and Scrum teams:
-cards in columns, sprints from a backlog, and the numbers a team wants to
-see computed from what actually happened. It is one tool in the Haij
+cards in columns, sprints from a backlog, one backlog structure that
+holds when the team grows, and the numbers a team wants to see computed
+from what actually happened. It is one tool in the Haij
 family (haij.dk) and stands on the Haij foundation, taken by way of Ajour.
 This file is the project constitution: read it fully at the start of
 every session. The non-negotiables below override any default you would
@@ -42,9 +43,17 @@ codebase to:
 
 ## Product principles
 
-- As few concepts as possible; each one must earn its place. Six: board,
-  column, card, label, sprint, comment. Everything else — the backlog, the
-  numbers, "my cards" — is a derived view.
+- As few concepts as possible; each one must earn its place. Nine: board,
+  column, card, sprint, comment, and the four of the backlog structure —
+  epic, feature, theme, area. Everything else — the backlog, the roadmap,
+  the overview, the numbers, "my cards" — is a derived view.
+- One backlog structure (ADR 0011). The hierarchy epic → feature → card
+  is used only to break the product down; overview, grouping and
+  belonging are fields on the item: kind (business/enabler), theme (why)
+  and area (where). Two tests decide where a thing belongs and the tool
+  enforces them: can it be finished, and does it have exactly one parent.
+  The tool never invents a container; items without a parent are shown as
+  exactly that. There are no free-text tags and no custom fields.
 - A board is one team's work. Kanban is a flow with WIP limits that warn
   and never forbid; Scrum is a backlog and one sprint at a time. The
   columns' categories (backlog, todo, doing, done), not their names, are
@@ -58,10 +67,10 @@ codebase to:
 - The AI writes three kinds of proposal — finish a card, split a card, the
   sprint's story — and a person edits and says yes. Without a model the
   buttons say so and everything else works.
-- Deliberately not built: time tracking, custom fields, swimlanes,
-  dependencies, automation rules, integrations, attachments, notifications
-  by mail. The omissions are the product; each one is a later decision,
-  not an oversight.
+- Deliberately not built: time tracking, custom fields, labels or tags,
+  swimlanes, dependencies, automation rules, integrations, attachments,
+  notifications by mail, a level above epic. The omissions are the
+  product; each one is a later decision, not an oversight.
 
 ## Architecture (decided — change only via a new ADR)
 
@@ -94,9 +103,10 @@ codebase to:
   backups to EU object storage.
 - Layout: shared kernel (auth, tenancy, audit, llm, team, env) in
   `src/core`; the product in `src/modules/{boards,ai,demo,export}` behind
-  services that take an `OrgContext`; server actions next to their
+  services that take an `OrgContext`, the backlog structure's rules and
+  services in `src/modules/boards/structure`; server actions next to their
   services as `actions*.ts`; pages in `src/app/[locale]` and components in
-  `src/components/{board,card,backlog,sprint,charts,settings}`.
+  `src/components/{board,card,backlog,item,roadmap,overview,sprint,charts,settings}`.
 - Trade-off accepted: the foundation is a copy of Ajour's copy of Haij's,
   not a shared package. Three products, three lifecycles, one set of rules
   (ADR 0001).
@@ -109,8 +119,10 @@ codebase to:
 - Every server action resolves the caller's session and workspace first
   and validates that every id it receives belongs to that workspace.
   Never trust an id from the client. Changing a board's shape (columns,
-  labels, archiving, deleting), inviting and removing members takes an
-  owner or an admin; the check lives in the action helper, not the form.
+  themes, areas, archiving, deleting), inviting and removing members takes
+  an owner or an admin; the check lives in the action helper, not the
+  form. The structure's blocking rules are refused in the service, and
+  rules 1, 4 and 5 again in the database.
 - Validate all input at the boundary (zod). Parameterized queries only.
 - Rate limiting on auth and all public endpoints, and a ceiling on AI
   calls per user and on prompt length. Generic auth error messages, no
@@ -151,14 +163,20 @@ codebase to:
 
 ## Roadmap
 
-- 0.9 (this): the foundation from Ajour; boards in two modes with
-  columns, WIP limits and labels; cards with assignee, estimate, priority,
-  due date, checklist, comments and activity; the backlog with sprint
-  planning, one active sprint, close with carry-over and velocity written
-  down; the insight page (burndown, velocity, throughput, cycle time,
-  cumulative flow); my cards; workspace invitations; the three AI
-  proposals; the demo with two boards; export and deletion; the help
-  page with the board's ABC.
+- 0.9: the foundation from Ajour; boards in two modes with columns and
+  WIP limits; cards with assignee, estimate, priority, due date,
+  checklist, comments and activity; the backlog with sprint planning, one
+  active sprint, close with carry-over and velocity written down; the
+  insight page (burndown, velocity, throughput, cycle time, cumulative
+  flow); my cards; workspace invitations; the three AI proposals; the
+  demo with two boards; export and deletion; the help page with the
+  board's ABC.
+- 0.10 (this): the backlog structure (ADR 0011) — epics and features
+  with "done when", kind and enabler type, themes and areas as closed
+  lists with owners, the eleven rules, inheritance, one order per level,
+  the close conversation; the backlog with grouping and filters on both
+  board types; the roadmap in quarters; the overview with the five health
+  measures; labels removed.
 - Before 1.0: dogma seven — a real team runs a real board on it; the
   screenshots for the README; the tool card on haij.dk; whatever the
   first team asks for that the omissions list did not foresee.

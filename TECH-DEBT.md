@@ -60,7 +60,8 @@ never move again.
 ### Files over 300 lines
 
 Three in `src`, all inherited from the foundation, against a rule of one
-responsibility per file and no file over roughly 300 lines:
+responsibility per file and no file over roughly 300 lines (the demo's
+`words.ts` is over it too, and is content, not code):
 
 | lines | file                               | the seam                                                      |
 | ----- | ---------------------------------- | ------------------------------------------------------------- |
@@ -167,6 +168,25 @@ never written a `v1` value; the read path can go the day the family's
 other tools no longer need it.
 
 ## Product decisions parked
+
+### The roadmap draws an epic from its creation quarter
+
+An open epic's bar starts in the quarter it was created and ends in its
+target quarter (ADR 0011). Creation is a fact, but an epic written down
+in March that nobody touches until September draws a bar over two idle
+quarters. The transition log knows when the first story under it was
+picked up; starting the bar there, with creation as the fallback, is a
+small change to `structure/roadmap.ts` and a better picture. Left for a
+real team to say whether the honest start is creation or first work.
+
+### Features rank in one order across epics, shown split under them
+
+One order per level is the rule, and the hierarchy view shows features
+under their epics, so the arrows move a feature past its neighbour under
+the same epic and the server computes the position in the whole lane. A
+feature cannot be ranked above one under another epic without moving
+both epics. Fine for tens of features; a team with a hundred will want
+a flat feature ranking view, which the grouped views could grow into.
 
 ### WIP limits count cards, not points, and never refuse
 
