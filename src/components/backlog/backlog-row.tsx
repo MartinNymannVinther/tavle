@@ -1,10 +1,14 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Initials, Points, PriorityMark } from "@/components/board/bits";
-import { CardChips, type ChipContext, type StructureLookup } from "@/components/board/card-chips";
+import { FlagChip, Initials, Points, PriorityMark, ThemeDots } from "@/components/board/bits";
+import {
+  deviatingPlace,
+  type ChipContext,
+  type StructureLookup,
+} from "@/components/board/card-chips";
 import { TypeGlyph, TypeIcon } from "@/components/board/type-icon";
-import type { Priority } from "@/core/db/schema";
+import type { Priority, Theme } from "@/core/db/schema";
 import type { CardView } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -13,10 +17,12 @@ import type { Crumb } from "./backlog-selection";
 
 /**
  * One story as a line in the backlog or in a sprint: a box to tick it
- * for a sprint, the card's symbol (a bug shows as one), the key and the
- * title with where it sits written small under it, then the facts that
- * matter for planning — points, priority, who. What the heading already
- * says is left out, so a line says only what is its own.
+ * for a sprint, the card's symbol (a bug shows as one), the key, the
+ * title with its themes as dots beside it, and where it sits written
+ * small under it — epic and feature, or the area when it has no
+ * feature. What the heading already says is left out, so a line says
+ * only what is its own, and nothing on it is a chip but the enabler
+ * kind.
  */
 export function BacklogRow({
   card,
@@ -60,7 +66,35 @@ export function BacklogRow({
   quiet?: boolean;
 }) {
   const t = useTranslations("backlog.row");
+  const s = useTranslations("boards.structure");
   const priorities = useTranslations("boards.priority");
+  const own = deviatingPlace(card, context);
+  const themes = own.themeIds
+    .map((id) => structure.themes.find((theme) => theme.id === id))
+    .filter((theme): theme is Theme => Boolean(theme));
+  const area = own.areaId ? structure.areas.find((a) => a.id === own.areaId) : null;
+  const parts: React.ReactNode[] = [];
+  if (crumb?.epic)
+    parts.push(
+      <span key="epic" className="inline-flex min-w-0 items-center gap-1">
+        <TypeGlyph type="epic" className="text-label shrink-0" />
+        <span className="truncate">{crumb.epic.title}</span>
+      </span>,
+    );
+  if (crumb?.feature)
+    parts.push(
+      <span key="feature" className="inline-flex min-w-0 items-center gap-1">
+        <TypeGlyph type="feature" className="text-label shrink-0" />
+        <span className="truncate">{crumb.feature.title}</span>
+      </span>,
+    );
+  if (area)
+    parts.push(
+      <span key="area" className="truncate">
+        {area.name}
+      </span>,
+    );
+
   return (
     <li
       draggable={draggable}
@@ -82,45 +116,46 @@ export function BacklogRow({
         />
       )}
       <TypeIcon type={card.bug ? "bug" : "card"} />
-      <Key boardKey={boardKey} number={card.number} />
+      <span className={cn("shrink-0", quiet && "hidden @md:inline")}>
+        <Key boardKey={boardKey} number={card.number} />
+      </span>
       <div className="min-w-0 flex-1">
-        <Link
-          href={`/boards/${boardId}/cards/${card.number}`}
-          className={cn(
-            "block truncate text-sm hover:underline",
-            card.doneAt && "text-meta line-through",
+        <span className="flex items-center gap-2">
+          <Link
+            href={`/boards/${boardId}/cards/${card.number}`}
+            className={cn(
+              "min-w-0 text-sm hover:underline",
+              quiet ? "line-clamp-2 leading-snug" : "truncate",
+              card.doneAt && "text-meta line-through",
+            )}
+          >
+            {card.title}
+          </Link>
+          <ThemeDots themes={themes} />
+          {card.kind === "enabler" && (
+            <FlagChip
+              tone="enabler"
+              className={cn("hidden", quiet ? "@lg:inline-flex" : "@sm:inline-flex")}
+            >
+              {card.enablerType ? s(`enablerType.${card.enablerType}`) : s("kind.enabler")}
+            </FlagChip>
           )}
-        >
-          {card.title}
-        </Link>
-        {(crumb?.epic || crumb?.feature) && (
-          <p className="text-meta mt-0.5 flex items-center gap-1 truncate text-[0.69rem]">
-            {crumb.epic && (
-              <>
-                <TypeGlyph type="epic" className="text-label" />
-                <span className="truncate">{crumb.epic.title}</span>
-                {crumb.feature && (
+        </span>
+        {parts.length > 0 && (
+          <p className="text-meta mt-0.5 flex items-center gap-1 text-[0.69rem]">
+            {parts.map((part, index) => (
+              <span key={index} className="inline-flex min-w-0 items-center gap-1">
+                {index > 0 && (
                   <span aria-hidden className="text-label">
                     ›
                   </span>
                 )}
-              </>
-            )}
-            {crumb.feature && (
-              <>
-                <TypeGlyph type="feature" className="text-label" />
-                <span className="truncate">{crumb.feature.title}</span>
-              </>
-            )}
+                {part}
+              </span>
+            ))}
           </p>
         )}
       </div>
-      <CardChips
-        card={{ ...card, bug: false }}
-        structure={structure}
-        context={context}
-        className={cn("hidden items-center gap-1", quiet ? "@lg:flex" : "@sm:flex")}
-      />
       <span className="flex shrink-0 items-center gap-2">
         {columnName && (
           <span
@@ -134,7 +169,11 @@ export function BacklogRow({
         )}
         <PriorityMark priority={card.priority as Priority} label={priorities(card.priority)} />
         <Points estimate={card.estimate} />
-        {card.assigneeName ? <Initials name={card.assigneeName} /> : <span className="size-6" />}
+        {card.assigneeName ? (
+          <Initials name={card.assigneeName} />
+        ) : (
+          !quiet && <span className="size-6" />
+        )}
         <RankArrows onUp={onMoveUp} onDown={onMoveDown} />
       </span>
     </li>

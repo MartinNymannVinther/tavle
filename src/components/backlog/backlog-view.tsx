@@ -193,8 +193,8 @@ export function BacklogView({ full }: { full: BoardFull }) {
           }
         />
       </header>
-      <div className="grid @3xl:grid-cols-[15rem_minmax(0,1fr)]">
-        <aside className="bg-secondary/60 border-hairline hidden border-r p-2 @3xl:block">
+      <div className="grid @2xl:grid-cols-[17rem_minmax(0,1fr)]">
+        <aside className="bg-secondary/60 border-hairline hidden border-r p-2 @2xl:block">
           <BacklogNav
             {...navProps}
             isOpen={folded.isOpen}
@@ -204,7 +204,7 @@ export function BacklogView({ full }: { full: BoardFull }) {
             onRank={rank}
           />
         </aside>
-        <div className="border-hairline border-b px-4 pt-3 @3xl:hidden">
+        <div className="border-hairline border-b px-4 pt-3 @2xl:hidden">
           <BacklogNavSelect {...navProps} />
         </div>
         <div className="flex min-w-0 flex-col">
@@ -266,7 +266,7 @@ export function BacklogView({ full }: { full: BoardFull }) {
   if (!scrum) return list;
 
   return (
-    <div className="grid gap-6 @5xl:grid-cols-[minmax(0,5fr)_minmax(0,2fr)]">
+    <div className="grid gap-6 @5xl:grid-cols-[minmax(0,1fr)_20rem]">
       {list}
       <SprintColumn
         full={full}

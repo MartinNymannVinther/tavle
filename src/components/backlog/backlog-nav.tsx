@@ -57,7 +57,7 @@ function Node({
   return (
     <div
       className={cn(
-        "group/row flex items-center gap-1 rounded-md pr-1",
+        "group/row flex items-start gap-1 rounded-md pr-1",
         selected ? "bg-card font-semibold shadow-[var(--surface-shadow)]" : "hover:bg-card/60",
         className,
       )}
@@ -72,10 +72,10 @@ function Node({
         type="button"
         onClick={onClick}
         aria-current={selected ? "true" : undefined}
-        className="flex min-w-0 flex-1 items-center gap-2 py-1.5 text-left text-[0.8125rem]"
+        className="flex min-w-0 flex-1 items-start gap-2 py-1.5 text-left text-[0.8125rem] leading-snug"
       >
-        {icon}
-        <span className="min-w-0 flex-1 truncate">{title}</span>
+        <span className="mt-px shrink-0">{icon}</span>
+        <span className="line-clamp-2 min-w-0 flex-1">{title}</span>
         <span className="text-meta shrink-0 text-[0.72rem] font-normal tabular-nums">{count}</span>
       </button>
       {arrows && <RankArrows onUp={arrows.onUp} onDown={arrows.onDown} />}
