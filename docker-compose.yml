@@ -1,0 +1,97 @@
+# Production compose for Tavle, designed to be run by Coolify on an EU VPS.
+# See docs/deploy.md. All secrets come from the environment (Coolify UI);
+# nothing here has a real default.
+#
+# The text after `:?` is compose's error when a variable is missing. Know
+# that Coolify reads this file to pre-create the resource's variables and
+# puts that text in as each one's VALUE. Every `set ...` you see in
+# Coolify's variable list must be replaced before the first deploy; the
+# migration step and the app both refuse to run on one, and say so.
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD (openssl rand -hex 24)}
+      POSTGRES_DB: tavle
+      TAVLE_APP_PASSWORD: ${TAVLE_APP_PASSWORD:?set TAVLE_APP_PASSWORD (openssl rand -hex 24)}
+      TAVLE_AUTH_PASSWORD: ${TAVLE_AUTH_PASSWORD:?set TAVLE_AUTH_PASSWORD (openssl rand -hex 24)}
+    volumes:
+      - tavle-pgdata:/var/lib/postgresql/data
+      - ./docker/postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tavle"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    build:
+      context: .
+      target: migrator
+    restart: "no"
+    environment:
+      MIGRATION_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:?}@db:5432/tavle
+      # The migration step is what gives the runtime roles their login
+      # rights: the Postgres init directory is bind-mounted from the
+      # repository and is empty on a build system that cleans up after
+      # itself. Learned the hard way on the first deploy.
+      TAVLE_APP_PASSWORD: ${TAVLE_APP_PASSWORD:?}
+      TAVLE_AUTH_PASSWORD: ${TAVLE_AUTH_PASSWORD:?}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    build:
+      context: .
+      target: runner
+      args:
+        # Coolify and any CI runner should pass these so the running app can
+        # name the code it was built from. Unset means "unknown", not a lie.
+        TAVLE_COMMIT: ${TAVLE_COMMIT:-}
+        TAVLE_BUILT_AT: ${TAVLE_BUILT_AT:-}
+    restart: unless-stopped
+    environment:
+      APP_DATABASE_URL: postgres://tavle_app:${TAVLE_APP_PASSWORD:?}@db:5432/tavle
+      AUTH_DATABASE_URL: postgres://tavle_auth:${TAVLE_AUTH_PASSWORD:?}@db:5432/tavle
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set BETTER_AUTH_SECRET (openssl rand -base64 32)}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:?set BETTER_AUTH_URL, e.g. https://tavle.haij.dk}
+      # Everything optional, forwarded explicitly.
+      #
+      # A variable set in Coolify reaches this file for `${...}`
+      # substitution; it does not reach the container unless it is named
+      # here. Until it was, setting LLM_PROVIDER and MISTRAL_API_KEY in
+      # the panel did nothing at all: the app started, defaulted to no
+      # model, and quietly answered with the rules engine. A deployment
+      # that ignores half its own configuration without saying so is
+      # worse than one that refuses to start.
+      #
+      # `:-` leaves an unset variable as the empty string, and env.ts
+      # reads an empty string as absent, so an unset variable here is the
+      # same thing as no variable at all.
+      LLM_PROVIDER: ${LLM_PROVIDER:-}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+      MISTRAL_BASE_URL: ${MISTRAL_BASE_URL:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-}
+      SIGNUP: ${SIGNUP:-}
+      DEMO: ${DEMO:-}
+      TRUSTED_PROXY_HOPS: ${TRUSTED_PROXY_HOPS:-}
+    # No published port. Coolify's proxy reaches the app over the compose
+    # network and terminates TLS in front of it; binding 0.0.0.0:3000 as
+    # well would put the same app on the VPS's public address in cleartext,
+    # outside the proxy, its TLS and its HSTS. Anyone running this without
+    # a proxy should bind loopback explicitly and put one in front.
+    expose:
+      - "3000"
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  tavle-pgdata:

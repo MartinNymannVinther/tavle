@@ -1,0 +1,1031 @@
+{
+  "common": {
+    "appName": "Tavle",
+    "loading": "Indlæser…",
+    "save": "Gem",
+    "cancel": "Annuller",
+    "close": "Luk",
+    "back": "Tilbage",
+    "error": "Noget gik galt. Prøv igen.",
+    "edit": "Redigér",
+    "delete": "Slet",
+    "week": "Uge {number}",
+    "weekOf": "Uge {date}",
+    "thinking": {
+      "seconds": "{seconds} s",
+      "slow": "En lokal model kan tage op mod et minut. Svarer den ikke, tager regelmotoren over, og siden siger det."
+    }
+  },
+  "landing": {
+    "nav": {
+      "login": "Log ind",
+      "register": "Opret konto",
+      "apply": "Ansøg om adgang"
+    },
+    "hero": {
+      "title": "Teamets tavle, uden abonnementet.",
+      "subtitle": "Kanban og Scrum for teams på to til femten. Kort, kolonner, WIP-grænser, sprints, burndown og velocity, regnet ud fra det der faktisk skete. Open source, på EU-jord eller din egen server, med en AI der foreslår og aldrig bestemmer.",
+      "ctaPrimary": "Opret konto",
+      "ctaSecondary": "Log ind",
+      "trust": "AGPL-3.0 · Passkeys og totrinslogin · Dine data kan hentes ud med ét klik",
+      "ctaApply": "Ansøg om adgang",
+      "ctaDemo": "Prøv demoen"
+    },
+    "flowsLabel": "Det I får",
+    "values": {
+      "aiTitle": "AI der hjælper, ikke overtager",
+      "aiBody": "Modellen kan skrive et kort færdigt, foreslå en opdeling og fortælle sprintens historie. Alt vises som forslag, og alt den gør, kan ses og fortrydes. Kør den hos Mistral i EU eller lokalt med Ollama.",
+      "dataTitle": "Dine data, altid",
+      "dataBody": "Hele arbejdsrummet hentes ud som regneark og JSON med ét klik og kan slettes helt igen. Koden er open source, så I kan tage den med jer.",
+      "securityTitle": "Sikkerhed fra første dag",
+      "securityBody": "Arbejdsrum er adskilt i databasen, ikke kun i koden. Passkeys, totrinslogin og en log der ikke kan redigeres."
+    },
+    "status": "Version 0.9 · bygget til at blive brugt",
+    "family": {
+      "body": "Tavle er ét værktøj i Haij-familien af open source-værktøjer til organisationer der vil eje deres egen teknologi.",
+      "link": "Læs om Haij"
+    },
+    "footer": {
+      "license": "Open source under AGPL-3.0",
+      "language": "English",
+      "terms": "Vilkår og privatliv"
+    },
+    "demo": {
+      "title": "Prøv uden at oprette noget",
+      "body": "Du får dit eget arbejdsrum med to tavler i fuld gang, en Kanban og en Scrum. Det slettes efter {hours} timer. Ingen e-mail, ingen tilmelding.",
+      "privacy": "Skriv ikke rigtige personoplysninger i demoen. Den passerer en database og eventuelt en sprogmodel på vejen.",
+      "cta": "Åbn en demo"
+    },
+    "flows": {
+      "kanban": "Kanban med WIP-grænser",
+      "scrum": "Scrum med sprints",
+      "cards": "Kort med tjekliste og kommentarer",
+      "backlog": "Prioriteret backlog",
+      "insight": "Burndown, velocity, cycle time, cumulative flow",
+      "team": "Inviter teamet med et link",
+      "ai": "AI der foreslår, du bestemmer"
+    }
+  },
+  "notFound": {
+    "title": "Siden findes ikke",
+    "body": "Adressen er enten forkert, eller også er siden flyttet.",
+    "cta": "Til forsiden"
+  },
+  "auth": {
+    "login": {
+      "title": "Log ind",
+      "subtitle": "Velkommen tilbage.",
+      "email": "E-mail",
+      "password": "Adgangskode",
+      "submit": "Log ind",
+      "or": "eller",
+      "withPasskey": "Log ind med passkey",
+      "noAccount": "Har du ikke en konto?",
+      "registerLink": "Opret konto",
+      "error": "Forkert e-mail eller adgangskode.",
+      "passkeyError": "Login med passkey mislykkedes. Prøv igen."
+    },
+    "register": {
+      "title": "Opret konto",
+      "subtitle": "Din konto og dit arbejdsrum oprettes samtidig.",
+      "name": "Dit navn",
+      "email": "E-mail",
+      "organizationName": "Arbejdsrummets navn",
+      "organizationHint": "Din virksomhed, forening eller afdeling. Kan ændres senere.",
+      "password": "Adgangskode",
+      "passwordHint": "Mindst 12 tegn.",
+      "submit": "Opret konto",
+      "haveAccount": "Har du allerede en konto?",
+      "loginLink": "Log ind",
+      "errorInvalid": "Tjek felterne og prøv igen.",
+      "errorEmailExists": "Der findes allerede en konto med denne e-mail.",
+      "errorGeneric": "Kontoen kunne ikke oprettes. Prøv igen.",
+      "closedTitle": "Oprettelse er lukket",
+      "closedBody": "Denne installation af Tavle tager ikke imod nye brugere. Kontakt ejeren hvis du skal have adgang.",
+      "invitedSubtitle": "Du er inviteret. Kontoen oprettes til den e-mail og det arbejdsrum, invitationen gælder for.",
+      "lockedHint": "Fastlagt af invitationen.",
+      "errorInvitationInvalid": "Invitationen er udløbet eller allerede brugt. Bed om et nyt link.",
+      "invitationInvalidTitle": "Linket virker ikke længere",
+      "invitationInvalidBody": "Invitationen er udløbet, brugt eller erstattet af en nyere. Bed den der inviterede dig om et nyt link, eller ansøg om adgang igen.",
+      "applyLink": "Ansøg om adgang"
+    },
+    "twoFactor": {
+      "title": "Totrinsbekræftelse",
+      "subtitle": "Indtast koden fra din authenticator-app.",
+      "submit": "Bekræft",
+      "error": "Forkert kode. Prøv igen."
+    },
+    "onboarding": {
+      "title": "Opret dit arbejdsrum",
+      "subtitle": "Du mangler et arbejdsrum, før du kan komme i gang.",
+      "organizationName": "Arbejdsrummets navn",
+      "submit": "Opret arbejdsrum",
+      "error": "Arbejdsrummet kunne ikke oprettes. Prøv igen."
+    },
+    "apply": {
+      "title": "Ansøg om adgang",
+      "subtitle": "Denne installation af Tavle tager imod nye brugere efter en kort ansøgning. Ejeren ser den personligt og svarer per mail.",
+      "name": "Dit navn",
+      "email": "E-mail",
+      "organizationName": "Organisation eller forening",
+      "message": "Hvad skal du bruge Tavle til?",
+      "messageHint": "Valgfrit. En linje eller to om teamet gør det nemmere at sige ja.",
+      "submit": "Send ansøgning",
+      "sentTitle": "Tak, ansøgningen er modtaget",
+      "sentBody": "Du hører fra ejeren af denne installation på {email}. Svaret kommer fra et menneske, så regn med en dag eller to.",
+      "errorInvalid": "Tjek felterne og prøv igen.",
+      "errorTooMany": "Der er sendt mange ansøgninger herfra på kort tid. Prøv igen om en time.",
+      "privacy": "Vi gemmer navn, e-mail og organisation for at behandle ansøgningen, og ikke andet. Bliver den afvist, står oplysningerne kun tilbage som en note om afgørelsen.",
+      "haveAccount": "Har du allerede en konto?",
+      "loginLink": "Log ind"
+    }
+  },
+  "app": {
+    "nav": {
+      "help": "Hjælp",
+      "security": "Sikkerhed",
+      "logout": "Log ud",
+      "appearance": "Udseende",
+      "light": "Lys",
+      "dark": "Mørk",
+      "system": "Følg systemet",
+      "language": "Sprog",
+      "danish": "Dansk",
+      "english": "English",
+      "openMenu": "Åbn menu",
+      "menuTitle": "Navigation",
+      "settings": "Indstillinger",
+      "skipToContent": "Spring til indholdet",
+      "hideMenu": "Skjul menuen",
+      "showMenu": "Vis menuen",
+      "boards": "Tavler",
+      "my": "Mine kort"
+    },
+    "orgSwitcher": {
+      "label": "Arbejdsrum",
+      "create": "Opret arbejdsrum",
+      "createTitle": "Opret nyt arbejdsrum",
+      "name": "Navn",
+      "createSubmit": "Opret",
+      "switched": "Skiftet til {name}",
+      "created": "{name} er oprettet",
+      "error": "Arbejdsrummet kunne ikke oprettes. Prøv igen.",
+      "switch": "Skift arbejdsrum"
+    },
+    "security": {
+      "title": "Sikkerhed",
+      "subtitle": "Passkeys og totrinsbekræftelse for din konto.",
+      "passkeys": {
+        "title": "Passkeys",
+        "description": "Log ind uden adgangskode med Touch ID, Face ID eller en sikkerhedsnøgle.",
+        "empty": "Ingen passkeys endnu.",
+        "nameLabel": "Navn",
+        "namePlaceholder": "F.eks. MacBook",
+        "add": "Tilføj passkey",
+        "remove": "Fjern",
+        "addedAt": "Tilføjet {date}",
+        "addedToast": "Passkey tilføjet",
+        "removedToast": "Passkey fjernet",
+        "error": "Passkey kunne ikke tilføjes. Prøv igen."
+      },
+      "totp": {
+        "title": "Totrinsbekræftelse (TOTP)",
+        "description": "Kræv en kode fra din authenticator-app ved login.",
+        "statusEnabled": "Slået til",
+        "statusDisabled": "Slået fra",
+        "enable": "Slå til",
+        "disable": "Slå fra",
+        "password": "Bekræft med din adgangskode",
+        "scan": "Scan QR-koden med din authenticator-app, og indtast koden nedenfor.",
+        "backupCodes": "Backupkoder",
+        "backupHint": "Gem koderne et sikkert sted. De kan bruges, hvis du mister din telefon.",
+        "verifyLabel": "Kode fra appen",
+        "verify": "Bekræft",
+        "verifyError": "Forkert kode. Prøv igen.",
+        "enabledToast": "Totrinsbekræftelse er slået til",
+        "disabledToast": "Totrinsbekræftelse er slået fra",
+        "error": "Handlingen mislykkedes. Tjek adgangskoden, og prøv igen.",
+        "totpQrAlt": "QR-kode du scanner i din autentificeringsapp for at tilføje Tavle"
+      }
+    },
+    "about": {
+      "title": "Om Tavle",
+      "subtitle": "Hvilken udgave af Tavle der kører her, og om databasen følger med.",
+      "short": "v{release}",
+      "dirtyShort": "ændret",
+      "dirty": "Lokale ændringer",
+      "dirtyHint": "Bygget fra en arbejdsmappe med ændringer der ikke er committet. Commit-nummeret fortæller altså ikke hele sandheden om koden der kører.",
+      "releaseHint": "Versionsnummeret hæves i hånden når et spring er værd at navngive. Commit-nummeret bages ind ved build og peger på præcis den kode der svarer.",
+      "versionLabel": "Version",
+      "commitLabel": "Commit",
+      "builtAtLabel": "Bygget",
+      "environmentLabel": "Miljø",
+      "runtimeLabel": "Runtime",
+      "environments": {
+        "development": "Udvikling",
+        "test": "Test",
+        "production": "Drift"
+      },
+      "schemaTitle": "Databaseskema",
+      "schemaHint": "Antallet af migreringer koden er bygget med, holdt op mod dem databasen har kørt.",
+      "schemaBehind": "Migreringer mangler",
+      "schemaBehindHint": "Databasen har færre migreringer end koden forventer. Kør migreringerne før du bruger systemet videre.",
+      "migrationLabel": "Seneste migrering",
+      "appliedLabel": "Kørt",
+      "appliedValue": "{applied} af {expected}",
+      "appliedAtLabel": "Senest kørt",
+      "unknown": "Ukendt",
+      "license": "Tavle er open source under AGPL-3.0 og en del af Haij-familien."
+    },
+    "dataExport": {
+      "title": "Data og eksport",
+      "subtitle": "Tag en komplet kopi af alt hvad dette arbejdsrum indeholder.",
+      "xlsxTitle": "Regneark",
+      "xlsxBody": "Én fil med en fane per type data. Til dig selv, til styregruppen eller til enhver der skal kigge med uden at kende Tavle.",
+      "xlsxAction": "Hent regneark",
+      "jsonTitle": "Maskinlæsbar kopi",
+      "jsonBody": "De samme data som JSON, med alle id'er bevaret. Det er den fil der gør, at du kan flytte til noget andet end Tavle uden at miste sammenhængen mellem projekter, opgaver og statusser.",
+      "jsonAction": "Hent JSON",
+      "sheetsLabel": "Faner i filen:",
+      "membersSheet": "Brugere",
+      "notBackupTitle": "Det her er ikke en backup.",
+      "notBackupBody": "En eksport kan læses, men den kan ikke lægges tilbage, og den er kun så ny som den dag du hentede den. Den dag databasen er væk, er det det natlige krypterede dump der redder dig.",
+      "privacy": "Eksporten indeholder navne på de personer, projekterne nævner, og hele arbejdsrummets historik. Adgangskoder og passkeys kommer aldrig med, og delelinks eksporteres uden deres nøgle. At du henter filen bliver skrevet i revisionssporet."
+    },
+    "boards": {
+      "passkeyPromptTitle": "Gør din konto mere sikker",
+      "passkeyPromptBody": "Tilføj en passkey, så du kan logge ind uden adgangskode.",
+      "passkeyPromptCta": "Tilføj passkey"
+    }
+  },
+  "settings": {
+    "title": "Indstillinger",
+    "subtitle": "Din sikkerhed og din installation.",
+    "nav": {
+      "security": "Sikkerhed",
+      "about": "Om",
+      "access": "Adgang",
+      "workspace": "Arbejdsrum",
+      "ai": "AI",
+      "data": "Data"
+    },
+    "access": {
+      "title": "Adgang til installationen",
+      "subtitle": "Hvem der må oprette et arbejdsrum her. Du godkender og sender linket; resten sker af sig selv.",
+      "pendingTitle": "Ansøgninger",
+      "pendingEmpty": "Ingen ventende ansøgninger.",
+      "approve": "Godkend",
+      "decline": "Afvis",
+      "declinedToast": "Ansøgningen er afvist.",
+      "linkTitle": "Link til {email}",
+      "linkBody": "Vises kun nu. Kopiér det og send det selv. Det virker i 7 dage og kun én gang.",
+      "copy": "Kopiér link",
+      "copiedToast": "Linket er kopieret.",
+      "inviteTitle": "Inviter direkte",
+      "inviteBody": "Uden ansøgning først. Samme link, samme regler.",
+      "inviteEmail": "E-mail",
+      "inviteOrganization": "Arbejdsrummets navn",
+      "inviteSubmit": "Opret invitation",
+      "invitationsTitle": "Invitationer",
+      "invitationsEmpty": "Ingen invitationer endnu.",
+      "renew": "Nyt link",
+      "expires": "Udløber {date}",
+      "used": "Brugt {date}",
+      "applied": "Ansøgt {date}",
+      "decidedApproved": "Godkendt {date}",
+      "decidedDeclined": "Afvist {date}",
+      "historyTitle": "Tidligere afgørelser",
+      "stateOpen": "Ubrugt",
+      "stateUsed": "Brugt",
+      "stateExpired": "Udløbet",
+      "stateRevoked": "Erstattet",
+      "errorInvalid": "Tjek e-mail og navnet på arbejdsrummet."
+    },
+    "workspace": {
+      "title": "Arbejdsrum",
+      "subtitle": "Hvem der er med, og vejen ud igen.",
+      "createdOn": "Oprettet {date}",
+      "name": "Navn",
+      "email": "E-mail",
+      "role": "Rolle",
+      "roles": {
+        "owner": "Ejer",
+        "admin": "Administrator",
+        "member": "Medlem"
+      },
+      "delete": {
+        "title": "Slet arbejdsrummet",
+        "body": "Alt i arbejdsrummet forsvinder: projekter, planer, statusser, beslutninger, delelinks og revisionssporet om dem. Det kan ikke fortrydes.",
+        "exportFirst": "Hent en eksport først, hvis du vil beholde noget. Den findes under Data.",
+        "typeName": "Skriv {name} for at bekræfte",
+        "action": "Slet arbejdsrummet permanent",
+        "deleting": "Sletter …",
+        "failed": "Arbejdsrummet blev ikke slettet. Prøv igen.",
+        "notOwner": "Kun ejeren af arbejdsrummet kan slette det.",
+        "nameMismatch": "Navnet passer ikke. Skriv arbejdsrummets navn præcis som det står."
+      }
+    },
+    "ai": {
+      "title": "AI",
+      "subtitle": "Hvilken motor der svarer, og hvad den må.",
+      "providerTitle": "Sprogmodel",
+      "providerHint": "Installationen sætter en model i miljøet, og hvert arbejdsrum kan vælge sin egen i stedet.",
+      "provider": "Udbyder",
+      "model": {
+        "title": "Din egen sprogmodel",
+        "subtitle": "Arbejdsrummet kan køre på en anden model end den installationen har sat op. Vælger du ingenting, arver du installationens.",
+        "current": "Model",
+        "source": "Valgt af",
+        "fromInstallation": "Installationen",
+        "fromWorkspace": "Dette arbejdsrum",
+        "keySource": "Nøgle",
+        "keyFromWorkspace": "Arbejdsrummets egen",
+        "keyFromInstallation": "Installationens",
+        "keyMissing": "Mangler",
+        "providerLabel": "Udbyder",
+        "provider_mistral": "Mistral (EU)",
+        "provider_ollama": "Ollama (lokal)",
+        "providerNone": "Ingen model",
+        "inherit": "Følg installationen ({provider})",
+        "providerHelp": "Ollama-adressen bestemmes af installationen. Det er med vilje: et arbejdsrum der selv kunne pege på en adresse, ville få serveren til at hente fra hvor som helst.",
+        "modelLabel": "Modelnavn",
+        "modelHelpMistral": "Lad feltet stå tomt for at bruge {placeholder}.",
+        "modelHelpOllama": "Navnet skal matche en model du har hentet med „ollama pull“. Test forbindelsen ovenfor, så siger den hvilke du har.",
+        "keyLabel": "API-nøgle",
+        "keyPlaceholder": "Indsæt din Mistral-nøgle",
+        "keyStored": "Der ligger en gemt nøgle",
+        "keyHelp": "Lad feltet stå tomt for at bruge installationens nøgle. Nøglen krypteres før den gemmes og kan ikke læses ud igen.",
+        "keyStoredHelp": "Arbejdsrummet har sin egen nøgle. Skriv en ny for at erstatte den, eller fjern den for at falde tilbage på installationens.",
+        "keyRemove": "Fjern gemt nøgle",
+        "save": "Gem",
+        "saving": "Gemmer …",
+        "saved": "Gemt",
+        "saveFailed": "Kunne ikke gemmes. Prøv igen.",
+        "notAllowed": "Kun ejere og administratorer kan ændre arbejdsrummets model.",
+        "short_mistral": "Mistral",
+        "short_ollama": "Ollama",
+        "shortNone": "ingen model"
+      },
+      "noModel": "Ingen model konfigureret",
+      "setupIntro": "Tavle virker uden en model. Vil du have rigtige forslag og fritekstsvar, så sæt en op:",
+      "setupOutro": "Kør derefter Tavle igen. Uden en model svarer reservemotoren, og de tre flows virker stadig.",
+      "limitsTitle": "Loft over AI-kald",
+      "limitsHint": "Et modelkald koster penge på en hostet installation og minutter på en lokal. Tallene er rundhåndede for et menneske og nærige for et script.",
+      "perUser": "Kald pr. bruger i timen",
+      "perWorkspace": "Kald pr. arbejdsrum i døgnet",
+      "messageLength": "Tegn i det modellen får at læse, højst",
+      "principlesTitle": "Sådan bruger Tavle AI",
+      "principleDecides": "AI'en foreslår og udfører, men mennesket beslutter. Den sender aldrig noget ud af huset og sletter aldrig noget.",
+      "principleUndo": "Der gemmes en kopi af hele projektet før hver AI-ændring, og hver ændring kan fortrydes fra beskeden der lavede den.",
+      "principleData": "Det du og dine kolleger skriver, sendes til modellen som data, aldrig som instruktioner, og modellens svar valideres mod projektets egne id'er, før noget skrives.",
+      "principleSovereign": "Modellen kan skiftes ud, også til en lokal. Hvem der kan se hvad står i docs/subprocessors.md.",
+      "test": "Test forbindelsen",
+      "testing": "Tester …",
+      "testPatience": "En lokal model skal måske læses ind fra disken først. Det kan tage op mod et minut første gang.",
+      "testOk": "Modellen svarer",
+      "testOkDetail": "{model} svarede „{sample}“ på {seconds} sekunder.",
+      "testFailed": "Modellen svarer ikke",
+      "failAuth": "Nøglen blev afvist. Tjek arbejdsrummets egen nøgle herunder, eller installationens MISTRAL_API_KEY.",
+      "failUnreachable": "Der er ingen der lytter på adressen. Kører Ollama? Tjek OLLAMA_BASE_URL.",
+      "failConfig": "Modellen er sat op forkert. Ret modelnavnet herunder, eller LLM_MODEL i .env.",
+      "failGeneric": "Kaldet gik galt. Detaljerne står herunder og i serverloggen.",
+      "failRateLimited": "Mistral afviste kaldet som for mange (429). Nøglen virker, men kontoen eller planen sætter loftet: på den gratis Experiment-plan sker det ofte når modellen er travl, og en nøgle under et arbejdsrum uden aktiv plan får det samme svar. Tjek Billing og Limits på console.mistral.ai for den organisation nøglen hører til.",
+      "failWhereToLook": "Detaljerne står i serverloggen.",
+      "testNotAllowed": "Kun ejeren eller en administrator kan teste forbindelsen.",
+      "withoutTitle": "Uden model",
+      "withoutBody": "Tavlen, sprintene og tallene har ikke brug for en model. Det AI'en tilbyder er tre forslag, som en person retter i og siger ja til: et udkast til et kort, en opdeling af et kort, og sprintens historie. Uden model siger knapperne det, og alt andet virker som før."
+    },
+    "members": {
+      "title": "Medlemmer",
+      "body": "Alle i arbejdsrummet kan se og arbejde på alle tavler. Ejere og administratorer kan ændre tavlernes form, invitere og fjerne medlemmer.",
+      "name": "Navn",
+      "email": "E-mail",
+      "role": "Rolle",
+      "you": "(dig)",
+      "remove": "Fjern",
+      "removeTitle": "Fjern {name} fra arbejdsrummet?",
+      "removeBody": "Personen mister adgangen med det samme. Kort med personen som ansvarlig beholdes, men står uden ansvarlig.",
+      "removeConfirm": "Fjern medlemmet",
+      "leave": "Forlad arbejdsrummet",
+      "leaveTitle": "Forlad arbejdsrummet?",
+      "leaveBody": "Du mister adgangen til tavlerne. En ejer eller administrator kan invitere dig igen.",
+      "leaveConfirm": "Forlad",
+      "inviteTitle": "Inviter en kollega",
+      "inviteBody": "Skriv adressen, og du får et link. Send det selv, sådan som I ellers taler sammen. Linket gælder kun den adresse og i 48 timer.",
+      "invite": "Lav et link",
+      "issued": "Link til {email}",
+      "issuedHint": "Kopiér og send. Har personen ingen konto, oprettes den gennem linket; ellers logger de ind og siger ja.",
+      "copy": "Kopiér",
+      "copied": "Kopieret",
+      "copyLink": "Kopiér link",
+      "copyFailed": "Kunne ikke kopiere. Markér linket og kopiér selv.",
+      "pendingEmail": "Inviteret",
+      "expires": "Udløber",
+      "cancel": "Træk tilbage",
+      "errors": {
+        "alreadyMember": "Personen er allerede medlem.",
+        "alreadyInvited": "Der findes allerede et åbent link til den adresse. Træk det tilbage først, hvis du vil lave et nyt.",
+        "forbidden": "Det kræver at du er ejer eller administrator.",
+        "invalid": "Skriv en gyldig e-mailadresse.",
+        "generic": "Det gik galt. Prøv igen."
+      }
+    }
+  },
+  "demo": {
+    "bannerTitle": "Det her er en demo.",
+    "bannerBody": "Arbejdsrummet og alt i det slettes efter {hours} timer. Skriv gerne i det.",
+    "bannerCta": "Ansøg om en rigtig konto"
+  },
+  "terms": {
+    "title": "Vilkår og privatliv",
+    "updated": "Senest opdateret 4. september 2026.",
+    "back": "Tilbage",
+    "language": "In English",
+    "intro": "Tavle er et open source-værktøj til Kanban- og Scrum-teams, drevet af Haij. Det her er aftalen mellem dig og os, når du bruger den udgave vi driver. Kører du koden selv, gælder kun licensen.",
+    "what": {
+      "title": "Hvad Tavle er",
+      "body": "Et værktøj til at holde et teams arbejde synligt: tavler, kort, sprints og de tal der kan regnes ud fra dem. Vi giver ingen garanti for at det passer til jeres måde at arbejde på; prøv demoen først."
+    },
+    "account": {
+      "title": "Konto og adgang",
+      "body": "Du får adgang ved at ansøge eller blive inviteret. Vi gemmer dit navn, din e-mail og navnet på dit arbejdsrum, og vi bruger dem til at logge dig ind og til at skrive til dig om tjenesten. Adgangskoder gemmes hashet, og du kan tilføje passkey og totrinsbekræftelse. Vi sælger ikke noget, og vi sender ikke markedsmails du ikke har bedt om."
+    },
+    "yourData": {
+      "title": "Jeres data",
+      "body": "Alt et arbejdsrum lægger ind, tilhører arbejdsrummet. Det kan hentes ud som regneark og JSON med ét klik og slettes helt igen, revisionssporet inklusive. Vi kigger ikke i det, medmindre I beder os om hjælp, og vi videregiver det aldrig."
+    },
+    "ai": {
+      "title": "AI",
+      "body": "Er der sat en sprogmodel op, sendes de kort og sprints en person beder om hjælp til, til modeludbyderen. Hvem det er, står under Indstillinger → AI og i listen over underdatabehandlere. Modellen foreslår; intet gemmes uden at en person siger ja."
+    },
+    "leaving": {
+      "title": "At holde op",
+      "body": "Du kan slette dit arbejdsrum med det samme, uden at skrive til nogen og uden at vente. Eksporten ligger et klik væk, og den er læsbar uden Tavle. Vi opbevarer ikke en kopi bagefter ud over de natlige krypterede backups, som ruller ud efter 30 dage."
+    },
+    "availability": {
+      "title": "Drift og garantier",
+      "body": "Tavle er ny, og der er ingen oppetidsgaranti. Vi passer på dine data med krypterede backups hver nat, men du bør hente en eksport ind imellem, hvis projektet er vigtigt. Tjenesten leveres som den er, uden garantier ud over hvad ufravigelig lovgivning kræver."
+    },
+    "license": {
+      "title": "Licens",
+      "body": "Koden er AGPL-3.0. Du må bruge, ændre og køre den selv; ændrer du den og stiller den til rådighed for andre over et netværk, skal dine ændringer også være tilgængelige. Det du skriver i værktøjet er ikke omfattet af licensen — det er dit."
+    },
+    "demo": {
+      "title": "Demoen",
+      "body": "Et demo-arbejdsrum oprettes uden e-mail eller tilmelding og slettes helt efter 24 timer, konto inklusive. Læg ikke rigtige personoplysninger i det. Vi gemmer kun de tekniske logdata der skal til for at holde demoen kørende."
+    },
+    "contact": {
+      "title": "Kontakt",
+      "body": "Skriv til martin@vintherconsulting.dk. Har du fundet et sikkerhedsproblem, står fremgangsmåden i SECURITY.md i kodearkivet; meld det der frem for i en almindelig mail."
+    },
+    "subprocessorsNote": "Hvem der kan se hvad, står i",
+    "shareLinks": {
+      "title": "Invitationer",
+      "body": "Et invitationslink gælder én adresse og udløber efter to døgn. Det er dig der sender det; vi sender ingen mails."
+    }
+  },
+  "boards": {
+    "mode": {
+      "kanban": "Kanban",
+      "scrum": "Scrum"
+    },
+    "tabs": {
+      "board": "Tavle",
+      "backlog": "Backlog",
+      "sprints": "Sprints",
+      "insight": "Indsigt",
+      "settings": "Indstillinger",
+      "archived": "arkiveret"
+    },
+    "list": {
+      "title": "Tavler",
+      "subtitle": "Alle tavler i arbejdsrummet. Én tavle pr. team eller produkt.",
+      "emptyTitle": "Ingen tavler endnu",
+      "emptyBody": "En tavle er ét teams arbejde: kolonner, kort og, hvis I kører Scrum, sprints. Opret den første, og inviter kollegerne under Indstillinger → Arbejdsrum.",
+      "counts": "{open} åbne · {doing} i gang · {done} færdige",
+      "activeSprint": "{name} slutter {date}",
+      "noSprint": "Ingen sprint i gang",
+      "flow": "Løbende flow",
+      "archived": "Arkiverede tavler"
+    },
+    "new": {
+      "cta": "Ny tavle",
+      "title": "Opret en tavle",
+      "subtitle": "Et navn, et kort præfiks til kortnumrene, og måden I arbejder på.",
+      "name": "Navn",
+      "key": "Nøgle",
+      "keyHint": "Kortene nummereres {key}-1, {key}-2 og så videre. Kan ikke ændres bagefter.",
+      "modeLabel": "Sådan arbejder I",
+      "kanbanHint": "Et løbende flow med kolonner og en grænse for hvor meget der må være i gang. Ingen sprints.",
+      "scrumHint": "Arbejdet planlægges i sprints fra en backlog. Tavlen viser den sprint der kører.",
+      "submit": "Opret tavle",
+      "cancel": "Annuller"
+    },
+    "view": {
+      "noSprintTitle": "Ingen sprint i gang",
+      "noSprintBody": "Tavlen viser den sprint der kører. Planlæg en i backloggen, læg kort i den og start den.",
+      "noSprintCta": "Gå til backloggen"
+    },
+    "column": {
+      "empty": "Ingen kort her. Træk et kort hertil, eller brug menuen på kortet.",
+      "overLimit": "Over grænsen"
+    },
+    "card": {
+      "blocked": "Blokeret",
+      "unassigned": "Ingen ansvarlig",
+      "menu": "Menu for kortet",
+      "open": "Åbn kortet",
+      "moveTo": "Flyt til"
+    },
+    "quickAdd": {
+      "open": "Tilføj kort",
+      "placeholder": "Hvad skal der laves?",
+      "label": "Nyt kort",
+      "add": "Tilføj",
+      "cancel": "Annuller"
+    },
+    "filters": {
+      "search": "Søg i kort",
+      "assignee": "Ansvarlig",
+      "anyone": "Alle",
+      "unassigned": "Uden ansvarlig",
+      "label": "Label",
+      "anyLabel": "Alle labels",
+      "clear": "Ryd"
+    },
+    "sprint": {
+      "kicker": "{start} – {end}",
+      "daysLeft": "Dage tilbage",
+      "overdue": "{days} dage over",
+      "progress": "Fremdrift",
+      "points": "point",
+      "toBacklog": "Backlog",
+      "close": "Afslut sprint",
+      "closeTitle": "Afslut {name}",
+      "closeBody": "{done} kort er færdige ({points} point). {open} er ikke. Sprintens tal gemmes som de er nu.",
+      "unfinishedGo": "De ufærdige kort flyttes til",
+      "toBacklogOption": "Backloggen, øverst",
+      "closeConfirm": "Afslut sprinten",
+      "cancel": "Annuller"
+    },
+    "priority": {
+      "low": "Lav",
+      "normal": "Normal",
+      "high": "Høj",
+      "urgent": "Haster"
+    },
+    "errors": {
+      "conflict": "Nogen har ændret det samme, mens du skrev. Siden er hentet igen, så du kan se hvad der står nu.",
+      "notFound": "Det findes ikke længere.",
+      "invalid": "Noget i det du skrev kunne ikke bruges. Se felterne igennem.",
+      "unauthorized": "Du er ikke logget ind længere.",
+      "forbidden": "Det kræver at du er ejer eller administrator af arbejdsrummet.",
+      "generic": "Det gik galt. Prøv igen."
+    }
+  },
+  "cards": {
+    "title": {
+      "label": "Titel",
+      "edit": "Redigér titlen",
+      "save": "Gem",
+      "cancel": "Annuller"
+    },
+    "description": {
+      "title": "Beskrivelse",
+      "edit": "Redigér",
+      "write": "Skriv",
+      "placeholder": "Hvad skal laves, og hvorfor? Hvad skal være sandt, når det er færdigt?",
+      "save": "Gem",
+      "cancel": "Annuller",
+      "empty": "Ingen beskrivelse endnu."
+    },
+    "checklist": {
+      "title": "Tjekliste",
+      "placeholder": "Nyt punkt",
+      "add": "Tilføj",
+      "remove": "Fjern {title}"
+    },
+    "comments": {
+      "title": "Kommentarer",
+      "empty": "Ingen kommentarer endnu.",
+      "placeholder": "Skriv til teamet …",
+      "send": "Send",
+      "remove": "Fjern",
+      "unknown": "Tidligere medlem"
+    },
+    "activity": {
+      "title": "Aktivitet",
+      "byAi": "AI"
+    },
+    "fields": {
+      "column": "Kolonne",
+      "inBacklog": "Kortet ligger i backloggen og er ikke på tavlen endnu.",
+      "sprint": "Sprint",
+      "backlog": "Backlog",
+      "active": "i gang",
+      "assignee": "Ansvarlig",
+      "nobody": "Ingen",
+      "estimate": "Estimat",
+      "priority": "Prioritet",
+      "dueDate": "Deadline",
+      "labels": "Labels",
+      "blocked": "Blokeret",
+      "blockedReason": "Hvad venter kortet på?"
+    },
+    "ai": {
+      "title": "AI-hjælp",
+      "draft": "Skriv kortet færdigt",
+      "split": "Foreslå opdeling",
+      "noModel": "Der er ingen sprogmodel sat op i arbejdsrummet.",
+      "noModelLink": "Vælg en under Indstillinger → AI.",
+      "principle": "AI'en foreslår, du bestemmer. Intet gemmes, før du siger ja, og alt den skriver mærkes i aktiviteten.",
+      "draftTitle": "Udkast til kortet",
+      "splitTitle": "Forslag til opdeling",
+      "thinking": "Modellen tænker. En lokal model kan tage op mod et minut.",
+      "editHint": "Ret i alt hvad du vil, før det gemmes.",
+      "descriptionField": "Beskrivelse",
+      "acceptanceField": "Sådan ved vi, det er færdigt",
+      "checklistField": "Tjekliste",
+      "acceptanceHeading": "Færdigt når:",
+      "drop": "Fjern",
+      "keep": "Behold",
+      "points": "Point",
+      "applyDraft": "Gem i kortet",
+      "applySplit": "Opret {count, plural, one {# kort} other {# kort}}",
+      "cancel": "Annuller",
+      "engine": "Skrevet af {engine}",
+      "errors": {
+        "noModel": "Der er ingen sprogmodel sat op.",
+        "rateLimited": "Der er kaldt modellen for mange gange. Prøv igen om lidt.",
+        "unreachable": "Modellen svarer ikke. Tjek indstillingerne under AI.",
+        "badAnswer": "Modellen svarede med noget der ikke kunne bruges. Prøv igen.",
+        "generic": "Det gik galt. Prøv igen.",
+        "unauthorized": "Du er ikke logget ind længere.",
+        "invalid": "Noget i forespørgslen var forkert.",
+        "notFound": "Kortet findes ikke længere."
+      }
+    },
+    "page": {
+      "archived": "Arkiveret",
+      "created": "Oprettet {date}",
+      "started": "Påbegyndt {date}",
+      "done": "Færdigt {date}",
+      "archive": "Arkivér",
+      "restore": "Gendan",
+      "delete": "Slet",
+      "deleteTitle": "Slet kortet?",
+      "deleteBody": "{key} slettes med kommentarer og historik. Vil du kunne finde det igen, så arkivér det i stedet.",
+      "deleteConfirm": "Slet kortet"
+    }
+  },
+  "backlog": {
+    "title": "Backlog",
+    "holds": "{cards, plural, one {# kort} other {# kort}} · {points} point",
+    "targetSprint": "Sprint",
+    "commit": "Læg {count, plural, one {# kort} other {# kort}} i sprinten",
+    "empty": "Backloggen er tom. Tilføj det næste, teamet skal lave.",
+    "addPlaceholder": "Nyt kort i backloggen",
+    "newSprint": "Planlæg en sprint",
+    "row": {
+      "select": "Vælg {key}",
+      "up": "Flyt op",
+      "down": "Flyt ned"
+    },
+    "sprint": {
+      "activeLabel": "i gang",
+      "plannedLabel": "planlagt",
+      "holds": "{cards, plural, one {# kort} other {# kort}} · {points} point",
+      "edit": "Redigér",
+      "start": "Start sprinten",
+      "anotherActive": "Der kører allerede en sprint. Afslut den først.",
+      "toBoard": "Se tavlen",
+      "empty": "Ingen kort endnu. Vælg kort i backloggen og læg dem her.",
+      "toBacklog": "Flyt {count, plural, one {# kort} other {# kort}} til backloggen"
+    },
+    "sprintForm": {
+      "defaultName": "Sprint {number}",
+      "newTitle": "Planlæg en sprint",
+      "editTitle": "Redigér sprinten",
+      "name": "Navn",
+      "goal": "Mål",
+      "goalPlaceholder": "Én sætning om hvad sprinten skal gøre muligt",
+      "start": "Start",
+      "end": "Slut",
+      "create": "Planlæg",
+      "save": "Gem",
+      "cancel": "Annuller"
+    }
+  },
+  "sprints": {
+    "title": "Sprints",
+    "velocityTitle": "Velocity",
+    "velocityBody": "Point færdiggjort pr. afsluttet sprint. Gennemsnit af de sidste tre: {average}.",
+    "emptyTitle": "Ingen sprints endnu",
+    "emptyBody": "Sprints planlægges i backloggen. Her ligger de, når de er kørt.",
+    "closedPoints": "{completed} af {committed} point",
+    "committedPoints": "{committed} point lovet",
+    "state": {
+      "planned": "Planlagt",
+      "active": "I gang",
+      "closed": "Afsluttet"
+    },
+    "detail": {
+      "back": "Alle sprints",
+      "burndownTitle": "Burndown",
+      "numbers": "{done} af {total} kort færdige · {donePoints} af {totalPoints} point",
+      "notStarted": "Sprinten er ikke startet endnu.",
+      "cardsTitle": "Kort i sprinten",
+      "noCards": "Ingen kort."
+    },
+    "notes": {
+      "summaryTitle": "Sprintens historie",
+      "summaryBody": "Hvad teamet satte sig for, hvad der blev færdigt, og hvad der ikke gjorde. Skriv selv, eller lad modellen lave et udkast ud fra kortene.",
+      "summaryPlaceholder": "Vi satte os for at …",
+      "save": "Gem",
+      "draft": "Lav et udkast",
+      "thinking": "Modellen tænker …",
+      "drafted": "Udkast fra {engine}. Ret i det, og gem.",
+      "highlights": "Det vigtigste:",
+      "risks": "Hold øje med:",
+      "noModel": "Ingen sprogmodel sat op.",
+      "noModelLink": "Vælg en under Indstillinger → AI.",
+      "retroTitle": "Retrospektiv",
+      "retroBody": "Tre spørgsmål efter hver sprint. Kort og ærligt, og med mindst én handling I faktisk gør.",
+      "retro": {
+        "wentWell": "Hvad gik godt?",
+        "improve": "Hvad kan blive bedre?",
+        "actions": "Hvad gør vi anderledes?"
+      },
+      "saveRetro": "Gem retrospektiv",
+      "errors": {
+        "noModel": "Der er ingen sprogmodel sat op.",
+        "rateLimited": "Der er kaldt modellen for mange gange. Prøv igen om lidt.",
+        "unreachable": "Modellen svarer ikke. Tjek indstillingerne under AI.",
+        "badAnswer": "Modellen svarede med noget der ikke kunne bruges. Prøv igen.",
+        "generic": "Det gik galt. Prøv igen.",
+        "unauthorized": "Du er ikke logget ind længere.",
+        "invalid": "Noget i forespørgslen var forkert.",
+        "notFound": "Sprinten findes ikke længere."
+      }
+    }
+  },
+  "insight": {
+    "title": "Indsigt",
+    "wip": "I gang nu",
+    "wipHint": "Kort i kolonner af typen I gang",
+    "cycle": "Cycle time",
+    "cycleNone": "Ingen færdige kort de sidste 30 dage",
+    "cycleHint": "Median. Gennemsnit {average} dage over {sample} kort",
+    "lead": "Lead time",
+    "leadHint": "Fra kortet blev oprettet til det var færdigt",
+    "weekly": "Færdige denne uge",
+    "weeklyHint": "Gennemsnit {average} pr. uge over otte uger",
+    "days": "{days} dage",
+    "burndownTitle": "Burndown",
+    "burndownBody": "{name}: {remaining} af {committed} point tilbage. Slutter {end}.",
+    "burndownNone": "Der kører ingen sprint lige nu.",
+    "velocityTitle": "Velocity",
+    "velocityBody": "Point færdiggjort pr. afsluttet sprint. Gennemsnit af de sidste tre: {average}.",
+    "velocityNone": "Ingen afsluttede sprints endnu.",
+    "throughputTitle": "Færdige kort pr. uge",
+    "throughputBody": "De sidste otte uger. Jævnt er godt; svingende er et tegn på flaskehalse.",
+    "flowTitle": "Cumulative flow",
+    "flowBody": "Hvor kortene har ligget, dag for dag de sidste 30 dage. Bliver båndet I gang bredere, hober arbejdet sig op.",
+    "legend": {
+      "backlog": "Backlog",
+      "todo": "Klar",
+      "doing": "I gang",
+      "done": "Færdig"
+    }
+  },
+  "boardSettings": {
+    "title": "Tavlens indstillinger",
+    "about": {
+      "title": "Om tavlen",
+      "body": "Nøglen {key} står foran hvert kortnummer og kan ikke ændres.",
+      "name": "Navn",
+      "description": "Beskrivelse",
+      "sprintLength": "Sprintlængde i dage",
+      "save": "Gem"
+    },
+    "columns": {
+      "title": "Kolonner",
+      "body": "Navn, hvad kolonnen betyder for tallene, og en eventuel grænse for hvor mange kort der må være i den. Grænsen advarer, den forbyder ikke.",
+      "name": "Navn",
+      "category": "Type",
+      "wip": "WIP-grænse",
+      "add": "Tilføj kolonne",
+      "save": "Gem",
+      "up": "Flyt til venstre",
+      "down": "Flyt til højre",
+      "moveCardsTo": "Flyt kortene til",
+      "delete": "Slet",
+      "deleteTitle": "Slet kolonnen {name}?",
+      "deleteBody": "Kortene i den flyttes til {into}.",
+      "deleteConfirm": "Slet kolonnen"
+    },
+    "category": {
+      "backlog": "Backlog",
+      "todo": "Klar",
+      "doing": "I gang",
+      "done": "Færdig"
+    },
+    "labels": {
+      "title": "Labels",
+      "body": "Korte ord kortene kan mærkes med. Højst tyve pr. tavle.",
+      "name": "Navn",
+      "color": "Farve",
+      "placeholder": "Nyt label",
+      "add": "Tilføj",
+      "save": "Gem",
+      "delete": "Slet",
+      "empty": "Ingen labels.",
+      "colors": {
+        "moss": "Grøn",
+        "amber": "Gul",
+        "rose": "Rød",
+        "sky": "Blå",
+        "plum": "Lilla",
+        "slate": "Grå"
+      }
+    },
+    "danger": {
+      "title": "Arkivér eller slet",
+      "body": "En arkiveret tavle forsvinder fra oversigten men beholder alt. Sletning fjerner tavlen med alle kort, kommentarer og historik.",
+      "archivedBody": "Tavlen er arkiveret. Den kan gendannes, eller slettes helt.",
+      "archive": "Arkivér tavlen",
+      "restore": "Gendan tavlen",
+      "delete": "Slet tavlen",
+      "deleteTitle": "Slet {name}?",
+      "deleteBody": "Alle kort, sprints, kommentarer og historik slettes. Det kan ikke fortrydes; eksportér først, hvis du er i tvivl.",
+      "deleteConfirm": "Slet tavlen"
+    }
+  },
+  "my": {
+    "title": "Mine kort",
+    "subtitle": "{count, plural, =0 {Ingen åbne kort med dig som ansvarlig} one {# åbent kort med dig som ansvarlig} other {# åbne kort med dig som ansvarlig}}.",
+    "emptyTitle": "Ingenting på dit bord",
+    "emptyBody": "Kort med dig som ansvarlig lander her, på tværs af alle tavler i arbejdsrummet.",
+    "blocked": "Blokeret"
+  },
+  "join": {
+    "title": "Du er inviteret",
+    "intro": "{inviter} har inviteret dig ind i arbejdsrummet {workspace}.",
+    "someone": "En kollega",
+    "invalidTitle": "Linket virker ikke længere",
+    "invalidBody": "Invitationen er udløbet eller trukket tilbage. Bed den der inviterede dig om et nyt link.",
+    "acceptedBody": "Invitationen er allerede brugt. Log ind for at komme ind i arbejdsrummet.",
+    "toLogin": "Log ind",
+    "wrongAccount": "Invitationen er til {email}, men du er logget ind som {current}. Log ud, og åbn linket igen.",
+    "switchAccount": "Log ud",
+    "accept": "Kom ind i arbejdsrummet",
+    "wrongPerson": "Invitationen er sendt til en anden adresse end den du er logget ind med.",
+    "name": "Dit navn",
+    "email": "E-mail",
+    "lockedHint": "Invitationen gælder denne adresse. Kontoen bliver medlem af {workspace}.",
+    "password": "Adgangskode",
+    "passwordHint": "Mindst 12 tegn. En sætning er nemmere at huske end et kodeord.",
+    "submit": "Opret konto og kom ind",
+    "haveAccount": "Har du allerede en konto?",
+    "loginLink": "Log ind",
+    "errorEmailExists": "Der findes allerede en konto med den adresse. Log ind, og åbn linket igen.",
+    "errorInvalid": "Noget i det du skrev kunne ikke bruges. Se felterne igennem.",
+    "errorGeneric": "Det gik galt. Prøv igen."
+  },
+  "events": {
+    "board": {
+      "created": "Tavlen {name} blev oprettet",
+      "updated": "Tavlen blev omdøbt til {name}"
+    },
+    "column": {
+      "created": "Kolonnen {name} blev tilføjet",
+      "updated": "Kolonnen {name} blev ændret",
+      "deleted": "Kolonnen {name} blev slettet; kortene flyttet til {into}"
+    },
+    "label": {
+      "created": "Labelet {name} blev tilføjet",
+      "deleted": "Labelet {name} blev slettet"
+    },
+    "card": {
+      "created": "{key} blev oprettet i {column}",
+      "moved": "{key} blev flyttet til {column}",
+      "updated": "{key} blev redigeret ({fields})",
+      "assigned": "{key} fik {name} som ansvarlig",
+      "unassigned": "{key} står uden ansvarlig",
+      "estimated": "{key} blev estimeret til {points} point",
+      "blocked": "{key} blev blokeret: {reason}",
+      "unblocked": "{key} er ikke længere blokeret",
+      "labels": "{key} fik labels: {labels}",
+      "checklist": "Tjeklisten på {key} står på {done} af {total}",
+      "sprint": "{key} blev lagt i {sprint}",
+      "backlog": "{key} blev flyttet til backloggen",
+      "archived": "{key} blev arkiveret",
+      "restored": "{key} blev gendannet",
+      "deleted": "{key} blev slettet",
+      "split": "{key} blev delt op i {into}"
+    },
+    "comment": {
+      "added": "Kommentar på {key}",
+      "deleted": "En kommentar på {key} blev fjernet"
+    },
+    "sprint": {
+      "created": "{name} blev planlagt",
+      "updated": "{name} blev ændret",
+      "started": "{name} startede med {cards} kort og {points} point",
+      "closed": "{name} blev afsluttet: {completed} af {committed} point, {carried} kort ført videre",
+      "retro": "Retrospektiv skrevet for {name}",
+      "summary": "Historien om {name} blev gemt"
+    },
+    "ai": {
+      "drafted": "AI skrev et udkast til {key} ({engine})"
+    }
+  },
+  "help": {
+    "title": "Hjælp",
+    "intro": "To ting på denne side: hvordan værktøjet virker, og hvordan man får en tavle til at hjælpe teamet. Den sidste del er den vigtigste.",
+    "howToTitle": "Sådan bruger du værktøjet",
+    "howTo": {
+      "boards": {
+        "title": "Tavler",
+        "body": "En tavle er ét teams arbejde. Når du opretter den, vælger du om I kører Kanban eller Scrum, og giver den en nøgle som WEB, så kortene hedder WEB-1, WEB-2 og så videre. Alle i arbejdsrummet kan se og arbejde på alle tavler."
+      },
+      "kanban": {
+        "title": "Kanban",
+        "body": "Kolonnerne er jeres flow: Backlog, Klar, I gang, Færdig som udgangspunkt, og I kan tilføje flere under tavlens indstillinger. Sæt en WIP-grænse på de kolonner hvor arbejdet udføres. Bliver kolonnen fuld, farves den, og det er tegnet på at gøre noget færdigt før I starter mere."
+      },
+      "scrum": {
+        "title": "Scrum",
+        "body": "Kortene ligger i backloggen, indtil I lægger dem i en sprint. Planlæg sprinten under Backlog, vælg kortene, og start den. Tavlen viser kun den sprint der kører. Når I afslutter den, skrives velocity ned, og de ufærdige kort ryger tilbage øverst i backloggen eller ind i den næste sprint."
+      },
+      "cards": {
+        "title": "Kort",
+        "body": "Et kort skal bare have en titel for at findes. Klik på titlen for at åbne kortet: her sætter I ansvarlig, estimat, prioritet, deadline, labels og tjekliste, og skriver til hinanden i kommentarerne. Alt gemmes med det samme. Et blokeret kort får en rød kant, så det ikke bliver overset."
+      },
+      "backlog": {
+        "title": "Backloggen",
+        "body": "Backloggen er den prioriterede liste over det næste, teamet skal lave, øverst er vigtigst. Træk kortene, eller brug pilene. Vælg kort med afkrydsningen og læg dem i en sprint med én knap."
+      },
+      "insight": {
+        "title": "Indsigt",
+        "body": "Alle tal regnes ud fra det der faktisk skete med kortene, aldrig fra et skøn. Kanban-teams kigger på færdige kort pr. uge, cycle time og cumulative flow. Scrum-teams kigger på burndown for den sprint der kører og velocity for de afsluttede."
+      },
+      "team": {
+        "title": "Teamet",
+        "body": "Inviter kollegerne under Indstillinger → Arbejdsrum. Du får et link, som du selv sender. Har personen ingen konto, bliver den oprettet gennem linket. Ejere og administratorer kan ændre tavlernes kolonner og labels, invitere og fjerne medlemmer; alle andre kan alt det andet."
+      },
+      "ai": {
+        "title": "AI-hjælpen",
+        "body": "Er der sat en sprogmodel op, kan den skrive et kort færdigt, foreslå at dele et stort kort op, og skrive sprintens historie. Alt vises som et forslag, du retter i og siger ja til. Intet gemmes uden dig, og alt den skriver mærkes i aktiviteten."
+      },
+      "data": {
+        "title": "Dine data",
+        "body": "Under Indstillinger → Data kan hele arbejdsrummet hentes som regneark og JSON med ét klik, og ejeren kan slette det helt. Det er jeres data, altid."
+      }
+    },
+    "abcTitle": "Tavlens ABC",
+    "abcIntro": "Ti regler for et team der arbejder på en tavle. De gælder, uanset hvilket værktøj I bruger.",
+    "abc": {
+      "0": {
+        "title": "Gør arbejdet synligt",
+        "body": "Alt teamet arbejder på, står på tavlen. Ikke det meste, alt. Det der ikke er på tavlen, kan ingen hjælpe med, og ingen kan se hvor meget der er i gang."
+      },
+      "1": {
+        "title": "Begræns hvor meget der er i gang",
+        "body": "Sæt en grænse på kolonnerne hvor arbejdet udføres, og hold den. Ti ting halvt færdige er værre end tre ting færdige. Grænsen er ikke en straf, den er en samtale: Hvad gør vi færdigt først?"
+      },
+      "2": {
+        "title": "Gør færdigt før I starter nyt",
+        "body": "Når en kolonne er fuld, hjælper man med det der er i gang i stedet for at trække et nyt kort. Det er det ene princip der forkorter tiden fra idé til noget virker."
+      },
+      "3": {
+        "title": "Hold kortene små",
+        "body": "Et kort skal kunne gøres færdigt på en dag eller to. Kan det ikke, så del det op. Små kort flyder, store kort sidder fast, og et blokeret stort kort er en uge tabt."
+      },
+      "4": {
+        "title": "Én ansvarlig pr. kort",
+        "body": "Flere kan hjælpe, men én person ejer kortet og ved hvor det står. Et kort uden ansvarlig er et kort ingen har."
+      },
+      "5": {
+        "title": "Aftal hvad færdig betyder",
+        "body": "Skriv i beskrivelsen hvad der skal være sandt, når kortet er færdigt. Testet? Vist til nogen? I drift? Hvis teamet ikke har samme svar, er Færdig bare et ord."
+      },
+      "6": {
+        "title": "Kig på flowet, ikke på personerne",
+        "body": "Tallene handler om systemet: hvor lang tid tager et kort, hvor hober det sig op. De handler ikke om hvem der er hurtigst. Et team der bruger tallene til at pege fingre, holder op med at skrive ærligt på tavlen."
+      },
+      "7": {
+        "title": "Et blokeret kort er et signal",
+        "body": "Markér kortet som blokeret med det samme, og skriv hvad det venter på. Så kan den der kan løse det, se det. Et blokeret kort der bare står i I gang, er det dyreste kort på tavlen."
+      },
+      "8": {
+        "title": "Hav en rytme",
+        "body": "Scrum-teams har sprints; Kanban-teams har et fast tidspunkt hvor de kigger på tavlen sammen. Rytmen er det der får teamet til at rydde op, tale om det der sidder fast og beslutte det næste."
+      },
+      "9": {
+        "title": "Forbedr i små skridt",
+        "body": "Efter hver sprint, eller hver anden uge, ét spørgsmål: Hvad gør vi anderledes? Vælg én ting, gør den, og se på tallene. Store forandringer overlever sjældent en travl uge; små gør."
+      }
+    },
+    "closing": "Værktøjet gør ikke teamet godt. Det gør de ti regler, og tavlen er der, så I kan se om I følger dem."
+  }
+}

@@ -1,0 +1,1031 @@
+{
+  "common": {
+    "appName": "Tavle",
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "error": "Something went wrong. Please try again.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "week": "Week {number}",
+    "weekOf": "Week of {date}",
+    "thinking": {
+      "seconds": "{seconds} s",
+      "slow": "A local model can take up to a minute. If it does not answer, the rules engine takes over and the page says so."
+    }
+  },
+  "landing": {
+    "nav": {
+      "login": "Log in",
+      "register": "Create account",
+      "apply": "Apply for access"
+    },
+    "hero": {
+      "title": "The team's board, without the subscription.",
+      "subtitle": "Kanban and Scrum for teams of two to fifteen. Cards, columns, WIP limits, sprints, burndown and velocity, computed from what actually happened. Open source, on EU soil or your own server, with an AI that proposes and never decides.",
+      "ctaPrimary": "Create account",
+      "ctaSecondary": "Sign in",
+      "trust": "AGPL-3.0 · Passkeys and two-factor sign-in · Your data leaves with one click",
+      "ctaApply": "Apply for access",
+      "ctaDemo": "Try the demo"
+    },
+    "flowsLabel": "What you get",
+    "values": {
+      "aiTitle": "AI that helps, not takes over",
+      "aiBody": "The model can finish writing a card, suggest a split and tell the sprint's story. Everything is shown as a proposal, and everything it does can be seen and undone. Run it at Mistral in the EU or locally with Ollama.",
+      "dataTitle": "Your data, always",
+      "dataBody": "The whole workspace comes out as a spreadsheet and JSON with one click and can be deleted entirely. The code is open source, so you can take it with you.",
+      "securityTitle": "Secure from day one",
+      "securityBody": "Workspaces are separated in the database, not only in the code. Passkeys, two-factor sign-in and a log that cannot be edited."
+    },
+    "status": "Version 0.9 · built to be used",
+    "family": {
+      "body": "Tavle is one tool in the Haij family of open source tools for organisations that want to own their technology.",
+      "link": "Read about Haij"
+    },
+    "footer": {
+      "license": "Open source under AGPL-3.0",
+      "language": "Dansk",
+      "terms": "Terms and privacy"
+    },
+    "demo": {
+      "title": "Try it without creating anything",
+      "body": "You get your own workspace with two boards in full swing, one Kanban and one Scrum. It is deleted after {hours} hours. No e-mail, no sign-up.",
+      "privacy": "Do not put real personal data in the demo. It passes a database and possibly a language model on the way.",
+      "cta": "Open a demo"
+    },
+    "flows": {
+      "kanban": "Kanban with WIP limits",
+      "scrum": "Scrum with sprints",
+      "cards": "Cards with checklist and comments",
+      "backlog": "An ordered backlog",
+      "insight": "Burndown, velocity, cycle time, cumulative flow",
+      "team": "Invite the team with a link",
+      "ai": "An AI that proposes, you decide"
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The address is wrong, or the page has moved.",
+    "cta": "To the front page"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Welcome back.",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "or": "or",
+      "withPasskey": "Sign in with a passkey",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Create account",
+      "error": "Wrong email or password.",
+      "passkeyError": "Passkey sign-in failed. Please try again."
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Your account and your workspace are created together.",
+      "name": "Your name",
+      "email": "Email",
+      "organizationName": "Workspace name",
+      "organizationHint": "Your company, association or team. Can be changed later.",
+      "password": "Password",
+      "passwordHint": "At least 12 characters.",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log in",
+      "errorInvalid": "Check the fields and try again.",
+      "errorEmailExists": "An account with this email already exists.",
+      "errorGeneric": "The account could not be created. Please try again.",
+      "closedTitle": "Registration is closed",
+      "closedBody": "This Tavle installation is not accepting new users. Contact the owner if you need access.",
+      "invitedSubtitle": "You are invited. The account is created for the email and the workspace the invitation is for.",
+      "lockedHint": "Set by the invitation.",
+      "errorInvitationInvalid": "The invitation has expired or has already been used. Ask for a new link.",
+      "invitationInvalidTitle": "This link no longer works",
+      "invitationInvalidBody": "The invitation has expired, been used, or been replaced by a newer one. Ask the person who invited you for a new link, or apply for access again.",
+      "applyLink": "Apply for access"
+    },
+    "twoFactor": {
+      "title": "Two-factor authentication",
+      "subtitle": "Enter the code from your authenticator app.",
+      "submit": "Verify",
+      "error": "Wrong code. Please try again."
+    },
+    "onboarding": {
+      "title": "Create your workspace",
+      "subtitle": "You need a workspace before you can get started.",
+      "organizationName": "Workspace name",
+      "submit": "Create workspace",
+      "error": "The workspace could not be created. Please try again."
+    },
+    "apply": {
+      "title": "Apply for access",
+      "subtitle": "This Tavle installation accepts new users after a short application. The owner reads it personally and replies by email.",
+      "name": "Your name",
+      "email": "Email",
+      "organizationName": "Organisation or association",
+      "message": "What will you use Tavle for?",
+      "messageHint": "Optional. A line or two about the team makes it easier to say yes.",
+      "submit": "Send application",
+      "sentTitle": "Thanks, your application has been received",
+      "sentBody": "You will hear from the owner of this installation at {email}. The reply comes from a person, so allow a day or two.",
+      "errorInvalid": "Check the fields and try again.",
+      "errorTooMany": "Many applications have been sent from here in a short time. Try again in an hour.",
+      "privacy": "We store your name, email and organisation to handle the application, and nothing else. If it is declined, the details remain only as a note of the decision.",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log in"
+    }
+  },
+  "app": {
+    "nav": {
+      "help": "Help",
+      "security": "Security",
+      "logout": "Log out",
+      "appearance": "Appearance",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "Follow system",
+      "language": "Language",
+      "danish": "Dansk",
+      "english": "English",
+      "openMenu": "Open menu",
+      "menuTitle": "Navigation",
+      "settings": "Settings",
+      "skipToContent": "Skip to content",
+      "hideMenu": "Hide the menu",
+      "showMenu": "Show the menu",
+      "boards": "Boards",
+      "my": "My cards"
+    },
+    "orgSwitcher": {
+      "label": "Workspace",
+      "create": "Create workspace",
+      "createTitle": "Create new workspace",
+      "name": "Name",
+      "createSubmit": "Create",
+      "switched": "Switched to {name}",
+      "created": "{name} has been created",
+      "error": "The workspace could not be created. Please try again.",
+      "switch": "Switch workspace"
+    },
+    "security": {
+      "title": "Security",
+      "subtitle": "Passkeys and two-factor authentication for your account.",
+      "passkeys": {
+        "title": "Passkeys",
+        "description": "Sign in without a password using Touch ID, Face ID or a security key.",
+        "empty": "No passkeys yet.",
+        "nameLabel": "Name",
+        "namePlaceholder": "E.g. MacBook",
+        "add": "Add passkey",
+        "remove": "Remove",
+        "addedAt": "Added {date}",
+        "addedToast": "Passkey added",
+        "removedToast": "Passkey removed",
+        "error": "The passkey could not be added. Please try again."
+      },
+      "totp": {
+        "title": "Two-factor authentication (TOTP)",
+        "description": "Require a code from your authenticator app at sign-in.",
+        "statusEnabled": "Enabled",
+        "statusDisabled": "Disabled",
+        "enable": "Enable",
+        "disable": "Disable",
+        "password": "Confirm with your password",
+        "scan": "Scan the QR code with your authenticator app and enter the code below.",
+        "backupCodes": "Backup codes",
+        "backupHint": "Store the codes somewhere safe. They can be used if you lose your phone.",
+        "verifyLabel": "Code from the app",
+        "verify": "Verify",
+        "verifyError": "Wrong code. Please try again.",
+        "enabledToast": "Two-factor authentication enabled",
+        "disabledToast": "Two-factor authentication disabled",
+        "error": "The action failed. Check the password and try again.",
+        "totpQrAlt": "QR code to scan in your authenticator app to add Tavle"
+      }
+    },
+    "about": {
+      "title": "About Tavle",
+      "subtitle": "Which release of Tavle is running here, and whether the database has kept up.",
+      "short": "v{release}",
+      "dirtyShort": "modified",
+      "dirty": "Local changes",
+      "dirtyHint": "Built from a working tree with uncommitted changes, so the commit does not tell the whole truth about the code that is running.",
+      "releaseHint": "The version number is raised by hand when a step is worth naming. The commit is stamped in at build time and points at exactly the code answering here.",
+      "versionLabel": "Version",
+      "commitLabel": "Commit",
+      "builtAtLabel": "Built",
+      "environmentLabel": "Environment",
+      "runtimeLabel": "Runtime",
+      "environments": {
+        "development": "Development",
+        "test": "Test",
+        "production": "Production"
+      },
+      "schemaTitle": "Database schema",
+      "schemaHint": "The number of migrations the build was made from, against the number the database has applied.",
+      "schemaBehind": "Migrations pending",
+      "schemaBehindHint": "The database has fewer migrations than the code expects. Run the migrations before using the system further.",
+      "migrationLabel": "Latest migration",
+      "appliedLabel": "Applied",
+      "appliedValue": "{applied} of {expected}",
+      "appliedAtLabel": "Last applied",
+      "unknown": "Unknown",
+      "license": "Tavle is open source under AGPL-3.0 and part of the Haij family."
+    },
+    "dataExport": {
+      "title": "Data and export",
+      "subtitle": "Take a complete copy of everything this workspace holds.",
+      "xlsxTitle": "Spreadsheet",
+      "xlsxBody": "One file with a tab per kind of data. For you, for the steering group, or for anyone who needs to look without knowing Tavle.",
+      "xlsxAction": "Download spreadsheet",
+      "jsonTitle": "Machine-readable copy",
+      "jsonBody": "The same data as JSON with every id kept, so you can move to something other than Tavle without losing the links between projects, tasks and statuses.",
+      "jsonAction": "Download JSON",
+      "sheetsLabel": "Tabs in the file:",
+      "membersSheet": "Users",
+      "notBackupTitle": "This is not a backup.",
+      "notBackupBody": "An export can be read but not restored, and it is only as fresh as the day you downloaded it. The night's encrypted dump is what saves you when the database is gone.",
+      "privacy": "The export contains the names of the people the projects mention and the workspace's whole history. Passwords and passkeys are never included, and share links are exported without their key. Downloading it is recorded in the audit log."
+    },
+    "boards": {
+      "passkeyPromptTitle": "Make your account more secure",
+      "passkeyPromptBody": "Add a passkey so you can sign in without a password.",
+      "passkeyPromptCta": "Add passkey"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Your security and your installation.",
+    "nav": {
+      "security": "Security",
+      "about": "About",
+      "access": "Access",
+      "workspace": "Workspace",
+      "ai": "AI",
+      "data": "Data"
+    },
+    "access": {
+      "title": "Access to this installation",
+      "subtitle": "Who may create a workspace here. You approve and send the link; the rest happens by itself.",
+      "pendingTitle": "Applications",
+      "pendingEmpty": "No pending applications.",
+      "approve": "Approve",
+      "decline": "Decline",
+      "declinedToast": "The application was declined.",
+      "linkTitle": "Link for {email}",
+      "linkBody": "Shown only now. Copy it and send it yourself. It works for 7 days and only once.",
+      "copy": "Copy link",
+      "copiedToast": "Link copied.",
+      "inviteTitle": "Invite directly",
+      "inviteBody": "Without an application first. Same link, same rules.",
+      "inviteEmail": "E-mail",
+      "inviteOrganization": "Workspace name",
+      "inviteSubmit": "Create invitation",
+      "invitationsTitle": "Invitations",
+      "invitationsEmpty": "No invitations yet.",
+      "renew": "New link",
+      "expires": "Expires {date}",
+      "used": "Used {date}",
+      "applied": "Applied {date}",
+      "decidedApproved": "Approved {date}",
+      "decidedDeclined": "Declined {date}",
+      "historyTitle": "Earlier decisions",
+      "stateOpen": "Unused",
+      "stateUsed": "Used",
+      "stateExpired": "Expired",
+      "stateRevoked": "Replaced",
+      "errorInvalid": "Check the email and the workspace name."
+    },
+    "workspace": {
+      "title": "Workspace",
+      "subtitle": "Who is in it, and the way out again.",
+      "createdOn": "Created {date}",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "roles": {
+        "owner": "Owner",
+        "admin": "Administrator",
+        "member": "Member"
+      },
+      "delete": {
+        "title": "Delete the workspace",
+        "body": "Everything in the workspace goes: projects, plans, statuses, decisions, share links and the audit trail about them. It cannot be undone.",
+        "exportFirst": "Take an export first if you want to keep anything. It is under Data.",
+        "typeName": "Type {name} to confirm",
+        "action": "Delete the workspace permanently",
+        "deleting": "Deleting …",
+        "failed": "The workspace was not deleted. Try again.",
+        "notOwner": "Only the workspace owner can delete it.",
+        "nameMismatch": "That name does not match. Type the workspace's name exactly."
+      }
+    },
+    "ai": {
+      "title": "AI",
+      "subtitle": "Which engine answers, and what it is allowed to do.",
+      "providerTitle": "Language model",
+      "providerHint": "The installation sets a model in the environment, and each workspace can choose its own instead.",
+      "provider": "Provider",
+      "model": {
+        "title": "Your own language model",
+        "subtitle": "This workspace can run on a different model than the installation set up. Choose nothing and you inherit the installation's.",
+        "current": "Model",
+        "source": "Chosen by",
+        "fromInstallation": "The installation",
+        "fromWorkspace": "This workspace",
+        "keySource": "Key",
+        "keyFromWorkspace": "The workspace's own",
+        "keyFromInstallation": "The installation's",
+        "keyMissing": "Missing",
+        "providerLabel": "Provider",
+        "provider_mistral": "Mistral (EU)",
+        "provider_ollama": "Ollama (local)",
+        "providerNone": "No model",
+        "inherit": "Follow the installation ({provider})",
+        "providerHelp": "The Ollama address is set by the installation. That is deliberate: a workspace that could point at an address of its own would make the server fetch from anywhere.",
+        "modelLabel": "Model name",
+        "modelHelpMistral": "Leave the field empty to use {placeholder}.",
+        "modelHelpOllama": "The name must match a model you have pulled with “ollama pull”. Test the connection above and it will list the ones you have.",
+        "keyLabel": "API key",
+        "keyPlaceholder": "Paste your Mistral key",
+        "keyStored": "A key is stored",
+        "keyHelp": "Leave the field empty to use the installation's key. The key is encrypted before it is stored and cannot be read back.",
+        "keyStoredHelp": "This workspace has its own key. Type a new one to replace it, or remove it to fall back on the installation's.",
+        "keyRemove": "Remove stored key",
+        "save": "Save",
+        "saving": "Saving …",
+        "saved": "Saved",
+        "saveFailed": "Could not be saved. Try again.",
+        "notAllowed": "Only owners and administrators can change the workspace's model.",
+        "short_mistral": "Mistral",
+        "short_ollama": "Ollama",
+        "shortNone": "no model"
+      },
+      "noModel": "No model configured",
+      "setupIntro": "Tavle works without a model. For real proposals and free-text answers, set one up:",
+      "setupOutro": "Then start Tavle again. Without a model the rules engine answers and the three flows still work.",
+      "limitsTitle": "Ceiling on AI calls",
+      "limitsHint": "A model call costs money on a hosted installation and minutes on a local one. The numbers are generous for a person and mean for a script.",
+      "perUser": "Calls per user per hour",
+      "perWorkspace": "Calls per workspace per day",
+      "messageLength": "Characters the model gets to read, at most",
+      "principlesTitle": "How Tavle uses AI",
+      "principleDecides": "The AI proposes and carries out, but the human decides. It never sends anything out of the house and never deletes.",
+      "principleUndo": "A copy of the whole project is taken before every AI change, and each change can be undone from the message that made it.",
+      "principleData": "What you and your colleagues write goes to the model as data, never as instructions, and the model's output is validated against the project's own ids before anything is written.",
+      "principleSovereign": "The model can be swapped, including for a local one. Who can see what is listed in docs/subprocessors.md.",
+      "test": "Test the connection",
+      "testing": "Testing …",
+      "testPatience": "A local model may have to be read off disk first. That can take up to a minute the first time.",
+      "testOk": "The model answers",
+      "testOkDetail": "{model} answered “{sample}” in {seconds} seconds.",
+      "testFailed": "The model does not answer",
+      "failAuth": "The key was rejected. Check the workspace's own key below, or the installation's MISTRAL_API_KEY.",
+      "failUnreachable": "Nothing is listening at that address. Is Ollama running? Check OLLAMA_BASE_URL.",
+      "failConfig": "The model is set up wrong. Correct the model name below, or LLM_MODEL in .env.",
+      "failGeneric": "The call failed. The details are below and in the server log.",
+      "failRateLimited": "Mistral refused the call as too many (429). The key works, but the account or plan sets the ceiling: on the free Experiment plan this happens often when the model is busy, and a key under a workspace with no active plan gets the same answer. Check Billing and Limits on console.mistral.ai for the organisation the key belongs to.",
+      "failWhereToLook": "The details are in the server log.",
+      "testNotAllowed": "Only the owner or an administrator can test the connection.",
+      "withoutTitle": "Without a model",
+      "withoutBody": "The board, the sprints and the numbers need no model. What the AI offers is three proposals a person edits and says yes to: a draft for a card, a split of a card, and the sprint's story. Without a model the buttons say so, and everything else works as before."
+    },
+    "members": {
+      "title": "Members",
+      "body": "Everyone in the workspace can see and work on every board. Owners and admins can change the boards' shape, invite and remove members.",
+      "name": "Name",
+      "email": "E-mail",
+      "role": "Role",
+      "you": "(you)",
+      "remove": "Remove",
+      "removeTitle": "Remove {name} from the workspace?",
+      "removeBody": "The person loses access immediately. Cards assigned to them are kept, but without an assignee.",
+      "removeConfirm": "Remove the member",
+      "leave": "Leave the workspace",
+      "leaveTitle": "Leave the workspace?",
+      "leaveBody": "You lose access to the boards. An owner or admin can invite you again.",
+      "leaveConfirm": "Leave",
+      "inviteTitle": "Invite a colleague",
+      "inviteBody": "Type the address and you get a link. Send it yourself, the way you talk to each other anyway. The link is for that address only and lasts 48 hours.",
+      "invite": "Make a link",
+      "issued": "Link for {email}",
+      "issuedHint": "Copy and send. If the person has no account, it is created through the link; otherwise they sign in and accept.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "copyLink": "Copy link",
+      "copyFailed": "Could not copy. Select the link and copy it yourself.",
+      "pendingEmail": "Invited",
+      "expires": "Expires",
+      "cancel": "Withdraw",
+      "errors": {
+        "alreadyMember": "The person is already a member.",
+        "alreadyInvited": "There is already an open link for that address. Withdraw it first to make a new one.",
+        "forbidden": "That takes an owner or an admin.",
+        "invalid": "Type a valid e-mail address.",
+        "generic": "That went wrong. Try again."
+      }
+    }
+  },
+  "demo": {
+    "bannerTitle": "This is a demo.",
+    "bannerBody": "The workspace and everything in it is deleted after {hours} hours. Feel free to write in it.",
+    "bannerCta": "Apply for a real account"
+  },
+  "terms": {
+    "title": "Terms and privacy",
+    "updated": "Last updated 4 September 2026.",
+    "back": "Back",
+    "language": "På dansk",
+    "intro": "Tavle is an open source tool for Kanban and Scrum teams, run by Haij. This is the agreement between you and us when you use the edition we run. If you run the code yourself, only the licence applies.",
+    "what": {
+      "title": "What Tavle is",
+      "body": "A tool for keeping a team's work visible: boards, cards, sprints and the numbers that can be computed from them. We make no promise that it fits the way you work; try the demo first."
+    },
+    "account": {
+      "title": "Accounts and access",
+      "body": "You get in by applying or being invited. We store your name, your email and your workspace's name, and use them to sign you in and to write to you about the service. Passwords are stored hashed, and you can add a passkey and two-factor. We sell nothing, and we do not send marketing you did not ask for."
+    },
+    "yourData": {
+      "title": "Your data",
+      "body": "Everything a workspace puts in belongs to the workspace. It can be downloaded as a spreadsheet and JSON with one click and deleted entirely again, audit trail included. We do not look at it unless you ask us for help, and we never pass it on."
+    },
+    "ai": {
+      "title": "AI",
+      "body": "With a language model set up, the cards and sprints a person asks for help with are sent to the model provider. Who that is stands under Settings → AI and in the list of subprocessors. The model proposes; nothing is saved without a person saying yes."
+    },
+    "leaving": {
+      "title": "Leaving",
+      "body": "You can delete your workspace immediately, without writing to anyone and without waiting. The export is one click away and readable without Tavle. We keep no copy afterwards beyond the nightly encrypted backups, which roll off after 30 days."
+    },
+    "availability": {
+      "title": "Running and guarantees",
+      "body": "Tavle is new, and there is no uptime guarantee. We look after your data with encrypted backups every night, but take an export now and then if the project matters. The service is provided as it is, without warranties beyond what the law requires."
+    },
+    "license": {
+      "title": "Licence",
+      "body": "The code is AGPL-3.0. You may use it, change it and run it yourself; if you change it and offer it to others over a network, your changes must be available too. What you write in the tool is not covered by the licence — that is yours."
+    },
+    "demo": {
+      "title": "The demo",
+      "body": "A demo workspace is created without e-mail or sign-up and deleted entirely after 24 hours, account included. Do not put real personal data in it. We keep only the technical log data needed to keep the demo running."
+    },
+    "contact": {
+      "title": "Contact",
+      "body": "Write to martin@vintherconsulting.dk. If you have found a security problem, SECURITY.md in the repository says how to report it; use that rather than an ordinary email."
+    },
+    "subprocessorsNote": "Who can see what is listed in",
+    "shareLinks": {
+      "title": "Invitations",
+      "body": "An invitation link is for one address and expires after two days. You send it; we send no mail."
+    }
+  },
+  "boards": {
+    "mode": {
+      "kanban": "Kanban",
+      "scrum": "Scrum"
+    },
+    "tabs": {
+      "board": "Board",
+      "backlog": "Backlog",
+      "sprints": "Sprints",
+      "insight": "Insight",
+      "settings": "Settings",
+      "archived": "archived"
+    },
+    "list": {
+      "title": "Boards",
+      "subtitle": "Every board in the workspace. One board per team or product.",
+      "emptyTitle": "No boards yet",
+      "emptyBody": "A board is one team's work: columns, cards and, if you run Scrum, sprints. Create the first one and invite colleagues under Settings → Workspace.",
+      "counts": "{open} open · {doing} in progress · {done} done",
+      "activeSprint": "{name} ends {date}",
+      "noSprint": "No sprint running",
+      "flow": "Continuous flow",
+      "archived": "Archived boards"
+    },
+    "new": {
+      "cta": "New board",
+      "title": "Create a board",
+      "subtitle": "A name, a short prefix for the card numbers, and the way you work.",
+      "name": "Name",
+      "key": "Key",
+      "keyHint": "Cards are numbered {key}-1, {key}-2 and so on. Cannot be changed afterwards.",
+      "modeLabel": "How you work",
+      "kanbanHint": "A continuous flow with columns and a limit on how much may be in progress. No sprints.",
+      "scrumHint": "Work is planned in sprints from a backlog. The board shows the sprint that is running.",
+      "submit": "Create board",
+      "cancel": "Cancel"
+    },
+    "view": {
+      "noSprintTitle": "No sprint running",
+      "noSprintBody": "The board shows the running sprint. Plan one in the backlog, put cards in it and start it.",
+      "noSprintCta": "Go to the backlog"
+    },
+    "column": {
+      "empty": "No cards here. Drag one here, or use the card's menu.",
+      "overLimit": "Over the limit"
+    },
+    "card": {
+      "blocked": "Blocked",
+      "unassigned": "Unassigned",
+      "menu": "Card menu",
+      "open": "Open the card",
+      "moveTo": "Move to"
+    },
+    "quickAdd": {
+      "open": "Add card",
+      "placeholder": "What needs doing?",
+      "label": "New card",
+      "add": "Add",
+      "cancel": "Cancel"
+    },
+    "filters": {
+      "search": "Search cards",
+      "assignee": "Assignee",
+      "anyone": "Anyone",
+      "unassigned": "Unassigned",
+      "label": "Label",
+      "anyLabel": "Any label",
+      "clear": "Clear"
+    },
+    "sprint": {
+      "kicker": "{start} – {end}",
+      "daysLeft": "Days left",
+      "overdue": "{days} days over",
+      "progress": "Progress",
+      "points": "points",
+      "toBacklog": "Backlog",
+      "close": "Close sprint",
+      "closeTitle": "Close {name}",
+      "closeBody": "{done} cards are done ({points} points). {open} are not. The sprint's numbers are written down as they stand now.",
+      "unfinishedGo": "The unfinished cards go to",
+      "toBacklogOption": "The backlog, at the top",
+      "closeConfirm": "Close the sprint",
+      "cancel": "Cancel"
+    },
+    "priority": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "errors": {
+      "conflict": "Somebody changed the same thing while you were writing. The page has been reloaded so you can see what it says now.",
+      "notFound": "That no longer exists.",
+      "invalid": "Something you wrote could not be used. Check the fields.",
+      "unauthorized": "You are no longer signed in.",
+      "forbidden": "That takes an owner or an admin of the workspace.",
+      "generic": "That went wrong. Try again."
+    }
+  },
+  "cards": {
+    "title": {
+      "label": "Title",
+      "edit": "Edit the title",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "description": {
+      "title": "Description",
+      "edit": "Edit",
+      "write": "Write",
+      "placeholder": "What needs doing, and why? What has to be true when it is done?",
+      "save": "Save",
+      "cancel": "Cancel",
+      "empty": "No description yet."
+    },
+    "checklist": {
+      "title": "Checklist",
+      "placeholder": "New item",
+      "add": "Add",
+      "remove": "Remove {title}"
+    },
+    "comments": {
+      "title": "Comments",
+      "empty": "No comments yet.",
+      "placeholder": "Write to the team …",
+      "send": "Send",
+      "remove": "Remove",
+      "unknown": "Former member"
+    },
+    "activity": {
+      "title": "Activity",
+      "byAi": "AI"
+    },
+    "fields": {
+      "column": "Column",
+      "inBacklog": "The card is in the backlog and not on the board yet.",
+      "sprint": "Sprint",
+      "backlog": "Backlog",
+      "active": "running",
+      "assignee": "Assignee",
+      "nobody": "Nobody",
+      "estimate": "Estimate",
+      "priority": "Priority",
+      "dueDate": "Due date",
+      "labels": "Labels",
+      "blocked": "Blocked",
+      "blockedReason": "What is the card waiting for?"
+    },
+    "ai": {
+      "title": "AI help",
+      "draft": "Finish writing the card",
+      "split": "Suggest a split",
+      "noModel": "No language model is set up in the workspace.",
+      "noModelLink": "Choose one under Settings → AI.",
+      "principle": "The AI proposes, you decide. Nothing is saved until you say yes, and everything it writes is marked in the activity.",
+      "draftTitle": "Draft for the card",
+      "splitTitle": "Proposed split",
+      "thinking": "The model is thinking. A local model can take up to a minute.",
+      "editHint": "Change anything you like before it is saved.",
+      "descriptionField": "Description",
+      "acceptanceField": "How we know it is done",
+      "checklistField": "Checklist",
+      "acceptanceHeading": "Done when:",
+      "drop": "Drop",
+      "keep": "Keep",
+      "points": "Points",
+      "applyDraft": "Save to the card",
+      "applySplit": "Create {count, plural, one {# card} other {# cards}}",
+      "cancel": "Cancel",
+      "engine": "Written by {engine}",
+      "errors": {
+        "noModel": "No language model is set up.",
+        "rateLimited": "The model has been called too many times. Try again in a while.",
+        "unreachable": "The model does not answer. Check the settings under AI.",
+        "badAnswer": "The model answered with something that could not be used. Try again.",
+        "generic": "That went wrong. Try again.",
+        "unauthorized": "You are no longer signed in.",
+        "invalid": "Something in the request was wrong.",
+        "notFound": "The card no longer exists."
+      }
+    },
+    "page": {
+      "archived": "Archived",
+      "created": "Created {date}",
+      "started": "Started {date}",
+      "done": "Done {date}",
+      "archive": "Archive",
+      "restore": "Restore",
+      "delete": "Delete",
+      "deleteTitle": "Delete the card?",
+      "deleteBody": "{key} is deleted with its comments and history. Archive it instead if you may want to find it again.",
+      "deleteConfirm": "Delete the card"
+    }
+  },
+  "backlog": {
+    "title": "Backlog",
+    "holds": "{cards, plural, one {# card} other {# cards}} · {points} points",
+    "targetSprint": "Sprint",
+    "commit": "Put {count, plural, one {# card} other {# cards}} in the sprint",
+    "empty": "The backlog is empty. Add the next thing the team should do.",
+    "addPlaceholder": "New card in the backlog",
+    "newSprint": "Plan a sprint",
+    "row": {
+      "select": "Select {key}",
+      "up": "Move up",
+      "down": "Move down"
+    },
+    "sprint": {
+      "activeLabel": "running",
+      "plannedLabel": "planned",
+      "holds": "{cards, plural, one {# card} other {# cards}} · {points} points",
+      "edit": "Edit",
+      "start": "Start the sprint",
+      "anotherActive": "A sprint is already running. Close it first.",
+      "toBoard": "See the board",
+      "empty": "No cards yet. Select cards in the backlog and put them here.",
+      "toBacklog": "Move {count, plural, one {# card} other {# cards}} to the backlog"
+    },
+    "sprintForm": {
+      "defaultName": "Sprint {number}",
+      "newTitle": "Plan a sprint",
+      "editTitle": "Edit the sprint",
+      "name": "Name",
+      "goal": "Goal",
+      "goalPlaceholder": "One sentence about what the sprint should make possible",
+      "start": "Start",
+      "end": "End",
+      "create": "Plan",
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "sprints": {
+    "title": "Sprints",
+    "velocityTitle": "Velocity",
+    "velocityBody": "Points completed per closed sprint. Average of the last three: {average}.",
+    "emptyTitle": "No sprints yet",
+    "emptyBody": "Sprints are planned in the backlog. They are listed here once they have run.",
+    "closedPoints": "{completed} of {committed} points",
+    "committedPoints": "{committed} points committed",
+    "state": {
+      "planned": "Planned",
+      "active": "Running",
+      "closed": "Closed"
+    },
+    "detail": {
+      "back": "All sprints",
+      "burndownTitle": "Burndown",
+      "numbers": "{done} of {total} cards done · {donePoints} of {totalPoints} points",
+      "notStarted": "The sprint has not started yet.",
+      "cardsTitle": "Cards in the sprint",
+      "noCards": "No cards."
+    },
+    "notes": {
+      "summaryTitle": "The sprint's story",
+      "summaryBody": "What the team set out to do, what got done, and what did not. Write it yourself, or let the model draft it from the cards.",
+      "summaryPlaceholder": "We set out to …",
+      "save": "Save",
+      "draft": "Draft it",
+      "thinking": "The model is thinking …",
+      "drafted": "Draft from {engine}. Edit it, and save.",
+      "highlights": "Highlights:",
+      "risks": "Watch out for:",
+      "noModel": "No language model set up.",
+      "noModelLink": "Choose one under Settings → AI.",
+      "retroTitle": "Retrospective",
+      "retroBody": "Three questions after every sprint. Short and honest, with at least one action you actually take.",
+      "retro": {
+        "wentWell": "What went well?",
+        "improve": "What could be better?",
+        "actions": "What do we do differently?"
+      },
+      "saveRetro": "Save retrospective",
+      "errors": {
+        "noModel": "No language model is set up.",
+        "rateLimited": "The model has been called too many times. Try again in a while.",
+        "unreachable": "The model does not answer. Check the settings under AI.",
+        "badAnswer": "The model answered with something that could not be used. Try again.",
+        "generic": "That went wrong. Try again.",
+        "unauthorized": "You are no longer signed in.",
+        "invalid": "Something in the request was wrong.",
+        "notFound": "The sprint no longer exists."
+      }
+    }
+  },
+  "insight": {
+    "title": "Insight",
+    "wip": "In progress now",
+    "wipHint": "Cards in columns of the In progress kind",
+    "cycle": "Cycle time",
+    "cycleNone": "No cards finished in the last 30 days",
+    "cycleHint": "Median. Average {average} days over {sample} cards",
+    "lead": "Lead time",
+    "leadHint": "From the card was created until it was done",
+    "weekly": "Done this week",
+    "weeklyHint": "Average {average} per week over eight weeks",
+    "days": "{days} days",
+    "burndownTitle": "Burndown",
+    "burndownBody": "{name}: {remaining} of {committed} points left. Ends {end}.",
+    "burndownNone": "No sprint is running right now.",
+    "velocityTitle": "Velocity",
+    "velocityBody": "Points completed per closed sprint. Average of the last three: {average}.",
+    "velocityNone": "No closed sprints yet.",
+    "throughputTitle": "Cards done per week",
+    "throughputBody": "The last eight weeks. Steady is good; swinging is a sign of bottlenecks.",
+    "flowTitle": "Cumulative flow",
+    "flowBody": "Where the cards have been, day by day for the last 30 days. If the In progress band widens, work is piling up.",
+    "legend": {
+      "backlog": "Backlog",
+      "todo": "Ready",
+      "doing": "In progress",
+      "done": "Done"
+    }
+  },
+  "boardSettings": {
+    "title": "Board settings",
+    "about": {
+      "title": "About the board",
+      "body": "The key {key} prefixes every card number and cannot be changed.",
+      "name": "Name",
+      "description": "Description",
+      "sprintLength": "Sprint length in days",
+      "save": "Save"
+    },
+    "columns": {
+      "title": "Columns",
+      "body": "A name, what the column means to the numbers, and an optional limit on how many cards may sit in it. The limit warns; it does not forbid.",
+      "name": "Name",
+      "category": "Kind",
+      "wip": "WIP limit",
+      "add": "Add column",
+      "save": "Save",
+      "up": "Move left",
+      "down": "Move right",
+      "moveCardsTo": "Move the cards to",
+      "delete": "Delete",
+      "deleteTitle": "Delete the column {name}?",
+      "deleteBody": "Its cards are moved to {into}.",
+      "deleteConfirm": "Delete the column"
+    },
+    "category": {
+      "backlog": "Backlog",
+      "todo": "Ready",
+      "doing": "In progress",
+      "done": "Done"
+    },
+    "labels": {
+      "title": "Labels",
+      "body": "Short words cards can be tagged with. At most twenty per board.",
+      "name": "Name",
+      "color": "Colour",
+      "placeholder": "New label",
+      "add": "Add",
+      "save": "Save",
+      "delete": "Delete",
+      "empty": "No labels.",
+      "colors": {
+        "moss": "Green",
+        "amber": "Yellow",
+        "rose": "Red",
+        "sky": "Blue",
+        "plum": "Purple",
+        "slate": "Grey"
+      }
+    },
+    "danger": {
+      "title": "Archive or delete",
+      "body": "An archived board leaves the overview but keeps everything. Deleting removes the board with every card, comment and its history.",
+      "archivedBody": "The board is archived. It can be restored, or deleted for good.",
+      "archive": "Archive the board",
+      "restore": "Restore the board",
+      "delete": "Delete the board",
+      "deleteTitle": "Delete {name}?",
+      "deleteBody": "Every card, sprint, comment and the history are deleted. This cannot be undone; export first if in doubt.",
+      "deleteConfirm": "Delete the board"
+    }
+  },
+  "my": {
+    "title": "My cards",
+    "subtitle": "{count, plural, =0 {No open cards assigned to you} one {# open card assigned to you} other {# open cards assigned to you}}.",
+    "emptyTitle": "Nothing on your desk",
+    "emptyBody": "Cards assigned to you land here, across every board in the workspace.",
+    "blocked": "Blocked"
+  },
+  "join": {
+    "title": "You are invited",
+    "intro": "{inviter} has invited you into the workspace {workspace}.",
+    "someone": "A colleague",
+    "invalidTitle": "This link no longer works",
+    "invalidBody": "The invitation has expired or been withdrawn. Ask the person who invited you for a new link.",
+    "acceptedBody": "The invitation has already been used. Sign in to enter the workspace.",
+    "toLogin": "Sign in",
+    "wrongAccount": "The invitation is for {email}, but you are signed in as {current}. Sign out and open the link again.",
+    "switchAccount": "Sign out",
+    "accept": "Enter the workspace",
+    "wrongPerson": "The invitation was sent to another address than the one you are signed in with.",
+    "name": "Your name",
+    "email": "E-mail",
+    "lockedHint": "The invitation is for this address. The account becomes a member of {workspace}.",
+    "password": "Password",
+    "passwordHint": "At least 12 characters. A sentence is easier to remember than a word.",
+    "submit": "Create account and enter",
+    "haveAccount": "Already have an account?",
+    "loginLink": "Sign in",
+    "errorEmailExists": "An account with that address already exists. Sign in and open the link again.",
+    "errorInvalid": "Something you wrote could not be used. Check the fields.",
+    "errorGeneric": "That went wrong. Try again."
+  },
+  "events": {
+    "board": {
+      "created": "The board {name} was created",
+      "updated": "The board was renamed to {name}"
+    },
+    "column": {
+      "created": "The column {name} was added",
+      "updated": "The column {name} was changed",
+      "deleted": "The column {name} was deleted; its cards moved to {into}"
+    },
+    "label": {
+      "created": "The label {name} was added",
+      "deleted": "The label {name} was deleted"
+    },
+    "card": {
+      "created": "{key} was created in {column}",
+      "moved": "{key} was moved to {column}",
+      "updated": "{key} was edited ({fields})",
+      "assigned": "{key} was assigned to {name}",
+      "unassigned": "{key} has no assignee",
+      "estimated": "{key} was estimated at {points} points",
+      "blocked": "{key} was blocked: {reason}",
+      "unblocked": "{key} is no longer blocked",
+      "labels": "{key} got labels: {labels}",
+      "checklist": "The checklist on {key} stands at {done} of {total}",
+      "sprint": "{key} was put in {sprint}",
+      "backlog": "{key} was moved to the backlog",
+      "archived": "{key} was archived",
+      "restored": "{key} was restored",
+      "deleted": "{key} was deleted",
+      "split": "{key} was split into {into}"
+    },
+    "comment": {
+      "added": "Comment on {key}",
+      "deleted": "A comment on {key} was removed"
+    },
+    "sprint": {
+      "created": "{name} was planned",
+      "updated": "{name} was changed",
+      "started": "{name} started with {cards} cards and {points} points",
+      "closed": "{name} was closed: {completed} of {committed} points, {carried} cards carried over",
+      "retro": "Retrospective written for {name}",
+      "summary": "The story of {name} was saved"
+    },
+    "ai": {
+      "drafted": "AI drafted {key} ({engine})"
+    }
+  },
+  "help": {
+    "title": "Help",
+    "intro": "Two things on this page: how the tool works, and how to make a board help the team. The second part is the important one.",
+    "howToTitle": "How to use the tool",
+    "howTo": {
+      "boards": {
+        "title": "Boards",
+        "body": "A board is one team's work. When you create it you choose Kanban or Scrum and give it a key such as WEB, so cards are called WEB-1, WEB-2 and so on. Everyone in the workspace can see and work on every board."
+      },
+      "kanban": {
+        "title": "Kanban",
+        "body": "The columns are your flow: Backlog, Ready, In progress, Done to begin with, and you can add more under the board's settings. Put a WIP limit on the columns where the work happens. When a column fills up it changes colour, and that is the sign to finish something before starting more."
+      },
+      "scrum": {
+        "title": "Scrum",
+        "body": "Cards sit in the backlog until you put them in a sprint. Plan the sprint under Backlog, pick the cards, and start it. The board shows only the running sprint. When you close it, the velocity is written down and the unfinished cards go back to the top of the backlog or into the next sprint."
+      },
+      "cards": {
+        "title": "Cards",
+        "body": "A card only needs a title to exist. Click the title to open it: here you set the assignee, estimate, priority, due date, labels and checklist, and write to each other in the comments. Everything saves immediately. A blocked card gets a red edge so it is not overlooked."
+      },
+      "backlog": {
+        "title": "The backlog",
+        "body": "The backlog is the ordered list of what the team does next, most important at the top. Drag the cards, or use the arrows. Select cards with the checkbox and put them in a sprint with one button."
+      },
+      "insight": {
+        "title": "Insight",
+        "body": "Every number is computed from what actually happened to the cards, never from an estimate. Kanban teams look at cards done per week, cycle time and cumulative flow. Scrum teams look at the burndown of the running sprint and the velocity of the closed ones."
+      },
+      "team": {
+        "title": "The team",
+        "body": "Invite colleagues under Settings → Workspace. You get a link you send yourself. If the person has no account, it is created through the link. Owners and admins can change the boards' columns and labels, invite and remove members; everyone else can do everything else."
+      },
+      "ai": {
+        "title": "The AI help",
+        "body": "With a language model set up, it can finish writing a card, suggest splitting a big card, and write the sprint's story. Everything is shown as a proposal you edit and say yes to. Nothing is saved without you, and everything it writes is marked in the activity."
+      },
+      "data": {
+        "title": "Your data",
+        "body": "Under Settings → Data the whole workspace can be downloaded as a spreadsheet and JSON with one click, and the owner can delete it entirely. It is your data, always."
+      }
+    },
+    "abcTitle": "The board's ABC",
+    "abcIntro": "Ten rules for a team working on a board. They hold whatever tool you use.",
+    "abc": {
+      "0": {
+        "title": "Make the work visible",
+        "body": "Everything the team works on is on the board. Not most of it, all of it. What is not on the board nobody can help with, and nobody can see how much is in progress."
+      },
+      "1": {
+        "title": "Limit the work in progress",
+        "body": "Put a limit on the columns where the work happens, and keep it. Ten things half done is worse than three things done. The limit is not a punishment, it is a conversation: what do we finish first?"
+      },
+      "2": {
+        "title": "Finish before you start",
+        "body": "When a column is full, help with what is in progress instead of pulling a new card. It is the one principle that shortens the time from idea to something working."
+      },
+      "3": {
+        "title": "Keep cards small",
+        "body": "A card should be finishable in a day or two. If it cannot be, split it. Small cards flow, big cards get stuck, and a blocked big card is a week lost."
+      },
+      "4": {
+        "title": "One owner per card",
+        "body": "Several can help, but one person owns the card and knows where it stands. A card without an owner is a card nobody has."
+      },
+      "5": {
+        "title": "Agree on what done means",
+        "body": "Write in the description what must be true when the card is done. Tested? Shown to somebody? Live? If the team does not share the answer, Done is just a word."
+      },
+      "6": {
+        "title": "Look at the flow, not at the people",
+        "body": "The numbers are about the system: how long a card takes, where it piles up. They are not about who is fastest. A team that uses the numbers to point fingers stops writing honestly on the board."
+      },
+      "7": {
+        "title": "A blocked card is a signal",
+        "body": "Mark the card blocked at once and write what it is waiting for. Then whoever can unblock it can see it. A blocked card that just sits in In progress is the most expensive card on the board."
+      },
+      "8": {
+        "title": "Have a rhythm",
+        "body": "Scrum teams have sprints; Kanban teams have a fixed time when they look at the board together. The rhythm is what makes the team tidy up, talk about what is stuck and decide what is next."
+      },
+      "9": {
+        "title": "Improve in small steps",
+        "body": "After every sprint, or every other week, one question: what do we do differently? Pick one thing, do it, and look at the numbers. Big changes rarely survive a busy week; small ones do."
+      }
+    },
+    "closing": "The tool does not make the team good. The ten rules do, and the board is there so you can see whether you follow them."
+  }
+}
