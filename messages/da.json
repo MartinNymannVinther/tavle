@@ -658,6 +658,13 @@
       "inherits": "Område og temaer arves fra epic'en og kan rettes bagefter.",
       "create": "Opret",
       "cancel": "Annuller"
+    },
+    "types": {
+      "epic": "Epic",
+      "feature": "Feature",
+      "card": "Kort",
+      "bug": "Fejl",
+      "enabler": "Enabler"
     }
   },
   "cards": {
@@ -766,7 +773,7 @@
     "title": "Backlog",
     "holds": "{cards, plural, one {# kort} other {# kort}} · {points} point",
     "targetSprint": "Sprint",
-    "commit": "Læg {count, plural, one {# kort} other {# kort}} i sprinten",
+    "commit": "Læg i sprinten",
     "empty": "Backloggen er tom. Tilføj det næste, teamet skal lave.",
     "addPlaceholder": "Nyt kort i backloggen",
     "newSprint": "Planlæg en sprint",
@@ -811,11 +818,26 @@
       "none": "Uden"
     },
     "hierarchy": {
-      "featureCounts": "{backlog, plural, one {# i backlog} other {# i backlog}} · {open} i gang · {done} færdige",
-      "epicCounts": "{features, plural, one {# feature} other {# features}}",
+      "epicCounts": "{features, plural, one {# feature} other {# features}} · {cards, plural, one {# kort} other {# kort}}",
+      "progress": "{done} af {total} færdige",
+      "progressShort": "{done} af {total}",
+      "underway": "{open, plural, one {# i gang} other {# i gang}}",
+      "noFeatures": "Ingen features endnu.",
+      "noStories": "Ingen kort endnu.",
+      "allElsewhere": "Alle kort under featuren er i gang eller færdige.",
       "noParent": "Uden forælder",
+      "noParentHint": "Features og kort, der ikke er del af noget endnu",
       "groupCount": "{count, plural, one {# kort} other {# kort}}",
       "groupEmpty": "Ingen kort her."
+    },
+    "selected": "{count, plural, one {# kort valgt} other {# kort valgt}}",
+    "clearSelection": "Fravælg",
+    "noSprint": "Planlæg en sprint for at lægge kort i den.",
+    "fold": {
+      "open": "Fold ud",
+      "close": "Fold sammen",
+      "all": "Fold alle sammen",
+      "none": "Fold alle ud"
     }
   },
   "sprints": {

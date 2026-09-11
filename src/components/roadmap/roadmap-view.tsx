@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { NativeSelect } from "@/components/ui/native-select";
 import { ThemeChip } from "@/components/board/bits";
 import { themeSwatch } from "@/components/board/tokens";
+import { TypeIcon } from "@/components/board/type-icon";
 import { roadmap, type RoadmapRow } from "@/modules/boards/structure/roadmap";
 import type { BoardFull } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
@@ -104,7 +105,8 @@ export function RoadmapView({ full }: { full: BoardFull }) {
           <ul className="border-hairline divide-hairline divide-y rounded-lg border">
             {unplanned.map((row) => (
               <li key={row.epic.id} className="flex items-center gap-3 px-3 py-2 text-sm">
-                <span className="text-meta w-16 shrink-0 text-[0.72rem] tabular-nums">
+                <TypeIcon type="epic" />
+                <span className="text-meta font-mono shrink-0 text-[0.72rem] tabular-nums">
                   {full.board.key}-{row.epic.number}
                 </span>
                 <Link
@@ -152,20 +154,23 @@ function RoadmapLine({
       className="border-hairline grid items-center border-b last:border-b-0"
       style={{ gridTemplateColumns: `16rem repeat(${quarters.length}, minmax(0, 1fr))` }}
     >
-      <div className="flex min-w-0 flex-col gap-0.5 px-4 py-2">
-        <Link
-          href={`/boards/${boardId}/items/${row.epic.number}`}
-          className={cn("truncate text-sm font-medium hover:underline", closed && "text-meta")}
-        >
-          {row.epic.title}
-        </Link>
-        <p className="text-meta flex flex-wrap items-center gap-2 text-[0.69rem] tabular-nums">
-          <span>
-            {boardKey}-{row.epic.number}
-          </span>
-          {row.theme && <span>{row.theme.name}</span>}
-          <span>{t("counts", { features: row.features, done: row.doneStories, total })}</span>
-        </p>
+      <div className="flex min-w-0 items-start gap-2 px-4 py-2">
+        <TypeIcon type="epic" className="mt-0.5" />
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <Link
+            href={`/boards/${boardId}/items/${row.epic.number}`}
+            className={cn("truncate text-sm font-medium hover:underline", closed && "text-meta")}
+          >
+            {row.epic.title}
+          </Link>
+          <p className="text-meta flex flex-wrap items-center gap-2 text-[0.69rem] tabular-nums">
+            <span className="font-mono">
+              {boardKey}-{row.epic.number}
+            </span>
+            {row.theme && <span>{row.theme.name}</span>}
+            <span>{t("counts", { features: row.features, done: row.doneStories, total })}</span>
+          </p>
+        </div>
       </div>
       {quarters.map((quarter, index) => (
         <div

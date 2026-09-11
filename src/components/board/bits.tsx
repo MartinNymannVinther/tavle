@@ -1,6 +1,7 @@
 import type { Priority, Theme } from "@/core/db/schema";
 import { cn } from "@/lib/utils";
 import { PRIORITY_MARK, themeSwatch } from "./tokens";
+import { TypeGlyph } from "./type-icon";
 
 const chip =
   "inline-flex h-5 max-w-[11rem] items-center gap-1 truncate rounded-full px-2 text-[0.69rem] font-medium";
@@ -34,7 +35,10 @@ export function AreaChip({ name, className }: { name: string; className?: string
   );
 }
 
-/** The bug flag and the enabler kind, as words on a tint; a business story shows nothing. */
+/**
+ * The bug flag and the enabler kind, as the type's symbol and its word on
+ * a tint; a business story shows nothing.
+ */
 export function FlagChip({
   tone,
   children,
@@ -52,6 +56,7 @@ export function FlagChip({
         className,
       )}
     >
+      <TypeGlyph type={tone} />
       {children}
     </span>
   );

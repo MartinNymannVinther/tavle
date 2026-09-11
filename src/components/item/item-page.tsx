@@ -7,6 +7,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { ActivityList } from "@/components/card/activity-list";
 import { StructureFields } from "@/components/card/placement-fields";
 import { quarterOptions } from "@/components/backlog/quarters";
+import { TypeIcon } from "@/components/board/type-icon";
 import { useBoardActions } from "@/components/board/use-board-actions";
 import {
   confirmReviewAction,
@@ -58,6 +59,7 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
             </>
           )}
           <span aria-hidden>›</span>
+          <TypeIcon type={item.level as "epic" | "feature"} />
           <span className="tabular-nums">
             {board.key}-{item.number}
           </span>

@@ -64,6 +64,11 @@ codebase to:
   cached.
 - Everything works on a phone and with a keyboard. Drag-and-drop is the
   quick path; every move also exists as a menu, a select or a button.
+- Every kind of thing has one symbol, the same everywhere (ADR 0012): a
+  flag for an epic, a puzzle piece for a feature, a note for a card, a
+  bug for a bug, a wrench for enabler work, each with its word for
+  assistive technology. The backlog reads as sections, three levels with
+  three weights, and a row says only what differs from its parent.
 - The AI writes three kinds of proposal — finish a card, split a card, the
   sprint's story — and a person edits and says yes. Without a model the
   buttons say so and everything else works.
@@ -176,7 +181,8 @@ codebase to:
   lists with owners, the eleven rules, inheritance, one order per level,
   the close conversation; the backlog with grouping and filters on both
   board types; the roadmap in quarters; the overview with the five health
-  measures; labels removed.
+  measures; labels removed. 0.10.2: the backlog as sections and the type
+  symbols (ADR 0012).
 - Before 1.0: dogma seven — a real team runs a real board on it; the
   screenshots for the README; the tool card on haij.dk; whatever the
   first team asks for that the omissions list did not foresee.

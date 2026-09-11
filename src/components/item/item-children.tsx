@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Initials, Points } from "@/components/board/bits";
+import { TypeIcon } from "@/components/board/type-icon";
 import type { Run } from "@/components/board/use-board-actions";
 import { ItemForm, type ItemFormSource } from "@/components/backlog/item-form";
 import type { ItemFull } from "@/modules/boards/structure/read";
@@ -17,7 +18,6 @@ import { cn } from "@/lib/utils";
  */
 export function ItemChildren({ full, run }: { full: ItemFull; run: Run }) {
   const t = useTranslations("items.children");
-  const s = useTranslations("boards.structure");
   const { item, board, features, stories, doneStories, themes, areas, epics, openFeatures } = full;
   const epic = item.level === "epic";
   const source: ItemFormSource = { board, themes, areas, items: [...epics, ...openFeatures] };
@@ -50,8 +50,9 @@ export function ItemChildren({ full, run }: { full: ItemFull; run: Run }) {
         ) : (
           <ol className="border-hairline divide-hairline divide-y rounded-lg border">
             {features.map((feature) => (
-              <li key={feature.id} className="flex items-center gap-3 px-3 py-2 text-sm">
-                <span className="text-meta w-16 shrink-0 text-[0.72rem] tabular-nums">
+              <li key={feature.id} className="flex items-center gap-2 px-3 py-2 text-sm">
+                <TypeIcon type="feature" />
+                <span className="text-meta font-mono shrink-0 text-[0.72rem] tabular-nums">
                   {board.key}-{feature.number}
                 </span>
                 <Link
@@ -75,8 +76,9 @@ export function ItemChildren({ full, run }: { full: ItemFull; run: Run }) {
       ) : (
         <ol className="border-hairline divide-hairline divide-y rounded-lg border">
           {stories.map((story) => (
-            <li key={story.id} className="flex items-center gap-3 px-3 py-2 text-sm">
-              <span className="text-meta w-16 shrink-0 text-[0.72rem] tabular-nums">
+            <li key={story.id} className="flex items-center gap-2 px-3 py-2 text-sm">
+              <TypeIcon type={story.bug ? "bug" : "card"} />
+              <span className="text-meta font-mono shrink-0 text-[0.72rem] tabular-nums">
                 {board.key}-{story.number}
               </span>
               <Link
@@ -88,9 +90,6 @@ export function ItemChildren({ full, run }: { full: ItemFull; run: Run }) {
               >
                 {story.title}
               </Link>
-              {story.bug && (
-                <span className="text-warning text-[0.69rem] font-medium">{s("bug")}</span>
-              )}
               <span className="text-meta hidden text-[0.72rem] sm:inline">{story.columnName}</span>
               <Points estimate={story.estimate} />
               {story.assigneeName ? (

@@ -3,6 +3,7 @@
 import { useFormatter, useTranslations } from "next-intl";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 import { Button } from "@/components/ui/button";
+import { TypeIcon } from "@/components/board/type-icon";
 import { useBoardActions } from "@/components/board/use-board-actions";
 import type { CardFull } from "@/modules/boards/types";
 import {
@@ -52,6 +53,7 @@ export function CardPage({
             {board.name}
           </Link>
           <span aria-hidden>›</span>
+          <TypeIcon type={card.bug ? "bug" : "card"} />
           <span className="tabular-nums">
             {board.key}-{card.number}
           </span>

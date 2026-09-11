@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { backlogStories, grouped, hierarchy } from "@/components/backlog/group-backlog";
+import {
+  backlogStories,
+  epicProgress,
+  featureProgress,
+  grouped,
+  hierarchy,
+} from "@/components/backlog/group-backlog";
+import { deviatingPlace } from "@/components/board/card-chips";
 import { overview } from "@/modules/boards/structure/overview";
 import { roadmap } from "@/modules/boards/structure/roadmap";
 import { quarterOf, quarterRange, quartersBetween } from "@/modules/boards/structure/rules";
@@ -264,6 +271,30 @@ describe("the backlog's groups", () => {
     expect(tree.looseFeatures.map((n) => n.feature.title)).toEqual(["Kunder kan gemme et kort"]);
     expect(tree.looseStories.map((s) => s.title)).toEqual(["Rettelse"]);
     expect(hierarchy(board, stories, { showClosed: true }).epics).toHaveLength(3);
+  });
+
+  it("adds up how far a feature and an epic are, from every story under them", () => {
+    const full = hierarchy(board, backlogStories(board), { showClosed: false });
+    const mobilePay = full.epics.find((n) => n.epic.id === "e1")!;
+    // One story in the backlog, one under way, one done: three in all, one done.
+    expect(featureProgress(mobilePay.features[0]!)).toEqual({ total: 3, done: 1, open: 1 });
+    expect(epicProgress(mobilePay)).toEqual({ total: 3, done: 1, open: 1 });
+    const rollout = full.epics.find((n) => n.epic.id === "e2")!;
+    expect(epicProgress(rollout)).toEqual({ total: 0, done: 0, open: 0 });
+  });
+
+  it("shows on a row only the place a story does not share with its parent", () => {
+    const story = { areaId: "a1", themeIds: ["t1", "t3"] };
+    expect(deviatingPlace(story, undefined)).toEqual(story);
+    expect(deviatingPlace(story, { areaId: "a1", themeIds: ["t1"] })).toEqual({
+      areaId: null,
+      themeIds: ["t3"],
+    });
+    expect(deviatingPlace(story, { areaId: "a2", themeIds: [] })).toEqual(story);
+    expect(deviatingPlace({ areaId: null, themeIds: [] }, { areaId: "a1" })).toEqual({
+      areaId: null,
+      themeIds: [],
+    });
   });
 
   it("groups the same stories by theme, area and kind", () => {

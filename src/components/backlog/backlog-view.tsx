@@ -3,10 +3,9 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { NativeSelect } from "@/components/ui/native-select";
 import {
   applyFilters,
-  BoardFilters,
+  hasFilters,
   NO_FILTERS,
   type Filters,
 } from "@/components/board/board-filters";
@@ -18,20 +17,26 @@ import type { BoardFull } from "@/modules/boards/types";
 import { createCardAction } from "@/modules/boards/actions-cards";
 import { reorderItemAction } from "@/modules/boards/actions-structure";
 import { reorderBacklogAction, setCardsSprintAction } from "@/modules/boards/actions-sprints";
-import { GroupedList, HierarchyList, type StoryRowProps } from "./backlog-list";
-import { backlogStories, grouped, GROUPINGS, hierarchy, type Grouping } from "./group-backlog";
+import { ALL_OPEN, HierarchyList, sectionIds, type StoryRowProps } from "./backlog-list";
+import { BacklogToolbar } from "./backlog-toolbar";
+import { backlogStories, grouped, hierarchy, type Group, type Grouping } from "./group-backlog";
+import { GroupedList } from "./grouped-list";
 import { ItemForm } from "./item-form";
+import { SelectionBar } from "./selection-bar";
 import { SprintForm } from "./sprint-form";
 import { SprintPlan } from "./sprint-plan";
+import { useFolded } from "./use-folded";
 
 /**
  * The backlog: one list with a choice of grouping — the hierarchy of
  * epics and features by default, or one field at a time — and the
- * filters. On a Scrum board the sprints stand to the right and selected
- * stories are committed to one; on a Kanban board the list has the
- * width to itself. The stories' one order is kept in every grouping:
- * the arrows move a story past its neighbour in the list, which is the
- * same move in the backlog's own order.
+ * filters. The page opens with the epics folded and remembers what is
+ * folded out. On a Scrum board the sprints stand to the right and
+ * ticked stories are committed to one from a bar that appears with the
+ * first tick; on a Kanban board the list has the width to itself. The
+ * stories' one order is kept in every grouping: the arrows move a story
+ * past its neighbour in the list, which is the same move in the
+ * backlog's own order.
  */
 export function BacklogView({ full }: { full: BoardFull }) {
   const t = useTranslations("backlog");
@@ -41,6 +46,7 @@ export function BacklogView({ full }: { full: BoardFull }) {
   const { board, cards, sprints } = full;
   const scrum = board.mode === "scrum";
   const structure = structureOf(full);
+  const folded = useFolded(board.id);
   const [grouping, setGrouping] = useState<Grouping>("hierarchy");
   const [showClosed, setShowClosed] = useState(false);
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
@@ -56,6 +62,8 @@ export function BacklogView({ full }: { full: BoardFull }) {
   const lastEnd = sprints.reduce((max, sp) => (sp.endDate > max ? sp.endDate : max), "");
   const suggestedStart = lastEnd ? addDaysIso(lastEnd, 1) : todayInCopenhagen();
   const points = all.reduce((total, c) => total + (c.estimate ?? 0), 0);
+  const tree = hierarchy(full, stories, { showClosed });
+  const filtering = hasFilters(filters);
 
   function select(cardId: string, checked: boolean) {
     setSelected((current) => {
@@ -92,20 +100,42 @@ export function BacklogView({ full }: { full: BoardFull }) {
     boardKey: board.key,
     boardId: board.id,
     structure,
+    reviewDays: board.epicReviewDays,
     selected,
-    onSelect: select,
+    onSelect: scrum ? select : undefined,
     onNudge: nudge,
     onRank: (itemId, siblingId, after) =>
       void run(() => reorderItemAction({ itemId, siblingId, after })),
     dragId,
     setDragId,
     onDropOn: dropOn,
+    isOpen: filtering ? ALL_OPEN : folded.isOpen,
+    toggle: folded.toggle,
+    newFeature: (epicId) => (
+      <ItemForm
+        full={full}
+        level="feature"
+        parentId={epicId}
+        run={run}
+        trigger={
+          <button type="button" className="text-meta hover:text-foreground font-medium">
+            + {t("newFeature")}
+          </button>
+        }
+      />
+    ),
   };
   const groupNames = { none: g("none"), business: s("kind.business"), enabler: s("kind.enabler") };
+  const contextOf = (group: Group) =>
+    grouping === "theme" && group.key !== "none"
+      ? { themeIds: [group.key] }
+      : grouping === "area" && group.key !== "none"
+        ? { areaId: group.key }
+        : undefined;
   const backlogSelected = all.filter((c) => selected.has(c.id)).length;
 
   const list = (
-    <section className="border-border bg-card flex min-w-0 flex-col rounded-xl border shadow-[var(--surface-shadow)]">
+    <section className="border-border bg-card @container flex min-w-0 flex-col rounded-xl border shadow-[var(--surface-shadow)]">
       <header className="flex flex-wrap items-center gap-3 px-4 py-3">
         <div className="min-w-0 flex-1">
           <h2 className="text-base font-semibold">{t("title")}</h2>
@@ -113,29 +143,6 @@ export function BacklogView({ full }: { full: BoardFull }) {
             {t("holds", { cards: all.length, points })}
           </p>
         </div>
-        <NativeSelect
-          variant="sm"
-          value={grouping}
-          onChange={(event) => setGrouping(event.target.value as Grouping)}
-          aria-label={g("label")}
-          className="w-40"
-        >
-          {GROUPINGS.map((option) => (
-            <option key={option} value={option}>
-              {g(option)}
-            </option>
-          ))}
-        </NativeSelect>
-        {grouping === "hierarchy" && (
-          <label className="text-meta flex items-center gap-1.5 text-[0.78rem]">
-            <input
-              type="checkbox"
-              checked={showClosed}
-              onChange={(event) => setShowClosed(event.target.checked)}
-            />
-            {t("showClosed")}
-          </label>
-        )}
         <ItemForm
           full={full}
           level="epic"
@@ -156,43 +163,38 @@ export function BacklogView({ full }: { full: BoardFull }) {
             </Button>
           }
         />
-        {scrum && backlogSelected > 0 && open.length > 0 && (
-          <div className="flex items-center gap-2">
-            <NativeSelect
-              variant="sm"
-              value={target}
-              onChange={(e) => setTarget(e.target.value)}
-              aria-label={t("targetSprint")}
-              className="w-44"
-            >
-              {open.map((sp) => (
-                <option key={sp.id} value={sp.id}>
-                  {sp.name}
-                </option>
-              ))}
-            </NativeSelect>
-            <Button type="button" size="sm" onClick={() => void commit()}>
-              {t("commit", { count: backlogSelected })}
-            </Button>
-          </div>
-        )}
       </header>
-      <div className="px-4 pb-3">
-        <BoardFilters
-          filters={filters}
-          onChange={setFilters}
-          members={full.members}
-          structure={structure}
+      <BacklogToolbar
+        grouping={grouping}
+        onGrouping={setGrouping}
+        showClosed={showClosed}
+        onShowClosed={setShowClosed}
+        anyOpen={folded.anyOpen}
+        filtering={filtering}
+        onFoldAll={() => (folded.anyOpen ? folded.closeAll() : folded.openAll(sectionIds(tree)))}
+        filters={filters}
+        onFilters={setFilters}
+        members={full.members}
+        structure={structure}
+      />
+      {scrum && (
+        <SelectionBar
+          count={backlogSelected}
+          sprints={open}
+          target={target}
+          onTarget={setTarget}
+          onCommit={() => void commit()}
+          onClear={() => setSelected(new Set())}
         />
-      </div>
+      )}
       {grouping === "hierarchy" ? (
-        <HierarchyList
-          tree={hierarchy(full, stories, { showClosed })}
-          rows={rows}
-          reviewDays={board.epicReviewDays}
-        />
+        <HierarchyList tree={tree} rows={rows} />
       ) : (
-        <GroupedList groups={grouped(full, stories, grouping, groupNames)} rows={rows} />
+        <GroupedList
+          groups={grouped(full, stories, grouping, groupNames)}
+          rows={rows}
+          contextOf={contextOf}
+        />
       )}
       {all.length === 0 && (
         <p className="text-meta border-hairline border-t px-4 py-3 text-sm">{t("empty")}</p>
@@ -212,7 +214,7 @@ export function BacklogView({ full }: { full: BoardFull }) {
   if (!scrum) return list;
 
   return (
-    <div className="grid gap-6 @3xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+    <div className="grid gap-6 @5xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
       {list}
       <div className="flex min-w-0 flex-col gap-4">
         {open.map((sprint) => (

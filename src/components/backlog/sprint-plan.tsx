@@ -48,7 +48,7 @@ export function SprintPlan({
   const active = sprint.state === "active";
 
   return (
-    <section className="border-border bg-card rounded-xl border shadow-[var(--surface-shadow)]">
+    <section className="border-border bg-card @container rounded-xl border shadow-[var(--surface-shadow)]">
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
         <div className="min-w-0 flex-1">
           <p className="text-chart-2 text-[0.72rem] font-medium">
@@ -109,6 +109,7 @@ export function SprintPlan({
               selected={selected.has(card.id)}
               onSelect={(checked) => onSelect(card.id, checked)}
               columnName={active ? columnNames.get(card.columnId) : undefined}
+              quiet
             />
           ))}
         </ul>

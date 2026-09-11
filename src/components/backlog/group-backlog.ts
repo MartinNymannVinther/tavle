@@ -35,6 +35,28 @@ export type Hierarchy = {
 
 export type Group = { key: string; name: string; color: string | null; stories: CardView[] };
 
+/** How far an item is: all its stories, the ones done, the ones under way elsewhere. */
+export type Progress = { total: number; done: number; open: number };
+
+export function featureProgress(node: FeatureNode): Progress {
+  return {
+    total: node.stories.length + node.elsewhere.open + node.elsewhere.done,
+    done: node.elsewhere.done,
+    open: node.elsewhere.open,
+  };
+}
+
+export function epicProgress(node: EpicNode): Progress {
+  return node.features.map(featureProgress).reduce(
+    (sum, p) => ({
+      total: sum.total + p.total,
+      done: sum.done + p.done,
+      open: sum.open + p.open,
+    }),
+    { total: 0, done: 0, open: 0 },
+  );
+}
+
 /** The stories that are in the backlog, in the backlog's own order. */
 export function backlogStories(full: BoardFull): CardView[] {
   const { board, columns, cards } = full;

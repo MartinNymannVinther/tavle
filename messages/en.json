@@ -658,6 +658,13 @@
       "inherits": "Area and themes are inherited from the epic and can be changed afterwards.",
       "create": "Create",
       "cancel": "Cancel"
+    },
+    "types": {
+      "epic": "Epic",
+      "feature": "Feature",
+      "card": "Card",
+      "bug": "Bug",
+      "enabler": "Enabler"
     }
   },
   "cards": {
@@ -766,7 +773,7 @@
     "title": "Backlog",
     "holds": "{cards, plural, one {# card} other {# cards}} · {points} points",
     "targetSprint": "Sprint",
-    "commit": "Put {count, plural, one {# card} other {# cards}} in the sprint",
+    "commit": "Add to sprint",
     "empty": "The backlog is empty. Add the next thing the team should do.",
     "addPlaceholder": "New card in the backlog",
     "newSprint": "Plan a sprint",
@@ -811,11 +818,26 @@
       "none": "None"
     },
     "hierarchy": {
-      "featureCounts": "{backlog, plural, one {# in backlog} other {# in backlog}} · {open} in progress · {done} done",
-      "epicCounts": "{features, plural, one {# feature} other {# features}}",
+      "epicCounts": "{features, plural, one {# feature} other {# features}} · {cards, plural, one {# card} other {# cards}}",
+      "progress": "{done} of {total} done",
+      "progressShort": "{done} of {total}",
+      "underway": "{open, plural, one {# under way} other {# under way}}",
+      "noFeatures": "No features yet.",
+      "noStories": "No cards yet.",
+      "allElsewhere": "Every card under the feature is under way or done.",
       "noParent": "No parent",
+      "noParentHint": "Features and cards that are not part of anything yet",
       "groupCount": "{count, plural, one {# card} other {# cards}}",
       "groupEmpty": "No cards here."
+    },
+    "selected": "{count, plural, one {# card selected} other {# cards selected}}",
+    "clearSelection": "Clear",
+    "noSprint": "Plan a sprint to put cards in it.",
+    "fold": {
+      "open": "Unfold",
+      "close": "Fold",
+      "all": "Fold all",
+      "none": "Unfold all"
     }
   },
   "sprints": {
