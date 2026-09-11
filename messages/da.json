@@ -678,7 +678,7 @@
     "description": {
       "title": "Beskrivelse",
       "edit": "Redigér",
-      "write": "Skriv",
+      "write": "Tilføj en beskrivelse",
       "placeholder": "Hvad skal laves, og hvorfor? Hvad skal være sandt, når det er færdigt?",
       "save": "Gem",
       "cancel": "Annuller",
@@ -714,7 +714,9 @@
       "priority": "Prioritet",
       "dueDate": "Deadline",
       "blocked": "Blokeret",
-      "blockedReason": "Hvad venter kortet på?"
+      "blockedReason": "Hvad venter kortet på?",
+      "blockedYes": "Ja, venter",
+      "blockedNo": "Nej"
     },
     "ai": {
       "title": "AI-hjælp",
@@ -747,7 +749,8 @@
         "unauthorized": "Du er ikke logget ind længere.",
         "invalid": "Noget i forespørgslen var forkert.",
         "notFound": "Kortet findes ikke længere."
-      }
+      },
+      "noModelShort": "Ingen sprogmodel sat op."
     },
     "page": {
       "archived": "Arkiveret",
@@ -763,7 +766,7 @@
     },
     "acceptance": {
       "title": "Acceptkriterier",
-      "write": "Skriv acceptkriterier",
+      "write": "Tilføj acceptkriterier",
       "edit": "Redigér",
       "placeholder": "Hvad skal være sandt, før kortet er færdigt? Én linje pr. kriterium.",
       "save": "Gem",

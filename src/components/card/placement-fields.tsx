@@ -5,15 +5,16 @@ import { useTranslations } from "next-intl";
 import { ThemeChip } from "@/components/board/bits";
 import type { Run } from "@/components/board/use-board-actions";
 import { NativeSelect } from "@/components/ui/native-select";
+import { PropertyRow } from "@/components/ui/property-row";
 import { ENABLER_TYPES, type Area, type Theme } from "@/core/db/schema";
 import { placeCardAction, updateCardAction } from "@/modules/boards/actions-cards";
 import type { CardView, ItemView } from "@/modules/boards/types";
 import { cn } from "@/lib/utils";
 
 /**
- * Where something belongs in the structure, as controls that save on
- * change: its parent (one level up, or none), its area, its themes, its
- * kind. Shared by the card and by the epic and feature pages, which pass
+ * Where something belongs in the structure, as property rows that save
+ * on change: its parent (one level up, or none), its area, its themes,
+ * its kind. Shared by the card and by the epic and feature pages, which pass
  * in what a parent is for them. An item without a parent needs an area,
  * so the area select is marked required when the parent is "none".
  */
@@ -37,9 +38,6 @@ export type KindFields = {
   enablerType?: (typeof ENABLER_TYPES)[number] | null;
   bug?: boolean;
 };
-
-const rowClass = "flex flex-col gap-1.5";
-const labelClass = "text-label text-[0.72rem] font-medium";
 
 export function StructureFields({
   parent,
@@ -84,13 +82,10 @@ export function StructureFields({
   return (
     <>
       {parent && (
-        <div className={rowClass}>
-          <label htmlFor="place-parent" className={labelClass}>
-            {parent.label}
-          </label>
+        <PropertyRow label={parent.label} htmlFor="place-parent">
           <NativeSelect
             id="place-parent"
-            variant="sm"
+            variant="xs"
             value={parent.value ?? ""}
             onChange={(event) => onPlace({ parentId: event.target.value || null })}
           >
@@ -101,17 +96,17 @@ export function StructureFields({
               </option>
             ))}
           </NativeSelect>
-        </div>
+        </PropertyRow>
       )}
 
-      <div className={rowClass}>
-        <label htmlFor="place-area" className={labelClass}>
-          {t("area")}
-          {needsArea && <span className="text-destructive"> · {t("areaRequired")}</span>}
-        </label>
+      <PropertyRow
+        label={t("area")}
+        htmlFor="place-area"
+        hint={needsArea ? <span className="text-destructive">{t("areaRequired")}</span> : undefined}
+      >
         <NativeSelect
           id="place-area"
-          variant="sm"
+          variant="xs"
           value={areaId ?? ""}
           onChange={(event) =>
             onPlace({ areaId: event.target.value || null, applyToChildren: cascade })
@@ -126,12 +121,11 @@ export function StructureFields({
             </option>
           ))}
         </NativeSelect>
-      </div>
+      </PropertyRow>
 
       {activeThemes.length > 0 && (
-        <div className={rowClass}>
-          <span className={labelClass}>{t("themes")}</span>
-          <div className="flex flex-wrap gap-1.5">
+        <PropertyRow label={t("themes")} className="items-start [&>span]:pt-1.5">
+          <div className="flex min-h-8 flex-wrap items-center gap-1.5">
             {activeThemes.map((theme) => {
               const on = themeIds.includes(theme.id);
               return (
@@ -150,11 +144,11 @@ export function StructureFields({
               );
             })}
           </div>
-        </div>
+        </PropertyRow>
       )}
 
       {offerCascade && (
-        <label className="flex items-center gap-2 text-[0.78rem]">
+        <label className="text-meta flex items-center gap-2 py-1 text-[0.72rem]">
           <input
             type="checkbox"
             checked={cascade}
@@ -164,14 +158,11 @@ export function StructureFields({
         </label>
       )}
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className={rowClass}>
-          <label htmlFor="place-kind" className={labelClass}>
-            {t("kindLabel")}
-          </label>
+      <PropertyRow label={t("kindLabel")} htmlFor="place-kind">
+        <div className="flex gap-2">
           <NativeSelect
             id="place-kind"
-            variant="sm"
+            variant="xs"
             value={kind}
             onChange={(event) =>
               onKind({ kind: event.target.value as "business" | "enabler", enablerType: null })
@@ -180,15 +171,11 @@ export function StructureFields({
             <option value="business">{t("kind.business")}</option>
             <option value="enabler">{t("kind.enabler")}</option>
           </NativeSelect>
-        </div>
-        {kind === "enabler" && (
-          <div className={rowClass}>
-            <label htmlFor="place-enabler-type" className={labelClass}>
-              {t("enablerTypeLabel")}
-            </label>
+          {kind === "enabler" && (
             <NativeSelect
               id="place-enabler-type"
-              variant="sm"
+              variant="xs"
+              aria-label={t("enablerTypeLabel")}
               value={enablerType ?? ""}
               onChange={(event) =>
                 onKind({
@@ -204,20 +191,25 @@ export function StructureFields({
                 </option>
               ))}
             </NativeSelect>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </PropertyRow>
 
       {bug !== undefined && (
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={bug}
-            onChange={(event) => onKind({ bug: event.target.checked })}
-            className="accent-[var(--warning)]"
-          />
-          <span className={cn("font-medium", bug && "text-warning")}>{t("bugFlag")}</span>
-        </label>
+        <PropertyRow label={t("bug")} htmlFor="place-bug">
+          <label className="flex h-8 items-center gap-2">
+            <input
+              id="place-bug"
+              type="checkbox"
+              checked={bug}
+              onChange={(event) => onKind({ bug: event.target.checked })}
+              className="accent-[var(--warning)]"
+            />
+            <span className={cn("text-[0.8125rem]", bug && "text-warning font-medium")}>
+              {t("bugFlag")}
+            </span>
+          </label>
+        </PropertyRow>
       )}
     </>
   );

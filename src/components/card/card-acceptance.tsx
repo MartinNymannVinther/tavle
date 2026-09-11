@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { AddAffordance } from "@/components/ui/add-affordance";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { CardView } from "@/modules/boards/types";
@@ -35,20 +36,15 @@ export function CardAcceptance({ card, run }: { card: CardView; run: Run }) {
 
   if (!editing && !card.acceptance) {
     return (
-      <div className="-mt-4">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="text-meta"
+      <section>
+        <AddAffordance
+          label={t("write")}
           onClick={() => {
             setValue("");
             setEditing(true);
           }}
-        >
-          {t("write")}
-        </Button>
-      </div>
+        />
+      </section>
     );
   }
 

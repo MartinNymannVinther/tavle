@@ -103,28 +103,34 @@ export function AiPanel({
     if (ok) setKind(null);
   }
 
-  return (
-    <section className="flex flex-col gap-2">
-      <h2 className="text-sm font-semibold">{t("title")}</h2>
-      {available ? (
-        <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={() => void ask("draft")}>
-            <Sparkles data-slot="icon" />
-            {t("draft")}
-          </Button>
-          <Button type="button" variant="outline" size="sm" onClick={() => void ask("split")}>
-            <Sparkles data-slot="icon" />
-            {t("split")}
-          </Button>
-        </div>
-      ) : (
-        <p className="text-meta text-[0.8125rem]">
-          {t("noModel")}{" "}
+  if (!available) {
+    return (
+      <section>
+        <p className="text-meta flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.78rem]">
+          <Sparkles className="size-3.5 shrink-0" aria-hidden />
+          <span className="font-medium">{t("title")}:</span>
+          <span>{t("noModelShort")}</span>
           <Link href="/settings/ai" className="text-primary underline-offset-4 hover:underline">
             {t("noModelLink")}
           </Link>
         </p>
-      )}
+      </section>
+    );
+  }
+
+  return (
+    <section className="flex flex-col gap-2">
+      <h2 className="text-sm font-semibold">{t("title")}</h2>
+      <div className="flex flex-wrap gap-2">
+        <Button type="button" variant="outline" size="sm" onClick={() => void ask("draft")}>
+          <Sparkles data-slot="icon" />
+          {t("draft")}
+        </Button>
+        <Button type="button" variant="outline" size="sm" onClick={() => void ask("split")}>
+          <Sparkles data-slot="icon" />
+          {t("split")}
+        </Button>
+      </div>
       <p className="text-meta text-[0.72rem]">{t("principle")}</p>
 
       <Dialog open={kind !== null} onOpenChange={(open) => !open && setKind(null)}>

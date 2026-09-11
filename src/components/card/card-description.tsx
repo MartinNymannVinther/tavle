@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { AddAffordance } from "@/components/ui/add-affordance";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { CardView } from "@/modules/boards/types";
@@ -37,17 +38,18 @@ export function CardDescription({ card, run }: { card: CardView; run: Run }) {
     <section className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold">{t("title")}</h2>
-        {!editing && (
+        {!editing && card.description && (
           <Button
             type="button"
             variant="ghost"
-            size="sm"
+            size="xs"
+            className="text-meta"
             onClick={() => {
               setValue(card.description);
               setEditing(true);
             }}
           >
-            {card.description ? t("edit") : t("write")}
+            {t("edit")}
           </Button>
         )}
       </div>
@@ -74,7 +76,13 @@ export function CardDescription({ card, run }: { card: CardView; run: Run }) {
       ) : card.description ? (
         <p className="text-[0.9375rem] leading-relaxed whitespace-pre-wrap">{card.description}</p>
       ) : (
-        <p className="text-meta text-sm">{t("empty")}</p>
+        <AddAffordance
+          label={t("write")}
+          onClick={() => {
+            setValue("");
+            setEditing(true);
+          }}
+        />
       )}
     </section>
   );

@@ -4,6 +4,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 import { NativeSelect } from "@/components/ui/native-select";
+import { PropertyGroup, PropertyRow } from "@/components/ui/property-row";
 import { ActivityList } from "@/components/card/activity-list";
 import { StructureFields } from "@/components/card/placement-fields";
 import { quarterOptions } from "@/components/backlog/quarters";
@@ -19,6 +20,8 @@ import {
 } from "@/modules/boards/actions-structure";
 import type { ItemFull } from "@/modules/boards/structure/read";
 import { Link, useRouter } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
+import { panel, surface } from "@/components/ui/detail-surfaces";
 import { CloseItemButton } from "./close-dialog";
 import { ItemChildren } from "./item-children";
 import { ItemTextarea } from "./item-textarea";
@@ -42,8 +45,8 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
   const backlog = `/boards/${board.id}/backlog`;
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
+      <div className="flex flex-col gap-1.5">
         <p className="text-meta flex flex-wrap items-center gap-2 text-[0.78rem]">
           <Link href={backlog} className="hover:text-foreground">
             {board.name}
@@ -61,7 +64,7 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
           )}
           <span aria-hidden>›</span>
           <TypeIcon type={item.level as "epic" | "feature"} />
-          <span className="tabular-nums">
+          <span className="font-mono tabular-nums">
             {board.key}-{item.number}
           </span>
           <span aria-hidden>·</span>
@@ -79,7 +82,7 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
         </p>
         <ItemTitle item={item} categoryNames={categoryNames} run={run} />
         {reviewDue && (
-          <div className="border-warning bg-warning-tint/40 flex flex-wrap items-center gap-3 rounded-lg border p-3 text-sm">
+          <div className="border-warning bg-warning-tint/40 mt-1 flex flex-wrap items-center gap-3 rounded-lg border p-3 text-sm">
             <p className="min-w-0 flex-1">{t("reviewBody", { days: board.epicReviewDays })}</p>
             <Button
               type="button"
@@ -92,67 +95,68 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
         )}
       </div>
 
-      <div className="grid gap-8 @3xl:grid-cols-[minmax(0,1fr)_18rem]">
-        <div className="flex min-w-0 flex-col gap-8">
+      <div className="grid items-start gap-6 @3xl:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className={surface}>
           <ItemTextarea item={item} field="doneWhen" run={run} />
           <ItemTextarea item={item} field="description" run={run} />
           <ItemChildren full={full} run={run} />
           <ActivityList events={events} />
         </div>
-        <aside className="flex flex-col gap-4 @3xl:sticky @3xl:top-6 @3xl:self-start">
-          <StructureFields
-            parent={
-              epic
-                ? null
-                : {
-                    label: s("epic"),
-                    value: item.parentId,
-                    options: epics,
-                    boardKey: board.key,
-                  }
-            }
-            areaId={item.areaId}
-            themeIds={item.themeIds}
-            kind={item.kind}
-            enablerType={item.enablerType}
-            themes={themes}
-            areas={areas}
-            offerCascade
-            onPlace={(placement) =>
-              void run(() => placeItemAction({ itemId: item.id, ...placement }))
-            }
-            onKind={(fields) => void run(() => updateItemAction({ itemId: item.id, ...fields }))}
-          />
+        <aside className={cn(panel, "@3xl:sticky @3xl:top-6")}>
+          <PropertyGroup>
+            <StructureFields
+              parent={
+                epic
+                  ? null
+                  : {
+                      label: s("epic"),
+                      value: item.parentId,
+                      options: epics,
+                      boardKey: board.key,
+                    }
+              }
+              areaId={item.areaId}
+              themeIds={item.themeIds}
+              kind={item.kind}
+              enablerType={item.enablerType}
+              themes={themes}
+              areas={areas}
+              offerCascade
+              onPlace={(placement) =>
+                void run(() => placeItemAction({ itemId: item.id, ...placement }))
+              }
+              onKind={(fields) => void run(() => updateItemAction({ itemId: item.id, ...fields }))}
+            />
+          </PropertyGroup>
           {epic && (
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="item-quarter" className="text-label text-[0.72rem] font-medium">
-                {s("targetQuarter")}
-              </label>
-              <NativeSelect
-                id="item-quarter"
-                variant="sm"
-                value={item.targetQuarter ?? ""}
-                onChange={(event) =>
-                  void run(() =>
-                    updateItemAction({
-                      itemId: item.id,
-                      targetQuarter: event.target.value || null,
-                    }),
-                  )
-                }
-              >
-                <option value="">{s("noQuarter")}</option>
-                {[...new Set([item.targetQuarter, ...quarterOptions()].filter(Boolean))].map(
-                  (quarter) => (
-                    <option key={quarter} value={quarter!}>
-                      {quarter}
-                    </option>
-                  ),
-                )}
-              </NativeSelect>
-            </div>
+            <PropertyGroup>
+              <PropertyRow label={s("targetQuarter")} htmlFor="item-quarter">
+                <NativeSelect
+                  id="item-quarter"
+                  variant="xs"
+                  value={item.targetQuarter ?? ""}
+                  onChange={(event) =>
+                    void run(() =>
+                      updateItemAction({
+                        itemId: item.id,
+                        targetQuarter: event.target.value || null,
+                      }),
+                    )
+                  }
+                >
+                  <option value="">{s("noQuarter")}</option>
+                  {[...new Set([item.targetQuarter, ...quarterOptions()].filter(Boolean))].map(
+                    (quarter) => (
+                      <option key={quarter} value={quarter!}>
+                        {quarter}
+                      </option>
+                    ),
+                  )}
+                </NativeSelect>
+              </PropertyRow>
+            </PropertyGroup>
           )}
-          <div className="text-meta flex flex-col gap-1 text-[0.72rem]">
+          <div className="border-hairline text-meta flex flex-col gap-0.5 border-t px-4 py-3 text-[0.72rem]">
             <p>
               {t("created", { date: format.dateTime(item.createdAt, { dateStyle: "medium" }) })}
             </p>
@@ -169,12 +173,12 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
               </p>
             )}
           </div>
-          <div className="border-hairline flex flex-wrap gap-2 border-t pt-4">
+          <div className="border-hairline flex flex-wrap gap-2 border-t px-4 py-3">
             {item.state === "closed" ? (
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
+                size="xs"
                 onClick={() => void run(() => reopenItemAction({ itemId: item.id }))}
               >
                 {t("reopen")}
@@ -190,6 +194,7 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
             )}
             {canManage && (
               <ConfirmButton
+                size="xs"
                 title={t("deleteTitle")}
                 body={t("deleteBody", { key: `${board.key}-${item.number}` })}
                 confirmLabel={t("deleteConfirm")}
@@ -204,7 +209,10 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
               </ConfirmButton>
             )}
           </div>
-          <TypeLegend types={["epic", "feature", "card", "bug"]} />
+          <TypeLegend
+            types={["epic", "feature", "card", "bug"]}
+            className="border-hairline border-t px-4 py-2"
+          />
         </aside>
       </div>
     </div>

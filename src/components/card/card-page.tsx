@@ -2,6 +2,7 @@
 
 import { useFormatter, useTranslations } from "next-intl";
 import { ConfirmButton } from "@/components/ui/confirm-button";
+import { panel, surface } from "@/components/ui/detail-surfaces";
 import { Button } from "@/components/ui/button";
 import { TypeIcon } from "@/components/board/type-icon";
 import { TypeLegend } from "@/components/board/type-legend";
@@ -13,6 +14,7 @@ import {
   restoreCardAction,
 } from "@/modules/boards/actions-cards";
 import { Link, useRouter } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
 import { ActivityList } from "./activity-list";
 import { AiPanel } from "./ai-panel";
 import { CardAcceptance } from "./card-acceptance";
@@ -47,15 +49,15 @@ export function CardPage({
   const column = columns.find((c) => c.id === card.columnId);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
+      <div className="flex flex-col gap-1.5">
         <p className="text-meta flex flex-wrap items-center gap-2 text-[0.78rem]">
           <Link href={`/boards/${board.id}`} className="hover:text-foreground">
             {board.name}
           </Link>
           <span aria-hidden>›</span>
           <TypeIcon type={card.bug ? "bug" : "card"} />
-          <span className="tabular-nums">
+          <span className="font-mono tabular-nums">
             {board.key}-{card.number}
           </span>
           {column && (
@@ -73,8 +75,8 @@ export function CardPage({
         <CardTitle card={card} run={run} />
       </div>
 
-      <div className="grid gap-8 @3xl:grid-cols-[minmax(0,1fr)_18rem]">
-        <div className="flex min-w-0 flex-col gap-8">
+      <div className="grid items-start gap-6 @3xl:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className={surface}>
           <CardDescription card={card} run={run} />
           <CardAcceptance card={card} run={run} />
           <ChecklistEditor card={card} run={run} />
@@ -88,7 +90,7 @@ export function CardPage({
           />
           <ActivityList events={events} />
         </div>
-        <aside className="flex flex-col gap-6 @3xl:sticky @3xl:top-6 @3xl:self-start">
+        <aside className={cn(panel, "@3xl:sticky @3xl:top-6")}>
           <CardSidePanel
             card={card}
             boardKey={board.key}
@@ -101,7 +103,7 @@ export function CardPage({
             scrum={board.mode === "scrum"}
             run={run}
           />
-          <div className="text-meta flex flex-col gap-1 text-[0.72rem]">
+          <div className="border-hairline text-meta flex flex-col gap-0.5 border-t px-4 py-3 text-[0.72rem]">
             <p>
               {t("created", { date: format.dateTime(card.createdAt, { dateStyle: "medium" }) })}
             </p>
@@ -114,12 +116,12 @@ export function CardPage({
               <p>{t("done", { date: format.dateTime(card.doneAt, { dateStyle: "medium" }) })}</p>
             )}
           </div>
-          <div className="border-hairline flex flex-wrap gap-2 border-t pt-4">
+          <div className="border-hairline flex flex-wrap gap-2 border-t px-4 py-3">
             {card.archivedAt ? (
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
+                size="xs"
                 onClick={() => void run(() => restoreCardAction({ cardId: card.id }))}
               >
                 {t("restore")}
@@ -128,7 +130,7 @@ export function CardPage({
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
+                size="xs"
                 onClick={() =>
                   void run(
                     () => archiveCardAction({ cardId: card.id }),
@@ -140,6 +142,7 @@ export function CardPage({
               </Button>
             )}
             <ConfirmButton
+              size="xs"
               title={t("deleteTitle")}
               body={t("deleteBody", { key: `${board.key}-${card.number}` })}
               confirmLabel={t("deleteConfirm")}
@@ -153,7 +156,10 @@ export function CardPage({
               {t("delete")}
             </ConfirmButton>
           </div>
-          <TypeLegend types={["card", "bug", "enabler"]} />
+          <TypeLegend
+            types={["card", "bug", "enabler"]}
+            className="border-hairline border-t px-4 py-2"
+          />
         </aside>
       </div>
     </div>

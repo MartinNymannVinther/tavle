@@ -70,6 +70,13 @@ codebase to:
   assistive technology. The backlog is one flat list in its own order
   with the decomposition as a navigator beside it (ADR 0013), and a row
   says only what its heading has not.
+- A detail page (a card, an epic, a feature) is two surfaces: the reading
+  surface on the left, sections divided by hairlines, an empty field
+  drawn as a dashed "add" row rather than a button somewhere else; the
+  property panel on the right, label left and control right in 32px
+  rows, grouped by hairlines (`src/components/ui/property-row.tsx`). The
+  board's header steps back to one line on these pages so the thing
+  itself is the title.
 - The AI writes three kinds of proposal — finish a card, split a card, the
   sprint's story — and a person edits and says yes. Without a model the
   buttons say so and everything else works.

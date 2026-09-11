@@ -86,7 +86,7 @@ export function CloseItemButton({
       <Button
         type="button"
         variant="outline"
-        size="sm"
+        size="xs"
         disabled={pending}
         onClick={() => void attempt(undefined)}
       >

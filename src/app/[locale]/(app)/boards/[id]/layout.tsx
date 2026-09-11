@@ -1,13 +1,13 @@
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { PageHeader } from "@/components/ui/page-header";
 import { requireOrgContext } from "@/core/auth/guard";
 import { getBoardHeader } from "@/modules/boards/read";
-import { BoardTabs } from "./board-tabs";
+import { BoardHeader } from "./board-header";
 
 /**
  * Everything under a board shares its header: the name, how it is run,
- * and the tabs. The board itself is read once here through the
+ * and the tabs, full on the board's pages and one line on a card or an
+ * item. The board itself is read once here through the
  * workspace's own context, so a board id from another workspace is
  * simply not there for any page below it.
  */
@@ -29,12 +29,12 @@ export default async function BoardLayout({
 
   return (
     <div className="flex flex-col gap-5">
-      <PageHeader
-        size="detail"
+      <BoardHeader
+        boardId={board.id}
         kicker={`${board.key} · ${t(board.mode)}${board.archivedAt ? ` · ${tabs("archived")}` : ""}`}
-        title={board.name}
-        subtitle={board.description || undefined}
-        actions={<BoardTabs boardId={board.id} scrum={board.mode === "scrum"} />}
+        name={board.name}
+        description={board.description || undefined}
+        scrum={board.mode === "scrum"}
       />
       {children}
     </div>
