@@ -806,27 +806,19 @@
       "save": "Save",
       "cancel": "Cancel"
     },
-    "showClosed": "Show closed",
     "newEpic": "New epic",
     "newFeature": "New feature",
     "grouping": {
-      "label": "Group by",
-      "hierarchy": "Hierarchy",
+      "label": "Show as",
+      "list": "List",
       "theme": "Theme",
       "area": "Area",
       "kind": "Kind",
       "none": "None"
     },
     "hierarchy": {
-      "epicCounts": "{features, plural, one {# feature} other {# features}} · {cards, plural, one {# card} other {# cards}}",
       "progress": "{done} of {total} done",
       "progressShort": "{done} of {total}",
-      "underway": "{open, plural, one {# under way} other {# under way}}",
-      "noFeatures": "No features yet.",
-      "noStories": "No cards yet.",
-      "allElsewhere": "Every card under the feature is under way or done.",
-      "noParent": "No parent",
-      "noParentHint": "Features and cards that are not part of anything yet",
       "groupCount": "{count, plural, one {# card} other {# cards}}",
       "groupEmpty": "No cards here."
     },
@@ -835,9 +827,21 @@
     "noSprint": "Plan a sprint to put cards in it.",
     "fold": {
       "open": "Unfold",
-      "close": "Fold",
-      "all": "Fold all",
-      "none": "Unfold all"
+      "close": "Fold"
+    },
+    "nothingHere": "No cards here.",
+    "nav": {
+      "label": "Breakdown",
+      "all": "All cards",
+      "noParent": "No parent",
+      "noFeatures": "No features yet",
+      "showClosed": "Show closed"
+    },
+    "heading": {
+      "doneWhen": "Done when:",
+      "epicCounts": "{features, plural, one {# feature} other {# features}} · {cards, plural, one {# card} other {# cards}} in the backlog · {points} points",
+      "featureCounts": "{cards, plural, one {# card} other {# cards}} in the backlog · {points} points · {open} under way",
+      "looseHint": "Cards that are not part of a feature yet"
     }
   },
   "sprints": {

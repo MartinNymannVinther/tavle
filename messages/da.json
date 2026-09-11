@@ -806,27 +806,19 @@
       "save": "Gem",
       "cancel": "Annuller"
     },
-    "showClosed": "Vis lukkede",
     "newEpic": "Ny epic",
     "newFeature": "Ny feature",
     "grouping": {
-      "label": "Gruppér efter",
-      "hierarchy": "Hierarki",
+      "label": "Vis som",
+      "list": "Liste",
       "theme": "Tema",
       "area": "Område",
       "kind": "Art",
       "none": "Uden"
     },
     "hierarchy": {
-      "epicCounts": "{features, plural, one {# feature} other {# features}} · {cards, plural, one {# kort} other {# kort}}",
       "progress": "{done} af {total} færdige",
       "progressShort": "{done} af {total}",
-      "underway": "{open, plural, one {# i gang} other {# i gang}}",
-      "noFeatures": "Ingen features endnu.",
-      "noStories": "Ingen kort endnu.",
-      "allElsewhere": "Alle kort under featuren er i gang eller færdige.",
-      "noParent": "Uden forælder",
-      "noParentHint": "Features og kort, der ikke er del af noget endnu",
       "groupCount": "{count, plural, one {# kort} other {# kort}}",
       "groupEmpty": "Ingen kort her."
     },
@@ -835,9 +827,21 @@
     "noSprint": "Planlæg en sprint for at lægge kort i den.",
     "fold": {
       "open": "Fold ud",
-      "close": "Fold sammen",
-      "all": "Fold alle sammen",
-      "none": "Fold alle ud"
+      "close": "Fold sammen"
+    },
+    "nothingHere": "Ingen kort her.",
+    "nav": {
+      "label": "Nedbrydning",
+      "all": "Alle kort",
+      "noParent": "Uden forælder",
+      "noFeatures": "Ingen features endnu",
+      "showClosed": "Vis lukkede"
+    },
+    "heading": {
+      "doneWhen": "Færdig når:",
+      "epicCounts": "{features, plural, one {# feature} other {# features}} · {cards, plural, one {# kort} other {# kort}} i backloggen · {points} point",
+      "featureCounts": "{cards, plural, one {# kort} other {# kort}} i backloggen · {points} point · {open} i gang",
+      "looseHint": "Kort der ikke er del af en feature endnu"
     }
   },
   "sprints": {

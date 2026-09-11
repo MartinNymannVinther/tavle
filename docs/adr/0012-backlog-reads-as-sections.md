@@ -1,6 +1,8 @@
 # ADR 0012: The backlog reads as sections, and every kind of thing has a symbol
 
-Status: accepted · Date: 2026-09-11
+Status: accepted · Date: 2026-09-11 · The section layout and the fold were
+superseded the same day by ADR 0013; the type symbols and the rule that a
+row says only what is its own stand.
 
 ## Context
 

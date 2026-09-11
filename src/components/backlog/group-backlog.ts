@@ -4,14 +4,15 @@ import type { BoardFull, CardView, ItemView } from "@/modules/boards/types";
  * The backlog as groups, computed from the board. The backlog is the
  * stories not yet committed: on a Scrum board those without a sprint, on
  * a Kanban board those in a backlog column (or, on a board without one,
- * in the first column). The hierarchy view hangs them under their
- * features and epics and puts what has no parent in a group of its own
- * at the bottom, never in an epic of the tool's making; the other views
- * group the same stories by one field each.
+ * in the first column). The hierarchy hangs them under their features
+ * and epics, with what has no parent in a group of its own, never in an
+ * epic of the tool's making; the navigator is drawn from it and the
+ * list is narrowed by it. The other views group the same stories by one
+ * field each.
  */
 
-export type Grouping = "hierarchy" | "theme" | "area" | "kind";
-export const GROUPINGS: Grouping[] = ["hierarchy", "theme", "area", "kind"];
+export type Grouping = "list" | "theme" | "area" | "kind";
+export const GROUPINGS: Grouping[] = ["list", "theme", "area", "kind"];
 
 export type FeatureNode = {
   feature: ItemView;
@@ -118,7 +119,7 @@ export function hierarchy(
 export function grouped(
   full: BoardFull,
   stories: CardView[],
-  by: Exclude<Grouping, "hierarchy">,
+  by: Exclude<Grouping, "list">,
   names: { none: string; business: string; enabler: string },
 ): Group[] {
   if (by === "theme") {

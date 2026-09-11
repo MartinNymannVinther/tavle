@@ -6,6 +6,17 @@ import {
   grouped,
   hierarchy,
 } from "@/components/backlog/group-backlog";
+import {
+  ALL,
+  crumbFor,
+  crumbOf,
+  LOOSE,
+  navCounts,
+  parseSelection,
+  selectStories,
+  selectionKey,
+  stillThere,
+} from "@/components/backlog/backlog-selection";
 import { deviatingPlace } from "@/components/board/card-chips";
 import { overview } from "@/modules/boards/structure/overview";
 import { roadmap } from "@/modules/boards/structure/roadmap";
@@ -310,6 +321,58 @@ describe("the backlog's groups", () => {
       ["Uden", 1],
     ]);
     expect(grouped(board, stories, "kind", names).map((g) => g.stories.length)).toEqual([2, 1]);
+  });
+});
+
+describe("the navigator's selection", () => {
+  const stories = backlogStories(board);
+  const tree = hierarchy(board, stories, { showClosed: false });
+
+  it("narrows the list without reordering it", () => {
+    expect(selectStories(stories, tree, ALL).map((s) => s.title)).toEqual([
+      "Rettelse",
+      "Vis knappen",
+      "Gem kortet",
+    ]);
+    expect(selectStories(stories, tree, { kind: "epic", id: "e1" }).map((s) => s.title)).toEqual([
+      "Vis knappen",
+    ]);
+    expect(selectStories(stories, tree, { kind: "feature", id: "f2" }).map((s) => s.title)).toEqual(
+      ["Gem kortet"],
+    );
+    expect(selectStories(stories, tree, LOOSE).map((s) => s.title)).toEqual(["Rettelse"]);
+  });
+
+  it("counts backlog stories per node and falls back to everything when a node is gone", () => {
+    const counts = navCounts(tree);
+    expect(counts.get("e1")).toBe(1);
+    expect(counts.get("f1")).toBe(1);
+    expect(counts.get("f2")).toBe(1);
+    expect(stillThere({ kind: "epic", id: "e1" }, tree)).toEqual({ kind: "epic", id: "e1" });
+    expect(stillThere({ kind: "epic", id: "e3" }, tree)).toEqual(ALL);
+    expect(stillThere({ kind: "feature", id: "f2" }, tree)).toEqual({ kind: "feature", id: "f2" });
+    expect(stillThere({ kind: "feature", id: "nope" }, tree)).toEqual(ALL);
+  });
+
+  it("writes under a story only the part of its place the heading has not said", () => {
+    const story = stories.find((s) => s.title === "Vis knappen")!;
+    const crumb = crumbOf(story, board.items);
+    expect(crumb.epic?.id).toBe("e1");
+    expect(crumb.feature?.id).toBe("f1");
+    expect(crumbFor(crumb, ALL)).toEqual(crumb);
+    expect(crumbFor(crumb, { kind: "epic", id: "e1" })).toEqual({
+      epic: null,
+      feature: crumb.feature,
+    });
+    expect(crumbFor(crumb, { kind: "feature", id: "f1" })).toEqual({ epic: null, feature: null });
+    expect(crumbOf({ featureId: null }, board.items)).toEqual({ epic: null, feature: null });
+  });
+
+  it("round-trips a selection through one string", () => {
+    for (const selection of [ALL, LOOSE, { kind: "epic" as const, id: "e1" }]) {
+      expect(parseSelection(selectionKey(selection))).toEqual(selection);
+    }
+    expect(parseSelection("garbage")).toEqual(ALL);
   });
 });
 

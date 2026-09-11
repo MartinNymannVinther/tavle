@@ -70,12 +70,12 @@ item: themes (a closed list of five to eight, each with an owner), areas
 and Tavle enforces them: can it be finished, then it is in the hierarchy;
 does it have exactly one parent, then it is in the hierarchy; otherwise
 it is a category. There is no "Diverse" epic and the tool will not make
-one: what has no parent is shown as exactly that. The backlog reads as
-sections — an epic, its features, their cards, each level with its own
-weight and its own symbol, folded to the epics until you open one — and
-groups by hierarchy, theme, area or kind; the roadmap draws epics on
-quarters; the overview says how the open work is spread and whether the
-structure is being kept.
+one: what has no parent is shown as exactly that. The backlog is one
+list in its own order, with the decomposition beside it as a navigator:
+click an epic or a feature and the list narrows to it, every kind of
+thing carrying its own symbol. The list also groups by theme, area or
+kind; the roadmap draws epics on quarters; the overview says how the
+open work is spread and whether the structure is being kept.
 
 **The numbers come from the record.** Every move a card makes is written
 down, so the insight page can say how many cards were finished per week,

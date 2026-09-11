@@ -22,17 +22,20 @@ export function QuickAdd({
   onAdd,
   structure,
   placeholder,
+  defaultWhere,
 }: {
   onAdd: (title: string, place: Place) => Promise<boolean>;
   structure: StructureLookup;
   placeholder?: string;
+  /** Where the card starts out, as the select's value: `f:<featureId>` or `a:<areaId>`. */
+  defaultWhere?: string;
 }) {
   const t = useTranslations("boards.quickAdd");
   const features = structure.items.filter((i) => i.level === "feature" && i.state === "open");
   const areas = structure.areas.filter((a) => a.active);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
-  const [where, setWhere] = useState<string>(areas[0] ? `a:${areas[0].id}` : "");
+  const [where, setWhere] = useState<string>(defaultWhere ?? (areas[0] ? `a:${areas[0].id}` : ""));
   const [pending, setPending] = useState(false);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {

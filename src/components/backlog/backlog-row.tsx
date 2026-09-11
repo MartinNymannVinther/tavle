@@ -3,18 +3,20 @@
 import { useTranslations } from "next-intl";
 import { Initials, Points, PriorityMark } from "@/components/board/bits";
 import { CardChips, type ChipContext, type StructureLookup } from "@/components/board/card-chips";
-import { TypeIcon } from "@/components/board/type-icon";
+import { TypeGlyph, TypeIcon } from "@/components/board/type-icon";
 import type { Priority } from "@/core/db/schema";
 import type { CardView } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { Key, RankArrows } from "./backlog-bits";
+import type { Crumb } from "./backlog-selection";
 
 /**
  * One story as a line in the backlog or in a sprint: a box to tick it
  * for a sprint, the card's symbol (a bug shows as one), the key and the
- * title, then the facts that matter for planning — points, priority,
- * who. Under a feature the line shows only the place it has of its own.
+ * title with where it sits written small under it, then the facts that
+ * matter for planning — points, priority, who. What the heading already
+ * says is left out, so a line says only what is its own.
  */
 export function BacklogRow({
   card,
@@ -22,6 +24,7 @@ export function BacklogRow({
   boardId,
   structure,
   context,
+  crumb,
   selected,
   onSelect,
   onMoveUp,
@@ -40,6 +43,8 @@ export function BacklogRow({
   structure: StructureLookup;
   /** The parent's or the group's place, left out of the chips. */
   context?: ChipContext;
+  /** The epic and feature to write under the title; empty parts are left out. */
+  crumb?: Crumb;
   selected?: boolean;
   /** Ticks the story for a sprint; without it the line has no box. */
   onSelect?: (checked: boolean) => void;
@@ -63,7 +68,7 @@ export function BacklogRow({
       onDragOver={onDragOver}
       onDrop={onDrop}
       className={cn(
-        "group/row hover:bg-secondary/40 flex items-center gap-2 py-1.5 pr-3 pl-3 transition-colors duration-[120ms]",
+        "group/row hover:bg-secondary/40 flex items-center gap-2 py-2 pr-3 pl-3 transition-colors duration-[120ms]",
         dragging && "opacity-40",
       )}
     >
@@ -78,15 +83,38 @@ export function BacklogRow({
       )}
       <TypeIcon type={card.bug ? "bug" : "card"} />
       <Key boardKey={boardKey} number={card.number} />
-      <Link
-        href={`/boards/${boardId}/cards/${card.number}`}
-        className={cn(
-          "min-w-0 flex-1 truncate text-sm hover:underline",
-          card.doneAt && "text-meta line-through",
+      <div className="min-w-0 flex-1">
+        <Link
+          href={`/boards/${boardId}/cards/${card.number}`}
+          className={cn(
+            "block truncate text-sm hover:underline",
+            card.doneAt && "text-meta line-through",
+          )}
+        >
+          {card.title}
+        </Link>
+        {(crumb?.epic || crumb?.feature) && (
+          <p className="text-meta mt-0.5 flex items-center gap-1 truncate text-[0.69rem]">
+            {crumb.epic && (
+              <>
+                <TypeGlyph type="epic" className="text-label" />
+                <span className="truncate">{crumb.epic.title}</span>
+                {crumb.feature && (
+                  <span aria-hidden className="text-label">
+                    ›
+                  </span>
+                )}
+              </>
+            )}
+            {crumb.feature && (
+              <>
+                <TypeGlyph type="feature" className="text-label" />
+                <span className="truncate">{crumb.feature.title}</span>
+              </>
+            )}
+          </p>
         )}
-      >
-        {card.title}
-      </Link>
+      </div>
       <CardChips
         card={{ ...card, bug: false }}
         structure={structure}
