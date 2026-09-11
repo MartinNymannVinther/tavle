@@ -665,7 +665,8 @@
       "card": "Card",
       "bug": "Bug",
       "enabler": "Enabler",
-      "legend": "Symbols:"
+      "legend": "Symbols:",
+      "themes": "Themes:"
     }
   },
   "cards": {

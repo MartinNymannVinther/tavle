@@ -665,7 +665,8 @@
       "card": "Kort",
       "bug": "Fejl",
       "enabler": "Enabler",
-      "legend": "Symboler:"
+      "legend": "Symboler:",
+      "themes": "Temaer:"
     }
   },
   "cards": {

@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import type { Theme } from "@/core/db/schema";
+import { themeSwatch } from "./tokens";
 import { TypeIcon, type ItemType } from "./type-icon";
 
 const ALL_TYPES: ItemType[] = ["epic", "feature", "card", "bug", "enabler"];
@@ -31,6 +33,39 @@ export function TypeLegend({
         <span key={type} className="inline-flex items-center gap-1">
           <TypeIcon type={type} />
           {t(type)}
+        </span>
+      ))}
+    </p>
+  );
+}
+
+/** The board's themes as dot and name, so a dot on a card can be read without hovering. */
+export function ThemeLegend({
+  themes,
+  className,
+}: {
+  themes: Array<Pick<Theme, "id" | "name" | "color" | "active">>;
+  className?: string;
+}) {
+  const t = useTranslations("boards.types");
+  const active = themes.filter((theme) => theme.active);
+  if (active.length === 0) return null;
+  return (
+    <p
+      className={cn(
+        "text-meta flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.72rem]",
+        className,
+      )}
+    >
+      <span className="text-label">{t("themes")}</span>
+      {active.map((theme) => (
+        <span key={theme.id} className="inline-flex items-center gap-1.5">
+          <span
+            aria-hidden
+            className="size-2 rounded-full"
+            style={{ background: themeSwatch(theme.color) }}
+          />
+          {theme.name}
         </span>
       ))}
     </p>

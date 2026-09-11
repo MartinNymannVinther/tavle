@@ -7,14 +7,17 @@ import type { Column, Priority } from "@/core/db/schema";
 import type { CardView } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import { Initials, Points, PriorityMark } from "./bits";
+import { Initials, Points, PriorityMark, ThemeDots } from "./bits";
 import { CardChips, PartOf, type StructureLookup } from "./card-chips";
 import { MoveMenu } from "./move-menu";
 
 /**
  * One card on the board. The title is a real link to the card's page;
- * the rest is what a glance needs: who, how big, when, and whether it is
- * stuck. Dragging is the quick path, the menu in the corner is the path
+ * the rest is what a glance needs: who, how big, when, whether it is
+ * stuck, and what it is part of. Its themes are dots by the key and its
+ * area is not on the card at all — a board of cards that all repeat the
+ * same three chips says nothing with them; the card page and the
+ * filters say where a card belongs. Dragging is the quick path, the menu in the corner is the path
  * that works everywhere else.
  */
 export function BoardCard({
@@ -46,6 +49,9 @@ export function BoardCard({
   const priorities = useTranslations("boards.priority");
   const overdue = Boolean(card.dueDate && card.dueDate < today && !card.doneAt);
   const href = `/boards/${boardId}/cards/${card.number}`;
+  const themes = card.themeIds
+    .map((id) => structure.themes.find((theme) => theme.id === id))
+    .filter((theme): theme is (typeof structure.themes)[number] => Boolean(theme));
 
   return (
     <div
@@ -64,10 +70,11 @@ export function BoardCard({
       <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1">
           <p className="text-meta flex items-center gap-1.5 text-[0.69rem] tabular-nums">
-            <span>
+            <span className="font-mono">
               {boardKey}-{card.number}
             </span>
             <PriorityMark priority={card.priority as Priority} label={priorities(card.priority)} />
+            <ThemeDots themes={themes} className="ml-0.5" />
             {card.blocked && (
               <span className="text-destructive inline-flex items-center gap-1 font-medium">
                 <CircleAlert className="size-3" aria-hidden />
@@ -88,7 +95,13 @@ export function BoardCard({
         </div>
         <MoveMenu columns={columns} currentColumnId={card.columnId} onMove={onMove} href={href} />
       </div>
-      <CardChips card={card} structure={structure} />
+      {(card.bug || card.kind === "enabler") && (
+        <CardChips
+          card={{ ...card, areaId: null, themeIds: [] }}
+          structure={structure}
+          className="mt-2 flex flex-wrap gap-1"
+        />
+      )}
       <div className="text-meta mt-2 flex items-center gap-2 text-[0.72rem]">
         {card.assigneeName ? (
           <Initials name={card.assigneeName} />

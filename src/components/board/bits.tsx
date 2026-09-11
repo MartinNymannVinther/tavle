@@ -26,6 +26,35 @@ export function ThemeChip({
   );
 }
 
+/**
+ * A card's themes as dots alone, for the board, where a chip per theme
+ * per card is noise: each dot carries its name for the pointer and for
+ * assistive technology, and the board's legend spells the pairs out.
+ */
+export function ThemeDots({
+  themes,
+  className,
+}: {
+  themes: Array<Pick<Theme, "id" | "name" | "color">>;
+  className?: string;
+}) {
+  if (themes.length === 0) return null;
+  return (
+    <span className={cn("inline-flex items-center gap-1", className)}>
+      {themes.map((theme) => (
+        <span
+          key={theme.id}
+          role="img"
+          aria-label={theme.name}
+          title={theme.name}
+          className="size-2 rounded-full"
+          style={{ background: themeSwatch(theme.color) }}
+        />
+      ))}
+    </span>
+  );
+}
+
 /** An area, plain: it answers where, and needs no colour to do it. */
 export function AreaChip({ name, className }: { name: string; className?: string }) {
   return (
