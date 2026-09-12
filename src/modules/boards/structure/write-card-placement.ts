@@ -8,7 +8,7 @@ import { inheritedFrom } from "./inherit";
 import { itemInBoard } from "./items";
 import { assertPlaced, RuleViolation } from "./rules";
 import type { CardPlacementInput } from "./validation";
-import { activeAreaInBoard, activeThemesInBoard } from "./write-lists";
+import { activeAreaInBoard, activeThemesInBoard, settleArea } from "./write-lists";
 
 /**
  * A card's place in the structure: the feature it is part of, its area
@@ -66,7 +66,12 @@ export async function placeCardInStructure(
   if (input.areaId !== undefined) areaId = input.areaId;
   if (input.themeIds !== undefined) themeIds = input.themeIds;
 
-  const area = await activeAreaInBoard(tx, board.id, areaId);
+  const area = await settleArea(
+    tx,
+    board,
+    featureId,
+    await activeAreaInBoard(tx, board.id, areaId),
+  );
   const themes = await activeThemesInBoard(tx, board.id, themeIds);
   assertPlaced(featureId, area?.id ?? null);
 

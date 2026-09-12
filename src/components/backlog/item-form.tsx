@@ -20,6 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ENABLER_TYPES, type EnablerType, type ItemLevel, type Kind } from "@/core/db/schema";
 import { createItemAction } from "@/modules/boards/actions-structure";
 import { titleWarnings } from "@/modules/boards/structure/rules";
+import { structureView } from "@/modules/boards/structure/view";
 import type { BoardFull } from "@/modules/boards/types";
 import { cn } from "@/lib/utils";
 import { quarterOptions } from "./quarters";
@@ -61,13 +62,17 @@ export function ItemForm({
   const [enablerType, setEnablerType] = useState<EnablerType | "">("");
   const [targetQuarter, setTargetQuarter] = useState("");
 
-  const epics = full.items.filter((i) => i.level === "epic" && i.state === "open");
+  const view = structureView(full.board);
+  const epics = view.epics
+    ? full.items.filter((i) => i.level === "epic" && i.state === "open")
+    : [];
   const areas = full.areas.filter((a) => a.active);
-  const themes = full.themes.filter((theme) => theme.active);
+  const themes = view.themes ? full.themes.filter((theme) => theme.active) : [];
   const categoryNames = [...full.themes.map((x) => x.name), ...full.areas.map((a) => a.name)];
   const warnings = titleWarnings(title, categoryNames);
   const parentChosen = level === "feature" && parent;
-  const needsArea = !parentChosen && !areaId;
+  // Rule 3 is the person's to meet while areas are shown; hidden, the service settles it.
+  const needsArea = view.areas && !parentChosen && !areaId;
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -81,7 +86,7 @@ export function ItemForm({
         kind,
         enablerType: kind === "enabler" ? enablerType || null : null,
         parentId: level === "feature" ? parent || null : null,
-        ...(parentChosen ? {} : { areaId: areaId || null, themeIds }),
+        ...(parentChosen ? {} : { areaId: view.areas ? areaId || null : null, themeIds }),
         targetQuarter: level === "epic" ? targetQuarter || null : null,
       }),
     );
@@ -128,7 +133,7 @@ export function ItemForm({
                 placeholder={t("doneWhenPlaceholder")}
               />
             </Field>
-            {level === "feature" && (
+            {level === "feature" && view.epics && (
               <Field>
                 <FieldLabel htmlFor="item-parent">{s("epic")}</FieldLabel>
                 <NativeSelect
@@ -148,25 +153,29 @@ export function ItemForm({
             )}
             {!parentChosen && (
               <>
-                <Field>
-                  <FieldLabel htmlFor="item-area">
-                    {s("area")}
-                    {needsArea && <span className="text-destructive"> · {s("areaRequired")}</span>}
-                  </FieldLabel>
-                  <NativeSelect
-                    id="item-area"
-                    value={areaId}
-                    onChange={(e) => setAreaId(e.target.value)}
-                    required
-                  >
-                    <option value="">{s("noArea")}</option>
-                    {areas.map((area) => (
-                      <option key={area.id} value={area.id}>
-                        {area.name}
-                      </option>
-                    ))}
-                  </NativeSelect>
-                </Field>
+                {view.areas && (
+                  <Field>
+                    <FieldLabel htmlFor="item-area">
+                      {s("area")}
+                      {needsArea && (
+                        <span className="text-destructive"> · {s("areaRequired")}</span>
+                      )}
+                    </FieldLabel>
+                    <NativeSelect
+                      id="item-area"
+                      value={areaId}
+                      onChange={(e) => setAreaId(e.target.value)}
+                      required
+                    >
+                      <option value="">{s("noArea")}</option>
+                      {areas.map((area) => (
+                        <option key={area.id} value={area.id}>
+                          {area.name}
+                        </option>
+                      ))}
+                    </NativeSelect>
+                  </Field>
+                )}
                 {themes.length > 0 && (
                   <Field>
                     <FieldLabel>{s("themes")}</FieldLabel>
@@ -197,18 +206,20 @@ export function ItemForm({
               </>
             )}
             <div className="grid grid-cols-2 gap-3">
-              <Field>
-                <FieldLabel htmlFor="item-kind">{s("kindLabel")}</FieldLabel>
-                <NativeSelect
-                  id="item-kind"
-                  value={kind}
-                  onChange={(e) => setKind(e.target.value as Kind)}
-                >
-                  <option value="business">{s("kind.business")}</option>
-                  <option value="enabler">{s("kind.enabler")}</option>
-                </NativeSelect>
-              </Field>
-              {kind === "enabler" ? (
+              {view.kind && (
+                <Field>
+                  <FieldLabel htmlFor="item-kind">{s("kindLabel")}</FieldLabel>
+                  <NativeSelect
+                    id="item-kind"
+                    value={kind}
+                    onChange={(e) => setKind(e.target.value as Kind)}
+                  >
+                    <option value="business">{s("kind.business")}</option>
+                    <option value="enabler">{s("kind.enabler")}</option>
+                  </NativeSelect>
+                </Field>
+              )}
+              {view.kind && kind === "enabler" ? (
                 <Field>
                   <FieldLabel htmlFor="item-enabler-type">{s("enablerTypeLabel")}</FieldLabel>
                   <NativeSelect

@@ -14,7 +14,7 @@ import {
   updateItem,
 } from "@/modules/boards/structure/write-items";
 import { createArea, createTheme, updateTheme } from "@/modules/boards/structure/write-lists";
-import { createBoard } from "@/modules/boards/write-boards";
+import { createBoard, updateStructureView } from "@/modules/boards/write-boards";
 import { createCard, moveCard } from "@/modules/boards/write-cards";
 import { adminPool } from "../helpers/db";
 import { seedWorkspace } from "../helpers/workspace";
@@ -422,5 +422,44 @@ describe("the closed lists", () => {
       kind: "business",
       enablerType: null,
     });
+  });
+});
+
+describe("the board's view of the structure", () => {
+  it("hides levels and fields without touching the data, and settles rule 3 on a hidden area", async () => {
+    const small = await run((tx) =>
+      createBoard(tx, ctx, {
+        name: "Lille",
+        key: "LIL",
+        mode: "kanban",
+        firstArea: "Alt",
+        structureLevels: "card",
+        showAreas: false,
+        showThemes: false,
+        showKind: false,
+      }),
+    );
+    expect(small.structureLevels).toBe("card");
+    expect(small.showAreas).toBe(false);
+    // Nobody can choose an area on this board, so a card without one gets the first area quietly.
+    const card = await run((tx) => createCard(tx, ctx, { boardId: small.id, title: "Første" }));
+    const full = (await getBoardFull(ctx, small.id))!;
+    expect(full.cards.find((c) => c.id === card.id)?.areaId).toBe(full.areas[0]!.id);
+    // Switching the view back on changes nothing but the view.
+    await run((tx) =>
+      updateStructureView(tx, ctx, small.id, {
+        structureLevels: "epic",
+        showAreas: true,
+        showThemes: true,
+        showKind: true,
+      }),
+    );
+    const again = (await getBoardFull(ctx, small.id))!;
+    expect(again.board.structureLevels).toBe("epic");
+    expect(again.cards.find((c) => c.id === card.id)?.areaId).toBe(full.areas[0]!.id);
+    // With areas shown, rule 3 is the person's to meet again.
+    expect(
+      await violation(run((tx) => createCard(tx, ctx, { boardId: small.id, title: "Uden" }))),
+    ).toBe("needsArea");
   });
 });

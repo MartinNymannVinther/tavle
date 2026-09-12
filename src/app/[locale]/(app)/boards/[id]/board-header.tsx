@@ -17,17 +17,20 @@ export function BoardHeader({
   name,
   description,
   scrum,
+  roadmap,
 }: {
   boardId: string;
   kicker: string;
   name: string;
   description?: string;
   scrum: boolean;
+  /** The roadmap draws epics; a board without them has no roadmap tab. */
+  roadmap: boolean;
 }) {
   const pathname = usePathname();
   const base = `/boards/${boardId}`;
   const detail = pathname.startsWith(`${base}/cards/`) || pathname.startsWith(`${base}/items/`);
-  const tabs = <BoardTabs boardId={boardId} scrum={scrum} />;
+  const tabs = <BoardTabs boardId={boardId} scrum={scrum} roadmap={roadmap} />;
 
   if (detail) {
     return (

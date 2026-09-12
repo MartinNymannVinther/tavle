@@ -49,9 +49,11 @@ export function BoardCard({
   const priorities = useTranslations("boards.priority");
   const overdue = Boolean(card.dueDate && card.dueDate < today && !card.doneAt);
   const href = `/boards/${boardId}/cards/${card.number}`;
-  const themes = card.themeIds
-    .map((id) => structure.themes.find((theme) => theme.id === id))
-    .filter((theme): theme is (typeof structure.themes)[number] => Boolean(theme));
+  const themes = structure.view.themes
+    ? card.themeIds
+        .map((id) => structure.themes.find((theme) => theme.id === id))
+        .filter((theme): theme is (typeof structure.themes)[number] => Boolean(theme))
+    : [];
 
   return (
     <div
@@ -95,7 +97,7 @@ export function BoardCard({
         </div>
         <MoveMenu columns={columns} currentColumnId={card.columnId} onMove={onMove} href={href} />
       </div>
-      {(card.bug || card.kind === "enabler") && (
+      {(card.bug || (structure.view.kind && card.kind === "enabler")) && (
         <CardChips
           card={{ ...card, areaId: null, themeIds: [] }}
           structure={structure}

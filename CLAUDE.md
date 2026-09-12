@@ -53,7 +53,10 @@ codebase to:
   and area (where). Two tests decide where a thing belongs and the tool
   enforces them: can it be finished, and does it have exactly one parent.
   The tool never invents a container; items without a parent are shown as
-  exactly that. There are no free-text tags and no custom fields.
+  exactly that. There are no free-text tags and no custom fields. A board
+  chooses how much of the structure it shows — the levels down to cards
+  alone, and each of the three fields — and the choice changes the view
+  only (ADR 0014): what is hidden stays and comes back.
 - A board is one team's work. Kanban is a flow with WIP limits that warn
   and never forbid; Scrum is a backlog and one sprint at a time. The
   columns' categories (backlog, todo, doing, done), not their names, are
@@ -190,7 +193,8 @@ codebase to:
   the close conversation; the backlog with grouping and filters on both
   board types; the roadmap in quarters; the overview with the five health
   measures; labels removed. 0.10.2: the type symbols (ADR 0012). 0.10.3:
-  the backlog as a navigator and a flat list (ADR 0013).
+  the backlog as a navigator and a flat list (ADR 0013). 0.10.7: the
+  structure's levels and fields chosen per board, view only (ADR 0014).
 - 0.11: the story map — epics and features across, sprints (or columns)
   down, stories in the cells — as the decomposition's own view.
 - Before 1.0: dogma seven — a real team runs a real board on it; the

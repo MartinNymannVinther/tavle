@@ -7,7 +7,7 @@ import { inheritedFrom } from "./inherit";
 import { itemInBoard, itemInWorkspace, setItemThemes, themeIdsOf } from "./items";
 import { assertPlaced, RuleViolation } from "./rules";
 import type { ItemPlacementInput } from "./validation";
-import { activeAreaInBoard, activeThemesInBoard } from "./write-lists";
+import { activeAreaInBoard, activeThemesInBoard, settleArea } from "./write-lists";
 
 const keyOf = (board: { key: string }, item: { number: number }) => `${board.key}-${item.number}`;
 
@@ -47,7 +47,7 @@ export async function placeItemInStructure(
   if (input.areaId !== undefined) areaId = input.areaId;
   if (input.themeIds !== undefined) themeIds = input.themeIds;
 
-  const area = await activeAreaInBoard(tx, board.id, areaId);
+  const area = await settleArea(tx, board, parentId, await activeAreaInBoard(tx, board.id, areaId));
   const themes = await activeThemesInBoard(tx, board.id, themeIds);
   assertPlaced(parentId, area?.id ?? null);
 

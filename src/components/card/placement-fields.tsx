@@ -8,6 +8,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { PropertyRow } from "@/components/ui/property-row";
 import { ENABLER_TYPES, type Area, type Theme } from "@/core/db/schema";
 import { placeCardAction, updateCardAction } from "@/modules/boards/actions-cards";
+import { FULL_VIEW, type StructureView } from "@/modules/boards/structure/view";
 import type { CardView, ItemView } from "@/modules/boards/types";
 import { cn } from "@/lib/utils";
 
@@ -49,6 +50,7 @@ export function StructureFields({
   themes,
   areas,
   offerCascade,
+  view = FULL_VIEW,
   onPlace,
   onKind,
 }: {
@@ -63,14 +65,18 @@ export function StructureFields({
   areas: Area[];
   /** Rule 11: offer to take the children along when the area or themes change. */
   offerCascade?: boolean;
+  /** Which fields the board shows; a hidden one is left out of the panel. */
+  view?: StructureView;
   onPlace: (placement: Placement) => void;
   onKind: (fields: KindFields) => void;
 }) {
   const t = useTranslations("boards.structure");
   const [cascade, setCascade] = useState(false);
   const activeAreas = areas.filter((a) => a.active || a.id === areaId);
-  const activeThemes = themes.filter((theme) => theme.active || themeIds.includes(theme.id));
-  const needsArea = !parent?.value && !areaId;
+  const activeThemes = view.themes
+    ? themes.filter((theme) => theme.active || themeIds.includes(theme.id))
+    : [];
+  const needsArea = view.areas && !parent?.value && !areaId;
 
   function toggleTheme(themeId: string) {
     const next = themeIds.includes(themeId)
@@ -99,29 +105,33 @@ export function StructureFields({
         </PropertyRow>
       )}
 
-      <PropertyRow
-        label={t("area")}
-        htmlFor="place-area"
-        hint={needsArea ? <span className="text-destructive">{t("areaRequired")}</span> : undefined}
-      >
-        <NativeSelect
-          id="place-area"
-          variant="xs"
-          value={areaId ?? ""}
-          onChange={(event) =>
-            onPlace({ areaId: event.target.value || null, applyToChildren: cascade })
+      {view.areas && (
+        <PropertyRow
+          label={t("area")}
+          htmlFor="place-area"
+          hint={
+            needsArea ? <span className="text-destructive">{t("areaRequired")}</span> : undefined
           }
-          className={cn(needsArea && "border-destructive")}
         >
-          <option value="">{t("noArea")}</option>
-          {activeAreas.map((area) => (
-            <option key={area.id} value={area.id}>
-              {area.name}
-              {area.active ? "" : ` · ${t("inactive")}`}
-            </option>
-          ))}
-        </NativeSelect>
-      </PropertyRow>
+          <NativeSelect
+            id="place-area"
+            variant="xs"
+            value={areaId ?? ""}
+            onChange={(event) =>
+              onPlace({ areaId: event.target.value || null, applyToChildren: cascade })
+            }
+            className={cn(needsArea && "border-destructive")}
+          >
+            <option value="">{t("noArea")}</option>
+            {activeAreas.map((area) => (
+              <option key={area.id} value={area.id}>
+                {area.name}
+                {area.active ? "" : ` · ${t("inactive")}`}
+              </option>
+            ))}
+          </NativeSelect>
+        </PropertyRow>
+      )}
 
       {activeThemes.length > 0 && (
         <PropertyRow label={t("themes")} className="items-start [&>span]:pt-1.5">
@@ -147,7 +157,7 @@ export function StructureFields({
         </PropertyRow>
       )}
 
-      {offerCascade && (
+      {offerCascade && (view.areas || view.themes) && (
         <label className="text-meta flex items-center gap-2 py-1 text-[0.72rem]">
           <input
             type="checkbox"
@@ -158,42 +168,44 @@ export function StructureFields({
         </label>
       )}
 
-      <PropertyRow label={t("kindLabel")} htmlFor="place-kind">
-        <div className="flex gap-2">
-          <NativeSelect
-            id="place-kind"
-            variant="xs"
-            value={kind}
-            onChange={(event) =>
-              onKind({ kind: event.target.value as "business" | "enabler", enablerType: null })
-            }
-          >
-            <option value="business">{t("kind.business")}</option>
-            <option value="enabler">{t("kind.enabler")}</option>
-          </NativeSelect>
-          {kind === "enabler" && (
+      {view.kind && (
+        <PropertyRow label={t("kindLabel")} htmlFor="place-kind">
+          <div className="flex gap-2">
             <NativeSelect
-              id="place-enabler-type"
+              id="place-kind"
               variant="xs"
-              aria-label={t("enablerTypeLabel")}
-              value={enablerType ?? ""}
+              value={kind}
               onChange={(event) =>
-                onKind({
-                  kind: "enabler",
-                  enablerType: (event.target.value || null) as KindFields["enablerType"],
-                })
+                onKind({ kind: event.target.value as "business" | "enabler", enablerType: null })
               }
             >
-              <option value="">{t("enablerType.none")}</option>
-              {ENABLER_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {t(`enablerType.${type}`)}
-                </option>
-              ))}
+              <option value="business">{t("kind.business")}</option>
+              <option value="enabler">{t("kind.enabler")}</option>
             </NativeSelect>
-          )}
-        </div>
-      </PropertyRow>
+            {kind === "enabler" && (
+              <NativeSelect
+                id="place-enabler-type"
+                variant="xs"
+                aria-label={t("enablerTypeLabel")}
+                value={enablerType ?? ""}
+                onChange={(event) =>
+                  onKind({
+                    kind: "enabler",
+                    enablerType: (event.target.value || null) as KindFields["enablerType"],
+                  })
+                }
+              >
+                <option value="">{t("enablerType.none")}</option>
+                {ENABLER_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {t(`enablerType.${type}`)}
+                  </option>
+                ))}
+              </NativeSelect>
+            )}
+          </div>
+        </PropertyRow>
+      )}
 
       {bug !== undefined && (
         <PropertyRow label={t("bug")} htmlFor="place-bug">
@@ -222,6 +234,7 @@ export function PlacementFields({
   themes,
   areas,
   features,
+  view = FULL_VIEW,
   run,
 }: {
   card: CardView;
@@ -229,12 +242,18 @@ export function PlacementFields({
   themes: Theme[];
   areas: Area[];
   features: ItemView[];
+  view?: StructureView;
   run: Run;
 }) {
   const t = useTranslations("boards.structure");
   return (
     <StructureFields
-      parent={{ label: t("feature"), value: card.featureId, options: features, boardKey }}
+      parent={
+        view.features
+          ? { label: t("feature"), value: card.featureId, options: features, boardKey }
+          : null
+      }
+      view={view}
       areaId={card.areaId}
       themeIds={card.themeIds}
       kind={card.kind}

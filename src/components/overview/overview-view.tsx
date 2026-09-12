@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { themeSwatch } from "@/components/board/tokens";
 import { overview, type Bucket } from "@/modules/boards/structure/overview";
+import { structureView } from "@/modules/boards/structure/view";
 import type { BoardFull } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -18,17 +19,11 @@ export function OverviewView({ full }: { full: BoardFull }) {
   const t = useTranslations("overview");
   const s = useTranslations("boards.structure");
   const data = overview(full);
+  const view = structureView(full.board);
   const percent = (value: number) => `${Math.round(value * 100)} %`;
   const share = (part: number, total: number) => (total > 0 ? percent(part / total) : "–");
-  const name = (bucket: Bucket) =>
-    bucket.key === "none"
-      ? t("none")
-      : bucket.key === "business" || bucket.key === "enabler"
-        ? s(`kind.${bucket.key}`)
-        : bucket.name;
-
   const tile = (label: string, value: string, hint: string, warn = false) => (
-    <div className="flex flex-col gap-0.5">
+    <div key={label} className="flex flex-col gap-0.5">
       <p className="text-label text-[0.72rem] font-medium">{label}</p>
       <p
         className={cn(
@@ -41,6 +36,58 @@ export function OverviewView({ full }: { full: BoardFull }) {
       <p className="text-meta text-[0.72rem]">{hint}</p>
     </div>
   );
+  const idleThemes = view.themes ? data.health.idleThemes : [];
+  const idleAreas = view.areas ? data.health.idleAreas : [];
+  const reviewEpics = view.epics ? data.health.reviewEpics : [];
+  const tiles = [
+    view.features &&
+      tile(
+        t("parentless"),
+        share(data.health.parentless.count, data.health.parentless.total),
+        t("parentlessHint", data.health.parentless),
+        data.health.parentless.count > 0,
+      ),
+    view.epics &&
+      tile(
+        t("review"),
+        String(reviewEpics.length),
+        t("reviewHint", { days: full.board.epicReviewDays }),
+        reviewEpics.length > 0,
+      ),
+    view.areas &&
+      tile(
+        t("withoutArea"),
+        share(data.health.withoutArea.count, data.health.withoutArea.total),
+        t("withoutAreaHint", data.health.withoutArea),
+        data.health.withoutArea.count > 0,
+      ),
+    view.kind &&
+      tile(
+        t("enablerShare"),
+        data.openCards > 0 ? percent(data.enablerShare) : "–",
+        data.openPoints > 0 ? t("byPoints") : t("byCards"),
+      ),
+    (view.themes || view.areas) &&
+      tile(
+        t("idle"),
+        String(idleThemes.length + idleAreas.length),
+        t("idleHint"),
+        idleThemes.length + idleAreas.length > 0,
+      ),
+  ].filter(Boolean);
+  const distributions = (
+    [
+      ["byTheme", data.byTheme, view.themes],
+      ["byArea", data.byArea, view.areas],
+      ["byKind", data.byKind, view.kind],
+    ] as const
+  ).filter(([, , shown]) => shown);
+  const name = (bucket: Bucket) =>
+    bucket.key === "none"
+      ? t("none")
+      : bucket.key === "business" || bucket.key === "enabler"
+        ? s(`kind.${bucket.key}`)
+        : bucket.name;
 
   return (
     <div className="flex flex-col gap-5">
@@ -49,42 +96,12 @@ export function OverviewView({ full }: { full: BoardFull }) {
           <CardTitle>{t("healthTitle")}</CardTitle>
           <CardDescription>{t("healthBody")}</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
-          {tile(
-            t("parentless"),
-            share(data.health.parentless.count, data.health.parentless.total),
-            t("parentlessHint", data.health.parentless),
-            data.health.parentless.count > 0,
-          )}
-          {tile(
-            t("review"),
-            String(data.health.reviewEpics.length),
-            t("reviewHint", { days: full.board.epicReviewDays }),
-            data.health.reviewEpics.length > 0,
-          )}
-          {tile(
-            t("withoutArea"),
-            share(data.health.withoutArea.count, data.health.withoutArea.total),
-            t("withoutAreaHint", data.health.withoutArea),
-            data.health.withoutArea.count > 0,
-          )}
-          {tile(
-            t("enablerShare"),
-            data.openCards > 0 ? percent(data.enablerShare) : "–",
-            data.openPoints > 0 ? t("byPoints") : t("byCards"),
-          )}
-          {tile(
-            t("idle"),
-            String(data.health.idleThemes.length + data.health.idleAreas.length),
-            t("idleHint"),
-            data.health.idleThemes.length + data.health.idleAreas.length > 0,
-          )}
-        </CardContent>
-        {(data.health.reviewEpics.length > 0 ||
-          data.health.idleThemes.length > 0 ||
-          data.health.idleAreas.length > 0) && (
+        {tiles.length > 0 && (
+          <CardContent className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">{tiles}</CardContent>
+        )}
+        {(reviewEpics.length > 0 || idleThemes.length > 0 || idleAreas.length > 0) && (
           <CardContent className="border-hairline flex flex-col gap-1 border-t pt-4 text-sm">
-            {data.health.reviewEpics.map((epic) => (
+            {reviewEpics.map((epic) => (
               <p key={epic.id}>
                 <span className="text-meta mr-2 text-[0.72rem] tabular-nums">
                   {full.board.key}-{epic.number}
@@ -100,16 +117,14 @@ export function OverviewView({ full }: { full: BoardFull }) {
                 </span>
               </p>
             ))}
-            {data.health.idleThemes.length > 0 && (
+            {idleThemes.length > 0 && (
               <p className="text-meta">
-                {t("idleThemes", {
-                  names: data.health.idleThemes.map((theme) => theme.name).join(", "),
-                })}
+                {t("idleThemes", { names: idleThemes.map((theme) => theme.name).join(", ") })}
               </p>
             )}
-            {data.health.idleAreas.length > 0 && (
+            {idleAreas.length > 0 && (
               <p className="text-meta">
-                {t("idleAreas", { names: data.health.idleAreas.map((a) => a.name).join(", ") })}
+                {t("idleAreas", { names: idleAreas.map((a) => a.name).join(", ") })}
               </p>
             )}
           </CardContent>
@@ -117,13 +132,7 @@ export function OverviewView({ full }: { full: BoardFull }) {
       </Card>
 
       <div className="grid gap-5 lg:grid-cols-3">
-        {(
-          [
-            ["byTheme", data.byTheme],
-            ["byArea", data.byArea],
-            ["byKind", data.byKind],
-          ] as const
-        ).map(([key, buckets]) => (
+        {distributions.map(([key, buckets]) => (
           <Card key={key}>
             <CardHeader>
               <CardTitle>{t(`${key}Title`)}</CardTitle>

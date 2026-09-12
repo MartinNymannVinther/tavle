@@ -35,6 +35,7 @@ export default async function BoardLayout({
         name={board.name}
         description={board.description || undefined}
         scrum={board.mode === "scrum"}
+        roadmap={board.structureLevels === "epic"}
       />
       {children}
     </div>

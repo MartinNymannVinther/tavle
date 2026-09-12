@@ -1,6 +1,13 @@
 import { z } from "zod";
 import { ISO_DATE } from "@/core/dates";
-import { BOARD_MODES, COLUMN_CATEGORIES, ENABLER_TYPES, KINDS, PRIORITIES } from "@/core/db/schema";
+import {
+  BOARD_MODES,
+  COLUMN_CATEGORIES,
+  ENABLER_TYPES,
+  KINDS,
+  PRIORITIES,
+  STRUCTURE_LEVELS,
+} from "@/core/db/schema";
 
 /**
  * Input schemas for everything a page or the AI may write. Lengths are the
@@ -27,14 +34,25 @@ export const checklistItemSchema = z.object({
   done: z.boolean(),
 });
 
-export const NewBoardSchema = z.object({
-  name: shortText(80).min(1),
-  key: boardKey,
-  mode: z.enum(BOARD_MODES),
-  description: shortText(500).optional(),
-  /** The board's first area, so rule 3 of the structure holds from the first card. */
-  firstArea: shortText(40).min(1),
+/** How much of the structure the board shows; a way of looking, never a change to the data. */
+export const StructureViewSchema = z.object({
+  structureLevels: z.enum(STRUCTURE_LEVELS),
+  showKind: z.boolean(),
+  showThemes: z.boolean(),
+  showAreas: z.boolean(),
 });
+export type StructureViewInput = z.infer<typeof StructureViewSchema>;
+
+export const NewBoardSchema = z
+  .object({
+    name: shortText(80).min(1),
+    key: boardKey,
+    mode: z.enum(BOARD_MODES),
+    description: shortText(500).optional(),
+    /** The board's first area, so rule 3 of the structure holds from the first card. */
+    firstArea: shortText(40).min(1),
+  })
+  .merge(StructureViewSchema.partial());
 
 export const BoardMetaSchema = z.object({
   boardId: id,
@@ -43,6 +61,8 @@ export const BoardMetaSchema = z.object({
   sprintLengthDays: z.number().int().min(1).max(60),
   epicReviewDays: z.number().int().min(7).max(730),
 });
+
+export const BoardViewSchema = StructureViewSchema.extend({ boardId: id });
 
 export const BoardIdSchema = z.object({ boardId: id });
 

@@ -17,7 +17,8 @@ import {
   selectionKey,
   stillThere,
 } from "@/components/backlog/backlog-selection";
-import { deviatingPlace } from "@/components/board/card-chips";
+import { deviatingPlace, structureOf } from "@/components/board/card-chips";
+import { structureView } from "@/modules/boards/structure/view";
 import { overview } from "@/modules/boards/structure/overview";
 import { roadmap } from "@/modules/boards/structure/roadmap";
 import { quarterOf, quarterRange, quartersBetween } from "@/modules/boards/structure/rules";
@@ -131,6 +132,10 @@ const board: BoardFull = {
     nextCardNumber: 20,
     nextSprintNumber: 3,
     epicReviewDays: 180,
+    structureLevels: "epic",
+    showKind: true,
+    showThemes: true,
+    showAreas: true,
     createdBy: null,
     archivedAt: null,
     createdAt: at(400),
@@ -373,6 +378,42 @@ describe("the navigator's selection", () => {
       expect(parseSelection(selectionKey(selection))).toEqual(selection);
     }
     expect(parseSelection("garbage")).toEqual(ALL);
+  });
+});
+
+describe("the board's view of the structure", () => {
+  it("reads the levels and fields off the board", () => {
+    expect(structureView(board.board)).toEqual({
+      epics: true,
+      features: true,
+      kind: true,
+      themes: true,
+      areas: true,
+    });
+    expect(structureView({ ...board.board, structureLevels: "feature", showKind: false })).toEqual({
+      epics: false,
+      features: true,
+      kind: false,
+      themes: true,
+      areas: true,
+    });
+    expect(structureView({ ...board.board, structureLevels: "card" }).features).toBe(false);
+  });
+
+  it("leaves hidden levels out of the lookup, so their children stand without a parent", () => {
+    const stories = backlogStories(board);
+    const noEpics = structureOf({
+      ...board,
+      board: { ...board.board, structureLevels: "feature" },
+    });
+    expect(noEpics.items.every((item) => item.level === "feature")).toBe(true);
+    const tree = hierarchy(board, stories, { showClosed: false, items: noEpics.items });
+    expect(tree.epics).toEqual([]);
+    expect(tree.looseFeatures.map((n) => n.feature.id).sort()).toEqual(["f1", "f2"]);
+    const onlyCards = structureOf({ ...board, board: { ...board.board, structureLevels: "card" } });
+    const flat = hierarchy(board, stories, { showClosed: false, items: onlyCards.items });
+    expect(flat.looseFeatures).toEqual([]);
+    expect(flat.looseStories).toHaveLength(stories.length);
   });
 });
 

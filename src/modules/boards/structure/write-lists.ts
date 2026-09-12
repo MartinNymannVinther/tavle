@@ -1,4 +1,4 @@
-import { and, count, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, count, eq, inArray, sql } from "drizzle-orm";
 import { areas, themes, type Area, type Theme, type ThemeColor } from "@/core/db/schema";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 import { recordEvent } from "../events";
@@ -164,6 +164,29 @@ export async function updateArea(
     });
   }
   return area;
+}
+
+/**
+ * Rule 3 on a board that hides areas: nobody can choose one, so a thing
+ * with no parent takes the board's first active area, quietly. It is
+ * still a real area on a real row, and it shows the day the field is
+ * switched on again. On a board that shows areas the choice stays with
+ * the person, and the rule refuses as before.
+ */
+export async function settleArea(
+  tx: AppTransaction,
+  board: { id: string; showAreas: boolean },
+  parentId: string | null,
+  area: Area | null,
+): Promise<Area | null> {
+  if (area || parentId || board.showAreas) return area;
+  const [first] = await tx
+    .select()
+    .from(areas)
+    .where(and(eq(areas.boardId, board.id), eq(areas.active, true)))
+    .orderBy(asc(areas.sort), asc(areas.createdAt))
+    .limit(1);
+  return first ?? null;
 }
 
 /** An active area of the board, or null; a deactivated one cannot be set on anything new. */

@@ -29,6 +29,10 @@ export const ITEM_LEVELS = ["epic", "feature"] as const;
 export type ItemLevel = (typeof ITEM_LEVELS)[number];
 
 /** What sort of work an item is. A field on every level, never a separate tree. */
+/** How much of the hierarchy a board shows: the top level in use. */
+export const STRUCTURE_LEVELS = ["epic", "feature", "card"] as const;
+export type StructureLevels = (typeof STRUCTURE_LEVELS)[number];
+
 export const KINDS = ["business", "enabler"] as const;
 export type Kind = (typeof KINDS)[number];
 

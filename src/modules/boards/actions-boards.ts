@@ -5,6 +5,7 @@ import { action, found } from "./action-helpers";
 import {
   BoardIdSchema,
   BoardMetaSchema,
+  BoardViewSchema,
   ColumnDeleteSchema,
   ColumnOrderSchema,
   ColumnUpdateSchema,
@@ -20,6 +21,7 @@ import {
   setBoardArchived,
   updateBoard,
   updateColumn,
+  updateStructureView,
 } from "./write-boards";
 
 /**
@@ -43,6 +45,15 @@ export async function updateBoardAction(raw: unknown): Promise<Result<string>> {
     BoardMetaSchema,
     raw,
     async (tx, ctx, input) => found(await updateBoard(tx, ctx, input.boardId, input)).id,
+    { manage: true },
+  );
+}
+
+export async function updateStructureViewAction(raw: unknown): Promise<Result<string>> {
+  return action(
+    BoardViewSchema,
+    raw,
+    async (tx, ctx, input) => found(await updateStructureView(tx, ctx, input.boardId, input)).id,
     { manage: true },
   );
 }

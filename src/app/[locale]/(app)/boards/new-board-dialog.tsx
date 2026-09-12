@@ -15,6 +15,8 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { Input } from "@/components/ui/input";
 import { useBoardActions } from "@/components/board/use-board-actions";
 import { createBoardAction } from "@/modules/boards/actions-boards";
+import type { StructureViewInput } from "@/modules/boards/validation";
+import { DEFAULT_VIEW, StructureViewFields } from "@/components/settings/structure-view-fields";
 import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +41,7 @@ function suggestKey(name: string): string {
 export function NewBoardDialog() {
   const t = useTranslations("boards.new");
   const modes = useTranslations("boards.mode");
+  const structure = useTranslations("boardSettings.structure");
   const router = useRouter();
   const { run } = useBoardActions();
   const [open, setOpen] = useState(false);
@@ -47,13 +50,14 @@ export function NewBoardDialog() {
   const [keyTouched, setKeyTouched] = useState(false);
   const [mode, setMode] = useState<"kanban" | "scrum">("kanban");
   const [firstArea, setFirstArea] = useState("");
+  const [view, setView] = useState<StructureViewInput>(DEFAULT_VIEW);
   const [pending, setPending] = useState(false);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
     const ok = await run(
-      () => createBoardAction({ name, key, mode, firstArea }),
+      () => createBoardAction({ name, key, mode, firstArea, ...view }),
       (boardId) => {
         setOpen(false);
         router.push(`/boards/${boardId}`);
@@ -152,6 +156,11 @@ export function NewBoardDialog() {
                 </span>
               </label>
             ))}
+          </fieldset>
+          <fieldset className="flex flex-col gap-2">
+            <legend className="mb-1 text-sm font-medium">{structure("title")}</legend>
+            <p className="text-meta mb-1 text-[0.8125rem] leading-snug">{structure("body")}</p>
+            <StructureViewFields value={view} onChange={setView} compact />
           </fieldset>
           <DialogFooter>
             <Button

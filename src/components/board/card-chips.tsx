@@ -3,6 +3,11 @@
 import { useTranslations } from "next-intl";
 import type { Area, Theme } from "@/core/db/schema";
 import type { CardView, ItemView } from "@/modules/boards/types";
+import {
+  structureView,
+  type StructureSettings,
+  type StructureView,
+} from "@/modules/boards/structure/view";
 import { AreaChip, FlagChip, ThemeChip } from "./bits";
 import { TypeGlyph } from "./type-icon";
 
@@ -11,10 +16,26 @@ export type StructureLookup = {
   themes: Theme[];
   areas: Area[];
   items: ItemView[];
+  /** How much of the structure the board shows; what is hidden is left out everywhere. */
+  view: StructureView;
 };
 
-export function structureOf(full: StructureLookup): StructureLookup {
-  return { themes: full.themes, areas: full.areas, items: full.items };
+export function structureOf(full: {
+  board: StructureSettings;
+  themes: Theme[];
+  areas: Area[];
+  items: ItemView[];
+}): StructureLookup {
+  const view = structureView(full.board);
+  return {
+    themes: full.themes,
+    areas: full.areas,
+    items: full.items.filter(
+      (item) =>
+        (item.level === "epic" && view.epics) || (item.level === "feature" && view.features),
+    ),
+    view,
+  };
 }
 
 /** The place a chip row is read against: what the parent, or the group, already says. */
@@ -51,16 +72,20 @@ export function CardChips({
   className?: string;
 }) {
   const t = useTranslations("boards.structure");
+  const { view } = structure;
   const own = deviatingPlace(card, context);
-  const area = own.areaId ? structure.areas.find((a) => a.id === own.areaId) : null;
-  const themes = own.themeIds
-    .map((id) => structure.themes.find((theme) => theme.id === id))
-    .filter((theme): theme is Theme => Boolean(theme));
-  if (!card.bug && card.kind !== "enabler" && !area && themes.length === 0) return null;
+  const area = view.areas && own.areaId ? structure.areas.find((a) => a.id === own.areaId) : null;
+  const themes = view.themes
+    ? own.themeIds
+        .map((id) => structure.themes.find((theme) => theme.id === id))
+        .filter((theme): theme is Theme => Boolean(theme))
+    : [];
+  const enabler = view.kind && card.kind === "enabler";
+  if (!card.bug && !enabler && !area && themes.length === 0) return null;
   return (
     <div className={className ?? "mt-2 flex flex-wrap gap-1"}>
       {card.bug && <FlagChip tone="bug">{t("bug")}</FlagChip>}
-      {card.kind === "enabler" && (
+      {enabler && (
         <FlagChip tone="enabler">
           {card.enablerType ? t(`enablerType.${card.enablerType}`) : t("kind.enabler")}
         </FlagChip>
@@ -84,7 +109,8 @@ export function PartOf({
   boardKey: string;
 }) {
   const t = useTranslations("boards.structure");
-  const feature = featureId ? structure.items.find((i) => i.id === featureId) : null;
+  const feature =
+    structure.view.features && featureId ? structure.items.find((i) => i.id === featureId) : null;
   if (!feature) return null;
   return (
     <p className="text-meta mt-1 flex items-center gap-1 text-[0.69rem]">

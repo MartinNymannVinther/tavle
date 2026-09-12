@@ -8,6 +8,7 @@ import { themeSwatch } from "@/components/board/tokens";
 import { TypeIcon } from "@/components/board/type-icon";
 import { TypeLegend } from "@/components/board/type-legend";
 import { roadmap, type RoadmapRow } from "@/modules/boards/structure/roadmap";
+import { structureView } from "@/modules/boards/structure/view";
 import type { BoardFull } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -29,11 +30,18 @@ export function RoadmapView({ full }: { full: BoardFull }) {
   const unplanned = areaId
     ? data.unplanned.filter((r) => r.epic.areaId === areaId)
     : data.unplanned;
-  const areas = full.areas.filter((a) => a.active);
+  const view = structureView(full.board);
+  const areas = view.areas ? full.areas.filter((a) => a.active) : [];
   const columns = data.quarters.length;
-  const themesUsed = [...new Set(rows.map((r) => r.theme?.id).filter(Boolean))].map((id) =>
-    full.themes.find((theme) => theme.id === id)!,
-  );
+  const themesUsed = view.themes
+    ? [...new Set(rows.map((r) => r.theme?.id).filter(Boolean))].map((id) =>
+        full.themes.find((theme) => theme.id === id)!,
+      )
+    : [];
+
+  if (!view.epics) {
+    return <p className="text-meta text-sm">{t("noEpics")}</p>;
+  }
 
   return (
     <div className="flex flex-col gap-5">

@@ -15,6 +15,7 @@ import { columnInBoard, columnsOf } from "./lanes";
 import { boardInWorkspace } from "./read";
 import { createArea } from "./structure/write-lists";
 import { enterColumn } from "./transitions";
+import type { StructureViewInput } from "./validation";
 
 /**
  * Boards and their columns. A board starts with the columns its mode
@@ -33,7 +34,13 @@ export class KeyTaken extends Error {
 export async function createBoard(
   tx: AppTransaction,
   ctx: OrgContext,
-  input: { name: string; key: string; mode: BoardMode; description?: string; firstArea: string },
+  input: {
+    name: string;
+    key: string;
+    mode: BoardMode;
+    description?: string;
+    firstArea: string;
+  } & Partial<StructureViewInput>,
 ): Promise<Board> {
   const [taken] = await tx
     .select({ id: boards.id })
@@ -50,6 +57,10 @@ export async function createBoard(
       mode: input.mode,
       description: input.description ?? "",
       sprintLengthDays: DEFAULT_SPRINT_LENGTH_DAYS,
+      structureLevels: input.structureLevels ?? "epic",
+      showKind: input.showKind ?? true,
+      showThemes: input.showThemes ?? true,
+      showAreas: input.showAreas ?? true,
       createdBy: ctx.userId,
     })
     .returning();
@@ -78,6 +89,24 @@ export async function updateBoard(
   if (!board) return null;
   await tx.update(boards).set(input).where(eq(boards.id, boardId));
   await recordEvent(tx, ctx, boardId, "board.updated", { name: input.name });
+  return board;
+}
+
+/**
+ * How much of the structure the board shows. A way of looking, written
+ * on the board and nowhere else: no item, theme or area is touched, so
+ * what is switched off comes back whole when it is switched on.
+ */
+export async function updateStructureView(
+  tx: AppTransaction,
+  ctx: OrgContext,
+  boardId: string,
+  input: StructureViewInput,
+): Promise<Board | null> {
+  const board = await boardInWorkspace(tx, boardId);
+  if (!board) return null;
+  await tx.update(boards).set(input).where(eq(boards.id, boardId));
+  await recordEvent(tx, ctx, boardId, "board.view", { levels: input.structureLevels });
   return board;
 }
 

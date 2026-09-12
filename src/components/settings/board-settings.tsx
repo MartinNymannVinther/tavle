@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { StructureSettings } from "./structure-settings";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -130,6 +131,8 @@ export function BoardSettings({ full, canManage }: { full: BoardFull; canManage:
           </form>
         </CardContent>
       </Card>
+
+      <StructureSettings board={board} canManage={canManage} run={run} />
 
       <Card>
         <CardHeader>

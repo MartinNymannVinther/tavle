@@ -13,7 +13,7 @@ import { applyFilters, BoardFilters, NO_FILTERS, type Filters } from "./board-fi
 import { structureOf } from "./card-chips";
 import type { Place } from "./quick-add";
 import { SprintHeader } from "./sprint-header";
-import { ThemeLegend, TypeLegend } from "./type-legend";
+import { legendTypes, ThemeLegend, TypeLegend } from "./type-legend";
 import { useBoardActions } from "./use-board-actions";
 
 /**
@@ -178,8 +178,8 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
-        <TypeLegend types={["feature", "bug", "enabler"]} />
-        <ThemeLegend themes={structure.themes} />
+        <TypeLegend types={legendTypes({ ...structure.view, epics: false }, ["bug"])} />
+        {structure.view.themes && <ThemeLegend themes={structure.themes} />}
       </div>
     </div>
   );

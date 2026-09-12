@@ -9,7 +9,8 @@ import { ActivityList } from "@/components/card/activity-list";
 import { StructureFields } from "@/components/card/placement-fields";
 import { quarterOptions } from "@/components/backlog/quarters";
 import { TypeIcon } from "@/components/board/type-icon";
-import { TypeLegend } from "@/components/board/type-legend";
+import { legendTypes, TypeLegend } from "@/components/board/type-legend";
+import { structureView } from "@/modules/boards/structure/view";
 import { useBoardActions } from "@/components/board/use-board-actions";
 import {
   confirmReviewAction,
@@ -43,6 +44,7 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
   const epic = item.level === "epic";
   const categoryNames = [...themes.map((x) => x.name), ...areas.map((a) => a.name)];
   const backlog = `/boards/${board.id}/backlog`;
+  const view = structureView(board);
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
@@ -106,7 +108,7 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
           <PropertyGroup>
             <StructureFields
               parent={
-                epic
+                epic || !view.epics
                   ? null
                   : {
                       label: s("epic"),
@@ -122,6 +124,7 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
               themes={themes}
               areas={areas}
               offerCascade
+              view={view}
               onPlace={(placement) =>
                 void run(() => placeItemAction({ itemId: item.id, ...placement }))
               }
@@ -210,7 +213,7 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
             )}
           </div>
           <TypeLegend
-            types={["epic", "feature", "card", "bug"]}
+            types={legendTypes({ ...view, kind: false })}
             className="border-hairline border-t px-4 py-2"
           />
         </aside>

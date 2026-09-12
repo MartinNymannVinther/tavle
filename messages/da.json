@@ -550,7 +550,8 @@
       "cancel": "Annuller",
       "where": "Hører til",
       "partOfFeature": "Del af feature",
-      "noParentInArea": "Uden forælder, i område"
+      "noParentInArea": "Uden forælder, i område",
+      "inArea": "I område"
     },
     "filters": {
       "search": "Søg i kort",
@@ -568,7 +569,8 @@
       "anyKind": "Business og enabler",
       "business": "Business",
       "enabler": "Enabler",
-      "bugs": "Kun fejl"
+      "bugs": "Kun fejl",
+      "all": "Alle kort"
     },
     "sprint": {
       "kicker": "{start} – {end}",
@@ -1016,6 +1018,20 @@
     },
     "lists": {
       "noOwner": "Ingen ejer"
+    },
+    "structure": {
+      "title": "Struktur",
+      "body": "Hvor meget af strukturen tavlen viser. Det er et valg om visningen: det, der slås fra, bliver stående og kommer tilbage, når det slås til igen.",
+      "levels": "Niveauer",
+      "levelEpic": "Epics, features og kort",
+      "levelFeature": "Features og kort",
+      "levelCard": "Kun kort",
+      "fields": "Felter",
+      "kind": "Art (business eller enabler)",
+      "themes": "Tema",
+      "areas": "Område",
+      "areasHint": "Uden feltet får nye kort uden feature stille tavlens første område.",
+      "save": "Gem"
     }
   },
   "my": {
@@ -1052,7 +1068,8 @@
   "events": {
     "board": {
       "created": "Tavlen {name} blev oprettet",
-      "updated": "Tavlen blev omdøbt til {name}"
+      "updated": "Tavlen blev omdøbt til {name}",
+      "view": "Tavlens visning af strukturen blev ændret"
     },
     "column": {
       "created": "Kolonnen {name} blev tilføjet",
@@ -1278,7 +1295,8 @@
     "unplanned": "{count, plural, one {# epic uden målkvartal} other {# epics uden målkvartal}}",
     "unplannedHint": "En epic uden mål tegnes ikke. Et roadmap, der viser bjælker uden ende, lyver.",
     "counts": "{features, plural, one {# feature} other {# features}} · {done} af {total} kort færdige",
-    "closed": "Lukket"
+    "closed": "Lukket",
+    "noEpics": "Tavlen viser ikke epics, så der er intet roadmap at tegne. Slå epics til under Indstillinger → Struktur."
   },
   "overview": {
     "title": "Overblik",

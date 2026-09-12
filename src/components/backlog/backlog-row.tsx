@@ -68,11 +68,14 @@ export function BacklogRow({
   const t = useTranslations("backlog.row");
   const s = useTranslations("boards.structure");
   const priorities = useTranslations("boards.priority");
+  const { view } = structure;
   const own = deviatingPlace(card, context);
-  const themes = own.themeIds
-    .map((id) => structure.themes.find((theme) => theme.id === id))
-    .filter((theme): theme is Theme => Boolean(theme));
-  const area = own.areaId ? structure.areas.find((a) => a.id === own.areaId) : null;
+  const themes = view.themes
+    ? own.themeIds
+        .map((id) => structure.themes.find((theme) => theme.id === id))
+        .filter((theme): theme is Theme => Boolean(theme))
+    : [];
+  const area = view.areas && own.areaId ? structure.areas.find((a) => a.id === own.areaId) : null;
   const parts: React.ReactNode[] = [];
   if (crumb?.epic)
     parts.push(
@@ -132,7 +135,7 @@ export function BacklogRow({
             {card.title}
           </Link>
           <ThemeDots themes={themes} />
-          {card.kind === "enabler" && (
+          {view.kind && card.kind === "enabler" && (
             <FlagChip
               tone="enabler"
               className={cn("hidden", quiet ? "@lg:inline-flex" : "@sm:inline-flex")}

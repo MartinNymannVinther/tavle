@@ -63,8 +63,9 @@ export function BoardFilters({
   structure: StructureLookup;
 }) {
   const t = useTranslations("boards.filters");
-  const themes = structure.themes.filter((theme) => theme.active);
-  const areas = structure.areas.filter((area) => area.active);
+  const { view } = structure;
+  const themes = view.themes ? structure.themes.filter((theme) => theme.active) : [];
+  const areas = view.areas ? structure.areas.filter((area) => area.active) : [];
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Input
@@ -131,9 +132,9 @@ export function BoardFilters({
         aria-label={t("kind")}
         className="w-36"
       >
-        <option value="">{t("anyKind")}</option>
-        <option value="business">{t("business")}</option>
-        <option value="enabler">{t("enabler")}</option>
+        <option value="">{view.kind ? t("anyKind") : t("all")}</option>
+        {view.kind && <option value="business">{t("business")}</option>}
+        {view.kind && <option value="enabler">{t("enabler")}</option>}
         <option value="bug">{t("bugs")}</option>
       </NativeSelect>
       {hasFilters(filters) && (

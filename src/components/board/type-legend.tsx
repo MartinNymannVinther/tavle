@@ -8,6 +8,20 @@ import { TypeIcon, type ItemType } from "./type-icon";
 
 const ALL_TYPES: ItemType[] = ["epic", "feature", "card", "bug", "enabler"];
 
+/** The kinds a page with cards and their parents shows under a given view. */
+export function legendTypes(
+  view: { epics: boolean; features: boolean; kind: boolean },
+  base: ItemType[] = ["card", "bug"],
+): ItemType[] {
+  return ALL_TYPES.filter(
+    (type) =>
+      base.includes(type) ||
+      (type === "epic" && view.epics) ||
+      (type === "feature" && view.features) ||
+      (type === "enabler" && view.kind),
+  );
+}
+
 /**
  * What the symbols on a page mean, said in one quiet line wherever they
  * are used: each symbol with its word. A page passes the kinds it shows,

@@ -12,6 +12,7 @@ import type { CardView, ItemView, Member } from "@/modules/boards/types";
 import { moveCardAction, updateCardAction } from "@/modules/boards/actions-cards";
 import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
 import type { Run } from "@/components/board/use-board-actions";
+import type { StructureView } from "@/modules/boards/structure/view";
 import { cn } from "@/lib/utils";
 import { PlacementFields } from "./placement-fields";
 
@@ -32,6 +33,7 @@ export function CardSidePanel({
   sprints,
   members,
   scrum,
+  view,
   run,
 }: {
   card: CardView;
@@ -43,6 +45,7 @@ export function CardSidePanel({
   sprints: Sprint[];
   members: Member[];
   scrum: boolean;
+  view: StructureView;
   run: Run;
 }) {
   const t = useTranslations("cards.fields");
@@ -171,6 +174,7 @@ export function CardSidePanel({
           themes={themes}
           areas={areas}
           features={features}
+          view={view}
           run={run}
         />
       </PropertyGroup>

@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { applyFilters, NO_FILTERS, type Filters } from "@/components/board/board-filters";
 import { structureOf } from "@/components/board/card-chips";
 import { QuickAdd } from "@/components/board/quick-add";
-import { TypeLegend } from "@/components/board/type-legend";
+import { legendTypes, TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
+import { cn } from "@/lib/utils";
 import type { BoardFull } from "@/modules/boards/types";
 import { createCardAction } from "@/modules/boards/actions-cards";
 import { reorderItemAction } from "@/modules/boards/actions-structure";
@@ -62,7 +63,8 @@ export function BacklogView({ full }: { full: BoardFull }) {
 
   const all = backlogStories(full);
   const filtered = applyFilters(all, filters);
-  const tree = hierarchy(full, all, { showClosed });
+  const { view } = structure;
+  const tree = hierarchy(full, all, { showClosed, items: structure.items });
   const selection = stillThere(chosen, tree);
   const stories = selectStories(filtered, tree, selection);
   const counts = navCounts(tree);
@@ -122,7 +124,7 @@ export function BacklogView({ full }: { full: BoardFull }) {
     dragId,
     setDragId,
     onDropOn: dropOn,
-    crumbOf: (card) => crumbFor(crumbOf(card, full.items), selection),
+    crumbOf: (card) => crumbFor(crumbOf(card, structure.items), selection),
     context: heading ? { areaId: heading.areaId, themeIds: heading.themeIds } : undefined,
   };
   const groupNames = { none: g("none"), business: s("kind.business"), enabler: s("kind.enabler") };
@@ -172,41 +174,49 @@ export function BacklogView({ full }: { full: BoardFull }) {
             })}
           </p>
         </div>
-        <ItemForm
-          full={full}
-          level="epic"
-          run={run}
-          trigger={
-            <Button type="button" variant="outline" size="sm">
-              {t("newEpic")}
-            </Button>
-          }
-        />
-        <ItemForm
-          full={full}
-          level="feature"
-          run={run}
-          trigger={
-            <Button type="button" variant="outline" size="sm">
-              {t("newFeature")}
-            </Button>
-          }
-        />
-      </header>
-      <div className="grid @2xl:grid-cols-[17rem_minmax(0,1fr)]">
-        <aside className="bg-secondary/60 border-hairline hidden border-r p-2 @2xl:block">
-          <BacklogNav
-            {...navProps}
-            isOpen={folded.isOpen}
-            toggle={folded.toggle}
-            showClosed={showClosed}
-            onShowClosed={setShowClosed}
-            onRank={rank}
+        {view.epics && (
+          <ItemForm
+            full={full}
+            level="epic"
+            run={run}
+            trigger={
+              <Button type="button" variant="outline" size="sm">
+                {t("newEpic")}
+              </Button>
+            }
           />
-        </aside>
-        <div className="border-hairline border-b px-4 pt-3 @2xl:hidden">
-          <BacklogNavSelect {...navProps} />
-        </div>
+        )}
+        {view.features && (
+          <ItemForm
+            full={full}
+            level="feature"
+            run={run}
+            trigger={
+              <Button type="button" variant="outline" size="sm">
+                {t("newFeature")}
+              </Button>
+            }
+          />
+        )}
+      </header>
+      <div className={cn("grid", view.features && "@2xl:grid-cols-[17rem_minmax(0,1fr)]")}>
+        {view.features && (
+          <aside className="bg-secondary/60 border-hairline hidden border-r p-2 @2xl:block">
+            <BacklogNav
+              {...navProps}
+              isOpen={folded.isOpen}
+              toggle={folded.toggle}
+              showClosed={showClosed}
+              onShowClosed={setShowClosed}
+              onRank={rank}
+            />
+          </aside>
+        )}
+        {view.features && (
+          <div className="border-hairline border-b px-4 pt-3 @2xl:hidden">
+            <BacklogNavSelect {...navProps} />
+          </div>
+        )}
         <div className="flex min-w-0 flex-col">
           <BacklogHeading
             selection={selection}
@@ -259,7 +269,7 @@ export function BacklogView({ full }: { full: BoardFull }) {
           </div>
         </div>
       </div>
-      <TypeLegend className="border-hairline border-t px-4 py-2" />
+      <TypeLegend types={legendTypes(view)} className="border-hairline border-t px-4 py-2" />
     </section>
   );
 

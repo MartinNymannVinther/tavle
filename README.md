@@ -70,7 +70,10 @@ item: themes (a closed list of five to eight, each with an owner), areas
 and Tavle enforces them: can it be finished, then it is in the hierarchy;
 does it have exactly one parent, then it is in the hierarchy; otherwise
 it is a category. There is no "Diverse" epic and the tool will not make
-one: what has no parent is shown as exactly that. The backlog is one
+one: what has no parent is shown as exactly that. A board decides how
+much of this it shows — all three levels or just cards, with or without
+kind, themes and areas — and the choice is a view: switch a part off and
+it waits, switch it on and it is back. The backlog is one
 list in its own order, with the decomposition beside it as a navigator:
 click an epic or a feature and the list narrows to it, every kind of
 thing carrying its own symbol. The list also groups by theme, area or

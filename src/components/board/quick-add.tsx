@@ -31,8 +31,12 @@ export function QuickAdd({
   defaultWhere?: string;
 }) {
   const t = useTranslations("boards.quickAdd");
-  const features = structure.items.filter((i) => i.level === "feature" && i.state === "open");
-  const areas = structure.areas.filter((a) => a.active);
+  const { view } = structure;
+  const features = view.features
+    ? structure.items.filter((i) => i.level === "feature" && i.state === "open")
+    : [];
+  const areas = view.areas ? structure.areas.filter((a) => a.active) : [];
+  const choice = features.length > 0 || areas.length > 0;
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [where, setWhere] = useState<string>(defaultWhere ?? (areas[0] ? `a:${areas[0].id}` : ""));
@@ -41,10 +45,13 @@ export function QuickAdd({
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmed = title.trim();
-    if (!trimmed || !where) return;
+    if (!trimmed || (choice && !where)) return;
     setPending(true);
     const [kind, id] = where.split(":");
-    const ok = await onAdd(trimmed, kind === "f" ? { featureId: id } : { areaId: id });
+    const ok = await onAdd(
+      trimmed,
+      !choice || !id ? {} : kind === "f" ? { featureId: id } : { areaId: id },
+    );
     setPending(false);
     if (ok) setTitle("");
   }
@@ -81,31 +88,35 @@ export function QuickAdd({
         aria-label={t("label")}
         className="h-9 text-[0.8125rem]"
       />
-      <NativeSelect
-        variant="sm"
-        value={where}
-        onChange={(event) => setWhere(event.target.value)}
-        aria-label={t("where")}
-      >
-        {features.length > 0 && (
-          <optgroup label={t("partOfFeature")}>
-            {features.map((feature) => (
-              <option key={feature.id} value={`f:${feature.id}`}>
-                {feature.title}
-              </option>
-            ))}
-          </optgroup>
-        )}
-        <optgroup label={t("noParentInArea")}>
-          {areas.map((area) => (
-            <option key={area.id} value={`a:${area.id}`}>
-              {area.name}
-            </option>
-          ))}
-        </optgroup>
-      </NativeSelect>
+      {choice && (
+        <NativeSelect
+          variant="sm"
+          value={where}
+          onChange={(event) => setWhere(event.target.value)}
+          aria-label={t("where")}
+        >
+          {features.length > 0 && (
+            <optgroup label={t("partOfFeature")}>
+              {features.map((feature) => (
+                <option key={feature.id} value={`f:${feature.id}`}>
+                  {feature.title}
+                </option>
+              ))}
+            </optgroup>
+          )}
+          {areas.length > 0 && (
+            <optgroup label={view.features ? t("noParentInArea") : t("inArea")}>
+              {areas.map((area) => (
+                <option key={area.id} value={`a:${area.id}`}>
+                  {area.name}
+                </option>
+              ))}
+            </optgroup>
+          )}
+        </NativeSelect>
+      )}
       <div className="flex gap-1.5">
-        <Button type="submit" size="sm" disabled={pending || !title.trim() || !where}>
+        <Button type="submit" size="sm" disabled={pending || !title.trim() || (choice && !where)}>
           {t("add")}
         </Button>
         <Button type="button" size="sm" variant="ghost" onClick={() => setOpen(false)}>

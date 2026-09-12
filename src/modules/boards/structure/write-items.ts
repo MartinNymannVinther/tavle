@@ -8,7 +8,7 @@ import { inheritedFrom, resolveNew } from "./inherit";
 import { itemInBoard, itemInWorkspace, levelLane, placeItem, setItemThemes } from "./items";
 import { assertPlaced, enablerTypeFor, RuleViolation } from "./rules";
 import type { ItemUpdateInput, NewItemInput } from "./validation";
-import { activeAreaInBoard, activeThemesInBoard } from "./write-lists";
+import { activeAreaInBoard, activeThemesInBoard, settleArea } from "./write-lists";
 
 /**
  * Epics and features: created, edited and ranked. Their place in the
@@ -37,7 +37,12 @@ export async function createItem(
     if (parent.state === "closed") throw new RuleViolation("itemClosed");
   }
   const got = resolveNew(input, parent ? await inheritedFrom(tx, parent) : null);
-  const area = await activeAreaInBoard(tx, board.id, got.areaId);
+  const area = await settleArea(
+    tx,
+    board,
+    parent?.id ?? null,
+    await activeAreaInBoard(tx, board.id, got.areaId),
+  );
   const themes = await activeThemesInBoard(tx, board.id, got.themeIds);
   assertPlaced(parent?.id ?? null, area?.id ?? null);
   const number = await nextNumber(tx, board.id);

@@ -18,7 +18,7 @@ import { inheritedFrom, resolveNew } from "./structure/inherit";
 import { itemInBoard } from "./structure/items";
 import { assertPlaced, enablerTypeFor, RuleViolation } from "./structure/rules";
 import { setCardThemes } from "./structure/write-card-placement";
-import { activeAreaInBoard, activeThemesInBoard } from "./structure/write-lists";
+import { activeAreaInBoard, activeThemesInBoard, settleArea } from "./structure/write-lists";
 import { clocksFor, enterColumn, recordTransition } from "./transitions";
 
 /**
@@ -76,7 +76,12 @@ export async function createCard(
     if (feature.state === "closed") throw new RuleViolation("itemClosed");
   }
   const got = resolveNew(input, feature ? await inheritedFrom(tx, feature) : null);
-  const area = await activeAreaInBoard(tx, board.id, got.areaId);
+  const area = await settleArea(
+    tx,
+    board,
+    feature?.id ?? null,
+    await activeAreaInBoard(tx, board.id, got.areaId),
+  );
   const themes = await activeThemesInBoard(tx, board.id, got.themeIds);
   assertPlaced(feature?.id ?? null, area?.id ?? null);
   const number = await nextNumber(tx, board.id);

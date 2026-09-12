@@ -70,6 +70,17 @@ export const boards = pgTable(
     nextSprintNumber: integer("next_sprint_number").notNull().default(1),
     /** An epic open longer than this is marked for review until its owner confirms it is still a result. */
     epicReviewDays: integer("epic_review_days").notNull().default(180),
+    /**
+     * How much of the structure the board shows: "epic" is all three
+     * levels, "feature" hides the epics, "card" hides both. A way of
+     * looking, not a shape: what is hidden stays in the tables and comes
+     * back when the level is switched on again.
+     */
+    structureLevels: text("structure_levels").notNull().default("epic"),
+    /** Which of the item's fields the board shows; the data stays either way. */
+    showKind: boolean("show_kind").notNull().default(true),
+    showThemes: boolean("show_themes").notNull().default(true),
+    showAreas: boolean("show_areas").notNull().default(true),
     createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
     archivedAt: timestamp("archived_at", { withTimezone: true }),
     ...timestamps,
@@ -77,6 +88,7 @@ export const boards = pgTable(
   (t) => [
     uniqueIndex("boards_org_key_uq").on(t.orgId, t.key),
     index("boards_org_created_idx").on(t.orgId, t.createdAt),
+    check("boards_structure_levels_ck", sql`${t.structureLevels} in ('epic', 'feature', 'card')`),
   ],
 );
 

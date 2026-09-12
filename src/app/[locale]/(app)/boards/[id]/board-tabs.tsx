@@ -10,7 +10,15 @@ import { SegmentedFilter } from "@/components/ui/segmented";
  * Links, so they work without a script and the active one is known from
  * the URL.
  */
-export function BoardTabs({ boardId, scrum }: { boardId: string; scrum: boolean }) {
+export function BoardTabs({
+  boardId,
+  scrum,
+  roadmap = true,
+}: {
+  boardId: string;
+  scrum: boolean;
+  roadmap?: boolean;
+}) {
   const t = useTranslations("boards.tabs");
   const pathname = usePathname();
   const base = `/boards/${boardId}`;
@@ -37,12 +45,16 @@ export function BoardTabs({ boardId, scrum }: { boardId: string; scrum: boolean 
           },
         ]
       : []),
-    {
-      key: "roadmap",
-      label: t("roadmap"),
-      href: `${base}/roadmap`,
-      active: pathname.startsWith(`${base}/roadmap`),
-    },
+    ...(roadmap
+      ? [
+          {
+            key: "roadmap",
+            label: t("roadmap"),
+            href: `${base}/roadmap`,
+            active: pathname.startsWith(`${base}/roadmap`),
+          },
+        ]
+      : []),
     {
       key: "overview",
       label: t("overview"),

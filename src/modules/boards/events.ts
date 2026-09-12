@@ -12,6 +12,7 @@ import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 export type EventType =
   | "board.created"
   | "board.updated"
+  | "board.view"
   | "column.created"
   | "column.updated"
   | "column.deleted"

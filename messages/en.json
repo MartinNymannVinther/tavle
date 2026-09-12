@@ -550,7 +550,8 @@
       "cancel": "Cancel",
       "where": "Belongs to",
       "partOfFeature": "Part of a feature",
-      "noParentInArea": "No parent, in area"
+      "noParentInArea": "No parent, in area",
+      "inArea": "In area"
     },
     "filters": {
       "search": "Search cards",
@@ -568,7 +569,8 @@
       "anyKind": "Business and enabler",
       "business": "Business",
       "enabler": "Enabler",
-      "bugs": "Bugs only"
+      "bugs": "Bugs only",
+      "all": "All cards"
     },
     "sprint": {
       "kicker": "{start} – {end}",
@@ -1016,6 +1018,20 @@
     },
     "lists": {
       "noOwner": "No owner"
+    },
+    "structure": {
+      "title": "Structure",
+      "body": "How much of the structure the board shows. A choice about the view: what is switched off stays and comes back when switched on again.",
+      "levels": "Levels",
+      "levelEpic": "Epics, features and cards",
+      "levelFeature": "Features and cards",
+      "levelCard": "Cards only",
+      "fields": "Fields",
+      "kind": "Kind (business or enabler)",
+      "themes": "Theme",
+      "areas": "Area",
+      "areasHint": "Without the field, new cards without a feature quietly take the board's first area.",
+      "save": "Save"
     }
   },
   "my": {
@@ -1052,7 +1068,8 @@
   "events": {
     "board": {
       "created": "The board {name} was created",
-      "updated": "The board was renamed to {name}"
+      "updated": "The board was renamed to {name}",
+      "view": "The board's view of the structure was changed"
     },
     "column": {
       "created": "The column {name} was added",
@@ -1278,7 +1295,8 @@
     "unplanned": "{count, plural, one {# epic without a target quarter} other {# epics without a target quarter}}",
     "unplannedHint": "An epic without a target is not drawn. A roadmap that shows bars without an end is lying.",
     "counts": "{features, plural, one {# feature} other {# features}} · {done} of {total} cards done",
-    "closed": "Closed"
+    "closed": "Closed",
+    "noEpics": "The board does not show epics, so there is no roadmap to draw. Switch epics on under Settings → Structure."
   },
   "overview": {
     "title": "Overview",

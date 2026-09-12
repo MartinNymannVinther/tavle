@@ -5,7 +5,8 @@ import { ConfirmButton } from "@/components/ui/confirm-button";
 import { panel, surface } from "@/components/ui/detail-surfaces";
 import { Button } from "@/components/ui/button";
 import { TypeIcon } from "@/components/board/type-icon";
-import { TypeLegend } from "@/components/board/type-legend";
+import { legendTypes, TypeLegend } from "@/components/board/type-legend";
+import { structureView } from "@/modules/boards/structure/view";
 import { useBoardActions } from "@/components/board/use-board-actions";
 import type { CardFull } from "@/modules/boards/types";
 import {
@@ -47,6 +48,7 @@ export function CardPage({
   const { card, board, columns, themes, areas, features, sprints, members, comments, events } =
     full;
   const column = columns.find((c) => c.id === card.columnId);
+  const view = structureView(board);
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
@@ -101,6 +103,7 @@ export function CardPage({
             sprints={sprints}
             members={members}
             scrum={board.mode === "scrum"}
+            view={view}
             run={run}
           />
           <div className="border-hairline text-meta flex flex-col gap-0.5 border-t px-4 py-3 text-[0.72rem]">
@@ -157,7 +160,7 @@ export function CardPage({
             </ConfirmButton>
           </div>
           <TypeLegend
-            types={["card", "bug", "enabler"]}
+            types={legendTypes({ ...view, epics: false, features: false })}
             className="border-hairline border-t px-4 py-2"
           />
         </aside>

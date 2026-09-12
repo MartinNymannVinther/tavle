@@ -77,11 +77,14 @@ const byRank = (a: ItemView, b: ItemView) => a.sort - b.sort || a.number - b.num
 export function hierarchy(
   full: BoardFull,
   stories: CardView[],
-  options: { showClosed: boolean },
+  options: { showClosed: boolean; items?: ItemView[] },
 ): Hierarchy {
   const category = new Map(full.columns.map((c) => [c.id, c.category]));
   const backlogIds = new Set(stories.map((s) => s.id));
-  const items = full.items.filter((i) => options.showClosed || i.state === "open");
+  // The items the board shows; a level switched off leaves its children without a parent here.
+  const items = (options.items ?? full.items).filter(
+    (i) => options.showClosed || i.state === "open",
+  );
   const features = items.filter((i) => i.level === "feature").sort(byRank);
   const epics = items.filter((i) => i.level === "epic").sort(byRank);
 
