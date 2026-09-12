@@ -5,18 +5,22 @@ import { usePathname } from "@/i18n/navigation";
 import { SegmentedFilter } from "@/components/ui/segmented";
 
 /**
- * The board's places: the board, the backlog, the sprints on a Scrum
- * board, the roadmap, the overview, the insight page and the settings.
+ * The board's places: the board, the backlog, the story map, the sprints
+ * on a Scrum board, the roadmap, the overview, the insight page and the
+ * settings.
  * Links, so they work without a script and the active one is known from
  * the URL.
  */
 export function BoardTabs({
   boardId,
   scrum,
+  map = true,
   roadmap = true,
 }: {
   boardId: string;
   scrum: boolean;
+  /** The map needs features to draw columns; a board of cards alone has none. */
+  map?: boolean;
   roadmap?: boolean;
 }) {
   const t = useTranslations("boards.tabs");
@@ -35,6 +39,16 @@ export function BoardTabs({
       href: `${base}/backlog`,
       active: pathname.startsWith(`${base}/backlog`) || pathname.startsWith(`${base}/items`),
     },
+    ...(map
+      ? [
+          {
+            key: "map",
+            label: t("map"),
+            href: `${base}/map`,
+            active: pathname.startsWith(`${base}/map`),
+          },
+        ]
+      : []),
     ...(scrum
       ? [
           {

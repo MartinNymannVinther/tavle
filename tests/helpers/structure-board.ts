@@ -1,0 +1,257 @@
+import type { BoardFull, CardView, ItemView } from "@/modules/boards/types";
+
+/**
+ * One fixed Scrum board with its structure, shared by the tests of the
+ * views computed from a board — the backlog's groups, the roadmap, the
+ * overview and the story map — so a change in a number is a change
+ * somebody decided on. Three epics (one closed), two features (one
+ * without an epic), five cards: two in the backlog under a feature, one
+ * loose bug, one in sprint s1 under way and one in s1 done.
+ */
+export const day = 86_400_000;
+export const now = new Date("2026-09-11T10:00:00Z");
+export const at = (daysAgo: number) => new Date(now.getTime() - daysAgo * day);
+
+export function item(
+  partial: Partial<ItemView> & Pick<ItemView, "id" | "level" | "title">,
+): ItemView {
+  return {
+    orgId: "org",
+    boardId: "board",
+    parentId: null,
+    number: 1,
+    description: "",
+    doneWhen: "når det er sådan",
+    kind: "business",
+    enablerType: null,
+    areaId: "a1",
+    state: "open",
+    closedAt: null,
+    targetQuarter: null,
+    reviewConfirmedAt: null,
+    sort: 1000,
+    createdBy: null,
+    createdAt: at(10),
+    updatedAt: at(10),
+    themeIds: [],
+    ...partial,
+  };
+}
+
+export function card(partial: Partial<CardView> & Pick<CardView, "id" | "title">): CardView {
+  return {
+    orgId: "org",
+    boardId: "board",
+    columnId: "todo",
+    sprintId: null,
+    featureId: null,
+    kind: "business",
+    enablerType: null,
+    areaId: "a1",
+    bug: false,
+    acceptance: "",
+    number: 1,
+    description: "",
+    sort: 1000,
+    assigneeUserId: null,
+    estimate: null,
+    priority: "normal",
+    dueDate: null,
+    checklist: [],
+    blocked: false,
+    blockedReason: "",
+    startedAt: null,
+    doneAt: null,
+    archivedAt: null,
+    createdBy: null,
+    createdAt: at(5),
+    updatedAt: at(5),
+    assigneeName: null,
+    themeIds: [],
+    checklistDone: 0,
+    checklistTotal: 0,
+    commentCount: 0,
+    ...partial,
+  };
+}
+
+export const theme = (id: string, name: string, color: string) => ({
+  id,
+  orgId: "org",
+  boardId: "board",
+  name,
+  color,
+  ownerUserId: null,
+  active: true,
+  sort: 0,
+  createdAt: at(30),
+  updatedAt: at(30),
+});
+
+export const area = (id: string, name: string, active = true) => ({
+  id,
+  orgId: "org",
+  boardId: "board",
+  name,
+  ownerUserId: null,
+  active,
+  sort: 0,
+  createdAt: at(30),
+  updatedAt: at(30),
+});
+
+export const board: BoardFull = {
+  board: {
+    id: "board",
+    orgId: "org",
+    name: "Webshop",
+    key: "WEB",
+    mode: "scrum",
+    description: "",
+    sprintLengthDays: 14,
+    nextCardNumber: 20,
+    nextSprintNumber: 3,
+    epicReviewDays: 180,
+    structureLevels: "epic",
+    showKind: true,
+    showThemes: true,
+    showAreas: true,
+    createdBy: null,
+    archivedAt: null,
+    createdAt: at(400),
+    updatedAt: at(1),
+  },
+  columns: [
+    {
+      id: "todo",
+      orgId: "org",
+      boardId: "board",
+      name: "Planlagt",
+      category: "todo",
+      wipLimit: null,
+      sort: 0,
+      createdAt: at(400),
+      updatedAt: at(400),
+    },
+    {
+      id: "done",
+      orgId: "org",
+      boardId: "board",
+      name: "Færdig",
+      category: "done",
+      wipLimit: null,
+      sort: 2,
+      createdAt: at(400),
+      updatedAt: at(400),
+    },
+  ],
+  themes: [
+    theme("t1", "Selvbetjening", "moss"),
+    theme("t2", "Stabil drift", "clay"),
+    theme("t3", "Regulatorisk", "rust"),
+  ],
+  areas: [area("a1", "Betalinger"), area("a2", "Login"), area("a3", "Gammelt", false)],
+  items: [
+    item({
+      id: "e1",
+      level: "epic",
+      title: "Kunder kan betale med MobilePay",
+      number: 1,
+      themeIds: ["t1"],
+      targetQuarter: "2026-Q4",
+      createdAt: at(200),
+      sort: 2000,
+    }),
+    item({
+      id: "e2",
+      level: "epic",
+      title: "Vi kan udrulle uden nedetid",
+      number: 2,
+      kind: "enabler",
+      enablerType: "infrastructure",
+      themeIds: ["t2"],
+      sort: 1000,
+    }),
+    item({
+      id: "e3",
+      level: "epic",
+      title: "Gammel epic",
+      number: 3,
+      state: "closed",
+      closedAt: at(3),
+      targetQuarter: "2026-Q1",
+    }),
+    item({
+      id: "f1",
+      level: "feature",
+      title: "Kunder kan betale i checkout",
+      number: 4,
+      parentId: "e1",
+      themeIds: ["t1"],
+      sort: 1000,
+    }),
+    item({
+      id: "f2",
+      level: "feature",
+      title: "Kunder kan gemme et kort",
+      number: 5,
+      areaId: "a2",
+      sort: 2000,
+    }),
+  ],
+  cards: [
+    card({
+      id: "c1",
+      title: "Vis knappen",
+      number: 6,
+      featureId: "f1",
+      themeIds: ["t1"],
+      estimate: 3,
+      sort: 2000,
+    }),
+    card({
+      id: "c2",
+      title: "Håndtér afvisning",
+      number: 7,
+      featureId: "f1",
+      themeIds: ["t1"],
+      estimate: 5,
+      sprintId: "s1",
+      sort: 1000,
+    }),
+    card({
+      id: "c3",
+      title: "Gem kortet",
+      number: 8,
+      featureId: "f2",
+      areaId: "a2",
+      estimate: 2,
+      kind: "enabler",
+      enablerType: "architecture",
+      sort: 3000,
+    }),
+    card({
+      id: "c4",
+      title: "Rettelse",
+      number: 9,
+      areaId: null,
+      bug: true,
+      estimate: 1,
+      sort: 500,
+    }),
+    card({
+      id: "c5",
+      title: "Gjort",
+      number: 10,
+      featureId: "f1",
+      columnId: "done",
+      doneAt: at(1),
+      estimate: 8,
+      sprintId: "s1",
+      sort: 100,
+    }),
+  ],
+  sprints: [],
+  activeSprint: null,
+  members: [],
+};

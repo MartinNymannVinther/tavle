@@ -497,7 +497,8 @@
       "settings": "Indstillinger",
       "archived": "arkiveret",
       "roadmap": "Roadmap",
-      "overview": "Overblik"
+      "overview": "Overblik",
+      "map": "Story map"
     },
     "list": {
       "title": "Tavler",
@@ -1182,6 +1183,10 @@
       "roadmap": {
         "title": "Roadmap og overblik",
         "body": "Roadmappet tegner epics på en linje af kvartaler, farvet efter deres første tema. En epic uden målkvartal tegnes ikke, den listes nedenunder. Overblikket viser hvor det åbne arbejde ligger pr. tema, område og art, enabler-andelen som ét tal, og fem mål på om strukturen holder: andelen uden forælder, epics til revision, items uden område, enabler-andelen, og temaer og områder ingen bruger."
+      },
+      "map": {
+        "title": "Story mappet",
+        "body": "Story mappet viser nedbrydningen og planen på én gang: epics og features hen over toppen, sprintene (eller kolonnerne på en Kanban-tavle) nedad, og hvert kort i den ene celle hvor dets feature og dets sprint mødes. Kort uden feature står i en stiplet kolonne yderst til højre, så de ikke gemmer sig. Træk et kort sidelæns for at flytte det til en anden feature, op eller ned for at lægge det i en anden sprint, og skriv et nyt kort direkte i en celle. Fold en epic sammen, og dens features bliver til én kolonne med tallene."
       }
     },
     "abcTitle": "Tavlens ABC",
@@ -1231,7 +1236,7 @@
     "closing": "Værktøjet gør ikke teamet godt. Det gør de ti regler, og tavlen er der, så I kan se om I følger dem.",
     "symbols": {
       "title": "Symbolerne",
-      "body": "Hver slags ting har sit eget symbol, og det er det samme overalt: i backloggen, på kortet, på roadmappet og på tavlen. Et flag er en epic, en puslespilsbrik er en feature, en note er et kort, en bille er en fejl, og en skruenøgle er enabler-arbejde. Symbolet har altid sit ord med, når du holder musen over det, og siden viser en forklaring nederst, hvor symbolerne bruges."
+      "body": "Hver slags ting har sit eget symbol, og det er det samme overalt: i backloggen, på kortet, på story mappet, på roadmappet og på tavlen. Et flag er en epic, en puslespilsbrik er en feature, en note er et kort, en bille er en fejl, og en skruenøgle er enabler-arbejde. Symbolet har altid sit ord med, når du holder musen over det, og siden viser en forklaring nederst, hvor symbolerne bruges."
     }
   },
   "items": {
@@ -1321,5 +1326,18 @@
     "distributionBody": "{cards, plural, one {# åbent kort} other {# åbne kort}} · {points} point",
     "none": "Uden",
     "bucketValue": "{cards} kort · {points} point"
+  },
+  "map": {
+    "title": "Story map",
+    "leadScrum": "Nedbrydningen på tværs, sprintene nedad. Træk et kort sidelæns for at flytte det til en anden feature, op eller ned for at lægge det i en anden sprint.",
+    "leadKanban": "Nedbrydningen på tværs, tavlens kolonner nedad. Træk et kort sidelæns for at flytte det til en anden feature, op eller ned for at flytte det til en anden kolonne.",
+    "noParent": "Uden feature",
+    "noParentHint": "{count, plural, =0 {Ingen kort uden feature} one {# kort uden feature} other {# kort uden feature}}",
+    "noEpic": "Uden epic",
+    "backlog": "Backlog",
+    "rowCounts": "{cards, plural, one {# kort} other {# kort}} · {points} point",
+    "foldedFeatures": "{count, plural, one {# feature foldet sammen} other {# features foldet sammen}}",
+    "underway": "{open} i gang",
+    "empty": "Ingen features og ingen kort endnu. Opret en feature, så får kortet en kolonne at ligge i."
   }
 }

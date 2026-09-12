@@ -17,6 +17,7 @@ const HOW_TO = [
   "backlog",
   "structure",
   "roadmap",
+  "map",
   "insight",
   "team",
   "ai",

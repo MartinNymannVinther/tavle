@@ -17,6 +17,7 @@ export function BoardHeader({
   name,
   description,
   scrum,
+  map,
   roadmap,
 }: {
   boardId: string;
@@ -24,13 +25,15 @@ export function BoardHeader({
   name: string;
   description?: string;
   scrum: boolean;
+  /** The map draws features; a board of cards alone has no map tab. */
+  map: boolean;
   /** The roadmap draws epics; a board without them has no roadmap tab. */
   roadmap: boolean;
 }) {
   const pathname = usePathname();
   const base = `/boards/${boardId}`;
   const detail = pathname.startsWith(`${base}/cards/`) || pathname.startsWith(`${base}/items/`);
-  const tabs = <BoardTabs boardId={boardId} scrum={scrum} roadmap={roadmap} />;
+  const tabs = <BoardTabs boardId={boardId} scrum={scrum} map={map} roadmap={roadmap} />;
 
   if (detail) {
     return (

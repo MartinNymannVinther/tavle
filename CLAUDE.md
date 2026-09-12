@@ -72,7 +72,10 @@ codebase to:
   bug for a bug, a wrench for enabler work, each with its word for
   assistive technology. The backlog is one flat list in its own order
   with the decomposition as a navigator beside it (ADR 0013), and a row
-  says only what its heading has not.
+  says only what its heading has not. The story map is the
+  decomposition's own view (ADR 0015): features across, sprints or
+  columns down, every card in one cell, computed from the board, and a
+  drag on it is the same move as anywhere else.
 - A detail page (a card, an epic, a feature) is two surfaces: the reading
   surface on the left, sections divided by hairlines, an empty field
   drawn as a dashed "add" row rather than a button somewhere else; the
@@ -122,7 +125,7 @@ codebase to:
   services that take an `OrgContext`, the backlog structure's rules and
   services in `src/modules/boards/structure`; server actions next to their
   services as `actions*.ts`; pages in `src/app/[locale]` and components in
-  `src/components/{board,card,backlog,item,roadmap,overview,sprint,charts,settings}`.
+  `src/components/{board,card,backlog,map,item,roadmap,overview,sprint,charts,settings}`.
 - Trade-off accepted: the foundation is a copy of Ajour's copy of Haij's,
   not a shared package. Three products, three lifecycles, one set of rules
   (ADR 0001).
@@ -187,7 +190,7 @@ codebase to:
   flow); my cards; workspace invitations; the three AI proposals; the
   demo with two boards; export and deletion; the help page with the
   board's ABC.
-- 0.10 (this): the backlog structure (ADR 0011) — epics and features
+- 0.10: the backlog structure (ADR 0011) — epics and features
   with "done when", kind and enabler type, themes and areas as closed
   lists with owners, the eleven rules, inheritance, one order per level,
   the close conversation; the backlog with grouping and filters on both
@@ -195,8 +198,9 @@ codebase to:
   measures; labels removed. 0.10.2: the type symbols (ADR 0012). 0.10.3:
   the backlog as a navigator and a flat list (ADR 0013). 0.10.7: the
   structure's levels and fields chosen per board, view only (ADR 0014).
-- 0.11: the story map — epics and features across, sprints (or columns)
-  down, stories in the cells — as the decomposition's own view.
+- 0.11 (this): the story map — epics and features across, sprints (or
+  columns) down, stories in the cells — as the decomposition's own view
+  (ADR 0015).
 - Before 1.0: dogma seven — a real team runs a real board on it; the
   screenshots for the README; the tool card on haij.dk; whatever the
   first team asks for that the omissions list did not foresee.

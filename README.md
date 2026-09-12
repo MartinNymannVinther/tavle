@@ -19,7 +19,7 @@ Decisions and their trade-offs live in [docs/adr](docs/adr/).
 
 ## Status
 
-Version 0.10: complete as a product, not yet run in anger. What it holds:
+Version 0.11: complete as a product, not yet run in anger. What it holds:
 the foundation (auth with passkeys and TOTP, workspaces separated in the
 database, admission by application, the audit log, CI, Docker), boards in
 two modes, cards with everything a card needs, the backlog structure with
@@ -77,8 +77,10 @@ it waits, switch it on and it is back. The backlog is one
 list in its own order, with the decomposition beside it as a navigator:
 click an epic or a feature and the list narrows to it, every kind of
 thing carrying its own symbol. The list also groups by theme, area or
-kind; the roadmap draws epics on quarters; the overview says how the
-open work is spread and whether the structure is being kept.
+kind; the story map lays the features across and the sprints down with
+every card in the cell where the two meet, and a card dragged on it is
+moved for real; the roadmap draws epics on quarters; the overview says
+how the open work is spread and whether the structure is being kept.
 
 **The numbers come from the record.** Every move a card makes is written
 down, so the insight page can say how many cards were finished per week,

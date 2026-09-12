@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import type { StructureLookup } from "./card-chips";
+import { cn } from "@/lib/utils";
 
 /** Where a new card goes in the structure: part of a feature, or on its own in an area. */
 export type Place = { featureId?: string; areaId?: string };
@@ -23,12 +24,18 @@ export function QuickAdd({
   structure,
   placeholder,
   defaultWhere,
+  fixed,
+  compact,
 }: {
   onAdd: (title: string, place: Place) => Promise<boolean>;
   structure: StructureLookup;
   placeholder?: string;
   /** Where the card starts out, as the select's value: `f:<featureId>` or `a:<areaId>`. */
   defaultWhere?: string;
+  /** The place is decided by where the form stands (a feature's column); no select is shown. */
+  fixed?: Place;
+  /** A smaller opener, for a cell on the map. */
+  compact?: boolean;
 }) {
   const t = useTranslations("boards.quickAdd");
   const { view } = structure;
@@ -36,7 +43,7 @@ export function QuickAdd({
     ? structure.items.filter((i) => i.level === "feature" && i.state === "open")
     : [];
   const areas = view.areas ? structure.areas.filter((a) => a.active) : [];
-  const choice = features.length > 0 || areas.length > 0;
+  const choice = !fixed && (features.length > 0 || areas.length > 0);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [where, setWhere] = useState<string>(defaultWhere ?? (areas[0] ? `a:${areas[0].id}` : ""));
@@ -50,7 +57,7 @@ export function QuickAdd({
     const [kind, id] = where.split(":");
     const ok = await onAdd(
       trimmed,
-      !choice || !id ? {} : kind === "f" ? { featureId: id } : { areaId: id },
+      fixed ?? (!choice || !id ? {} : kind === "f" ? { featureId: id } : { areaId: id }),
     );
     setPending(false);
     if (ok) setTitle("");
@@ -61,8 +68,8 @@ export function QuickAdd({
       <Button
         type="button"
         variant="ghost"
-        size="sm"
-        className="text-meta w-full justify-start"
+        size={compact ? "xs" : "sm"}
+        className={cn("text-meta w-full justify-start", compact && "px-1")}
         onClick={() => setOpen(true)}
       >
         <Plus data-slot="icon" />
