@@ -1,20 +1,22 @@
 import { describe, expect, it } from "vitest";
 import {
+  backbone,
   cellKey,
   featureTotals,
   LOOSE_COLUMN,
   mapRows,
   rowOf,
   storyMap,
+  tray,
 } from "@/components/map/story-map";
-import { structureView } from "@/modules/boards/structure/view";
-import type { BoardFull } from "@/modules/boards/types";
-import { at, board, card } from "../helpers/structure-board";
+import type { BoardFull, ItemView } from "@/modules/boards/types";
+import { at, board, card, item } from "../helpers/structure-board";
 
 /**
- * The story map computed from the fixed board: which columns it draws,
- * which rows, and that every card lands in exactly one cell in the
- * backlog's own order.
+ * The story map computed from the fixed board: the backbone in the
+ * map's own order, the tray of what is not up yet, the rows, and that
+ * every card under a feature on the map lands in exactly one cell in
+ * the backlog's order.
  */
 
 const sprint = (id: string, number: number, state: "planned" | "active" | "closed") => ({
@@ -37,11 +39,17 @@ const sprint = (id: string, number: number, state: "planned" | "active" | "close
   updatedAt: at(30),
 });
 
+/** Both features up, f2 first: the map's order is not the backlog's rank. */
+const up = (items: ItemView[]) =>
+  items.map((i) =>
+    i.id === "f1" ? { ...i, mapSort: 2000 } : i.id === "f2" ? { ...i, mapSort: 1000 } : i,
+  );
+
 const scrum: BoardFull = {
   ...board,
+  items: up(board.items),
   sprints: [sprint("s2", 2, "planned"), sprint("s1", 1, "active"), sprint("s0", 0, "closed")],
 };
-const full = structureView(board.board);
 const titles = (map: ReturnType<typeof storyMap>, row: string, column: string) =>
   (map.cells.get(cellKey(row, column)) ?? []).map((c) => c.title);
 
@@ -56,27 +64,36 @@ describe("the story map", () => {
     expect(rowOf(board.cards[0]!, mapRows(kanban), false)).toBe("column:todo");
   });
 
-  it("puts the epics across with their features, the orphans after, the loose column last", () => {
-    const map = storyMap(scrum, full, scrum.items, scrum.cards, { showClosed: false });
-    expect(map.groups.map((g) => [g.key, g.columns.map((c) => c.key)])).toEqual([
-      ["e2", []],
-      ["e1", ["f1"]],
-      ["no-epic", ["f2"]],
-      [LOOSE_COLUMN, [LOOSE_COLUMN]],
-    ]);
-    expect(map.columnCount).toBe(3);
-    const withClosed = storyMap(scrum, full, scrum.items, scrum.cards, { showClosed: true });
-    expect(withClosed.groups.map((g) => g.key)).toEqual(["e2", "e3", "e1", "no-epic", "loose"]);
+  it("puts the features up in the map's own order, and the loose column last", () => {
+    const map = storyMap(scrum, scrum.items, scrum.cards, { showClosed: false });
+    expect(map.columns.map((c) => c.key)).toEqual(["f2", "f1", LOOSE_COLUMN]);
+    expect(tray(scrum.items)).toEqual([]);
   });
 
-  it("drops the epic row when the board shows features and cards only", () => {
-    const view = structureView({ ...board.board, structureLevels: "feature" });
-    const items = scrum.items.filter((item) => item.level !== "epic");
-    const map = storyMap(scrum, view, items, scrum.cards, { showClosed: false });
-    expect(map.groups.map((g) => [g.key, g.columns.map((c) => c.key)])).toEqual([
-      ["features", ["f1", "f2"]],
-      [LOOSE_COLUMN, [LOOSE_COLUMN]],
+  it("keeps a feature off the map in the tray, in the backlog's rank, and its cards off the map", () => {
+    const items = board.items.map((i) => (i.id === "f1" ? { ...i, mapSort: 1000 } : i));
+    const map = storyMap(scrum, items, scrum.cards, { showClosed: false });
+    expect(map.columns.map((c) => c.key)).toEqual(["f1", LOOSE_COLUMN]);
+    expect(tray(items).map((f) => f.id)).toEqual(["f2"]);
+    expect([...map.cells.values()].flat().map((c) => c.id)).not.toContain("c3");
+  });
+
+  it("offers only open features in the tray, and shows a closed one on the map only on request", () => {
+    const closed = item({
+      id: "f3",
+      level: "feature",
+      title: "Lukket feature",
+      number: 12,
+      state: "closed",
+      mapSort: 500,
+    });
+    const items = [...scrum.items, closed];
+    expect(tray([...board.items, { ...closed, mapSort: null }]).map((f) => f.id)).toEqual([
+      "f1",
+      "f2",
     ]);
+    expect(backbone(items, { showClosed: false }).map((f) => f.id)).toEqual(["f2", "f1"]);
+    expect(backbone(items, { showClosed: true }).map((f) => f.id)).toEqual(["f3", "f2", "f1"]);
   });
 
   it("puts every card in one cell, in the backlog's order, and a closed sprint's off the map", () => {
@@ -84,7 +101,7 @@ describe("the story map", () => {
       ...scrum.cards,
       card({ id: "c6", title: "Gammelt", number: 11, sprintId: "s0" }),
     ];
-    const map = storyMap(scrum, full, scrum.items, cards, { showClosed: false });
+    const map = storyMap(scrum, scrum.items, cards, { showClosed: false });
     expect(titles(map, "sprint:s1", "f1")).toEqual(["Gjort", "Håndtér afvisning"]);
     expect(titles(map, "backlog", "f1")).toEqual(["Vis knappen"]);
     expect(titles(map, "backlog", "f2")).toEqual(["Gem kortet"]);
@@ -94,15 +111,8 @@ describe("the story map", () => {
     expect(placed.map((c) => c.id)).not.toContain("c6");
   });
 
-  it("counts a card under a hidden feature as loose", () => {
-    const view = structureView({ ...board.board, structureLevels: "card" });
-    const map = storyMap(scrum, view, [], scrum.cards, { showClosed: false });
-    expect(map.groups.map((g) => g.key)).toEqual([LOOSE_COLUMN]);
-    expect(titles(map, "backlog", LOOSE_COLUMN)).toEqual(["Rettelse", "Vis knappen", "Gem kortet"]);
-  });
-
   it("adds up a feature from every card under it, on and off the map", () => {
-    const f1 = scrum.items.find((item) => item.id === "f1")!;
+    const f1 = scrum.items.find((i) => i.id === "f1")!;
     expect(featureTotals(f1, scrum)).toEqual({ total: 3, done: 1, open: 1 });
   });
 });

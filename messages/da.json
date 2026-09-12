@@ -1132,6 +1132,8 @@
       "closed": "{key} blev lukket",
       "reopened": "{key} blev genåbnet",
       "reviewed": "{key} blev bekræftet som stadig et resultat",
+      "mapped": "{key} blev sat op på story mappet",
+      "unmapped": "{key} blev taget ned fra story mappet",
       "deleted": "{key} blev slettet"
     }
   },
@@ -1186,7 +1188,7 @@
       },
       "map": {
         "title": "Story mappet",
-        "body": "Story mappet viser nedbrydningen og planen på én gang: epics og features hen over toppen, sprintene (eller kolonnerne på en Kanban-tavle) nedad, og hvert kort i den ene celle hvor dets feature og dets sprint mødes. Kort uden feature står i en stiplet kolonne yderst til højre, så de ikke gemmer sig. Træk et kort sidelæns for at flytte det til en anden feature, op eller ned for at lægge det i en anden sprint, og skriv et nyt kort direkte i en celle. Fold en epic sammen, og dens features bliver til én kolonne med tallene."
+        "body": "Story mappet er teamets væg: features som gule noter hen over toppen i fortællingens rækkefølge (det brugeren gør først står til venstre), sprintene (eller kolonnerne på en Kanban-tavle) nedad, og hvert kort i den celle hvor dets feature og dets sprint mødes. Rækkefølgen på mappet er mappets egen og rører ikke backloggens prioritering. Features sættes op fra bakken under overskriften, trækkes på plads eller flyttes med pilene, og tages ned igen fra notens menu. Kort uden feature står i en stiplet kolonne yderst til højre, så de ikke gemmer sig. Træk et kort sidelæns for at flytte det til en anden feature, op eller ned for at lægge det i en anden sprint, og skriv et nyt kort direkte i en celle."
       }
     },
     "abcTitle": "Tavlens ABC",
@@ -1329,15 +1331,22 @@
   },
   "map": {
     "title": "Story map",
-    "leadScrum": "Nedbrydningen på tværs, sprintene nedad. Træk et kort sidelæns for at flytte det til en anden feature, op eller ned for at lægge det i en anden sprint.",
-    "leadKanban": "Nedbrydningen på tværs, tavlens kolonner nedad. Træk et kort sidelæns for at flytte det til en anden feature, op eller ned for at flytte det til en anden kolonne.",
+    "leadScrum": "Features hen over toppen i fortællingens rækkefølge, sprintene nedad. Sæt features op fra bakken, træk dem på plads, og træk et kort sidelæns til en anden feature eller op og ned til en anden sprint.",
+    "leadKanban": "Features hen over toppen i fortællingens rækkefølge, tavlens kolonner nedad. Sæt features op fra bakken, træk dem på plads, og træk et kort sidelæns til en anden feature eller op og ned til en anden kolonne.",
+    "tray": "Ikke på mappet",
+    "trayEmpty": "Alle åbne features er sat op.",
+    "putUp": "Sæt op på mappet",
+    "takeDown": "Tag ned fra mappet",
+    "openFeature": "Åbn featuren",
+    "noteMenu": "Menu for featuren",
+    "nudgeLeft": "Flyt til venstre",
+    "nudgeRight": "Flyt til højre",
     "noParent": "Uden feature",
     "noParentHint": "{count, plural, =0 {Ingen kort uden feature} one {# kort uden feature} other {# kort uden feature}}",
-    "noEpic": "Uden epic",
     "backlog": "Backlog",
     "rowCounts": "{cards, plural, one {# kort} other {# kort}} · {points} point",
-    "foldedFeatures": "{count, plural, one {# feature foldet sammen} other {# features foldet sammen}}",
     "underway": "{open} i gang",
-    "empty": "Ingen features og ingen kort endnu. Opret en feature, så får kortet en kolonne at ligge i."
+    "emptyTray": "Mappet er tomt. Klik på en feature i bakken for at sætte den op.",
+    "empty": "Ingen features endnu. Opret en feature, så kan den sættes op på mappet."
   }
 }

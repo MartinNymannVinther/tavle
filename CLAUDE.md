@@ -72,10 +72,11 @@ codebase to:
   bug for a bug, a wrench for enabler work, each with its word for
   assistive technology. The backlog is one flat list in its own order
   with the decomposition as a navigator beside it (ADR 0013), and a row
-  says only what its heading has not. The story map is the
-  decomposition's own view (ADR 0015): features across, sprints or
-  columns down, every card in one cell, computed from the board, and a
-  drag on it is the same move as anywhere else.
+  says only what its heading has not. The story map is the team's wall
+  (ADR 0015, 0016): the features the team has put up, across the top in
+  the story's own order (`map_sort`, never the backlog's rank), sprints
+  or columns down, every card in one cell, and a drag on it is the same
+  move as anywhere else.
 - A detail page (a card, an epic, a feature) is two surfaces: the reading
   surface on the left, sections divided by hairlines, an empty field
   drawn as a dashed "add" row rather than a button somewhere else; the
@@ -198,9 +199,10 @@ codebase to:
   measures; labels removed. 0.10.2: the type symbols (ADR 0012). 0.10.3:
   the backlog as a navigator and a flat list (ADR 0013). 0.10.7: the
   structure's levels and fields chosen per board, view only (ADR 0014).
-- 0.11 (this): the story map — epics and features across, sprints (or
-  columns) down, stories in the cells — as the decomposition's own view
-  (ADR 0015).
+- 0.11 (this): the story map — features across, sprints (or columns)
+  down, stories in the cells — as the decomposition's own view (ADR
+  0015). 0.11.1: the backbone is the team's — chosen features in the
+  story's order, a tray for the rest, sticky notes (ADR 0016).
 - Before 1.0: dogma seven — a real team runs a real board on it; the
   screenshots for the README; the tool card on haij.dk; whatever the
   first team asks for that the omissions list did not foresee.

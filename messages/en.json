@@ -1132,6 +1132,8 @@
       "closed": "{key} was closed",
       "reopened": "{key} was reopened",
       "reviewed": "{key} was confirmed as still a result",
+      "mapped": "{key} was put on the story map",
+      "unmapped": "{key} was taken off the story map",
       "deleted": "{key} was deleted"
     }
   },
@@ -1186,7 +1188,7 @@
       },
       "map": {
         "title": "The story map",
-        "body": "The story map shows the breakdown and the plan at once: epics and features across the top, the sprints (or the columns on a Kanban board) down the side, and every card in the one cell where its feature and its sprint meet. Cards without a feature stand in a dashed column at the far right, so they cannot hide. Drag a card sideways to move it to another feature, up or down to put it in another sprint, and write a new card straight into a cell. Fold an epic, and its features become one column with the numbers."
+        "body": "The story map is the team's wall: features as yellow notes across the top in the story's order (what the user does first stands at the left), the sprints (or the columns on a Kanban board) down the side, and every card in the cell where its feature and its sprint meet. The map's order is its own and leaves the backlog's priority alone. Features go up from the tray under the heading, are dragged into place or moved with the arrows, and come down again from the note's menu. Cards without a feature stand in a dashed column at the far right, so they cannot hide. Drag a card sideways to move it to another feature, up or down to put it in another sprint, and write a new card straight into a cell."
       }
     },
     "abcTitle": "The board's ABC",
@@ -1329,15 +1331,22 @@
   },
   "map": {
     "title": "Story map",
-    "leadScrum": "The breakdown across, the sprints down. Drag a card sideways to move it to another feature, up or down to put it in another sprint.",
-    "leadKanban": "The breakdown across, the board's columns down. Drag a card sideways to move it to another feature, up or down to move it to another column.",
+    "leadScrum": "Features across the top in the story's order, the sprints down. Put features up from the tray, drag them into place, and drag a card sideways to another feature or up and down to another sprint.",
+    "leadKanban": "Features across the top in the story's order, the board's columns down. Put features up from the tray, drag them into place, and drag a card sideways to another feature or up and down to another column.",
+    "tray": "Not on the map",
+    "trayEmpty": "Every open feature is up.",
+    "putUp": "Put on the map",
+    "takeDown": "Take off the map",
+    "openFeature": "Open the feature",
+    "noteMenu": "Feature menu",
+    "nudgeLeft": "Move left",
+    "nudgeRight": "Move right",
     "noParent": "No feature",
     "noParentHint": "{count, plural, =0 {No cards without a feature} one {# card without a feature} other {# cards without a feature}}",
-    "noEpic": "No epic",
     "backlog": "Backlog",
     "rowCounts": "{cards, plural, one {# card} other {# cards}} · {points} points",
-    "foldedFeatures": "{count, plural, one {# feature folded} other {# features folded}}",
     "underway": "{open} underway",
-    "empty": "No features and no cards yet. Create a feature, and a card gets a column to sit in."
+    "emptyTray": "The map is empty. Click a feature in the tray to put it up.",
+    "empty": "No features yet. Create a feature, and it can go up on the map."
   }
 }

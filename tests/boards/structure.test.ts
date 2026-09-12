@@ -14,6 +14,7 @@ import {
   updateItem,
 } from "@/modules/boards/structure/write-items";
 import { createArea, createTheme, updateTheme } from "@/modules/boards/structure/write-lists";
+import { placeOnMap } from "@/modules/boards/structure/write-map";
 import { createBoard, updateStructureView } from "@/modules/boards/write-boards";
 import { createCard, moveCard } from "@/modules/boards/write-cards";
 import { adminPool } from "../helpers/db";
@@ -461,5 +462,46 @@ describe("the board's view of the structure", () => {
     expect(
       await violation(run((tx) => createCard(tx, ctx, { boardId: small.id, title: "Uden" }))),
     ).toBe("needsArea");
+  });
+});
+
+describe("the story map's backbone", () => {
+  it("takes features up in its own order, moves them, and takes them down, leaving the rank alone", async () => {
+    const feature = (title: string) =>
+      run((tx) =>
+        createItem(tx, ctx, {
+          boardId,
+          level: "feature",
+          title,
+          doneWhen: "Når det virker",
+          areaId,
+        }),
+      );
+    const a = await feature("Kunder kan betale i checkout");
+    const b = await feature("Kunder kan gemme et kort");
+    expect(a.mapSort).toBeNull();
+
+    const onMap = async () =>
+      (await getBoardFull(ctx, boardId))!.items
+        .filter((i) => i.mapSort !== null)
+        .sort((x, y) => x.mapSort! - y.mapSort!)
+        .map((i) => i.id);
+
+    await run((tx) => placeOnMap(tx, ctx, a.id, undefined));
+    await run((tx) => placeOnMap(tx, ctx, b.id, 0));
+    expect(await onMap()).toEqual([b.id, a.id]);
+    const ranked = (await getBoardFull(ctx, boardId))!.items.find((i) => i.id === a.id)!;
+    expect(ranked.sort).toBe(a.sort);
+
+    await run((tx) => placeOnMap(tx, ctx, a.id, 0));
+    expect(await onMap()).toEqual([a.id, b.id]);
+
+    await run((tx) => placeOnMap(tx, ctx, b.id, null));
+    expect(await onMap()).toEqual([a.id]);
+
+    const epic = (await getBoardFull(ctx, boardId))!.items.find((i) => i.level === "epic")!;
+    expect(await violation(run((tx) => placeOnMap(tx, ctx, epic.id, undefined)))).toBe(
+      "parentLevel",
+    );
   });
 });

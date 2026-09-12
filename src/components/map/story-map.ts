@@ -1,29 +1,21 @@
 import type { Column, Sprint } from "@/core/db/schema";
-import type { StructureView } from "@/modules/boards/structure/view";
 import type { BoardFull, CardView, ItemView } from "@/modules/boards/types";
 
 /**
  * The story map as a grid, computed from the board. Across: the
- * decomposition — each feature a column, the features of one epic side
- * by side under its header, features without an epic in a group of
- * their own, and last a column for the cards with no feature. Down: the
- * plan — on a Scrum board the open sprints (the running one first) and
- * the backlog, on a Kanban board the columns from done to backlog. Every
- * card sits in exactly one cell, and the cells keep the backlog's order.
+ * backbone — the features somebody has put on the map, left to right
+ * in the story's order (`mapSort`), and last a dashed column for the
+ * cards with no feature at all. Down: the plan — on a Scrum board the
+ * open sprints (the running one first) and the backlog, on a Kanban
+ * board the columns from done to backlog. Every card under a feature
+ * on the map sits in exactly one cell, in the backlog's order; cards
+ * under a feature that is not on the map are not drawn, and the tray
+ * says how many wait there.
  */
 export type MapColumn = {
   key: string;
   /** Null for the column of cards without a feature. */
   feature: ItemView | null;
-};
-
-export type MapGroup = {
-  key: string;
-  /** Null for the features without an epic, and for the loose column. */
-  epic: ItemView | null;
-  columns: MapColumn[];
-  /** The group of cards with no feature at all; drawn dashed. */
-  loose: boolean;
 };
 
 export type MapRow =
@@ -32,18 +24,34 @@ export type MapRow =
   | { key: string; kind: "column"; column: Column };
 
 export type StoryMap = {
-  groups: MapGroup[];
+  columns: MapColumn[];
   rows: MapRow[];
   /** Cards per cell, keyed by `${row.key}|${column.key}`, in the backlog's order. */
   cells: Map<string, CardView[]>;
-  columnCount: number;
 };
 
 export const LOOSE_COLUMN = "loose";
 export const cellKey = (row: string, column: string) => `${row}|${column}`;
 
+const byMapOrder = (a: ItemView, b: ItemView) =>
+  (a.mapSort ?? 0) - (b.mapSort ?? 0) || a.number - b.number;
 const byRank = (a: ItemView, b: ItemView) => a.sort - b.sort || a.number - b.number;
 const byOrder = (a: CardView, b: CardView) => a.sort - b.sort || a.number - b.number;
+
+/** The features on the map, left to right. */
+export function backbone(items: ItemView[], options: { showClosed: boolean }): ItemView[] {
+  return items
+    .filter((item) => item.level === "feature" && item.mapSort !== null)
+    .filter((item) => options.showClosed || item.state === "open")
+    .sort(byMapOrder);
+}
+
+/** The open features not on the map, in the backlog's rank: what the tray offers. */
+export function tray(items: ItemView[]): ItemView[] {
+  return items
+    .filter((item) => item.level === "feature" && item.mapSort === null && item.state === "open")
+    .sort(byRank);
+}
 
 export function mapRows(full: BoardFull): MapRow[] {
   if (full.board.mode === "scrum") {
@@ -73,60 +81,33 @@ export function rowOf(card: CardView, rows: MapRow[], scrum: boolean): string | 
 
 export function storyMap(
   full: BoardFull,
-  view: StructureView,
   /** The items the board shows — hidden levels already left out. */
   items: ItemView[],
   cards: CardView[],
   options: { showClosed: boolean },
 ): StoryMap {
-  const shown = items.filter((item) => options.showClosed || item.state === "open");
-  const epics = shown.filter((item) => item.level === "epic").sort(byRank);
-  const features = shown.filter((item) => item.level === "feature").sort(byRank);
-  const epicIds = new Set(epics.map((epic) => epic.id));
-  const column = (feature: ItemView): MapColumn => ({ key: feature.id, feature });
-
-  const groups: MapGroup[] = [];
-  if (view.epics) {
-    for (const epic of epics) {
-      groups.push({
-        key: epic.id,
-        epic,
-        columns: features.filter((f) => f.parentId === epic.id).map(column),
-        loose: false,
-      });
-    }
-    const orphans = features.filter((f) => !f.parentId || !epicIds.has(f.parentId));
-    if (orphans.length > 0) {
-      groups.push({ key: "no-epic", epic: null, columns: orphans.map(column), loose: false });
-    }
-  } else if (features.length > 0) {
-    groups.push({ key: "features", epic: null, columns: features.map(column), loose: false });
-  }
-  groups.push({
-    key: LOOSE_COLUMN,
-    epic: null,
-    columns: [{ key: LOOSE_COLUMN, feature: null }],
-    loose: true,
-  });
-
+  const features = backbone(items, options);
+  const columns: MapColumn[] = [
+    ...features.map((feature) => ({ key: feature.id, feature })),
+    { key: LOOSE_COLUMN, feature: null },
+  ];
+  const onMap = new Set(features.map((f) => f.id));
   const rows = mapRows(full);
   const scrum = full.board.mode === "scrum";
-  const featureIds = new Set(features.map((f) => f.id));
   const cells = new Map<string, CardView[]>();
   for (const card of [...cards].sort(byOrder)) {
     const row = rowOf(card, rows, scrum);
     if (!row) continue;
-    const col = card.featureId && featureIds.has(card.featureId) ? card.featureId : LOOSE_COLUMN;
-    const key = cellKey(row, col);
+    const column = card.featureId
+      ? onMap.has(card.featureId)
+        ? card.featureId
+        : null
+      : LOOSE_COLUMN;
+    if (!column) continue;
+    const key = cellKey(row, column);
     cells.set(key, [...(cells.get(key) ?? []), card]);
   }
-
-  return {
-    groups,
-    rows,
-    cells,
-    columnCount: groups.reduce((sum, group) => sum + group.columns.length, 0),
-  };
+  return { columns, rows, cells };
 }
 
 /** How far a feature is, from every card under it, on and off the map. */

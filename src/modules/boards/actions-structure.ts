@@ -8,6 +8,7 @@ import {
   CloseItemSchema,
   ItemIdSchema,
   ItemOrderSchema,
+  MapPlaceSchema,
   ItemPlacementSchema,
   ItemUpdateSchema,
   NewAreaSchema,
@@ -25,6 +26,7 @@ import {
   updateItem,
 } from "./structure/write-items";
 import { createArea, createTheme, updateArea, updateTheme } from "./structure/write-lists";
+import { placeOnMap } from "./structure/write-map";
 
 /**
  * Everything a person can do to the backlog structure: epics and
@@ -62,6 +64,15 @@ export async function placeItemAction(raw: unknown): Promise<Result<string>> {
 export async function reorderItemAction(raw: unknown): Promise<Result<string>> {
   return action(ItemOrderSchema, raw, async (tx, ctx, input, touch) => {
     const item = found(await reorderItem(tx, input.itemId, input.siblingId, input.after));
+    touch(item.boardId);
+    return item.boardId;
+  });
+}
+
+/** A feature up on the story map at a place, or down from it. */
+export async function placeOnMapAction(raw: unknown): Promise<Result<string>> {
+  return action(MapPlaceSchema, raw, async (tx, ctx, input, touch) => {
+    const item = found(await placeOnMap(tx, ctx, input.itemId, input.index));
     touch(item.boardId);
     return item.boardId;
   });

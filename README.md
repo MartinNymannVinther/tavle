@@ -77,9 +77,9 @@ it waits, switch it on and it is back. The backlog is one
 list in its own order, with the decomposition beside it as a navigator:
 click an epic or a feature and the list narrows to it, every kind of
 thing carrying its own symbol. The list also groups by theme, area or
-kind; the story map lays the features across and the sprints down with
-every card in the cell where the two meet, and a card dragged on it is
-moved for real; the roadmap draws epics on quarters; the overview says
+kind; the story map is the team's wall — the features they put up,
+across in the story's order, the sprints down, every card in the cell
+where the two meet — and a card dragged on it is moved for real; the roadmap draws epics on quarters; the overview says
 how the open work is spread and whether the structure is being kept.
 
 **The numbers come from the record.** Every move a card makes is written

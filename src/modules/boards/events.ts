@@ -29,6 +29,8 @@ export type EventType =
   | "item.closed"
   | "item.reopened"
   | "item.reviewed"
+  | "item.mapped"
+  | "item.unmapped"
   | "item.deleted"
   | "card.created"
   | "card.moved"

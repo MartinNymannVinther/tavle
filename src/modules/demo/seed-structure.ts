@@ -5,12 +5,14 @@ import { closeItem } from "@/modules/boards/structure/close";
 import { nextQuarter, quarterOf } from "@/modules/boards/structure/rules";
 import { createItem } from "@/modules/boards/structure/write-items";
 import { createArea, createTheme } from "@/modules/boards/structure/write-lists";
+import { placeOnMap } from "@/modules/boards/structure/write-map";
 import type { DemoStructure } from "./words";
 
 /**
  * The structure above a demo board's cards: its areas and themes, its
- * epics with their features, all through the ordinary services so the
- * demo cannot drift from what the product does. Answers the lookups the
+ * epics with their features and the open features up on the story map,
+ * all through the ordinary services so the demo cannot drift from what
+ * the product does. Answers the lookups the
  * card seeding needs — a feature by its title, an area by its name —
  * and the epics to age afterwards, and closes what the words say is
  * closed once the cards are in.
@@ -79,6 +81,8 @@ export async function seedStructure(
       });
       featureIdByTitle.set(featureSpec.title, feature.id);
       if (featureSpec.closed) features.push(feature.id);
+      // The open features stand on the story map in the words' order, so the demo has a wall.
+      else await placeOnMap(tx, ctx, feature.id, undefined);
     }
   }
   return { featureIdByTitle, areaIdByName, aged, toClose: [...features, ...epics] };

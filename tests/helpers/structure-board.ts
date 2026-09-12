@@ -30,6 +30,7 @@ export function item(
     targetQuarter: null,
     reviewConfirmedAt: null,
     sort: 1000,
+    mapSort: null,
     createdBy: null,
     createdAt: at(10),
     updatedAt: at(10),

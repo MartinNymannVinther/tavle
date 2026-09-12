@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { ItemForm } from "@/components/backlog/item-form";
-import { useFolded } from "@/components/backlog/use-folded";
 import {
   applyFilters,
   BoardFilters,
@@ -17,18 +16,20 @@ import { useBoardActions } from "@/components/board/use-board-actions";
 import { Button } from "@/components/ui/button";
 import type { BoardFull } from "@/modules/boards/types";
 import { createCardAction, moveCardAction, placeCardAction } from "@/modules/boards/actions-cards";
+import { placeOnMapAction } from "@/modules/boards/actions-structure";
 import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
-import { MapGrid } from "./map-grid";
-import { LOOSE_COLUMN, storyMap, type MapRow } from "./story-map";
+import { MapGrid, type Drag } from "./map-grid";
+import { MapTray } from "./map-tray";
+import { backbone, featureTotals, LOOSE_COLUMN, storyMap, tray, type MapRow } from "./story-map";
 
 /**
- * The story map: the decomposition across, the plan down, and every
- * card in the one cell where those two meet. Dragging a card sideways
- * moves it to another feature; dragging it down or up moves it to
- * another sprint (or column). Nothing here is a new fact about the
- * board — the map is the backlog and the sprints seen from above — so
- * what a person does on it is what they could do on the backlog page,
- * only in one motion.
+ * The story map: the backbone of features across, in the story's
+ * order, the plan down, and every card in the one cell where those two
+ * meet. The backbone is the team's to build — a feature goes up from
+ * the tray, is dragged or nudged into its place, and comes down from
+ * its menu. Dragging a card sideways moves it to another feature; up
+ * or down moves it to another sprint (or column). Every move is the
+ * same write the backlog page would make, only in one motion.
  */
 export function StoryMapView({ full }: { full: BoardFull }) {
   const t = useTranslations("map");
@@ -38,31 +39,27 @@ export function StoryMapView({ full }: { full: BoardFull }) {
   const scrum = board.mode === "scrum";
   const structure = structureOf(full);
   const { view } = structure;
-  // The map opens with every epic unfolded; the set remembers the folded ones.
-  const folded = useFolded(`${board.id}.map`);
   const [showClosed, setShowClosed] = useState(false);
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
-  const [dragId, setDragId] = useState<string | null>(null);
+  const [drag, setDrag] = useState<Drag>(null);
 
   const cards = applyFilters(full.cards, filters);
-  const map = storyMap(full, view, structure.items, cards, { showClosed });
+  const map = storyMap(full, structure.items, cards, { showClosed });
+  const onMap = backbone(structure.items, { showClosed });
+  const waiting = tray(structure.items);
   const doneColumns = new Set(full.columns.filter((c) => c.category === "done").map((c) => c.id));
   const doneIds = new Set(full.cards.filter((c) => doneColumns.has(c.columnId)).map((c) => c.id));
-  const empty = structure.items.length === 0 && full.cards.length === 0;
+  const countOf = (featureId: string) => full.cards.filter((c) => c.featureId === featureId).length;
 
-  /** A drop is at most two moves: a new feature, and a new sprint or column. */
-  async function drop(row: MapRow, columnKey: string) {
-    const id = dragId;
-    setDragId(null);
+  /** A card's drop is at most two moves: a new feature, and a new sprint or column. */
+  async function dropCard(row: MapRow, columnKey: string) {
+    const id = drag?.kind === "card" ? drag.id : null;
+    setDrag(null);
     if (!id) return;
     const card = full.cards.find((c) => c.id === id);
     if (!card) return;
-    const featureId = columnKey.startsWith("fold:")
-      ? undefined
-      : columnKey === LOOSE_COLUMN
-        ? null
-        : columnKey;
-    if (featureId !== undefined && featureId !== card.featureId) {
+    const featureId = columnKey === LOOSE_COLUMN ? null : columnKey;
+    if (featureId !== card.featureId) {
       const ok = await run(() => placeCardAction({ cardId: id, featureId }));
       if (!ok) return;
     }
@@ -73,6 +70,26 @@ export function StoryMapView({ full }: { full: BoardFull }) {
     } else if (row.kind === "column" && card.columnId !== row.column.id) {
       await run(() => moveCardAction({ cardId: id, columnId: row.column.id }));
     }
+  }
+
+  /** The backbone's order is the map's own; a note lands before another, or at the end. */
+  function dropFeature(beforeId: string | null) {
+    const id = drag?.kind === "feature" ? drag.id : null;
+    setDrag(null);
+    if (!id || id === beforeId) return;
+    const order = onMap.map((f) => f.id).filter((f) => f !== id);
+    const index = beforeId ? order.indexOf(beforeId) : order.length;
+    if (index < 0) return;
+    void run(() => placeOnMapAction({ itemId: id, index }));
+  }
+
+  function nudgeFeature(featureId: string, delta: -1 | 1) {
+    const order = onMap.map((f) => f.id);
+    const at = order.indexOf(featureId);
+    if (at < 0) return;
+    const index = Math.max(0, Math.min(order.length - 1, at + delta));
+    if (index === at) return;
+    void run(() => placeOnMapAction({ itemId: featureId, index }));
   }
 
   const add = (row: MapRow, place: Place, title: string) =>
@@ -93,18 +110,6 @@ export function StoryMapView({ full }: { full: BoardFull }) {
           <h2 className="text-base font-semibold">{t("title")}</h2>
           <p className="text-meta text-sm">{scrum ? t("leadScrum") : t("leadKanban")}</p>
         </div>
-        {view.epics && (
-          <ItemForm
-            full={full}
-            level="epic"
-            run={run}
-            trigger={
-              <Button type="button" variant="outline" size="sm">
-                {b("newEpic")}
-              </Button>
-            }
-          />
-        )}
         <ItemForm
           full={full}
           level="feature"
@@ -116,6 +121,11 @@ export function StoryMapView({ full }: { full: BoardFull }) {
           }
         />
       </header>
+      <MapTray
+        features={waiting}
+        countOf={countOf}
+        onPutUp={(featureId) => void run(() => placeOnMapAction({ itemId: featureId }))}
+      />
       <div className="border-hairline flex flex-wrap items-center gap-x-4 gap-y-2 border-b px-4 py-2">
         <BoardFilters
           filters={filters}
@@ -133,25 +143,32 @@ export function StoryMapView({ full }: { full: BoardFull }) {
           {b("nav.showClosed")}
         </label>
       </div>
-      {empty ? (
-        <p className="text-meta px-4 py-10 text-center text-sm">{t("empty")}</p>
-      ) : (
-        <MapGrid
-          map={map}
-          full={full}
-          structure={structure}
-          doneIds={doneIds}
-          run={run}
-          handlers={{
-            isFolded: (epicId) => folded.isOpen(epicId),
-            toggleFold: folded.toggle,
-            dragId,
-            setDragId,
-            onDrop: (row, columnKey) => void drop(row, columnKey),
-            onAdd: add,
-          }}
-        />
+      {onMap.length === 0 && (
+        <p className="text-meta border-hairline border-b px-4 py-6 text-center text-sm">
+          {waiting.length > 0 ? t("emptyTray") : t("empty")}
+        </p>
       )}
+      <MapGrid
+        map={map}
+        boardId={board.id}
+        structure={structure}
+        doneIds={doneIds}
+        handlers={{
+          drag,
+          setDrag,
+          onDropCard: (row, columnKey) => void dropCard(row, columnKey),
+          onDropFeature: dropFeature,
+          onNudgeFeature: nudgeFeature,
+          onTakeDown: (featureId) =>
+            void run(() => placeOnMapAction({ itemId: featureId, index: null })),
+          onAdd: add,
+          featureTotals: (featureId) =>
+            featureTotals(
+              full.items.find((item) => item.id === featureId)!,
+              full,
+            ),
+        }}
+      />
       <div className="border-hairline flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t px-4 py-2">
         <TypeLegend types={legendTypes(view)} />
         {view.themes && <ThemeLegend themes={structure.themes} />}

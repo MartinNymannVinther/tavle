@@ -32,6 +32,8 @@
   --color-success-tint: var(--success-tint);
   --color-warning: var(--warning);
   --color-warning-tint: var(--warning-tint);
+  --color-sticky: var(--sticky);
+  --color-sticky-ink: var(--sticky-ink);
   --color-label: var(--label);
   --color-meta: var(--meta);
   --color-hairline: var(--hairline);

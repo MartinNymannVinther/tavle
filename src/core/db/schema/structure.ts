@@ -150,6 +150,8 @@ export const backlogItems = pgTable(
     reviewConfirmedAt: timestamp("review_confirmed_at", { withTimezone: true }),
     /** Position within its level on the board. One order per level, business and enabler alike. */
     sort: doublePrecision("sort").notNull().default(0),
+    /** Features only: the place on the story map, left to right in the story's order; null is off the map. */
+    mapSort: doublePrecision("map_sort"),
     createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
     ...timestamps,
   },

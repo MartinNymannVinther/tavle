@@ -50,6 +50,13 @@
       "when": 1789196559840,
       "tag": "0006_structure_view",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789201176830,
+      "tag": "0007_story_map_backbone",
+      "breakpoints": true
     }
   ]
 }

@@ -59,6 +59,12 @@ export const ItemOrderSchema = z.object({
 
 export const ItemIdSchema = z.object({ itemId: id });
 
+/** A feature's place on the story map: an index from the left, undefined for the end, null to take it down. */
+export const MapPlaceSchema = z.object({
+  itemId: id,
+  index: z.number().int().min(0).max(10_000).nullable().optional(),
+});
+
 /** What to do with each open child when its parent closes (rule 10). */
 export const ChildDecisionSchema = z.object({
   id: id,

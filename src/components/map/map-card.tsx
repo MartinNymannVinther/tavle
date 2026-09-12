@@ -10,10 +10,10 @@ import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 /**
- * A card as it sits in a cell of the map: the symbol, the title as a
- * link, and the planning facts. Small on purpose — a map shows many —
- * and quiet: the column already says what it is part of, so only the
- * themes as dots and the enabler kind are its own.
+ * A card as it sits in a cell of the map: a paper note with the symbol,
+ * the title as a link, and the planning facts. Small on purpose — a map
+ * shows many — and quiet: the column already says what it is part of,
+ * so only the themes as dots and the enabler kind are its own.
  */
 export function MapCard({
   card,
@@ -53,8 +53,8 @@ export function MapCard({
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       className={cn(
-        "bg-card border-border flex cursor-grab gap-1.5 rounded-lg border px-2 py-1.5 shadow-[var(--surface-shadow)] transition",
-        "hover:border-primary/40 focus-within:border-primary/40",
+        "bg-card flex cursor-grab gap-1.5 rounded-[0.3rem] px-2.5 py-2 shadow-[0_1px_2px_rgba(36,34,30,0.1),0_5px_12px_-8px_rgba(36,34,30,0.3)] transition",
+        "hover:shadow-[0_1px_2px_rgba(36,34,30,0.12),0_8px_18px_-8px_rgba(36,34,30,0.4)] focus-within:shadow-[0_1px_2px_rgba(36,34,30,0.12),0_8px_18px_-8px_rgba(36,34,30,0.4)]",
         done && "opacity-55",
         dragging && "opacity-40",
       )}

@@ -1,6 +1,6 @@
 # ADR 0015: The story map is the decomposition's own view, computed from the board
 
-Status: accepted · Date: 2026-09-12
+Status: accepted, amended by ADR 0016 · Date: 2026-09-12
 
 ## Context
 
