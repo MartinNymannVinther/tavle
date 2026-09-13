@@ -34,6 +34,9 @@ export default defineConfig({
     env: {
       ...testDatabaseUrls,
       SIGNUP: "open",
+      // The demo suite exercises the demo end to end; that the shipped
+      // default is "off" is proven in tests/core/env.
+      DEMO: "on",
       LLM_PROVIDER: "none",
       // Mail is kept in memory: the suite proves what would be sent, and
       // never sends it.
