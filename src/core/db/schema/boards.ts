@@ -35,6 +35,15 @@ export const BOARD_MODES = ["kanban", "scrum"] as const;
 export type BoardMode = (typeof BOARD_MODES)[number];
 
 /**
+ * What splits a Kanban board into swimlanes: nothing, one of the three
+ * structure fields, or lanes the team names itself (docs/adr/0017). The
+ * three field modes are a way of looking, like the rest of the view;
+ * only "manual" adds rows of its own.
+ */
+export const SWIMLANE_MODES = ["none", "kind", "theme", "area", "manual"] as const;
+export type SwimlaneMode = (typeof SWIMLANE_MODES)[number];
+
+/**
  * What a column means, whatever it is called. The metrics read the
  * category, not the name: a card enters `doing` and its clock starts, it
  * enters `done` and the clock stops.
@@ -81,6 +90,8 @@ export const boards = pgTable(
     showKind: boolean("show_kind").notNull().default(true),
     showThemes: boolean("show_themes").notNull().default(true),
     showAreas: boolean("show_areas").notNull().default(true),
+    /** Kanban only: how the board splits into swimlanes, if at all. */
+    swimlaneBy: text("swimlane_by").notNull().default("none"),
     createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
     archivedAt: timestamp("archived_at", { withTimezone: true }),
     ...timestamps,
@@ -89,6 +100,34 @@ export const boards = pgTable(
     uniqueIndex("boards_org_key_uq").on(t.orgId, t.key),
     index("boards_org_created_idx").on(t.orgId, t.createdAt),
     check("boards_structure_levels_ck", sql`${t.structureLevels} in ('epic', 'feature', 'card')`),
+    check(
+      "boards_swimlane_by_ck",
+      sql`${t.swimlaneBy} in ('none', 'kind', 'theme', 'area', 'manual')`,
+    ),
+  ],
+);
+
+/**
+ * The lanes a board names itself when `swimlane_by` is "manual". The same
+ * shape as the closed lists: deactivated rather than deleted, so a lane's
+ * name survives on the cards' history.
+ */
+export const swimlanes = pgTable(
+  "swimlanes",
+  {
+    id: domainId("id"),
+    orgId: tenant(),
+    boardId: text("board_id")
+      .notNull()
+      .references(() => boards.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    active: boolean("active").notNull().default(true),
+    sort: integer("sort").notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("swimlanes_board_name_uq").on(t.boardId, sql`lower(${t.name})`),
+    index("swimlanes_board_idx").on(t.boardId, t.sort),
   ],
 );
 
@@ -159,6 +198,8 @@ export const cards = pgTable(
     kind: text("kind").notNull().default("business"),
     enablerType: text("enabler_type"),
     areaId: text("area_id").references(() => areas.id, { onDelete: "set null" }),
+    /** The card's manual swimlane, when the board runs with them; null is the "without" lane. */
+    swimlaneId: text("swimlane_id").references(() => swimlanes.id, { onDelete: "set null" }),
     /** A bug is a story with a flag, not a fourth level; it follows every story rule and can be counted. */
     bug: boolean("bug").notNull().default(false),
     /** Acceptance criteria, optional. */
@@ -274,6 +315,7 @@ export const events = pgTable(
 
 export type Board = typeof boards.$inferSelect;
 export type Column = typeof columns.$inferSelect;
+export type Swimlane = typeof swimlanes.$inferSelect;
 export type Sprint = typeof sprints.$inferSelect;
 export type Card = typeof cards.$inferSelect;
 export type Comment = typeof comments.$inferSelect;

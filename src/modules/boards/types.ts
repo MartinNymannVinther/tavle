@@ -8,6 +8,7 @@ import type {
   Column,
   Comment,
   Sprint,
+  Swimlane,
   Theme,
 } from "@/core/db/schema";
 
@@ -38,6 +39,8 @@ export type BoardFull = {
   columns: Column[];
   themes: Theme[];
   areas: Area[];
+  /** The board's manual swimlanes; empty unless the team has named some. */
+  swimlanes: Swimlane[];
   /** Every epic and feature of the board, open and closed; closed ones still name a card's parent. */
   items: ItemView[];
   /** Every card that is not archived, backlog included on a Scrum board. */

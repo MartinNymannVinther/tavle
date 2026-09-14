@@ -1,5 +1,12 @@
-import { eq } from "drizzle-orm";
-import { cards, type Card, type EnablerType, type Kind, type Priority } from "@/core/db/schema";
+import { and, eq } from "drizzle-orm";
+import {
+  cards,
+  swimlanes,
+  type Card,
+  type EnablerType,
+  type Kind,
+  type Priority,
+} from "@/core/db/schema";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 import { recordEvent, type ActorKind } from "./events";
 import {
@@ -45,6 +52,8 @@ export type NewCardInput = {
   featureId?: string | null;
   areaId?: string | null;
   themeIds?: string[];
+  /** The manual swimlane the card starts in, when the board runs with them. */
+  swimlaneId?: string | null;
   kind?: Kind;
   enablerType?: EnablerType | null;
   bug?: boolean;
@@ -84,6 +93,17 @@ export async function createCard(
   );
   const themes = await activeThemesInBoard(tx, board.id, got.themeIds);
   assertPlaced(feature?.id ?? null, area?.id ?? null);
+  let swimlaneId: string | null = null;
+  if (input.swimlaneId) {
+    const [lane] = await tx
+      .select()
+      .from(swimlanes)
+      .where(and(eq(swimlanes.id, input.swimlaneId), eq(swimlanes.boardId, board.id)))
+      .limit(1);
+    if (!lane) throw new Error("notFound");
+    if (!lane.active) throw new Error("invalid");
+    swimlaneId = lane.id;
+  }
   const number = await nextNumber(tx, board.id);
   const sort = await joiningSort(
     tx,
@@ -108,6 +128,7 @@ export async function createCard(
       dueDate: input.dueDate ?? null,
       featureId: feature?.id ?? null,
       areaId: area?.id ?? null,
+      swimlaneId,
       kind: got.kind,
       enablerType: enablerTypeFor(got.kind, input.enablerType),
       bug: input.bug ?? false,

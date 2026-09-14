@@ -26,6 +26,7 @@ export function StructureSettings({
     showKind: board.showKind,
     showThemes: board.showThemes,
     showAreas: board.showAreas,
+    swimlaneBy: board.swimlaneBy as StructureViewInput["swimlaneBy"],
   };
   const [value, setValue] = useState<StructureViewInput>(current);
   const dirty = (Object.keys(current) as Array<keyof StructureViewInput>).some(
@@ -45,7 +46,12 @@ export function StructureSettings({
           }}
           className="flex max-w-xl flex-col gap-4"
         >
-          <StructureViewFields value={value} onChange={setValue} disabled={!canManage} />
+          <StructureViewFields
+            value={value}
+            onChange={setValue}
+            disabled={!canManage}
+            withSwimlanes={board.mode === "kanban"}
+          />
           {canManage && (
             <div>
               <Button type="submit" size="sm" disabled={!dirty}>

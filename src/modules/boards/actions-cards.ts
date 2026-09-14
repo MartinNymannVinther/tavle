@@ -18,6 +18,7 @@ import {
 import { updateChecklist } from "./write-card-details";
 import { archiveCard, deleteCard, restoreCard } from "./write-card-lifecycle";
 import { createCard, moveCard, updateCard } from "./write-cards";
+import { applySwimlaneAssignment } from "./write-swimlanes";
 
 /**
  * Everything a person can do to a card. The services answer null when a
@@ -38,6 +39,9 @@ export async function createCardAction(raw: unknown): Promise<Result<CreatedCard
 export async function moveCardAction(raw: unknown): Promise<Result<string>> {
   return action(CardMoveSchema, raw, async (tx, ctx, input, touch) => {
     const card = found(await moveCard(tx, ctx, input.cardId, input.columnId, input.index));
+    // A drop that also crossed a swimlane writes the lane's field, in the
+    // same transaction, so one gesture is one change.
+    if (input.swimlane) await applySwimlaneAssignment(tx, ctx, card, input.swimlane);
     touch(card.boardId);
     return card.boardId;
   });

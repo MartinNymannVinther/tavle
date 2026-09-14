@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import type { Column } from "@/core/db/schema";
 import { useRouter } from "@/i18n/navigation";
+import type { LaneOption } from "./board-column";
 
 /**
  * The card's menu: open it, or move it to any column. Drag and drop does
@@ -26,11 +27,17 @@ export function MoveMenu({
   currentColumnId,
   onMove,
   href,
+  currentLaneKey = null,
+  laneOptions,
+  onMoveToLane,
 }: {
   columns: Column[];
   currentColumnId: string;
   onMove: (columnId: string) => void;
   href: string;
+  currentLaneKey?: string | null;
+  laneOptions?: LaneOption[];
+  onMoveToLane?: (laneKey: string | null) => void;
 }) {
   const t = useTranslations("boards.card");
   const router = useRouter();
@@ -63,6 +70,21 @@ export function MoveMenu({
               </DropdownMenuItem>
             ))}
         </DropdownMenuGroup>
+        {onMoveToLane && laneOptions && laneOptions.length > 0 && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>{t("moveToLane")}</DropdownMenuLabel>
+              {laneOptions
+                .filter((lane) => lane.key !== currentLaneKey)
+                .map((lane) => (
+                  <DropdownMenuItem key={lane.key ?? ""} onClick={() => onMoveToLane(lane.key)}>
+                    {lane.label}
+                  </DropdownMenuItem>
+                ))}
+            </DropdownMenuGroup>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

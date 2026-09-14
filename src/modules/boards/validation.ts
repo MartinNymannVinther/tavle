@@ -7,6 +7,7 @@ import {
   KINDS,
   PRIORITIES,
   STRUCTURE_LEVELS,
+  SWIMLANE_MODES,
 } from "@/core/db/schema";
 
 /**
@@ -40,6 +41,7 @@ export const StructureViewSchema = z.object({
   showKind: z.boolean(),
   showThemes: z.boolean(),
   showAreas: z.boolean(),
+  swimlaneBy: z.enum(SWIMLANE_MODES),
 });
 export type StructureViewInput = z.infer<typeof StructureViewSchema>;
 
@@ -100,6 +102,8 @@ export const NewCardSchema = z.object({
   featureId: id.nullable().optional(),
   areaId: id.nullable().optional(),
   themeIds: z.array(id).max(8).optional(),
+  /** The manual swimlane the card starts in, when the board runs with them. */
+  swimlaneId: id.nullable().optional(),
   kind: z.enum(KINDS).optional(),
   enablerType: z.enum(ENABLER_TYPES).nullable().optional(),
   bug: z.boolean().optional(),
@@ -126,11 +130,34 @@ export const CardUpdateSchema = z.object({
   expectedUpdatedAt: z.string().optional(),
 });
 
+/**
+ * What a drop into another swimlane writes on the card, named by the
+ * board's own mode so a stale client cannot set a field the board does
+ * not group by. Kind has no "without" lane; the others allow null.
+ */
+export const SwimlaneAssignmentSchema = z.union([
+  z.object({ by: z.literal("kind"), kind: z.enum(KINDS) }),
+  z.object({ by: z.literal("theme"), themeId: id }),
+  z.object({ by: z.literal("area"), areaId: id.nullable() }),
+  z.object({ by: z.literal("manual"), swimlaneId: id.nullable() }),
+]);
+export type SwimlaneAssignment = z.infer<typeof SwimlaneAssignmentSchema>;
+
 export const CardMoveSchema = z.object({
   cardId: id,
   columnId: id,
   /** Position in the target lane, 0 = first. Omitted means the end. */
   index: z.number().int().min(0).max(10_000).optional(),
+  /** Set when the drop also crossed a swimlane. */
+  swimlane: SwimlaneAssignmentSchema.optional(),
+});
+
+export const NewSwimlaneSchema = z.object({ boardId: id, name: shortText(40).min(1) });
+
+export const SwimlaneUpdateSchema = z.object({
+  swimlaneId: id,
+  name: shortText(40).min(1),
+  active: z.boolean(),
 });
 
 export const CardIdSchema = z.object({ cardId: id });

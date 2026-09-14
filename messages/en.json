@@ -530,7 +530,10 @@
     "view": {
       "noSprintTitle": "No sprint running",
       "noSprintBody": "The board shows the running sprint. Plan one in the backlog, put cards in it and start it.",
-      "noSprintCta": "Go to the backlog"
+      "noSprintCta": "Go to the backlog",
+      "laneWithout_theme": "Without a theme",
+      "laneWithout_area": "Without an area",
+      "laneWithout_manual": "Without a lane"
     },
     "column": {
       "empty": "No cards here. Drag one here, or use the card's menu.",
@@ -541,7 +544,8 @@
       "unassigned": "Unassigned",
       "menu": "Card menu",
       "open": "Open the card",
-      "moveTo": "Move to"
+      "moveTo": "Move to",
+      "moveToLane": "Move to lane"
     },
     "quickAdd": {
       "open": "Add card",
@@ -1032,7 +1036,26 @@
       "themes": "Theme",
       "areas": "Area",
       "areasHint": "Without the field, new cards without a feature quietly take the board's first area.",
-      "save": "Save"
+      "save": "Save",
+      "swimlanes": "Swimlanes",
+      "swimlane_none": "None",
+      "swimlane_kind": "By kind",
+      "swimlane_theme": "By theme",
+      "swimlane_area": "By area",
+      "swimlane_manual": "Own lanes",
+      "swimlanesHint": "Lanes split the board into rows. Only the view changes; own lanes are named in the Swimlanes section."
+    },
+    "swimlanes": {
+      "title": "Swimlanes",
+      "body": "The board's own lanes, in the order they were made. A lane is deactivated rather than deleted; its cards stay where they stand.",
+      "empty": "No lanes yet. Make the first one below.",
+      "name": "Name",
+      "placeholder": "New lane",
+      "add": "Add lane",
+      "save": "Save",
+      "deactivate": "Deactivate",
+      "activate": "Activate again",
+      "inactive": "deactivated"
     }
   },
   "my": {
@@ -1097,7 +1120,8 @@
       "placed": "{key} got area {area} and themes {themes}",
       "kind": "{key} was set to {kind} {enablerType}",
       "bug": "{key} was marked as a bug",
-      "notBug": "{key} is no longer marked as a bug"
+      "notBug": "{key} is no longer marked as a bug",
+      "swimlane": "{lane, select, none {{key} was put outside the lanes} other {{key} was put in the lane {lane}}}"
     },
     "comment": {
       "added": "Comment on {key}",
@@ -1135,6 +1159,11 @@
       "mapped": "{key} was put on the story map",
       "unmapped": "{key} was taken off the story map",
       "deleted": "{key} was deleted"
+    },
+    "swimlane": {
+      "created": "The lane {name} was created",
+      "activated": "The lane {name} was activated again",
+      "deactivated": "The lane {name} was deactivated"
     }
   },
   "help": {

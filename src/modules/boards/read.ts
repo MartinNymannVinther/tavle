@@ -9,6 +9,7 @@ import {
   comments,
   memberships,
   sprints,
+  swimlanes,
   themes,
   users,
   type BacklogItem,
@@ -101,6 +102,14 @@ export async function boardAreas(tx: AppTransaction, boardId: string) {
   return tx.select().from(areas).where(eq(areas.boardId, boardId)).orderBy(asc(areas.sort));
 }
 
+export async function boardSwimlanes(tx: AppTransaction, boardId: string) {
+  return tx
+    .select()
+    .from(swimlanes)
+    .where(eq(swimlanes.boardId, boardId))
+    .orderBy(asc(swimlanes.sort), asc(swimlanes.createdAt));
+}
+
 export async function boardItems(tx: AppTransaction, boardId: string): Promise<ItemView[]> {
   const rows = await tx
     .select()
@@ -114,11 +123,12 @@ export async function getBoardFull(ctx: OrgContext, boardId: string): Promise<Bo
   return withOrgContext(ctx, async (tx) => {
     const board = await boardInWorkspace(tx, boardId);
     if (!board) return null;
-    const [columnRows, themeRows, areaRows, itemRows, sprintRows, cardRows, members] =
+    const [columnRows, themeRows, areaRows, swimlaneRows, itemRows, sprintRows, cardRows, members] =
       await Promise.all([
         tx.select().from(columns).where(eq(columns.boardId, boardId)).orderBy(asc(columns.sort)),
         boardThemes(tx, boardId),
         boardAreas(tx, boardId),
+        boardSwimlanes(tx, boardId),
         boardItems(tx, boardId),
         tx.select().from(sprints).where(eq(sprints.boardId, boardId)).orderBy(desc(sprints.number)),
         tx
@@ -133,6 +143,7 @@ export async function getBoardFull(ctx: OrgContext, boardId: string): Promise<Bo
       columns: columnRows,
       themes: themeRows,
       areas: areaRows,
+      swimlanes: swimlaneRows,
       items: itemRows,
       cards: await toViews(tx, cardRows),
       sprints: sprintRows,

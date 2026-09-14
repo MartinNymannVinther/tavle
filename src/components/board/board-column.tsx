@@ -9,13 +9,18 @@ import type { StructureLookup } from "./card-chips";
 import { QuickAdd, type Place } from "./quick-add";
 import { CATEGORY_DOT } from "./tokens";
 
-export type DropTarget = { columnId: string; index: number } | null;
+export type DropTarget = { columnId: string; index: number; laneKey: string | null } | null;
+
+/** A swimlane a card can be moved to from the menu, worded by the board view. */
+export type LaneOption = { key: string | null; label: string };
 
 /**
  * One column: its name, how many cards it holds against its limit, the
  * cards in order, and a way to add one. A column over its WIP limit is
  * tinted and says so; it never refuses a card, because a limit is a
- * conversation the team has, not a wall the tool builds.
+ * conversation the team has, not a wall the tool builds. On a board with
+ * swimlanes the column appears once per lane; `wipCount` then carries
+ * the whole column's count, because the limit belongs to the column.
  */
 export function BoardColumn({
   column,
@@ -25,6 +30,9 @@ export function BoardColumn({
   structure,
   columns,
   today,
+  laneKey = null,
+  laneOptions,
+  wipCount,
   dragId,
   dropTarget,
   setDropTarget,
@@ -32,6 +40,7 @@ export function BoardColumn({
   onDragEnd,
   onDrop,
   onMove,
+  onMoveToLane,
   onAdd,
 }: {
   column: Column;
@@ -41,6 +50,9 @@ export function BoardColumn({
   structure: StructureLookup;
   columns: Column[];
   today: string;
+  laneKey?: string | null;
+  laneOptions?: LaneOption[];
+  wipCount?: number;
   dragId: string | null;
   dropTarget: DropTarget;
   setDropTarget: (target: DropTarget) => void;
@@ -48,19 +60,26 @@ export function BoardColumn({
   onDragEnd: () => void;
   onDrop: (columnId: string, index: number) => void;
   onMove: (cardId: string, columnId: string, index?: number) => void;
-  onAdd: (columnId: string, title: string, place: Place) => Promise<boolean>;
+  onMoveToLane?: (cardId: string, laneKey: string | null) => void;
+  onAdd: (
+    columnId: string,
+    title: string,
+    place: Place,
+    laneKey: string | null,
+  ) => Promise<boolean>;
 }) {
   const t = useTranslations("boards.column");
-  const over = column.wipLimit !== null && cards.length > column.wipLimit;
-  const isTarget = dropTarget?.columnId === column.id;
+  const count = wipCount ?? cards.length;
+  const over = column.wipLimit !== null && count > column.wipLimit;
+  const isTarget = dropTarget?.columnId === column.id && dropTarget.laneKey === laneKey;
 
   return (
     <section
       aria-label={column.name}
       onDragOver={(event) => {
         event.preventDefault();
-        if (dropTarget?.columnId !== column.id || event.target === event.currentTarget) {
-          setDropTarget({ columnId: column.id, index: cards.length });
+        if (!isTarget || event.target === event.currentTarget) {
+          setDropTarget({ columnId: column.id, index: cards.length, laneKey });
         }
       }}
       onDragLeave={(event) => {
@@ -68,7 +87,7 @@ export function BoardColumn({
       }}
       onDrop={(event) => {
         event.preventDefault();
-        onDrop(column.id, dropTarget?.index ?? cards.length);
+        onDrop(column.id, isTarget ? (dropTarget?.index ?? cards.length) : cards.length);
       }}
       className={cn(
         "flex min-h-[12rem] w-[17rem] shrink-0 flex-col rounded-xl border p-2.5 transition-colors",
@@ -88,7 +107,7 @@ export function BoardColumn({
             over ? "text-destructive font-semibold" : "text-label",
           )}
         >
-          {column.wipLimit === null ? cards.length : `${cards.length}/${column.wipLimit}`}
+          {column.wipLimit === null ? count : `${count}/${column.wipLimit}`}
         </span>
         {over && (
           <span className="text-destructive ml-auto text-[0.69rem] font-medium">
@@ -117,6 +136,8 @@ export function BoardColumn({
               structure={structure}
               columns={columns}
               today={today}
+              laneKey={laneKey}
+              laneOptions={laneOptions}
               dragging={dragId === card.id}
               onDragStart={(event) => {
                 event.dataTransfer.setData("text/plain", card.id);
@@ -129,9 +150,10 @@ export function BoardColumn({
                 event.stopPropagation();
                 const rect = event.currentTarget.getBoundingClientRect();
                 const below = event.clientY > rect.top + rect.height / 2;
-                setDropTarget({ columnId: column.id, index: index + (below ? 1 : 0) });
+                setDropTarget({ columnId: column.id, index: index + (below ? 1 : 0), laneKey });
               }}
               onMove={(columnId, at) => onMove(card.id, columnId, at)}
+              onMoveToLane={onMoveToLane ? (key) => onMoveToLane(card.id, key) : undefined}
             />
           </div>
         ))}
@@ -140,7 +162,10 @@ export function BoardColumn({
         )}
       </div>
       <div className="pt-2">
-        <QuickAdd onAdd={(title, place) => onAdd(column.id, title, place)} structure={structure} />
+        <QuickAdd
+          onAdd={(title, place) => onAdd(column.id, title, place, laneKey)}
+          structure={structure}
+        />
       </div>
     </section>
   );

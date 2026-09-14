@@ -20,6 +20,7 @@ import {
 import { useRouter } from "@/i18n/navigation";
 import { AreasEditor } from "./areas-editor";
 import { ColumnsEditor } from "./columns-editor";
+import { SwimlanesEditor } from "./swimlanes-editor";
 import { ThemesEditor } from "./themes-editor";
 
 /**
@@ -133,6 +134,23 @@ export function BoardSettings({ full, canManage }: { full: BoardFull; canManage:
       </Card>
 
       <StructureSettings board={board} canManage={canManage} run={run} />
+
+      {board.mode === "kanban" && board.swimlaneBy === "manual" && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("swimlanes.title")}</CardTitle>
+            <CardDescription>{t("swimlanes.body")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SwimlanesEditor
+              boardId={board.id}
+              swimlanes={full.swimlanes}
+              canManage={canManage}
+              run={run}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

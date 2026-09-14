@@ -61,6 +61,7 @@ export async function createBoard(
       showKind: input.showKind ?? true,
       showThemes: input.showThemes ?? true,
       showAreas: input.showAreas ?? true,
+      swimlaneBy: input.mode === "kanban" ? (input.swimlaneBy ?? "none") : "none",
       createdBy: ctx.userId,
     })
     .returning();
@@ -105,6 +106,14 @@ export async function updateStructureView(
 ): Promise<Board | null> {
   const board = await boardInWorkspace(tx, boardId);
   if (!board) return null;
+  // Swimlanes are Kanban's, and a lane cannot group by a field the same
+  // choice hides (docs/adr/0017).
+  if (input.swimlaneBy !== "none") {
+    if (board.mode !== "kanban") throw new Error("invalid");
+    if (input.swimlaneBy === "kind" && !input.showKind) throw new Error("invalid");
+    if (input.swimlaneBy === "theme" && !input.showThemes) throw new Error("invalid");
+    if (input.swimlaneBy === "area" && !input.showAreas) throw new Error("invalid");
+  }
   await tx.update(boards).set(input).where(eq(boards.id, boardId));
   await recordEvent(tx, ctx, boardId, "board.view", { levels: input.structureLevels });
   return board;

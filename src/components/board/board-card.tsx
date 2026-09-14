@@ -8,6 +8,7 @@ import type { CardView } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { Initials, Points, PriorityMark, ThemeDots } from "./bits";
+import type { LaneOption } from "./board-column";
 import { CardChips, PartOf, type StructureLookup } from "./card-chips";
 import { MoveMenu } from "./move-menu";
 
@@ -27,11 +28,14 @@ export function BoardCard({
   structure,
   columns,
   today,
+  laneKey = null,
+  laneOptions,
   dragging,
   onDragStart,
   onDragEnd,
   onDragOver,
   onMove,
+  onMoveToLane,
 }: {
   card: CardView;
   boardKey: string;
@@ -39,11 +43,14 @@ export function BoardCard({
   structure: StructureLookup;
   columns: Column[];
   today: string;
+  laneKey?: string | null;
+  laneOptions?: LaneOption[];
   dragging: boolean;
   onDragStart: (event: React.DragEvent) => void;
   onDragEnd: () => void;
   onDragOver: (event: React.DragEvent) => void;
   onMove: (columnId: string, index?: number) => void;
+  onMoveToLane?: (laneKey: string | null) => void;
 }) {
   const t = useTranslations("boards.card");
   const priorities = useTranslations("boards.priority");
@@ -95,7 +102,15 @@ export function BoardCard({
           </Link>
           <PartOf featureId={card.featureId} structure={structure} boardKey={boardKey} />
         </div>
-        <MoveMenu columns={columns} currentColumnId={card.columnId} onMove={onMove} href={href} />
+        <MoveMenu
+          columns={columns}
+          currentColumnId={card.columnId}
+          onMove={onMove}
+          href={href}
+          currentLaneKey={laneKey}
+          laneOptions={laneOptions}
+          onMoveToLane={onMoveToLane}
+        />
       </div>
       {(card.bug || (structure.view.kind && card.kind === "enabler")) && (
         <CardChips

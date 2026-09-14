@@ -38,6 +38,10 @@ const TABLES: Array<{ table: string; row: (suffix: string) => Record<string, unk
     row: (s) => ({ id: `area_${s}`, board_id: `board_${s}`, name: `Område ${s}` }),
   },
   {
+    table: "swimlanes",
+    row: (s) => ({ id: `swimlane_${s}`, board_id: `board_${s}`, name: `Bane ${s}` }),
+  },
+  {
     table: "backlog_items",
     row: (s) => ({
       id: `epic_${s}`,

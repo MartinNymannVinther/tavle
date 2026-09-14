@@ -49,6 +49,7 @@ export function card(partial: Partial<CardView> & Pick<CardView, "id" | "title">
     kind: "business",
     enablerType: null,
     areaId: "a1",
+    swimlaneId: null,
     bug: false,
     acceptance: "",
     number: 1,
@@ -113,6 +114,7 @@ export const board: BoardFull = {
     nextCardNumber: 20,
     nextSprintNumber: 3,
     epicReviewDays: 180,
+    swimlaneBy: "none",
     structureLevels: "epic",
     showKind: true,
     showThemes: true,
@@ -152,6 +154,7 @@ export const board: BoardFull = {
     theme("t3", "Regulatorisk", "rust"),
   ],
   areas: [area("a1", "Betalinger"), area("a2", "Login"), area("a3", "Gammelt", false)],
+  swimlanes: [],
   items: [
     item({
       id: "e1",

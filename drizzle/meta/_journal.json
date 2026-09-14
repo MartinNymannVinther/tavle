@@ -57,6 +57,13 @@
       "when": 1789201176830,
       "tag": "0007_story_map_backbone",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789366220077,
+      "tag": "0008_swimlanes",
+      "breakpoints": true
     }
   ]
 }

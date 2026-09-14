@@ -530,7 +530,10 @@
     "view": {
       "noSprintTitle": "Ingen sprint i gang",
       "noSprintBody": "Tavlen viser den sprint der kører. Planlæg en i backloggen, læg kort i den og start den.",
-      "noSprintCta": "Gå til backloggen"
+      "noSprintCta": "Gå til backloggen",
+      "laneWithout_theme": "Uden tema",
+      "laneWithout_area": "Uden område",
+      "laneWithout_manual": "Uden bane"
     },
     "column": {
       "empty": "Ingen kort her. Træk et kort hertil, eller brug menuen på kortet.",
@@ -541,7 +544,8 @@
       "unassigned": "Ingen ansvarlig",
       "menu": "Menu for kortet",
       "open": "Åbn kortet",
-      "moveTo": "Flyt til"
+      "moveTo": "Flyt til",
+      "moveToLane": "Flyt til bane"
     },
     "quickAdd": {
       "open": "Tilføj kort",
@@ -1032,7 +1036,26 @@
       "themes": "Tema",
       "areas": "Område",
       "areasHint": "Uden feltet får nye kort uden feature stille tavlens første område.",
-      "save": "Gem"
+      "save": "Gem",
+      "swimlanes": "Svømmebaner",
+      "swimlane_none": "Ingen",
+      "swimlane_kind": "Efter art",
+      "swimlane_theme": "Efter tema",
+      "swimlane_area": "Efter område",
+      "swimlane_manual": "Egne baner",
+      "swimlanesHint": "Baner deler tavlen i rækker. Kun visningen ændres; egne baner navngives i afsnittet Svømmebaner."
+    },
+    "swimlanes": {
+      "title": "Svømmebaner",
+      "body": "Tavlens egne baner, i den rækkefølge de blev lavet. En bane deaktiveres i stedet for at blive slettet; kortene i den bliver stående.",
+      "empty": "Ingen baner endnu. Lav den første herunder.",
+      "name": "Navn",
+      "placeholder": "Ny bane",
+      "add": "Tilføj bane",
+      "save": "Gem",
+      "deactivate": "Deaktivér",
+      "activate": "Aktivér igen",
+      "inactive": "deaktiveret"
     }
   },
   "my": {
@@ -1097,7 +1120,8 @@
       "placed": "{key} fik område {area} og temaer {themes}",
       "kind": "{key} blev sat til {kind} {enablerType}",
       "bug": "{key} blev markeret som fejl",
-      "notBug": "{key} er ikke længere markeret som fejl"
+      "notBug": "{key} er ikke længere markeret som fejl",
+      "swimlane": "{lane, select, none {{key} blev lagt uden bane} other {{key} blev lagt i banen {lane}}}"
     },
     "comment": {
       "added": "Kommentar på {key}",
@@ -1135,6 +1159,11 @@
       "mapped": "{key} blev sat op på story mappet",
       "unmapped": "{key} blev taget ned fra story mappet",
       "deleted": "{key} blev slettet"
+    },
+    "swimlane": {
+      "created": "Banen {name} blev oprettet",
+      "activated": "Banen {name} blev aktiveret igen",
+      "deactivated": "Banen {name} blev deaktiveret"
     }
   },
   "help": {

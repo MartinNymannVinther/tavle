@@ -88,9 +88,11 @@ codebase to:
   sprint's story — and a person edits and says yes. Without a model the
   buttons say so and everything else works.
 - Deliberately not built: time tracking, custom fields, labels or tags,
-  swimlanes, dependencies, automation rules, integrations, attachments,
+  dependencies, automation rules, integrations, attachments,
   notifications by mail, a level above epic. The omissions are the
-  product; each one is a later decision, not an oversight.
+  product; each one is a later decision, not an oversight. Swimlanes
+  left this list with ADR 0017: a Kanban board can split into rows by
+  kind, theme, area or the team's own named lanes.
 
 ## Architecture (decided — change only via a new ADR)
 

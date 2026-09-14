@@ -453,6 +453,7 @@ describe("the board's view of the structure", () => {
         showAreas: true,
         showThemes: true,
         showKind: true,
+        swimlaneBy: "none",
       }),
     );
     const again = (await getBoardFull(ctx, small.id))!;
