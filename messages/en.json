@@ -1143,7 +1143,8 @@
       "summary": "The story of {name} was saved"
     },
     "ai": {
-      "drafted": "AI drafted {key} ({engine})"
+      "drafted": "AI drafted {key} ({engine})",
+      "bootstrapped": "AI laid a starting point: {epics} epics, {features} features, {cards} cards ({engine})"
     },
     "theme": {
       "created": "The theme {name} was created",
@@ -1403,5 +1404,30 @@
     "tray": "Without a parent",
     "trayHint": "Features and cards with no place in the breakdown. Drag them in — or out to here.",
     "trayEmpty": "Everything has a parent."
+  },
+  "aiBootstrap": {
+    "cta": "Build a starting point",
+    "title": "Build a starting point with AI",
+    "subtitle": "Describe the product or project in your own words. The model proposes a first structure — you prune and edit before anything is created.",
+    "reviewSubtitle": "The proposal. Untick what should not come along and edit the titles. Only what is ticked is created.",
+    "description": "Description",
+    "descriptionPlaceholder": "What is the product or project? Who is it for, and what should it do?",
+    "descriptionHint": "Your text goes to the chosen model as data — the more concrete, the better the proposal.",
+    "horizon": "Horizon",
+    "quarters": "{count} quarters",
+    "focus": "What should come first?",
+    "focusPlaceholder": "For example the first thing that must be usable",
+    "propose": "Propose a structure",
+    "thinking": "The model is thinking …",
+    "apply": "Create selected",
+    "back": "Back",
+    "cancel": "Cancel",
+    "areas": "Areas",
+    "themes": "Themes",
+    "doneWhen": "Done when:",
+    "marked": "Proposal from {engine}. Everything created is marked as AI in the activity.",
+    "keepEpic": "Keep epic {title}",
+    "keepFeature": "Keep feature {title}",
+    "keepCard": "Keep card {title}"
   }
 }

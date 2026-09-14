@@ -6,6 +6,7 @@ import type { Run } from "@/components/board/use-board-actions";
 import type { StructureView } from "@/modules/boards/structure/view";
 import type { BoardFull, CardView } from "@/modules/boards/types";
 import { selectionKey, type Selection } from "./backlog-selection";
+import { BootstrapDialog } from "./bootstrap-dialog";
 import { ItemForm } from "./item-form";
 
 /**
@@ -41,6 +42,7 @@ export function BacklogHeader({
           })}
         </p>
       </div>
+      {view.features && <BootstrapDialog boardId={full.board.id} run={run} />}
       {view.epics && (
         <ItemForm
           full={full}

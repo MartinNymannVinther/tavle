@@ -12,7 +12,7 @@ export const MAX_INPUT_CHARS = 6000;
 export const MAX_CALLS_PER_USER_PER_HOUR = 60;
 export const MAX_CALLS_PER_WORKSPACE_PER_DAY = 600;
 
-export type AiKind = "draft" | "split" | "summary" | "test";
+export type AiKind = "draft" | "split" | "summary" | "bootstrap" | "test";
 
 export class RateLimited extends Error {
   constructor() {

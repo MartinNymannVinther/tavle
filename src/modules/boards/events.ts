@@ -53,6 +53,7 @@ export type EventType =
   | "card.deleted"
   | "card.split"
   | "card.swimlane"
+  | "ai.bootstrapped"
   | "swimlane.created"
   | "swimlane.activated"
   | "swimlane.deactivated"

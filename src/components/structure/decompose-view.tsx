@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { structureOf } from "@/components/board/card-chips";
 import { legendTypes, TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
+import { BootstrapDialog } from "@/components/backlog/bootstrap-dialog";
 import { ItemForm } from "@/components/backlog/item-form";
 import { createCardAction, placeCardAction } from "@/modules/boards/actions-cards";
 import { createItemAction, placeItemAction } from "@/modules/boards/actions-structure";
@@ -73,6 +74,9 @@ export function DecomposeView({ full }: { full: BoardFull }) {
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex justify-end">
+        <BootstrapDialog boardId={board.id} run={run} />
+      </div>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
         <div className="-mx-5 min-w-0 flex-1 overflow-x-auto px-5 pb-2 sm:-mx-7 sm:px-7 lg:mx-0 lg:px-0">
           {view.epics ? (

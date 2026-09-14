@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { backlogItems, type BacklogItem, type EnablerType, type Kind } from "@/core/db/schema";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
-import { recordEvent } from "../events";
+import { recordEvent, type ActorKind } from "../events";
 import { assertFresh, nextNumber } from "../lanes";
 import { boardInWorkspace } from "../read";
 import { inheritedFrom, resolveNew } from "./inherit";
@@ -24,6 +24,7 @@ export async function createItem(
   tx: AppTransaction,
   ctx: OrgContext,
   input: NewItemInput,
+  actor: ActorKind = "user",
 ): Promise<BacklogItem> {
   const board = await boardInWorkspace(tx, input.boardId);
   if (!board) throw new Error("notFound");
@@ -78,7 +79,7 @@ export async function createItem(
     board.id,
     "item.created",
     { key: keyOf(board, item!), level: input.level, title: input.title },
-    { itemId: item!.id },
+    { itemId: item!.id, actor },
   );
   return (await itemInWorkspace(tx, item!.id))!;
 }

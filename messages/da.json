@@ -1143,7 +1143,8 @@
       "summary": "Historien om {name} blev gemt"
     },
     "ai": {
-      "drafted": "AI skrev et udkast til {key} ({engine})"
+      "drafted": "AI skrev et udkast til {key} ({engine})",
+      "bootstrapped": "AI lagde et udgangspunkt: {epics} epics, {features} features, {cards} kort ({engine})"
     },
     "theme": {
       "created": "Temaet {name} blev oprettet",
@@ -1403,5 +1404,30 @@
     "tray": "Uden forælder",
     "trayHint": "Features og kort uden plads i nedbrydningen. Træk dem ind — eller ud hertil.",
     "trayEmpty": "Alt har en forælder."
+  },
+  "aiBootstrap": {
+    "cta": "Byg et udgangspunkt",
+    "title": "Byg et udgangspunkt med AI",
+    "subtitle": "Beskriv produktet eller projektet med dine egne ord. Modellen foreslår en første struktur — du beskærer og retter, før noget oprettes.",
+    "reviewSubtitle": "Forslaget. Fjern flueben ved det, der ikke skal med, og ret titlerne. Kun det valgte oprettes.",
+    "description": "Beskrivelse",
+    "descriptionPlaceholder": "Hvad er det for et produkt eller projekt? Hvem er det til, og hvad skal det kunne?",
+    "descriptionHint": "Din tekst sendes til den valgte model som data — jo mere konkret, desto bedre forslag.",
+    "horizon": "Tidshorisont",
+    "quarters": "{count} kvartaler",
+    "focus": "Hvad skal ligge først?",
+    "focusPlaceholder": "Fx det første, der skal kunne bruges",
+    "propose": "Foreslå struktur",
+    "thinking": "Modellen tænker …",
+    "apply": "Opret valgte",
+    "back": "Tilbage",
+    "cancel": "Annullér",
+    "areas": "Områder",
+    "themes": "Temaer",
+    "doneWhen": "Færdig når:",
+    "marked": "Forslag fra {engine}. Alt der oprettes, mærkes som AI i aktiviteten.",
+    "keepEpic": "Behold epic {title}",
+    "keepFeature": "Behold feature {title}",
+    "keepCard": "Behold kort {title}"
   }
 }
