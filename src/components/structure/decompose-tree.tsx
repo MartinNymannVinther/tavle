@@ -8,7 +8,15 @@ import type { StructureLookup } from "@/components/board/card-chips";
 import type { CardView, ItemView } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { themeSwatch } from "@/components/board/tokens";
+import type { ThemeColor } from "@/core/db/schema";
 import { MoveTo, NewFeature } from "./decompose-bits";
+
+/** The first theme's swatch, or nothing: colour says why, never decorates. */
+function stripeFor(themeIds: string[], structure: StructureLookup): string | null {
+  const theme = themeIds[0] ? structure.themes.find((t) => t.id === themeIds[0]) : null;
+  return theme ? themeSwatch(theme.color as ThemeColor) : null;
+}
 
 /** What is being carried: a feature looking for an epic, or a card looking for a feature. */
 export type DragItem = { kind: "feature" | "card"; id: string } | null;
@@ -78,6 +86,7 @@ export function ChartNode({
   href,
   strike,
   emphasis,
+  stripe,
   menu,
   drop,
   dragProps,
@@ -89,6 +98,8 @@ export function ChartNode({
   href: string;
   strike?: boolean;
   emphasis?: boolean;
+  /** The first theme's colour on the left edge — the same word the dots and bars speak. */
+  stripe?: string | null;
   menu?: React.ReactNode;
   drop?: { over: boolean; props: object };
   dragProps?: React.HTMLAttributes<HTMLDivElement> & { draggable?: boolean };
@@ -99,19 +110,21 @@ export function ChartNode({
       {...dragProps}
       {...(drop?.props ?? {})}
       className={cn(
-        "border-border bg-card group/box flex w-[15rem] items-center gap-1.5 rounded-lg border px-2.5 py-1.5 shadow-[var(--surface-shadow)] transition-colors",
-        emphasis && "border-foreground/25",
+        "border-border group/box flex w-[11.5rem] items-center gap-1.5 rounded-lg border px-2 py-1.5 shadow-[var(--surface-shadow)] transition-colors",
+        emphasis ? "bg-accent/70 border-primary/30" : "bg-card",
+        stripe && "border-l-4",
         dragProps?.draggable && "cursor-grab active:cursor-grabbing",
         dragging && "opacity-40",
         drop?.over && "border-primary bg-accent/60",
       )}
+      style={stripe ? { borderLeftColor: stripe } : undefined}
     >
       {icon}
       <span className="text-meta font-mono shrink-0 text-[0.69rem] tabular-nums">{keyLabel}</span>
       <Link
         href={href}
         className={cn(
-          "line-clamp-2 min-w-0 flex-1 text-[0.8125rem] leading-snug hover:underline",
+          "line-clamp-2 min-w-0 flex-1 text-[0.78rem] leading-snug hover:underline",
           emphasis && "font-semibold",
           strike && "text-meta line-through",
         )}
@@ -155,6 +168,7 @@ export function EpicTree({
         title={epic.title}
         href={`/boards/${boardId}/items/${epic.number}`}
         emphasis
+        stripe={stripeFor(epic.themeIds, structure)}
         drop={drop}
       />
       <Stem />
@@ -173,7 +187,7 @@ export function EpicTree({
           </Branch>
         ))}
         <Branch>
-          <div className="border-border w-[15rem] rounded-lg border border-dashed p-1.5">
+          <div className="border-border w-[11.5rem] rounded-lg border border-dashed p-1.5">
             <NewFeature onAdd={(title) => h.onAddFeature(epic.id, title)} />
           </div>
         </Branch>
@@ -212,6 +226,7 @@ export function FeatureTree({
         keyLabel={`${boardKey}-${feature.number}`}
         title={feature.title}
         href={`/boards/${boardId}/items/${feature.number}`}
+        stripe={stripeFor(feature.themeIds, structure)}
         drop={drop}
         dragging={h.drag?.kind === "feature" && h.drag.id === feature.id}
         dragProps={{
@@ -248,7 +263,7 @@ export function FeatureTree({
           </Branch>
         ))}
         <Branch>
-          <div className="border-border w-[15rem] rounded-lg border border-dashed p-1">
+          <div className="border-border w-[11.5rem] rounded-lg border border-dashed p-1">
             <QuickAdd
               compact
               structure={structure}
@@ -286,6 +301,7 @@ export function CardNode({
       title={card.title}
       href={`/boards/${boardId}/cards/${card.number}`}
       strike={done}
+      stripe={stripeFor(card.themeIds, structure)}
       dragging={h.drag?.kind === "card" && h.drag.id === card.id}
       dragProps={{
         draggable: true,
