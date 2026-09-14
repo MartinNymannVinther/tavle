@@ -10,8 +10,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { Sprint } from "@/core/db/schema";
 import type { ItemView } from "@/modules/boards/types";
 
 /** "Move to …" as a menu: the path that needs no pointer. */
@@ -21,12 +23,15 @@ export function MoveTo({
   keyOf,
   onMove,
   withNone,
+  plan,
 }: {
   label: string;
   options: ItemView[];
   keyOf: (item: ItemView) => string;
   onMove: (id: string | null) => void;
   withNone: boolean;
+  /** A feature's planned sprint (docs/adr/0023): pick one, or take the plan away. */
+  plan?: { sprints: Sprint[]; current: string | null; onPlan: (sprintId: string | null) => void };
 }) {
   const t = useTranslations("decompose");
   return (
@@ -53,6 +58,24 @@ export function MoveTo({
         ))}
         {withNone && (
           <DropdownMenuItem onClick={() => onMove(null)}>{t("noParent")}</DropdownMenuItem>
+        )}
+        {plan && plan.sprints.length > 0 && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel>{t("planSprint")}</DropdownMenuLabel>
+            {plan.sprints.map((sprint) => (
+              <DropdownMenuItem
+                key={sprint.id}
+                onClick={() => plan.onPlan(sprint.id)}
+                className={sprint.id === plan.current ? "font-semibold" : undefined}
+              >
+                {sprint.name}
+              </DropdownMenuItem>
+            ))}
+            {plan.current && (
+              <DropdownMenuItem onClick={() => plan.onPlan(null)}>{t("noPlan")}</DropdownMenuItem>
+            )}
+          </>
         )}
       </DropdownMenuContent>
     </DropdownMenu>

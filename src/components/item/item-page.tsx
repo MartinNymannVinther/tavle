@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 import { NativeSelect } from "@/components/ui/native-select";
 import { PropertyGroup, PropertyRow } from "@/components/ui/property-row";
+import { FeaturePlanFields } from "./feature-plan-fields";
 import { ActivityList } from "@/components/card/activity-list";
 import { StructureFields } from "@/components/card/placement-fields";
 import { quarterOptions } from "@/components/backlog/quarters";
@@ -135,6 +136,13 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
               onKind={(fields) => void run(() => updateItemAction({ itemId: item.id, ...fields }))}
             />
           </PropertyGroup>
+          {!epic && board.mode === "scrum" && full.sprints.length > 0 && (
+            <PropertyGroup>
+              <PropertyRow label={s("plannedSprints")}>
+                <FeaturePlanFields item={item} sprints={full.sprints} run={run} />
+              </PropertyRow>
+            </PropertyGroup>
+          )}
           {epic && (
             <PropertyGroup>
               <PropertyRow label={s("targetQuarter")} htmlFor="item-quarter">

@@ -16,6 +16,7 @@ import {
 } from "@/modules/boards/actions-cards";
 import { reorderItemAction } from "@/modules/boards/actions-structure";
 import { reorderBacklogAction, setCardsSprintAction } from "@/modules/boards/actions-sprints";
+import { FeaturePlanFields } from "@/components/item/feature-plan-fields";
 import { BacklogHeader } from "./backlog-header";
 import { BacklogHeading } from "./backlog-heading";
 import { BacklogList, type StoryRowProps } from "./backlog-list";
@@ -222,6 +223,11 @@ export function BacklogView({ full }: { full: BoardFull }) {
             cards={stories.length}
             points={points}
             newFeature={newFeature}
+            featurePlan={
+              scrum
+                ? (feature) => <FeaturePlanFields item={feature} sprints={full.sprints} run={run} />
+                : undefined
+            }
           />
           <BacklogToolbar
             grouping={grouping}

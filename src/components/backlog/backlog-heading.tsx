@@ -22,6 +22,7 @@ export function BacklogHeading({
   cards,
   points,
   newFeature,
+  featurePlan,
 }: {
   selection: Selection;
   tree: Hierarchy;
@@ -34,6 +35,8 @@ export function BacklogHeading({
   points: number;
   /** The form that starts a feature under an epic, rendered by the page. */
   newFeature?: (epicId: string) => React.ReactNode;
+  /** The chosen feature's planned span, rendered by the page (docs/adr/0023). */
+  featurePlan?: (feature: import("@/modules/boards/types").ItemView) => React.ReactNode;
 }) {
   const t = useTranslations("backlog");
   const h = useTranslations("backlog.heading");
@@ -70,6 +73,7 @@ export function BacklogHeading({
         reviewDue={false}
         progress={progress}
         counts={h("featureCounts", { cards, points, open: progress.open })}
+        action={node.feature.state === "open" ? featurePlan?.(node.feature) : undefined}
       />
     );
   }

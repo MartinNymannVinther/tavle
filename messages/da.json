@@ -646,7 +646,11 @@
       "applyToChildren": "Opdatér også børnene, når område eller temaer ændres",
       "targetQuarter": "Målkvartal",
       "noQuarter": "Intet mål endnu",
-      "missingDoneWhen": "Mangler “Færdig når”"
+      "missingDoneWhen": "Mangler “Færdig når”",
+      "plannedSprints": "Planlagt sprint",
+      "noPlan": "Uden plan",
+      "planStart": "Planlagt start for {title}",
+      "planTarget": "Planlagt mål for {title}"
     },
     "rules": {
       "parentLevel": "En forælder er altid præcis ét niveau op: en feature hører til en epic, et kort til en feature, på samme tavle.",
@@ -1426,7 +1430,9 @@
     "fullscreen": "Fuld skærm",
     "exitFullscreen": "Luk fuld skærm",
     "zoomIn": "Zoom ind",
-    "zoomOut": "Zoom ud"
+    "zoomOut": "Zoom ud",
+    "planSprint": "Planlagt sprint",
+    "noPlan": "Uden plan"
   },
   "aiBootstrap": {
     "cta": "Byg et udgangspunkt",

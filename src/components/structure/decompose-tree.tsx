@@ -28,6 +28,9 @@ export type DecomposeHandlers = {
   onPlaceCard: (cardId: string, featureId: string | null) => void;
   onAddCard: (featureId: string, title: string) => Promise<boolean>;
   onAddFeature: (epicId: string, title: string) => Promise<boolean>;
+  /** The open sprints, for planning a feature from its menu; empty on Kanban. */
+  sprints: import("@/core/db/schema").Sprint[];
+  onPlanFeature: (featureId: string, sprintId: string | null) => void;
 };
 
 /** Shared drop wiring: highlight while a matching drag hovers, place on drop. */
@@ -245,6 +248,11 @@ export function FeatureTree({
             keyOf={(e) => `${boardKey}-${e.number}`}
             onMove={(epicId) => h.onPlaceFeature(feature.id, epicId)}
             withNone={feature.parentId !== null}
+            plan={{
+              sprints: h.sprints,
+              current: feature.targetSprintId,
+              onPlan: (sprintId) => h.onPlanFeature(feature.id, sprintId),
+            }}
           />
         }
       />

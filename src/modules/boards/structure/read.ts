@@ -1,5 +1,14 @@
 import { and, asc, eq, isNull } from "drizzle-orm";
-import { backlogItems, cards, columns, type Area, type Board, type Theme } from "@/core/db/schema";
+import {
+  backlogItems,
+  cards,
+  columns,
+  sprints,
+  type Area,
+  type Board,
+  type Sprint,
+  type Theme,
+} from "@/core/db/schema";
 import { withOrgContext, type AppTransaction, type OrgContext } from "@/core/db/tenant";
 import { itemEvents } from "../events";
 import { boardAreas, boardInWorkspace, boardThemes, itemViews, membersOf } from "../read";
@@ -44,6 +53,8 @@ export type ItemFull = {
   openFeatures: ItemView[];
   themes: Theme[];
   areas: Area[];
+  /** The board's sprints, oldest first — the axis a feature plans on (docs/adr/0023). */
+  sprints: Sprint[];
   members: Member[];
   events: BoardEvent[];
   reviewDue: boolean;
@@ -132,6 +143,11 @@ export async function getItemFull(
       openFeatures: openViews.filter((i) => i.level === "feature"),
       themes: await boardThemes(tx, boardId),
       areas: await boardAreas(tx, boardId),
+      sprints: await tx
+        .select()
+        .from(sprints)
+        .where(eq(sprints.boardId, boardId))
+        .orderBy(asc(sprints.startDate)),
       members: await membersOf(tx, ctx.orgId),
       events: await itemEvents(tx, row.id),
       reviewDue: reviewDue(row, board.epicReviewDays),

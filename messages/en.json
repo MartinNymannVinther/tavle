@@ -646,7 +646,11 @@
       "applyToChildren": "Also update the children when the area or themes change",
       "targetQuarter": "Target quarter",
       "noQuarter": "No target yet",
-      "missingDoneWhen": "Missing its “done when”"
+      "missingDoneWhen": "Missing its “done when”",
+      "plannedSprints": "Planned sprint",
+      "noPlan": "No plan",
+      "planStart": "Planned start of {title}",
+      "planTarget": "Planned target of {title}"
     },
     "rules": {
       "parentLevel": "A parent is always exactly one level up: a feature belongs to an epic, a card to a feature, on the same board.",
@@ -1426,7 +1430,9 @@
     "fullscreen": "Full screen",
     "exitFullscreen": "Exit full screen",
     "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out"
+    "zoomOut": "Zoom out",
+    "planSprint": "Planned sprint",
+    "noPlan": "No plan"
   },
   "aiBootstrap": {
     "cta": "Build a starting point",

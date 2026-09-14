@@ -11,6 +11,7 @@ import { BootstrapDialog } from "@/components/backlog/bootstrap-dialog";
 import { ItemForm } from "@/components/backlog/item-form";
 import { createCardAction, placeCardAction } from "@/modules/boards/actions-cards";
 import { createItemAction, placeItemAction } from "@/modules/boards/actions-structure";
+import { planFeatureAction } from "@/modules/boards/actions-sprints";
 import type { BoardFull, CardView } from "@/modules/boards/types";
 import { cn } from "@/lib/utils";
 import { DecomposeTray } from "./decompose-tray";
@@ -84,6 +85,14 @@ export function DecomposeView({ full }: { full: BoardFull }) {
     },
     onAddCard: (featureId: string, title: string) =>
       run(() => createCardAction({ boardId: board.id, title, featureId })),
+    sprints: full.sprints
+      .filter((s) => s.state !== "closed")
+      .sort((a, b) => a.startDate.localeCompare(b.startDate)),
+    onPlanFeature: (featureId: string, sprintId: string | null) => {
+      void run(() =>
+        planFeatureAction({ itemId: featureId, startSprintId: sprintId, targetSprintId: sprintId }),
+      );
+    },
     onAddFeature: (epicId: string, title: string) =>
       run(() =>
         createItemAction({
