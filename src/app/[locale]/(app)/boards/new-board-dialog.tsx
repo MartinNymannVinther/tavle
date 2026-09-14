@@ -51,6 +51,7 @@ export function NewBoardDialog() {
   const [mode, setMode] = useState<"kanban" | "scrum">("kanban");
   const [firstArea, setFirstArea] = useState("");
   const [view, setView] = useState<StructureViewInput>(DEFAULT_VIEW);
+  const [aiStart, setAiStart] = useState(false);
   const [pending, setPending] = useState(false);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -60,7 +61,9 @@ export function NewBoardDialog() {
       () => createBoardAction({ name, key, mode, firstArea, ...view }),
       (boardId) => {
         setOpen(false);
-        router.push(`/boards/${boardId}`);
+        // Straight into the AI starting point when asked: the backlog
+        // opens with the bootstrap dialog already up (docs/adr/0021).
+        router.push(aiStart ? `/boards/${boardId}/backlog?ai=start` : `/boards/${boardId}`);
       },
     );
     setPending(false);
@@ -162,6 +165,18 @@ export function NewBoardDialog() {
             <p className="text-meta mb-1 text-[0.8125rem] leading-snug">{structure("body")}</p>
             <StructureViewFields value={view} onChange={setView} compact />
           </fieldset>
+          <label className="flex items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={aiStart}
+              onChange={(event) => setAiStart(event.target.checked)}
+              className="mt-0.5 accent-[var(--primary)]"
+            />
+            <span>
+              {t("aiStart")}
+              <span className="text-meta block text-[0.72rem]">{t("aiStartHint")}</span>
+            </span>
+          </label>
           <DialogFooter>
             <Button
               type="submit"

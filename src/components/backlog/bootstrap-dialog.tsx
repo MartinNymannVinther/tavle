@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,10 @@ import { BootstrapReview, keepChecked, toEditable, type Editable } from "./boots
 export function BootstrapDialog({ boardId, run }: { boardId: string; run: Run }) {
   const t = useTranslations("aiBootstrap");
   const errors = useTranslations("cards.ai.errors");
-  const [open, setOpen] = useState(false);
+  // A fresh board can arrive asking for the starting point (?ai=start
+  // from the new-board dialog); the dialog then opens from birth.
+  const params = useSearchParams();
+  const [open, setOpen] = useState(() => params.get("ai") === "start");
   const [description, setDescription] = useState("");
   const [horizon, setHorizon] = useState("4");
   const [focus, setFocus] = useState("");
@@ -39,6 +43,13 @@ export function BootstrapDialog({ boardId, run }: { boardId: string; run: Run })
   const [failure, setFailure] = useState<string | null>(null);
   const [engine, setEngine] = useState("");
   const [tree, setTree] = useState<Editable | null>(null);
+  // The ask is consumed, so a reload does not reopen the dialog.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("ai")) return;
+    url.searchParams.delete("ai");
+    window.history.replaceState(null, "", url);
+  }, []);
 
   async function ask(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

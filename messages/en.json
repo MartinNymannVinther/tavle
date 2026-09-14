@@ -526,7 +526,9 @@
       "cancel": "Cancel",
       "firstArea": "First area",
       "firstAreaPlaceholder": "Payments",
-      "firstAreaHint": "The part of the product the board is about. Cards without a parent must belong to an area, so the board starts with one you name yourselves. More can be added under settings."
+      "firstAreaHint": "The part of the product the board is about. Cards without a parent must belong to an area, so the board starts with one you name yourselves. More can be added under settings.",
+      "aiStart": "Get AI help to get started",
+      "aiStartHint": "The backlog opens with “Build a starting point”: describe the product and the model proposes epics, features and cards, which you prune before anything is created."
     },
     "view": {
       "noSprintTitle": "No sprint running",

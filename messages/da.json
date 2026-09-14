@@ -526,7 +526,9 @@
       "cancel": "Annuller",
       "firstArea": "Første område",
       "firstAreaPlaceholder": "Betalinger",
-      "firstAreaHint": "Den del af produktet tavlen handler om. Kort uden forælder skal høre til et område, så tavlen starter med ét, som I selv navngiver. Flere kan tilføjes under indstillinger."
+      "firstAreaHint": "Den del af produktet tavlen handler om. Kort uden forælder skal høre til et område, så tavlen starter med ét, som I selv navngiver. Flere kan tilføjes under indstillinger.",
+      "aiStart": "Få hjælp af AI til at komme i gang",
+      "aiStartHint": "Backloggen åbner med “Byg et udgangspunkt”: beskriv produktet, og modellen foreslår epics, features og kort, som du beskærer, før noget oprettes."
     },
     "view": {
       "noSprintTitle": "Ingen sprint i gang",
