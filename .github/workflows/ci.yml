@@ -157,7 +157,7 @@ jobs:
           set -euo pipefail
           GITLEAKS_VERSION=8.24.3
           GITLEAKS_SHA256=9991e0b2903da4c8f6122b5c3186448b927a5da4deef1fe45271c3793f4ee29c
-          curl -sSfL -o gitleaks.tar.gz \
+          curl -sSfL --retry 4 --retry-delay 5 --retry-all-errors -o gitleaks.tar.gz \
             "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
           # The scan runs on every pull request, from every fork. A tarball
           # fetched over the network and executed unchecked is a way in;
