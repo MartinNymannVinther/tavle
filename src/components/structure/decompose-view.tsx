@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,15 +31,19 @@ export function DecomposeView({ full }: { full: BoardFull }) {
   const structure = structureOf(full);
   const { view } = structure;
   const [drag, setDrag] = useState<DragItem>(null);
-  // Full screen on a desktop: the chart takes the whole display, tray
-  // included so a drag still has somewhere to land.
-  const surface = useRef<HTMLDivElement>(null);
+  // Full screen as a fixed overlay rather than the Fullscreen API: the
+  // dialogs and menus portal to the body, and the browser's fullscreen
+  // shows only the fullscreened element's own subtree — "Ny epic" would
+  // open invisibly behind the chart. An overlay keeps every popup alive.
   const [fullscreen, setFullscreen] = useState(false);
   useEffect(() => {
-    const onChange = () => setFullscreen(Boolean(document.fullscreenElement));
-    document.addEventListener("fullscreenchange", onChange);
-    return () => document.removeEventListener("fullscreenchange", onChange);
-  }, []);
+    if (!fullscreen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setFullscreen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [fullscreen]);
 
   const epics = full.items
     .filter((i) => i.level === "epic" && i.state === "open")
@@ -85,8 +89,10 @@ export function DecomposeView({ full }: { full: BoardFull }) {
 
   return (
     <div
-      ref={surface}
-      className={cn("flex flex-col gap-4", fullscreen && "bg-background overflow-auto p-6")}
+      className={cn(
+        "flex flex-col gap-4",
+        fullscreen && "bg-background fixed inset-0 z-40 overflow-auto p-6",
+      )}
     >
       <div className="flex justify-end gap-2">
         <BootstrapDialog boardId={board.id} run={run} />
@@ -95,10 +101,7 @@ export function DecomposeView({ full }: { full: BoardFull }) {
           variant="outline"
           size="sm"
           className="max-sm:hidden"
-          onClick={() => {
-            if (document.fullscreenElement) void document.exitFullscreen();
-            else void surface.current?.requestFullscreen();
-          }}
+          onClick={() => setFullscreen((current) => !current)}
         >
           {fullscreen ? <Minimize2 data-slot="icon" /> : <Maximize2 data-slot="icon" />}
           {fullscreen ? t("exitFullscreen") : t("fullscreen")}
