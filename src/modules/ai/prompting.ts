@@ -13,14 +13,17 @@ const CLOSE = "</data>";
 
 /** Text from a person, ready for a prompt. The fence cannot be closed from inside. */
 export function fenceUntrusted(text: unknown, max = MAX_INPUT_CHARS): string {
-  const clean = capText(
+  let clean = capText(
     typeof text === "string"
       ? text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
       : "",
     max,
-  )
-    .replaceAll(CLOSE, "")
-    .replaceAll(OPEN, "");
+  );
+  // One pass is not enough: "</<data>data>" splices back into a close tag
+  // after the inner tag is removed. Strip until no tag can reassemble.
+  while (clean.includes(OPEN) || clean.includes(CLOSE)) {
+    clean = clean.replaceAll(CLOSE, "").replaceAll(OPEN, "");
+  }
   return `${OPEN}\n${clean}\n${CLOSE}`;
 }
 

@@ -109,6 +109,11 @@ export async function updateItem(
     changed.push("description");
   }
   if (input.doneWhen !== undefined && input.doneWhen !== item.doneWhen) {
+    // Rule 4 holds at and after the close: what let the item close cannot
+    // be blanked while it stands closed. The database refuses it too.
+    if (item.state === "closed" && !input.doneWhen.trim()) {
+      throw new RuleViolation("doneWhenRequired");
+    }
     patch.doneWhen = input.doneWhen;
     changed.push("doneWhen");
   }
@@ -132,6 +137,11 @@ export async function updateItem(
   if (start && target && compareQuarters(start, target) > 0) {
     patch.startQuarter = target;
     patch.targetQuarter = start;
+    // The swap writes both ends, so the feed and the reverse must carry
+    // both — otherwise undo restores half a span.
+    for (const field of ["startQuarter", "targetQuarter"]) {
+      if (!changed.includes(field)) changed.push(field);
+    }
   }
   if (changed.length === 0) return item;
   await tx.update(backlogItems).set(patch).where(eq(backlogItems.id, item.id));

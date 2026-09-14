@@ -1169,6 +1169,7 @@
       "updated": "{key} blev redigeret ({fields})",
       "moved": "{key} blev flyttet til {parent}",
       "placed": "{key} fik område {area} og temaer {themes}",
+      "cascaded": "{key}: område og temaer gik ned til {features} features og {cards} kort",
       "closed": "{key} blev lukket",
       "reopened": "{key} blev genåbnet",
       "reviewed": "{key} blev bekræftet som stadig et resultat",

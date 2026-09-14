@@ -9,9 +9,9 @@ import { createItem } from "@/modules/boards/structure/write-items";
 import { createBoard } from "@/modules/boards/write-boards";
 import { archiveCard } from "@/modules/boards/write-card-lifecycle";
 import { createCard, moveCard, updateCard } from "@/modules/boards/write-cards";
-import { setCardsSprint, createSprint } from "@/modules/boards/write-sprints";
+import { setCardsSprint, createSprint, startSprint } from "@/modules/boards/write-sprints";
 import { adminPool } from "../helpers/db";
-import { seedWorkspace } from "../helpers/workspace";
+import { seedMember, seedWorkspace } from "../helpers/workspace";
 
 /**
  * Undo (docs/adr/0022): the events carry their own reverse, the reverse
@@ -115,6 +115,31 @@ describe("events carry their reverse", () => {
     expect(fresh.sprintId).toBeNull();
   });
 
+  it("a send-back to the backlog restores the column and its clock on undo", async () => {
+    const sprint = await run((tx) =>
+      createSprint(tx, ctx, {
+        boardId,
+        name: "Sprint 2",
+        goal: "",
+        startDate: "2026-10-01",
+        endDate: "2026-10-14",
+      }),
+    );
+    await run((tx) => startSprint(tx, ctx, sprint!.id));
+    const done = (await getBoardFull(ctx, boardId))!.columns.find((c) => c.category === "done")!.id;
+    const card = await run((tx) =>
+      createCard(tx, ctx, { boardId, title: "Var færdigt", columnId: todo, areaId }),
+    );
+    await run((tx) => setCardsSprint(tx, ctx, [card.id], sprint!.id));
+    await run((tx) => moveCard(tx, ctx, card.id, done, 0));
+    await run((tx) => setCardsSprint(tx, ctx, [card.id], null));
+    const sent = (await lastEventFor(card.id, "card.backlog"))!;
+    await run((tx) => undoEvent(tx, ctx, sent.id));
+    const fresh = (await getBoardFull(ctx, boardId))!.cards.find((c) => c.id === card.id)!;
+    expect([fresh.sprintId, fresh.columnId]).toEqual([sprint!.id, done]);
+    expect(fresh.doneAt).toBeTruthy();
+  });
+
   it("a close is undone by reopening, through the same rules", async () => {
     const epic = await run((tx) =>
       createItem(tx, ctx, {
@@ -139,5 +164,45 @@ describe("events carry their reverse", () => {
     const events = await run((tx) => recentBoardEvents(tx, boardId, 50));
     const bare = events.find((event) => event.type === "board.created")!;
     await expect(run((tx) => undoEvent(tx, ctx, bare.id))).rejects.toThrow(NotUndoable);
+  });
+});
+
+describe("the reverses keep their gates", () => {
+  it("a plain member cannot undo a board-shape change; the owner can", async () => {
+    const member = await seedMember(admin, ctx.orgId, "undo_m");
+    const item = await run((tx) =>
+      createItem(tx, ctx, {
+        boardId,
+        level: "feature",
+        title: "Formet af ejeren",
+        doneWhen: "Den findes",
+        areaId,
+      }),
+    );
+    const events = await run((tx) => recentBoardEvents(tx, boardId, 10));
+    const created = events.find(
+      (event) => event.type === "item.created" && event.itemId === item.id,
+    )!;
+    // Undoing a creation deletes the item — an owner/admin act, so the
+    // member is refused where the owner is not.
+    await expect(withOrgContext(member, (tx) => undoEvent(tx, member, created.id))).rejects.toThrow(
+      "forbidden",
+    );
+    await run((tx) => undoEvent(tx, ctx, created.id));
+    expect((await getBoardFull(ctx, boardId))!.items.find((i) => i.id === item.id)).toBeUndefined();
+  });
+
+  it("a member's everyday undo still works", async () => {
+    const member = await seedMember(admin, ctx.orgId, "undo_m2");
+    const mrun = <T>(fn: Parameters<typeof withOrgContext<T>>[1]) => withOrgContext(member, fn);
+    const card = await mrun((tx) =>
+      createCard(tx, member, { boardId, title: "Medlemmets kort", columnId: todo, areaId }),
+    );
+    await mrun((tx) => moveCard(tx, member, card.id, doing, 0));
+    const rows = await mrun((tx) => cardEvents(tx, card.id));
+    const moved = rows.find((event) => event.type === "card.moved")!;
+    await mrun((tx) => undoEvent(tx, member, moved.id));
+    const fresh = (await getBoardFull(ctx, boardId))!.cards.find((c) => c.id === card.id)!;
+    expect(fresh.columnId).toBe(todo);
   });
 });

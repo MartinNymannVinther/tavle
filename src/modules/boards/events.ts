@@ -30,6 +30,7 @@ export type EventType =
   | "item.reopened"
   | "item.reviewed"
   | "item.planned"
+  | "item.cascaded"
   | "item.mapped"
   | "item.unmapped"
   | "item.deleted"

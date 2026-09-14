@@ -1,22 +1,23 @@
 import { and, eq, sql } from "drizzle-orm";
-import { z } from "zod";
 import { events, swimlanes, themes as themesTable, areas as areasTable } from "@/core/db/schema";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 import { applySwimlaneAssignment, updateSwimlane } from "./write-swimlanes";
 import { archiveCard, deleteCard, restoreCard } from "./write-card-lifecycle";
 import { moveCard, updateCard, type CardUpdate } from "./write-cards";
 import { deleteComment } from "./comments";
-import { cardInWorkspace } from "./lanes";
+import { cardInWorkspace, columnInBoard, joiningSort, laneFor } from "./lanes";
+import { canManage, roleOf } from "./members";
 import { closeItem, type CloseOutcome } from "./structure/close";
 import { placeCardInStructure } from "./structure/write-card-placement";
-import { placeItemInStructure } from "./structure/place-item";
+import { placeItemInStructure, restoreSubtree } from "./structure/place-item";
 import { planFeature } from "./structure/plan-feature";
 import { deleteItem, reopenItem, updateItem } from "./structure/write-items";
 import { updateArea, updateTheme } from "./structure/write-lists";
+import { enterColumn } from "./transitions";
+import { UndoStepSchema, type UndoStep } from "./undo-steps";
 import { updateStructureView } from "./write-boards";
 import { setCardsSprint } from "./write-sprints";
 import { recordEvent } from "./events";
-import { id } from "./validation";
 import type { StructureViewInput } from "./validation";
 
 /**
@@ -28,82 +29,7 @@ import type { StructureViewInput } from "./validation";
  * full lane) refuses the reverse honestly.
  */
 
-const cardFields = z
-  .object({
-    title: z.string(),
-    description: z.string(),
-    acceptance: z.string(),
-    priority: z.enum(["low", "normal", "high", "urgent"]),
-    dueDate: z.string().nullable(),
-    estimate: z.number().nullable(),
-    assigneeUserId: z.string().nullable(),
-    blocked: z.boolean(),
-    blockedReason: z.string(),
-    bug: z.boolean(),
-    kind: z.enum(["business", "enabler"]),
-    enablerType: z.enum(["architecture", "infrastructure", "exploration", "compliance"]).nullable(),
-  })
-  .partial();
-
-const itemFields = z
-  .object({
-    title: z.string(),
-    description: z.string(),
-    doneWhen: z.string(),
-    kind: z.enum(["business", "enabler"]),
-    enablerType: z.enum(["architecture", "infrastructure", "exploration", "compliance"]).nullable(),
-    targetQuarter: z.string().nullable(),
-    startQuarter: z.string().nullable(),
-  })
-  .partial();
-
-export const UndoStepSchema = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("card.move"), cardId: id, columnId: id, index: z.number().int() }),
-  z.object({ kind: z.literal("card.swimlane"), cardId: id, swimlaneId: id.nullable() }),
-  z.object({
-    kind: z.literal("card.place"),
-    cardId: id,
-    featureId: id.nullable(),
-    areaId: id.nullable(),
-    themeIds: z.array(id),
-  }),
-  z.object({ kind: z.literal("card.update"), cardId: id, fields: cardFields }),
-  z.object({ kind: z.literal("card.delete"), cardId: id }),
-  z.object({ kind: z.literal("card.archive"), cardId: id }),
-  z.object({ kind: z.literal("card.restore"), cardId: id }),
-  z.object({ kind: z.literal("card.sprint"), cardId: id, sprintId: id.nullable() }),
-  z.object({ kind: z.literal("item.delete"), itemId: id }),
-  z.object({ kind: z.literal("item.update"), itemId: id, fields: itemFields }),
-  z.object({
-    kind: z.literal("item.place"),
-    itemId: id,
-    parentId: id.nullable(),
-    areaId: id.nullable(),
-    themeIds: z.array(id),
-  }),
-  z.object({
-    kind: z.literal("item.plan"),
-    itemId: id,
-    startSprintId: id.nullable(),
-    targetSprintId: id.nullable(),
-  }),
-  z.object({ kind: z.literal("item.reopen"), itemId: id }),
-  z.object({ kind: z.literal("item.close"), itemId: id }),
-  z.object({
-    kind: z.literal("board.view"),
-    boardId: id,
-    structureLevels: z.enum(["epic", "feature", "card"]),
-    showKind: z.boolean(),
-    showThemes: z.boolean(),
-    showAreas: z.boolean(),
-    swimlaneBy: z.enum(["none", "kind", "theme", "area", "manual"]),
-  }),
-  z.object({ kind: z.literal("comment.delete"), commentId: id }),
-  z.object({ kind: z.literal("theme.active"), themeId: id, active: z.boolean() }),
-  z.object({ kind: z.literal("area.active"), areaId: id, active: z.boolean() }),
-  z.object({ kind: z.literal("swimlane.active"), swimlaneId: id, active: z.boolean() }),
-]);
-export type UndoStep = z.infer<typeof UndoStepSchema>;
+export { UndoStepSchema, type UndoStep } from "./undo-steps";
 
 export class NotUndoable extends Error {
   constructor() {
@@ -111,6 +37,15 @@ export class NotUndoable extends Error {
     this.name = "NotUndoable";
   }
 }
+
+/** The reverses of owner/admin actions: undoing a board-shape change is a board-shape change. */
+const MANAGE_KINDS = new Set<UndoStep["kind"]>([
+  "item.delete",
+  "board.view",
+  "theme.active",
+  "area.active",
+  "swimlane.active",
+]);
 
 /** Runs one reverse through the ordinary services. Null means the thing is gone. */
 async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): Promise<void> {
@@ -145,11 +80,29 @@ async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): P
     case "card.restore":
       if (!(await restoreCard(tx, ctx, step.cardId))) throw new NotUndoable();
       return;
-    case "card.sprint":
+    case "card.sprint": {
       if ((await setCardsSprint(tx, ctx, [step.cardId], step.sprintId)) === 0) {
         throw new NotUndoable();
       }
+      // The move between backlog and a planned sprint reset the column
+      // too; the reverse re-enters the one the card stood in, when it
+      // still exists — the done clock restarts with the transition.
+      if (step.columnId) {
+        const card = await cardInWorkspace(tx, step.cardId);
+        if (card && card.columnId !== step.columnId) {
+          const to = await columnInBoard(tx, card.boardId, step.columnId);
+          if (to) {
+            const from = await columnInBoard(tx, card.boardId, card.columnId);
+            const sort = await joiningSort(
+              tx,
+              laneFor("scrum", { boardId: card.boardId, columnId: to.id, sprintId: card.sprintId }),
+            );
+            await enterColumn(tx, ctx, card, from, to, { sort });
+          }
+        }
+      }
       return;
+    }
     case "item.delete":
       if (!(await deleteItem(tx, ctx, step.itemId))) throw new NotUndoable();
       return;
@@ -160,6 +113,9 @@ async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): P
       return;
     case "item.place":
       if (!(await placeItemInStructure(tx, ctx, { ...step }))) throw new NotUndoable();
+      return;
+    case "item.cascade":
+      if (!(await restoreSubtree(tx, ctx, step.itemId, step.children))) throw new NotUndoable();
       return;
     case "item.plan":
       if (!(await planFeature(tx, ctx, { ...step }))) throw new NotUndoable();
@@ -248,14 +204,27 @@ export async function undoEvent(
   ctx: OrgContext,
   eventId: string,
 ): Promise<string | null> {
-  const [row] = await tx.select().from(events).where(eq(events.id, eventId)).limit(1);
+  // The row lock serializes two people undoing the same event at once:
+  // the second waits here and then sees the first one's `undo.applied`.
+  const [row] = await tx.select().from(events).where(eq(events.id, eventId)).limit(1).for("update");
   if (!row) return null;
   const parsed = UndoStepSchema.safeParse((row.payload as { undo?: unknown }).undo);
   if (!parsed.success) throw new NotUndoable();
+  if (MANAGE_KINDS.has(parsed.data.kind) && !canManage(await roleOf(tx, ctx))) {
+    throw new Error("forbidden");
+  }
   const [already] = await tx
     .select({ id: events.id })
     .from(events)
-    .where(and(eq(events.type, "undo.applied"), sql`${events.payload}->>'of' = ${row.id}`))
+    .where(
+      and(
+        // The board narrows the walk to one feed's history; the partial
+        // expression index on payload->>'of' answers the rest.
+        eq(events.boardId, row.boardId),
+        eq(events.type, "undo.applied"),
+        sql`${events.payload}->>'of' = ${row.id}`,
+      ),
+    )
     .limit(1);
   if (already) throw new NotUndoable();
   await applyUndo(tx, ctx, parsed.data);

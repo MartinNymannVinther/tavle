@@ -97,6 +97,9 @@ export async function placeItemInStructure(
     );
   }
   if (input.applyToChildren) {
+    // Rule 11 touches many rows at once, so the feed says it happened
+    // and the event carries every child's "before" as its reverse.
+    const children = await subtreeStates(tx, item);
     await applyToSubtree(
       tx,
       ctx,
@@ -104,6 +107,108 @@ export async function placeItemInStructure(
       area?.id ?? null,
       themes.map((t) => t.id),
     );
+    if (children.length > 0) {
+      await recordEvent(
+        tx,
+        ctx,
+        item.boardId,
+        "item.cascaded",
+        {
+          key: keyOf(board, item),
+          title: item.title,
+          features: children.filter((c) => c.itemId).length,
+          cards: children.filter((c) => c.cardId).length,
+        },
+        { itemId: item.id, undo: { kind: "item.cascade", itemId: item.id, children } },
+      );
+    }
+  }
+  return item;
+}
+
+type ChildState = { itemId?: string; cardId?: string; areaId: string | null; themeIds: string[] };
+
+/** Every feature and card the cascade will touch, as they stand now. */
+async function subtreeStates(tx: AppTransaction, item: BacklogItem): Promise<ChildState[]> {
+  const out: ChildState[] = [];
+  const features =
+    item.level === "epic"
+      ? await tx
+          .select({ id: backlogItems.id, areaId: backlogItems.areaId })
+          .from(backlogItems)
+          .where(eq(backlogItems.parentId, item.id))
+      : [{ id: item.id, areaId: item.areaId }];
+  for (const feature of features) {
+    if (feature.id !== item.id) {
+      out.push({
+        itemId: feature.id,
+        areaId: feature.areaId,
+        themeIds: await themeIdsOf(tx, feature.id),
+      });
+    }
+    const stories = await tx
+      .select({ id: cards.id, areaId: cards.areaId })
+      .from(cards)
+      .where(eq(cards.featureId, feature.id));
+    for (const story of stories) {
+      const themeRows = await tx
+        .select({ themeId: cardThemes.themeId })
+        .from(cardThemes)
+        .where(eq(cardThemes.cardId, story.id));
+      out.push({
+        cardId: story.id,
+        areaId: story.areaId,
+        themeIds: themeRows.map((row) => row.themeId),
+      });
+    }
+  }
+  return out;
+}
+
+/**
+ * The cascade's reverse: each child back to the area and themes it had.
+ * A child gone since restores nothing; an area or theme deactivated
+ * since refuses with its rule, like every other undo.
+ */
+export async function restoreSubtree(
+  tx: AppTransaction,
+  ctx: OrgContext,
+  itemId: string,
+  children: ChildState[],
+): Promise<BacklogItem | null> {
+  const item = await itemInWorkspace(tx, itemId);
+  if (!item) return null;
+  const board = (await boardInWorkspace(tx, item.boardId))!;
+  for (const child of children) {
+    const area = await activeAreaInBoard(tx, board.id, child.areaId);
+    const themes = await activeThemesInBoard(tx, board.id, child.themeIds);
+    if (child.itemId) {
+      const row = await itemInWorkspace(tx, child.itemId);
+      if (!row || row.boardId !== board.id) continue;
+      await tx
+        .update(backlogItems)
+        .set({ areaId: area?.id ?? null })
+        .where(eq(backlogItems.id, row.id));
+      await setItemThemes(
+        tx,
+        ctx.orgId,
+        row.id,
+        themes.map((t) => t.id),
+      );
+    } else if (child.cardId) {
+      const [row] = await tx.select().from(cards).where(eq(cards.id, child.cardId)).limit(1);
+      if (!row || row.boardId !== board.id) continue;
+      await tx
+        .update(cards)
+        .set({ areaId: area?.id ?? null })
+        .where(eq(cards.id, row.id));
+      await tx.delete(cardThemes).where(eq(cardThemes.cardId, row.id));
+      if (themes.length > 0) {
+        await tx
+          .insert(cardThemes)
+          .values(themes.map((t) => ({ orgId: ctx.orgId, cardId: row.id, themeId: t.id })));
+      }
+    }
   }
   return item;
 }

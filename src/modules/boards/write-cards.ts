@@ -1,6 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import {
   cards,
+  sprints,
   swimlanes,
   type Card,
   type EnablerType,
@@ -74,7 +75,19 @@ export async function createCard(
     ? await columnInBoard(tx, board.id, input.columnId)
     : await firstColumn(tx, board.id);
   if (!column) throw new Error("notFound");
-  const sprintId = board.mode === "scrum" ? (input.sprintId ?? null) : null;
+  // The sprint must be the board's own and still open — the same promise
+  // setCardsSprint keeps; a closed sprint's record does not change shape.
+  let sprintId: string | null = null;
+  if (board.mode === "scrum" && input.sprintId) {
+    const [sprint] = await tx
+      .select()
+      .from(sprints)
+      .where(and(eq(sprints.id, input.sprintId), eq(sprints.boardId, board.id)))
+      .limit(1);
+    if (!sprint) throw new Error("notFound");
+    if (sprint.state === "closed") throw new Error("invalid");
+    sprintId = sprint.id;
+  }
   const assignee = await memberInWorkspace(tx, input.assigneeUserId);
   // Rule 1 and 3 of the structure: a parent is a feature on this board, and
   // a card without one needs an area. What the caller left out is the

@@ -15,6 +15,7 @@ import {
 import { RuleViolation } from "./rules";
 import type { ChildDecision } from "./validation";
 import { placeCardInStructure } from "./write-card-placement";
+import { activeAreaInBoard } from "./write-lists";
 
 /**
  * Rule 10: closing a feature or an epic with open children is a decision
@@ -138,7 +139,10 @@ async function applyDecision(
         return;
       }
       case "orphan": {
-        const areaId = child.areaId ?? decision.areaId ?? parent.areaId;
+        const areaId =
+          child.areaId ??
+          (await activeAreaInBoard(tx, parent.boardId, decision.areaId))?.id ??
+          parent.areaId;
         if (!areaId) throw new RuleViolation("needsArea");
         await tx
           .update(backlogItems)
@@ -161,7 +165,12 @@ async function applyDecision(
       return;
     }
     case "orphan": {
-      const areaId = child.areaId ?? decision.areaId ?? parent.areaId;
+      // The chosen area must be the board's own and active, like every
+      // other write path; the child's or parent's own area is trusted.
+      const areaId =
+        child.areaId ??
+        (await activeAreaInBoard(tx, parent.boardId, decision.areaId))?.id ??
+        parent.areaId;
       if (!areaId) throw new RuleViolation("needsArea");
       await tx.update(cards).set({ featureId: null, areaId }).where(eq(cards.id, child.id));
       return;

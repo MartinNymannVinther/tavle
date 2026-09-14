@@ -1169,6 +1169,7 @@
       "updated": "{key} was edited ({fields})",
       "moved": "{key} was moved under {parent}",
       "placed": "{key} got area {area} and themes {themes}",
+      "cascaded": "{key}: area and themes went down to {features} features and {cards} cards",
       "closed": "{key} was closed",
       "reopened": "{key} was reopened",
       "reviewed": "{key} was confirmed as still a result",

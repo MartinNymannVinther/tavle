@@ -22,6 +22,14 @@ export async function createSprintSeries(
 ): Promise<Sprint[]> {
   const board = await boardInWorkspace(tx, input.boardId);
   if (!board || board.mode !== "scrum") return [];
+  // The board row is the series' lock: two concurrent series serialize
+  // here, so the ceiling and the axis are read after the other landed.
+  const [numbering] = await tx
+    .select({ next: boards.nextSprintNumber })
+    .from(boards)
+    .where(eq(boards.id, board.id))
+    .for("update");
+  let number = numbering!.next;
   const [planned] = await tx
     .select({ n: sql<number>`count(*)::int` })
     .from(sprints)
@@ -34,11 +42,6 @@ export async function createSprintSeries(
     .where(and(eq(sprints.boardId, board.id), ne(sprints.state, "closed")));
   // The series continues where the plan ends; with no open sprint it starts today.
   let start = latest?.endDate ? addDaysIso(latest.endDate, 1) : todayInCopenhagen();
-  const [numbering] = await tx
-    .select({ next: boards.nextSprintNumber })
-    .from(boards)
-    .where(eq(boards.id, board.id));
-  let number = numbering!.next;
 
   const created: Sprint[] = [];
   for (let i = 0; i < input.count; i += 1) {

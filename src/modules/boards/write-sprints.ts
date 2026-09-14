@@ -240,7 +240,12 @@ export async function setCardsSprint(
       {
         cardId: card.id,
         actor,
-        undo: { kind: "card.sprint", cardId: card.id, sprintId: card.sprintId },
+        undo: {
+          kind: "card.sprint",
+          cardId: card.id,
+          sprintId: card.sprintId,
+          columnId: card.columnId,
+        },
       },
     );
     moved += 1;

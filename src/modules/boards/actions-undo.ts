@@ -9,8 +9,9 @@ import { id } from "./validation";
 /**
  * Undo as one action (docs/adr/0022): the event names its own reverse,
  * the service re-checks everything and refuses what can no longer hold,
- * and the undo is written down as a new event. Any member may undo — the
- * reverse runs the same services the original did, with the same guards.
+ * and the undo is written down as a new event. Any member may undo their
+ * board's everyday events; the reverses of owner/admin actions carry the
+ * owner/admin gate with them, checked in the service.
  */
 
 const UndoRef = z.object({ eventId: id });

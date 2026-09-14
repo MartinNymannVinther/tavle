@@ -168,13 +168,20 @@ export const backlogItems = pgTable(
     uniqueIndex("backlog_items_board_number_uq").on(t.boardId, t.number),
     index("backlog_items_board_level_idx").on(t.boardId, t.level, t.sort),
     index("backlog_items_parent_idx").on(t.parentId),
+    index("backlog_items_start_sprint_idx").on(t.startSprintId),
+    index("backlog_items_target_sprint_idx").on(t.targetSprintId),
     check("backlog_items_level_ck", sql`${t.level} in ('epic', 'feature')`),
     check(
       "backlog_items_epic_has_no_parent_ck",
       sql`${t.level} = 'feature' or ${t.parentId} is null`,
     ),
-    // done_when may be empty while an item is shaped; rule 4 refuses at
-    // the close instead (docs/adr/0018), so the old <> '' check is gone.
+    // done_when may be empty while an item is shaped; rule 4 bites at the
+    // close (docs/adr/0018), and the database holds that form of it: a
+    // closed item keeps its done-when, whatever path closed it.
+    check(
+      "backlog_items_closed_done_when_ck",
+      sql`${t.state} <> 'closed' or btrim(${t.doneWhen}) <> ''`,
+    ),
     check("backlog_items_enabler_type_ck", sql`${t.enablerType} is null or ${t.kind} = 'enabler'`),
     check(
       "backlog_items_target_quarter_ck",

@@ -231,6 +231,9 @@ export const cards = pgTable(
     index("cards_sprint_idx").on(t.sprintId),
     index("cards_assignee_idx").on(t.assigneeUserId),
     index("cards_feature_idx").on(t.featureId),
+    // The FK's set-null on swimlane delete walks this; without it every
+    // lane row deleted in a cascade seq-scans the whole cards table.
+    index("cards_swimlane_idx").on(t.swimlaneId),
     check("cards_enabler_type_ck", sql`${t.enablerType} is null or ${t.kind} = 'enabler'`),
   ],
 );

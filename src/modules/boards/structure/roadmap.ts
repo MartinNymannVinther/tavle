@@ -60,15 +60,17 @@ export function roadmap(full: BoardFull, now: Date = new Date()): Roadmap {
     const featureIds = featuresOf.get(epic.id) ?? [];
     const stories = full.cards.filter((c) => c.featureId && featureIds.includes(c.featureId));
     const done = stories.filter((c) => category.get(c.columnId) === "done").length;
+    // Stored instants become dates in Danish time, like `current` above:
+    // an epic closed 00:30 on 1 January belongs to Q1, not the UTC Q4.
     const endQuarter =
       epic.state === "closed"
-        ? quarterOf((epic.closedAt ?? epic.updatedAt).toISOString().slice(0, 10))
+        ? quarterOf(todayInCopenhagen(epic.closedAt ?? epic.updatedAt))
         : epic.targetQuarter;
     const row: RoadmapRow = {
       epic,
       theme: epic.themeIds[0] ? (themeOf.get(epic.themeIds[0]) ?? null) : null,
       // The planned start wins; without one the creation quarter is the honest fallback.
-      startQuarter: epic.startQuarter ?? quarterOf(epic.createdAt.toISOString().slice(0, 10)),
+      startQuarter: epic.startQuarter ?? quarterOf(todayInCopenhagen(epic.createdAt)),
       endQuarter: endQuarter ?? current,
       reviewDue: reviewDue(epic, full.board.epicReviewDays, now),
       openStories: stories.length - done,
