@@ -79,7 +79,7 @@ export async function createItem(
     board.id,
     "item.created",
     { key: keyOf(board, item!), level: input.level, title: input.title },
-    { itemId: item!.id, actor },
+    { itemId: item!.id, actor, undo: { kind: "item.delete", itemId: item!.id } },
   );
   return (await itemInWorkspace(tx, item!.id))!;
 }
@@ -141,7 +141,23 @@ export async function updateItem(
     item.boardId,
     "item.updated",
     { key: keyOf(board, item), title: patch.title ?? item.title, fields: changed },
-    { itemId: item.id },
+    {
+      itemId: item.id,
+      undo: {
+        kind: "item.update",
+        itemId: item.id,
+        fields: Object.fromEntries(
+          changed.flatMap((field) =>
+            field === "kind"
+              ? [
+                  ["kind", item.kind],
+                  ["enablerType", item.enablerType],
+                ]
+              : [[field, item[field as keyof typeof item] ?? null]],
+          ),
+        ),
+      },
+    },
   );
   return item;
 }
@@ -186,7 +202,7 @@ export async function reopenItem(
     item.boardId,
     "item.reopened",
     { key: keyOf(board, item), title: item.title },
-    { itemId: item.id },
+    { itemId: item.id, undo: { kind: "item.close", itemId: item.id } },
   );
   return item;
 }

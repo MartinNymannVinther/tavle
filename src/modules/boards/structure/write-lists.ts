@@ -73,7 +73,14 @@ export async function createTheme(
       sort: await activeCount(tx, themes, board.id),
     })
     .returning();
-  await recordEvent(tx, ctx, board.id, "theme.created", { name: input.name });
+  await recordEvent(
+    tx,
+    ctx,
+    board.id,
+    "theme.created",
+    { name: input.name },
+    { undo: { kind: "theme.active", themeId: row!.id, active: false } },
+  );
   return row!;
 }
 
@@ -111,9 +118,8 @@ export async function updateTheme(
       ctx,
       theme.boardId,
       input.active ? "theme.activated" : "theme.deactivated",
-      {
-        name: input.name,
-      },
+      { name: input.name },
+      { undo: { kind: "theme.active", themeId: theme.id, active: theme.active } },
     );
   }
   return theme;
@@ -138,7 +144,14 @@ export async function createArea(
       sort: await activeCount(tx, areas, board.id),
     })
     .returning();
-  await recordEvent(tx, ctx, board.id, "area.created", { name: input.name });
+  await recordEvent(
+    tx,
+    ctx,
+    board.id,
+    "area.created",
+    { name: input.name },
+    { undo: { kind: "area.active", areaId: row!.id, active: false } },
+  );
   return row!;
 }
 
@@ -159,9 +172,14 @@ export async function updateArea(
     })
     .where(eq(areas.id, area.id));
   if (area.active !== input.active) {
-    await recordEvent(tx, ctx, area.boardId, input.active ? "area.activated" : "area.deactivated", {
-      name: input.name,
-    });
+    await recordEvent(
+      tx,
+      ctx,
+      area.boardId,
+      input.active ? "area.activated" : "area.deactivated",
+      { name: input.name },
+      { undo: { kind: "area.active", areaId: area.id, active: area.active } },
+    );
   }
   return area;
 }

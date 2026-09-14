@@ -115,7 +115,24 @@ export async function updateStructureView(
     if (input.swimlaneBy === "area" && !input.showAreas) throw new Error("invalid");
   }
   await tx.update(boards).set(input).where(eq(boards.id, boardId));
-  await recordEvent(tx, ctx, boardId, "board.view", { levels: input.structureLevels });
+  await recordEvent(
+    tx,
+    ctx,
+    boardId,
+    "board.view",
+    { levels: input.structureLevels },
+    {
+      undo: {
+        kind: "board.view",
+        boardId,
+        structureLevels: board.structureLevels,
+        showKind: board.showKind,
+        showThemes: board.showThemes,
+        showAreas: board.showAreas,
+        swimlaneBy: board.swimlaneBy,
+      },
+    },
+  );
   return board;
 }
 

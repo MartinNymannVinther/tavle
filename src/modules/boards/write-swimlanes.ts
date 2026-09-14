@@ -57,7 +57,14 @@ export async function createSwimlane(
       sort: await activeLaneCount(tx, board.id),
     })
     .returning();
-  await recordEvent(tx, ctx, board.id, "swimlane.created", { name: input.name });
+  await recordEvent(
+    tx,
+    ctx,
+    board.id,
+    "swimlane.created",
+    { name: input.name },
+    { undo: { kind: "swimlane.active", swimlaneId: row!.id, active: false } },
+  );
   return row!;
 }
 
@@ -89,6 +96,7 @@ export async function updateSwimlane(
       lane.boardId,
       input.active ? "swimlane.activated" : "swimlane.deactivated",
       { name: input.name },
+      { undo: { kind: "swimlane.active", swimlaneId: lane.id, active: lane.active } },
     );
   }
   return lane;
@@ -155,7 +163,10 @@ export async function applySwimlaneAssignment(
         "card.swimlane",
         // "none" is the sentence's own sentinel for the lane-less row, not a name.
         { key: `${board.key}-${card.number}`, title: card.title, lane: lane?.name ?? "none" },
-        { cardId: card.id },
+        {
+          cardId: card.id,
+          undo: { kind: "card.swimlane", cardId: card.id, swimlaneId: card.swimlaneId },
+        },
       );
       return;
     }

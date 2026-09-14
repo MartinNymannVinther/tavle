@@ -28,7 +28,7 @@ export async function archiveCard(tx: AppTransaction, ctx: OrgContext, cardId: s
     card.boardId,
     "card.archived",
     { key: `${board?.key ?? ""}-${card.number}`, title: card.title },
-    { cardId: card.id },
+    { cardId: card.id, undo: { kind: "card.restore", cardId: card.id } },
   );
   return card;
 }
@@ -55,7 +55,7 @@ export async function restoreCard(tx: AppTransaction, ctx: OrgContext, cardId: s
     card.boardId,
     "card.restored",
     { key: `${board?.key ?? ""}-${card.number}`, title: card.title },
-    { cardId: card.id },
+    { cardId: card.id, undo: { kind: "card.archive", cardId: card.id } },
   );
   return card;
 }

@@ -237,7 +237,11 @@ export async function setCardsSprint(
       board.id,
       target ? "card.sprint" : "card.backlog",
       { key: `${board.key}-${card.number}`, title: card.title, sprint: target?.name ?? "" },
-      { cardId: card.id, actor },
+      {
+        cardId: card.id,
+        actor,
+        undo: { kind: "card.sprint", cardId: card.id, sprintId: card.sprintId },
+      },
     );
     moved += 1;
   }

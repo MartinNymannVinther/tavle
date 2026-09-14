@@ -15,6 +15,7 @@ import {
   columnInBoard,
   firstColumn,
   joiningSort,
+  laneCards,
   laneFor,
   nextNumber,
   placeCard,
@@ -150,7 +151,7 @@ export async function createCard(
     board.id,
     "card.created",
     { key: `${board.key}-${number}`, title: input.title, column: column.name },
-    { cardId: card!.id, actor },
+    { cardId: card!.id, actor, undo: { kind: "card.delete", cardId: card!.id } },
   );
   return card!;
 }
@@ -176,6 +177,9 @@ export async function moveCard(
   const from = await columnInBoard(tx, card.boardId, card.columnId);
   const board = await boardInWorkspace(tx, card.boardId);
   if (target.id !== card.columnId) {
+    const oldIndex = (await laneCards(tx, laneFor(board?.mode ?? "kanban", card))).findIndex(
+      (c) => c.id === card.id,
+    );
     await enterColumn(tx, ctx, card, from, target);
     await recordEvent(
       tx,
@@ -183,7 +187,16 @@ export async function moveCard(
       card.boardId,
       "card.moved",
       { key: `${board?.key ?? ""}-${card.number}`, title: card.title, column: target.name },
-      { cardId: card.id, actor },
+      {
+        cardId: card.id,
+        actor,
+        undo: {
+          kind: "card.move",
+          cardId: card.id,
+          columnId: card.columnId,
+          index: Math.max(0, oldIndex),
+        },
+      },
     );
   }
   await placeCard(
@@ -261,7 +274,15 @@ export async function updateCard(
         card.boardId,
         "card.kind",
         { key, title: card.title, kind, enablerType: enablerType ?? "" },
-        { cardId: card.id, actor },
+        {
+          cardId: card.id,
+          actor,
+          undo: {
+            kind: "card.update",
+            cardId: card.id,
+            fields: { kind: card.kind, enablerType: card.enablerType },
+          },
+        },
       );
     }
   }
@@ -273,7 +294,11 @@ export async function updateCard(
       card.boardId,
       input.bug ? "card.bug" : "card.notBug",
       { key, title: card.title },
-      { cardId: card.id, actor },
+      {
+        cardId: card.id,
+        actor,
+        undo: { kind: "card.update", cardId: card.id, fields: { bug: card.bug } },
+      },
     );
   }
   if (input.priority !== undefined && input.priority !== card.priority) {
@@ -292,7 +317,11 @@ export async function updateCard(
       card.boardId,
       "card.estimated",
       { key, title: card.title, points: input.estimate ?? 0 },
-      { cardId: card.id, actor },
+      {
+        cardId: card.id,
+        actor,
+        undo: { kind: "card.update", cardId: card.id, fields: { estimate: card.estimate } },
+      },
     );
   }
   if (input.assigneeUserId !== undefined && input.assigneeUserId !== card.assigneeUserId) {
@@ -305,7 +334,15 @@ export async function updateCard(
       card.boardId,
       member ? "card.assigned" : "card.unassigned",
       { key, title: card.title, name: member?.name ?? "" },
-      { cardId: card.id, actor },
+      {
+        cardId: card.id,
+        actor,
+        undo: {
+          kind: "card.update",
+          cardId: card.id,
+          fields: { assigneeUserId: card.assigneeUserId },
+        },
+      },
     );
   }
   if (input.blocked !== undefined && input.blocked !== card.blocked) {
@@ -317,7 +354,15 @@ export async function updateCard(
       card.boardId,
       input.blocked ? "card.blocked" : "card.unblocked",
       { key, title: card.title, reason: patch.blockedReason },
-      { cardId: card.id, actor },
+      {
+        cardId: card.id,
+        actor,
+        undo: {
+          kind: "card.update",
+          cardId: card.id,
+          fields: { blocked: card.blocked, blockedReason: card.blockedReason },
+        },
+      },
     );
   } else if (input.blockedReason !== undefined && card.blocked) {
     patch.blockedReason = input.blockedReason;
@@ -326,13 +371,20 @@ export async function updateCard(
   if (Object.keys(patch).length === 0) return card;
   await tx.update(cards).set(patch).where(eq(cards.id, card.id));
   if (changed.length > 0) {
+    const oldFields = Object.fromEntries(
+      changed.map((field) => [field, card[field as keyof typeof card] ?? null]),
+    );
     await recordEvent(
       tx,
       ctx,
       card.boardId,
       "card.updated",
       { key, title: patch.title ?? card.title, fields: changed },
-      { cardId: card.id, actor },
+      {
+        cardId: card.id,
+        actor,
+        undo: { kind: "card.update", cardId: card.id, fields: oldFields },
+      },
     );
   }
   return card;

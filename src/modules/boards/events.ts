@@ -54,6 +54,7 @@ export type EventType =
   | "card.split"
   | "card.swimlane"
   | "ai.bootstrapped"
+  | "undo.applied"
   | "swimlane.created"
   | "swimlane.activated"
   | "swimlane.deactivated"
@@ -75,7 +76,13 @@ export async function recordEvent(
   boardId: string,
   type: EventType,
   payload: Record<string, unknown> = {},
-  options: { cardId?: string | null; itemId?: string | null; actor?: ActorKind } = {},
+  options: {
+    cardId?: string | null;
+    itemId?: string | null;
+    actor?: ActorKind;
+    /** The action's own reverse (docs/adr/0022), named while the "before" is in hand. */
+    undo?: Record<string, unknown>;
+  } = {},
 ): Promise<void> {
   await tx.insert(events).values({
     orgId: ctx.orgId,
@@ -83,7 +90,7 @@ export async function recordEvent(
     cardId: options.cardId ?? null,
     itemId: options.itemId ?? null,
     type,
-    payload,
+    payload: options.undo ? { ...payload, undo: options.undo } : payload,
     actorKind: options.actor ?? "user",
     actorUserId: ctx.userId,
   });

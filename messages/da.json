@@ -714,7 +714,8 @@
     },
     "activity": {
       "title": "Aktivitet",
-      "byAi": "AI"
+      "byAi": "AI",
+      "undo": "Fortryd"
     },
     "fields": {
       "column": "Kolonne",
@@ -1174,6 +1175,9 @@
       "created": "Banen {name} blev oprettet",
       "activated": "Banen {name} blev aktiveret igen",
       "deactivated": "Banen {name} blev deaktiveret"
+    },
+    "undo": {
+      "applied": "En handling blev fortrudt"
     }
   },
   "help": {

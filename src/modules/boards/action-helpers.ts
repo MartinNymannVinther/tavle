@@ -6,6 +6,7 @@ import { fail, ok, type ActionError, type Result } from "@/core/result";
 import { Conflict } from "./lanes";
 import { canManage, roleOf } from "./members";
 import { RuleViolation } from "./structure/rules";
+import { NotUndoable } from "./undo";
 import { NameTaken } from "./structure/write-lists";
 import { KeyTaken } from "./write-boards";
 import { SprintStateError } from "./write-sprints";
@@ -104,6 +105,8 @@ function classify(error: unknown): ActionError {
     return "conflict";
   }
   if (error instanceof SprintStateError) return "conflict";
+  // The state has moved on since the event; the reverse no longer holds.
+  if (error instanceof NotUndoable) return "conflict";
   if (error instanceof NotFound) return "notFound";
   if (error instanceof Forbidden) return "forbidden";
   if (error instanceof Error && error.message === "notFound") return "notFound";

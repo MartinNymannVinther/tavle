@@ -31,7 +31,7 @@ export async function addComment(
     card.boardId,
     "comment.added",
     { key: `${board?.key ?? ""}-${card.number}`, title: card.title },
-    { cardId: card.id },
+    { cardId: card.id, undo: { kind: "comment.delete", commentId: comment!.id } },
   );
   return comment!;
 }

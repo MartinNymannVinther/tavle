@@ -29,6 +29,13 @@ export async function placeItemInStructure(
   let areaId = item.areaId;
   let themeIds = await themeIdsOf(tx, item.id);
   let parentId = item.parentId;
+  const undo = {
+    kind: "item.place",
+    itemId: item.id,
+    parentId: item.parentId,
+    areaId: item.areaId,
+    themeIds: [...themeIds],
+  };
   let moved = false;
 
   if (input.parentId !== undefined && input.parentId !== item.parentId) {
@@ -72,7 +79,7 @@ export async function placeItemInStructure(
         title: item.title,
         parent: parentId ? keyOf(board, (await itemInWorkspace(tx, parentId))!) : "",
       },
-      { itemId: item.id },
+      { itemId: item.id, undo },
     );
   } else {
     await recordEvent(
@@ -86,7 +93,7 @@ export async function placeItemInStructure(
         area: area?.name ?? "",
         themes: themes.map((t) => t.name),
       },
-      { itemId: item.id },
+      { itemId: item.id, undo },
     );
   }
   if (input.applyToChildren) {

@@ -8,6 +8,7 @@ import { TypeIcon } from "@/components/board/type-icon";
 import { legendTypes, TypeLegend } from "@/components/board/type-legend";
 import { structureView } from "@/modules/boards/structure/view";
 import { useBoardActions } from "@/components/board/use-board-actions";
+import { undoEventAction } from "@/modules/boards/actions-undo";
 import type { CardFull } from "@/modules/boards/types";
 import {
   archiveCardAction,
@@ -90,7 +91,10 @@ export function CardPage({
             canManage={canManage}
             run={run}
           />
-          <ActivityList events={events} />
+          <ActivityList
+            events={events}
+            onUndo={(eventId) => void run(() => undoEventAction({ eventId }))}
+          />
         </div>
         <aside className={cn(panel, "@3xl:sticky @3xl:top-6")}>
           <CardSidePanel

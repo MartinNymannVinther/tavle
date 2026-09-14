@@ -49,6 +49,8 @@ export async function placeCardInStructure(
   let featureId = card.featureId;
   let areaId = card.areaId;
   let themeIds = await cardThemeIds(tx, card.id);
+  const before = { featureId: card.featureId, areaId: card.areaId, themeIds: [...themeIds] };
+  const undo = { kind: "card.place", cardId: card.id, ...before };
   let moved = false;
 
   if (input.featureId !== undefined && input.featureId !== card.featureId) {
@@ -94,7 +96,7 @@ export async function placeCardInStructure(
       card.boardId,
       "card.parent",
       { key, title: card.title, parent: parent ? `${board.key}-${parent.number}` : "" },
-      { cardId: card.id, actor },
+      { cardId: card.id, actor, undo },
     );
   } else {
     await recordEvent(
@@ -103,7 +105,7 @@ export async function placeCardInStructure(
       card.boardId,
       "card.placed",
       { key, title: card.title, area: area?.name ?? "", themes: themes.map((t) => t.name) },
-      { cardId: card.id, actor },
+      { cardId: card.id, actor, undo },
     );
   }
   return card;

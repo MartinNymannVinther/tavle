@@ -714,7 +714,8 @@
     },
     "activity": {
       "title": "Activity",
-      "byAi": "AI"
+      "byAi": "AI",
+      "undo": "Undo"
     },
     "fields": {
       "column": "Column",
@@ -1174,6 +1175,9 @@
       "created": "The lane {name} was created",
       "activated": "The lane {name} was activated again",
       "deactivated": "The lane {name} was deactivated"
+    },
+    "undo": {
+      "applied": "An action was undone"
     }
   },
   "help": {

@@ -105,7 +105,7 @@ export async function closeItem(
     item.boardId,
     "item.closed",
     { key: `${board.key}-${item.number}`, title: item.title, level: item.level },
-    { itemId: item.id },
+    { itemId: item.id, undo: { kind: "item.reopen", itemId: item.id } },
   );
   return { closed: true };
 }
