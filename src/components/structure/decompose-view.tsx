@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Maximize2, Minimize2 } from "lucide-react";
+import { Maximize2, Minimize2, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { structureOf } from "@/components/board/card-chips";
 import { legendTypes, TypeLegend } from "@/components/board/type-legend";
@@ -36,6 +36,15 @@ export function DecomposeView({ full }: { full: BoardFull }) {
   // shows only the fullscreened element's own subtree — "Ny epic" would
   // open invisibly behind the chart. An overlay keeps every popup alive.
   const [fullscreen, setFullscreen] = useState(false);
+  // Zoom: the whole surface scales, tray included, so a big breakdown
+  // can be read at a glance or a corner of it up close. CSS zoom keeps
+  // layout and hit-testing honest, so every drag still lands right.
+  const STEPS = [0.5, 0.65, 0.8, 1, 1.2] as const;
+  const [zoom, setZoom] = useState(1);
+  const step = (by: number) => {
+    const at = STEPS.indexOf(zoom as (typeof STEPS)[number]);
+    setZoom(STEPS[Math.min(STEPS.length - 1, Math.max(0, at + by))] ?? 1);
+  };
   useEffect(() => {
     if (!fullscreen) return;
     const onKey = (event: KeyboardEvent) => {
@@ -94,7 +103,32 @@ export function DecomposeView({ full }: { full: BoardFull }) {
         fullscreen && "bg-background fixed inset-0 z-40 overflow-auto p-6",
       )}
     >
-      <div className="flex justify-end gap-2">
+      <div className="flex items-center justify-end gap-2">
+        <div className="border-border bg-secondary/60 flex items-center gap-0.5 rounded-lg border p-0.5">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t("zoomOut")}
+            disabled={zoom === STEPS[0]}
+            onClick={() => step(-1)}
+          >
+            <ZoomOut />
+          </Button>
+          <span className="text-meta w-10 text-center text-[0.72rem] tabular-nums">
+            {Math.round(zoom * 100)}%
+          </span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t("zoomIn")}
+            disabled={zoom === STEPS[STEPS.length - 1]}
+            onClick={() => step(1)}
+          >
+            <ZoomIn />
+          </Button>
+        </div>
         <BootstrapDialog boardId={board.id} run={run} />
         <Button
           type="button"
@@ -107,7 +141,7 @@ export function DecomposeView({ full }: { full: BoardFull }) {
           {fullscreen ? t("exitFullscreen") : t("fullscreen")}
         </Button>
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4" style={{ zoom }}>
         <div className="-mx-5 min-w-0 flex-1 overflow-x-auto px-5 pb-2 sm:-mx-7 sm:px-7 lg:mx-0 lg:px-0">
           {view.epics ? (
             <div className="flex flex-col gap-10">

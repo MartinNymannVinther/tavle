@@ -1424,7 +1424,9 @@
     "trayHint": "Features and cards with no place in the breakdown. Drag them in — or out to here.",
     "trayEmpty": "Everything has a parent.",
     "fullscreen": "Full screen",
-    "exitFullscreen": "Exit full screen"
+    "exitFullscreen": "Exit full screen",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out"
   },
   "aiBootstrap": {
     "cta": "Build a starting point",
