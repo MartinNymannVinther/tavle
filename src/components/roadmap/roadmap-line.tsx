@@ -160,23 +160,46 @@ export function RoadmapLine({
           <span className="relative truncate">
             {closed ? t("closed") : row.reviewDue ? s("forReview") : quarters[span.end]}
           </span>
-          {planned && (
-            <>
-              <div
-                onPointerDown={down("start")}
-                className="absolute inset-y-0 left-0 w-2.5 cursor-ew-resize touch-none"
-                aria-hidden
-              />
-              <div
-                onPointerDown={down("end")}
-                className="absolute inset-y-0 right-0 w-2.5 cursor-ew-resize touch-none"
-                aria-hidden
-              />
-            </>
-          )}
         </div>
+        {planned && (
+          <>
+            <EdgeHandle
+              onPointerDown={down("start")}
+              left={`calc(${(span.start / quarters.length) * 100}% + 0.25rem)`}
+            />
+            <EdgeHandle
+              onPointerDown={down("end")}
+              left={`calc(${((span.end + 1) / quarters.length) * 100}% - 0.25rem)`}
+            />
+          </>
+        )}
       </div>
     </li>
+  );
+}
+
+/**
+ * A duration handle on the bar's edge. A sibling of the bar rather than
+ * a child, so the bar's rounded clipping cannot swallow it: a wide,
+ * centred hit area straddling the edge, with a grip that shows itself
+ * on hover.
+ */
+function EdgeHandle({
+  onPointerDown,
+  left,
+}: {
+  onPointerDown: (event: React.PointerEvent<HTMLDivElement>) => void;
+  left: string;
+}) {
+  return (
+    <div
+      onPointerDown={onPointerDown}
+      className="group/handle absolute inset-y-2 z-10 flex w-4 -translate-x-1/2 cursor-ew-resize touch-none items-center justify-center"
+      style={{ left }}
+      aria-hidden
+    >
+      <span className="bg-foreground/35 h-5 w-1 rounded-full opacity-0 transition-opacity group-hover/handle:opacity-100" />
+    </div>
   );
 }
 

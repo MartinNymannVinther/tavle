@@ -4,7 +4,7 @@ Status: accepted · Date: 2026-09-14
 
 ## Context
 
-The roadmap drew an epic from the quarter it was *created* in to its
+The roadmap drew an epic from the quarter it was _created_ in to its
 target quarter. The start was history, not intent: a bar's length said
 "how long this has existed", never "how long we plan for it". The owner
 asked for an interactive roadmap — move an epic, change its duration —
