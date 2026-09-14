@@ -29,6 +29,8 @@ export function item(
     closedAt: null,
     targetQuarter: null,
     startQuarter: null,
+    startSprintId: null,
+    targetSprintId: null,
     reviewConfirmedAt: null,
     sort: 1000,
     mapSort: null,

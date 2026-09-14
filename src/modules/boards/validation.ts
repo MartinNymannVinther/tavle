@@ -188,6 +188,19 @@ export const BacklogOrderSchema = z.object({
 export const NewCommentSchema = z.object({ cardId: id, text: shortText(4000).min(1) });
 export const CommentIdSchema = z.object({ commentId: id });
 
+/** A run of planned sprints laid back to back (docs/adr/0023). */
+export const SprintSeriesSchema = z.object({
+  boardId: id,
+  count: z.number().int().min(1).max(12),
+});
+
+/** A feature's planned span on the sprint axis; null unplans it. */
+export const ItemPlanSchema = z.object({
+  itemId: id,
+  startSprintId: id.nullable(),
+  targetSprintId: id.nullable(),
+});
+
 export const NewSprintSchema = z.object({
   boardId: id,
   name: shortText(80).min(1),

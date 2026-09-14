@@ -1143,7 +1143,8 @@
       "started": "{name} started with {cards} cards and {points} points",
       "closed": "{name} was closed: {completed} of {committed} points, {carried} cards carried over",
       "retro": "Retrospective written for {name}",
-      "summary": "The story of {name} was saved"
+      "summary": "The story of {name} was saved",
+      "series": "{count} sprints were laid ahead, {from} to {to}"
     },
     "ai": {
       "drafted": "AI drafted {key} ({engine})",
@@ -1169,7 +1170,8 @@
       "reviewed": "{key} was confirmed as still a result",
       "mapped": "{key} was put on the story map",
       "unmapped": "{key} was taken off the story map",
-      "deleted": "{key} was deleted"
+      "deleted": "{key} was deleted",
+      "planned": "{key} was planned for {from, select, none {no sprint} other {{from} – {to}}}"
     },
     "swimlane": {
       "created": "The lane {name} was created",
@@ -1351,7 +1353,17 @@
     "addInQuarter": "New epic in {quarter}",
     "planQuarter": "Quarter for {title}",
     "planStart": "Start of {title}",
-    "featureCards": "{done} of {total} cards"
+    "featureCards": "{done} of {total} cards",
+    "axisEpics": "Epics · quarters",
+    "axisFeatures": "Features · sprints",
+    "featureColumn": "Feature",
+    "createSeries": "Create sprints ahead",
+    "seriesCount": "Number of sprints",
+    "seriesOption": "{count} sprints ({weeks} weeks)",
+    "noSprints": "No open sprints. Create a run ahead so the features have a timeline to lie on.",
+    "noPlanned": "No features are planned yet. Pick a sprint on one below.",
+    "unplannedFeatures": "Unplanned features ({count})",
+    "unplannedWord": "Pick a sprint …"
   },
   "overview": {
     "title": "Overview",

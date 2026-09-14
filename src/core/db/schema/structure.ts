@@ -12,7 +12,7 @@ import {
   uniqueIndex,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
-import { boards, cards } from "./boards";
+import { boards, cards, sprints } from "./boards";
 import { domainId, users } from "./foundation";
 import { tenant, timestamps } from "./shared";
 
@@ -148,6 +148,13 @@ export const backlogItems = pgTable(
     targetQuarter: text("target_quarter"),
     /** Epics only: the planned start the roadmap draws from; null falls back to the creation quarter. */
     startQuarter: text("start_quarter"),
+    /** Features only: the planned span on the sprint axis (docs/adr/0023); null is unplanned. */
+    startSprintId: text("start_sprint_id").references((): AnyPgColumn => sprints.id, {
+      onDelete: "set null",
+    }),
+    targetSprintId: text("target_sprint_id").references((): AnyPgColumn => sprints.id, {
+      onDelete: "set null",
+    }),
     /** The last time an owner said "still a result"; the review clock counts from here, or from creation. */
     reviewConfirmedAt: timestamp("review_confirmed_at", { withTimezone: true }),
     /** Position within its level on the board. One order per level, business and enabler alike. */

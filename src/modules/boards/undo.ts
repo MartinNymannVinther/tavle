@@ -4,12 +4,13 @@ import { events, swimlanes, themes as themesTable, areas as areasTable } from "@
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 import { applySwimlaneAssignment, updateSwimlane } from "./write-swimlanes";
 import { archiveCard, deleteCard, restoreCard } from "./write-card-lifecycle";
-import { createCard, moveCard, updateCard, type CardUpdate } from "./write-cards";
+import { moveCard, updateCard, type CardUpdate } from "./write-cards";
 import { deleteComment } from "./comments";
 import { cardInWorkspace } from "./lanes";
 import { closeItem, type CloseOutcome } from "./structure/close";
 import { placeCardInStructure } from "./structure/write-card-placement";
 import { placeItemInStructure } from "./structure/place-item";
+import { planFeature } from "./structure/plan-feature";
 import { deleteItem, reopenItem, updateItem } from "./structure/write-items";
 import { updateArea, updateTheme } from "./structure/write-lists";
 import { updateStructureView } from "./write-boards";
@@ -79,6 +80,12 @@ export const UndoStepSchema = z.discriminatedUnion("kind", [
     parentId: id.nullable(),
     areaId: id.nullable(),
     themeIds: z.array(id),
+  }),
+  z.object({
+    kind: z.literal("item.plan"),
+    itemId: id,
+    startSprintId: id.nullable(),
+    targetSprintId: id.nullable(),
   }),
   z.object({ kind: z.literal("item.reopen"), itemId: id }),
   z.object({ kind: z.literal("item.close"), itemId: id }),
@@ -154,6 +161,9 @@ async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): P
     case "item.place":
       if (!(await placeItemInStructure(tx, ctx, { ...step }))) throw new NotUndoable();
       return;
+    case "item.plan":
+      if (!(await planFeature(tx, ctx, { ...step }))) throw new NotUndoable();
+      return;
     case "item.reopen":
       if (!(await reopenItem(tx, ctx, step.itemId))) throw new NotUndoable();
       return;
@@ -165,10 +175,14 @@ async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): P
       return;
     }
     case "board.view": {
-      const { kind: _, boardId, ...view } = step;
-      if (!(await updateStructureView(tx, ctx, boardId, view as StructureViewInput))) {
-        throw new NotUndoable();
-      }
+      const view: StructureViewInput = {
+        structureLevels: step.structureLevels,
+        showKind: step.showKind,
+        showThemes: step.showThemes,
+        showAreas: step.showAreas,
+        swimlaneBy: step.swimlaneBy,
+      };
+      if (!(await updateStructureView(tx, ctx, step.boardId, view))) throw new NotUndoable();
       return;
     }
     case "comment.delete":

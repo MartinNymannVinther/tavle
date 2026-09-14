@@ -1143,7 +1143,8 @@
       "started": "{name} startede med {cards} kort og {points} point",
       "closed": "{name} blev afsluttet: {completed} af {committed} point, {carried} kort ført videre",
       "retro": "Retrospektiv skrevet for {name}",
-      "summary": "Historien om {name} blev gemt"
+      "summary": "Historien om {name} blev gemt",
+      "series": "{count} sprints blev lagt forud, {from} til {to}"
     },
     "ai": {
       "drafted": "AI skrev et udkast til {key} ({engine})",
@@ -1169,7 +1170,8 @@
       "reviewed": "{key} blev bekræftet som stadig et resultat",
       "mapped": "{key} blev sat op på story mappet",
       "unmapped": "{key} blev taget ned fra story mappet",
-      "deleted": "{key} blev slettet"
+      "deleted": "{key} blev slettet",
+      "planned": "{key} blev planlagt til {from, select, none {ingen sprint} other {{from} – {to}}}"
     },
     "swimlane": {
       "created": "Banen {name} blev oprettet",
@@ -1351,7 +1353,17 @@
     "addInQuarter": "Ny epic i {quarter}",
     "planQuarter": "Kvartal for {title}",
     "planStart": "Start for {title}",
-    "featureCards": "{done} af {total} kort"
+    "featureCards": "{done} af {total} kort",
+    "axisEpics": "Epics · kvartaler",
+    "axisFeatures": "Features · sprints",
+    "featureColumn": "Feature",
+    "createSeries": "Opret sprints forud",
+    "seriesCount": "Antal sprints",
+    "seriesOption": "{count} sprints ({weeks} uger)",
+    "noSprints": "Ingen åbne sprints. Opret en række forud, så featurene har en tidslinje at ligge på.",
+    "noPlanned": "Ingen features er planlagt endnu. Vælg en sprint på en feature herunder.",
+    "unplannedFeatures": "Uplanlagte features ({count})",
+    "unplannedWord": "Vælg sprint …"
   },
   "overview": {
     "title": "Overblik",

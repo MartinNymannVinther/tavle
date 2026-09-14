@@ -1,13 +1,17 @@
 "use server";
 
 import type { Result } from "@/core/result";
-import { action, found } from "./action-helpers";
+import { createSprintSeries } from "./write-sprint-series";
+import { planFeature } from "./structure/plan-feature";
+import { action, found, NotFound } from "./action-helpers";
 import { cardInWorkspace } from "./lanes";
 import {
   BacklogOrderSchema,
   CardSprintSchema,
   CloseSprintSchema,
+  ItemPlanSchema,
   NewSprintSchema,
+  SprintSeriesSchema,
   RetroSchema,
   SprintIdSchema,
   SprintSummarySchema,
@@ -29,6 +33,23 @@ import {
  * it. Any member may plan and run a sprint — that is the team's job, not
  * an administrator's.
  */
+
+export async function createSprintSeriesAction(raw: unknown): Promise<Result<number>> {
+  return action(SprintSeriesSchema, raw, async (tx, ctx, input) => {
+    const created = await createSprintSeries(tx, ctx, input);
+    if (created.length === 0) throw new NotFound();
+    return created.length;
+  });
+}
+
+/** The feature's planned span, from the roadmap's feature view. */
+export async function planFeatureAction(raw: unknown): Promise<Result<string>> {
+  return action(ItemPlanSchema, raw, async (tx, ctx, input, touch) => {
+    const item = found(await planFeature(tx, ctx, input));
+    touch(item.boardId);
+    return item.id;
+  });
+}
 
 export async function createSprintAction(raw: unknown): Promise<Result<string>> {
   return action(

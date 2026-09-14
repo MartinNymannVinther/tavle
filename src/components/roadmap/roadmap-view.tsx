@@ -16,6 +16,7 @@ import type { RoadmapRow } from "@/modules/boards/structure/roadmap";
 import { structureView } from "@/modules/boards/structure/view";
 import { useFolded } from "@/components/backlog/use-folded";
 import { RoadmapChildren } from "./roadmap-children";
+import { FeaturePlan } from "./feature-plan";
 import { QuarterSelect, RoadmapLine, type PlanSpan } from "./roadmap-line";
 import type { BoardFull } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
@@ -36,6 +37,11 @@ export function RoadmapView({ full }: { full: BoardFull }) {
   const t = useTranslations("roadmap");
   const s = useTranslations("boards.structure");
   const { run } = useBoardActions();
+  const scrum = full.board.mode === "scrum";
+  // Two ways of looking at time: the epics on quarters, the features on
+  // sprints (docs/adr/0023). Scrum boards have both; Kanban has no
+  // sprints to plan against yet.
+  const [axis, setAxis] = useState<"epics" | "features">("epics");
   const [areaId, setAreaId] = useState("");
   // Its own fold memory, apart from the backlog's: two pages, two looks.
   const folded = useFolded(`${full.board.id}:roadmap`);
@@ -83,9 +89,40 @@ export function RoadmapView({ full }: { full: BoardFull }) {
     return <p className="text-meta text-sm">{t("noEpics")}</p>;
   }
 
+  const toggle = scrum && (
+    <div className="border-border bg-secondary/60 flex w-fit gap-0.5 rounded-lg border p-0.5">
+      {(["epics", "features"] as const).map((option) => (
+        <button
+          key={option}
+          type="button"
+          aria-pressed={axis === option}
+          onClick={() => setAxis(option)}
+          className={cn(
+            "rounded-md px-2.5 py-1 text-[0.78rem] font-medium transition-colors",
+            axis === option
+              ? "bg-card shadow-[var(--surface-shadow)]"
+              : "text-meta hover:text-foreground",
+          )}
+        >
+          {t(option === "epics" ? "axisEpics" : "axisFeatures")}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (axis === "features") {
+    return (
+      <div className="flex flex-col gap-4">
+        {toggle}
+        <FeaturePlan full={full} />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center gap-3">
+        {toggle}
         {areas.length > 1 && (
           <NativeSelect
             variant="sm"
