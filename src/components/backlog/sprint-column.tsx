@@ -6,6 +6,7 @@ import type { StructureLookup } from "@/components/board/card-chips";
 import type { Run } from "@/components/board/use-board-actions";
 import { addDaysIso, todayInCopenhagen } from "@/core/dates";
 import type { Sprint } from "@/core/db/schema";
+import { velocity } from "@/modules/boards/metrics/velocity";
 import type { BoardFull } from "@/modules/boards/types";
 import { SprintForm } from "./sprint-form";
 import { SprintPlan } from "./sprint-plan";
@@ -36,6 +37,9 @@ export function SprintColumn({
   const t = useTranslations("backlog");
   const { board, cards } = full;
   const columnNames = new Map(full.columns.map((c) => [c.id, c.name]));
+  // The record speaks at the moment of planning: the recent closed
+  // sprints' written-down points, next to what this plan holds.
+  const average = velocity(full.sprints).average;
   const lastEnd = full.sprints.reduce((max, sp) => (sp.endDate > max ? sp.endDate : max), "");
   const suggestedStart = lastEnd ? addDaysIso(lastEnd, 1) : todayInCopenhagen();
   return (
@@ -53,6 +57,7 @@ export function SprintColumn({
           selected={selected}
           onSelect={onSelect}
           lengthDays={board.sprintLengthDays}
+          velocityAverage={average}
           run={run}
         />
       ))}

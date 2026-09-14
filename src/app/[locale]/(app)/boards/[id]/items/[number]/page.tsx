@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { ItemPage } from "@/components/item/item-page";
 import { requireOrgContext } from "@/core/auth/guard";
 import { withOrgContext } from "@/core/db/tenant";
+import { modelConfigured } from "@/modules/ai/service";
 import { canManage, roleOf } from "@/modules/boards/members";
 import { getItemFull } from "@/modules/boards/structure/read";
 import { itemTitle } from "@/modules/boards/read-titles";
@@ -25,6 +26,9 @@ export default async function ItemRoute({ params }: Params) {
   if (!Number.isInteger(n) || n < 1) notFound();
   const full = await getItemFull(context, id, n);
   if (!full) notFound();
-  const role = await withOrgContext(context, (tx) => roleOf(tx, context));
-  return <ItemPage full={full} canManage={canManage(role)} />;
+  const [role, aiAvailable] = await Promise.all([
+    withOrgContext(context, (tx) => roleOf(tx, context)),
+    modelConfigured(context),
+  ]);
+  return <ItemPage full={full} canManage={canManage(role)} aiAvailable={aiAvailable} />;
 }

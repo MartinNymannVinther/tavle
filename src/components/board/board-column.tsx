@@ -195,6 +195,8 @@ export function BoardColumn({
         <QuickAdd
           onAdd={(title, place) => onAdd(column.id, title, place, laneKey)}
           structure={structure}
+          boardId={boardId}
+          boardKey={boardKey}
         />
       </div>
     </section>

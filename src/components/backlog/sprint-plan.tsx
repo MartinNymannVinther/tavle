@@ -29,6 +29,7 @@ export function SprintPlan({
   selected,
   onSelect,
   lengthDays,
+  velocityAverage = null,
   run,
 }: {
   sprint: Sprint;
@@ -41,6 +42,8 @@ export function SprintPlan({
   selected: Set<string>;
   onSelect: (cardId: string, checked: boolean) => void;
   lengthDays: number;
+  /** The recent closed sprints' average completed points; null before any close. */
+  velocityAverage?: number | null;
   run: Run;
 }) {
   const t = useTranslations("backlog.sprint");
@@ -58,6 +61,9 @@ export function SprintPlan({
           <h2 className="text-base font-semibold">{sprint.name}</h2>
           <p className="text-meta text-2sm tabular-nums">
             {t("holds", { cards: cards.length, points })}
+            {velocityAverage !== null && points > 0 && (
+              <span> · {t("againstAverage", { average: velocityAverage })}</span>
+            )}
           </p>
         </div>
         {sprint.goal && <p className="text-meta text-sm">{sprint.goal}</p>}

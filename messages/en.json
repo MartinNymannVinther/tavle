@@ -564,7 +564,9 @@
       "partOfFeature": "Part of a feature",
       "noParentInArea": "No parent, in area",
       "inArea": "In area",
-      "looseFeatures": "Features without an epic"
+      "looseFeatures": "Features without an epic",
+      "aiSuggested": "AI suggests this place — pick one yourself to change it",
+      "similar": "Looks like:"
     },
     "filters": {
       "search": "Search cards",
@@ -818,7 +820,8 @@
       "anotherActive": "A sprint is already running. Close it first.",
       "toBoard": "See the board",
       "empty": "No cards yet. Select cards in the backlog and put them here.",
-      "toBacklog": "Move {count, plural, one {# card} other {# cards}} to the backlog"
+      "toBacklog": "Move {count, plural, one {# card} other {# cards}} to the backlog",
+      "againstAverage": "the average is {average}"
     },
     "sprintForm": {
       "defaultName": "Sprint {number}",
@@ -1309,7 +1312,9 @@
       "placeholder": "The condition that makes it done",
       "save": "Save",
       "cancel": "Cancel",
-      "empty": "Not written yet."
+      "empty": "Not written yet.",
+      "suggest": "Suggest",
+      "aiDraft": "The AI's draft — rework it and save it as yours."
     },
     "page": {
       "closed": "Closed",

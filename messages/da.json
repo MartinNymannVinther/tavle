@@ -564,7 +564,9 @@
       "partOfFeature": "Del af feature",
       "noParentInArea": "Uden forælder, i område",
       "inArea": "I område",
-      "looseFeatures": "Features uden epic"
+      "looseFeatures": "Features uden epic",
+      "aiSuggested": "AI foreslår placeringen — vælg selv for at ændre den",
+      "similar": "Ligner:"
     },
     "filters": {
       "search": "Søg i kort",
@@ -818,7 +820,8 @@
       "anotherActive": "Der kører allerede en sprint. Afslut den først.",
       "toBoard": "Se tavlen",
       "empty": "Ingen kort endnu. Vælg kort i backloggen og læg dem her.",
-      "toBacklog": "Flyt {count, plural, one {# kort} other {# kort}} til backloggen"
+      "toBacklog": "Flyt {count, plural, one {# kort} other {# kort}} til backloggen",
+      "againstAverage": "snittet er {average}"
     },
     "sprintForm": {
       "defaultName": "Sprint {number}",
@@ -1309,7 +1312,9 @@
       "placeholder": "Den betingelse der gør det færdigt",
       "save": "Gem",
       "cancel": "Annuller",
-      "empty": "Ikke skrevet endnu."
+      "empty": "Ikke skrevet endnu.",
+      "suggest": "Foreslå",
+      "aiDraft": "AI'ens udkast — ret det til, og gem det som jeres."
     },
     "page": {
       "closed": "Lukket",

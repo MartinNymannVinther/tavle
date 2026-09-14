@@ -263,6 +263,8 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
               structure={structure}
               placeholder={t("addPlaceholder")}
               defaultWhere={quickAddWhere}
+              boardId={board.id}
+              boardKey={board.key}
             />
           </div>
           {grouping === "list" ? (

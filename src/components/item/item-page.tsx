@@ -37,7 +37,15 @@ import { ItemTitle } from "./item-title";
  * header, and the review confirmation is a button next to the mark it
  * removes.
  */
-export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boolean }) {
+export function ItemPage({
+  full,
+  canManage,
+  aiAvailable = false,
+}: {
+  full: ItemFull;
+  canManage: boolean;
+  aiAvailable?: boolean;
+}) {
   const t = useTranslations("items.page");
   const s = useTranslations("boards.structure");
   const format = useFormatter();
@@ -94,7 +102,7 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
 
       <div className="grid items-start gap-6 @3xl:grid-cols-[minmax(0,1fr)_20rem]">
         <div className={surface}>
-          <ItemTextarea item={item} field="doneWhen" run={run} />
+          <ItemTextarea item={item} field="doneWhen" run={run} assist={aiAvailable} />
           <ItemTextarea item={item} field="description" run={run} />
           <ItemChildren full={full} run={run} />
           <ActivityList

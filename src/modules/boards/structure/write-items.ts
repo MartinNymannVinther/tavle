@@ -88,6 +88,7 @@ export async function updateItem(
   tx: AppTransaction,
   ctx: OrgContext,
   input: ItemUpdateInput,
+  actor: ActorKind = "user",
 ): Promise<BacklogItem | null> {
   const item = await itemInWorkspace(tx, input.itemId);
   if (!item) return null;
@@ -153,6 +154,7 @@ export async function updateItem(
     { key: keyOf(board, item), title: patch.title ?? item.title, fields: changed },
     {
       itemId: item.id,
+      actor,
       undo: {
         kind: "item.update",
         itemId: item.id,
