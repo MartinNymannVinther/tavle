@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { DecomposeView } from "@/components/structure/decompose-view";
 import { requireOrgContext } from "@/core/auth/guard";
+import { modelConfigured } from "@/modules/ai/service";
 import { getBoardFull } from "@/modules/boards/read";
 
 type Params = { params: Promise<{ id: string }> };
@@ -19,5 +20,5 @@ export default async function DecomposePage({ params }: Params) {
   const { id } = await params;
   const full = await getBoardFull(context, id);
   if (!full) notFound();
-  return <DecomposeView full={full} />;
+  return <DecomposeView full={full} aiAvailable={await modelConfigured(context)} />;
 }

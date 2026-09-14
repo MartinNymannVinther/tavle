@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import type { Run } from "@/components/board/use-board-actions";
+import { Link } from "@/i18n/navigation";
 import { proposeBootstrapAction, applyBootstrapAction } from "@/modules/ai/actions-bootstrap";
 import type { BootstrapProposal } from "@/modules/ai/bootstrap";
 import { BootstrapReview, keepChecked, toEditable, type Editable } from "./bootstrap-review";
@@ -29,8 +30,18 @@ import { BootstrapReview, keepChecked, toEditable, type Editable } from "./boots
  * answers with a tree the person prunes and edits before anything is
  * written — the AI proposes, the person decides.
  */
-export function BootstrapDialog({ boardId, run }: { boardId: string; run: Run }) {
+export function BootstrapDialog({
+  boardId,
+  run,
+  available = true,
+}: {
+  boardId: string;
+  run: Run;
+  /** Without a model the button says so up front, before anyone writes a description. */
+  available?: boolean;
+}) {
   const t = useTranslations("aiBootstrap");
+  const ai = useTranslations("cards.ai");
   const errors = useTranslations("cards.ai.errors");
   // A fresh board can arrive asking for the starting point (?ai=start
   // from the new-board dialog); the dialog then opens from birth.
@@ -83,6 +94,19 @@ export function BootstrapDialog({ boardId, run }: { boardId: string; run: Run })
       setDescription("");
       setFocus("");
     }
+  }
+
+  if (!available) {
+    return (
+      <p className="text-meta flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.78rem]">
+        <Sparkles className="size-3.5 shrink-0" aria-hidden />
+        <span className="font-medium">{t("cta")}:</span>
+        <span>{ai("noModelShort")}</span>
+        <Link href="/settings/ai" className="text-primary underline-offset-4 hover:underline">
+          {ai("noModelLink")}
+        </Link>
+      </p>
+    );
   }
 
   return (

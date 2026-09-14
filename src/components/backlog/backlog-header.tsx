@@ -22,6 +22,7 @@ export function BacklogHeader({
   selection,
   run,
   follow,
+  aiAvailable,
 }: {
   full: BoardFull;
   view: StructureView;
@@ -29,6 +30,7 @@ export function BacklogHeader({
   selection: Selection;
   run: Run;
   follow: (level: "epic" | "feature") => (item: { id: string; parentId: string | null }) => void;
+  aiAvailable: boolean;
 }) {
   const t = useTranslations("backlog");
   return (
@@ -42,7 +44,9 @@ export function BacklogHeader({
           })}
         </p>
       </div>
-      {view.features && <BootstrapDialog boardId={full.board.id} run={run} />}
+      {view.features && (
+        <BootstrapDialog boardId={full.board.id} run={run} available={aiAvailable} />
+      )}
       {view.epics && (
         <ItemForm
           full={full}

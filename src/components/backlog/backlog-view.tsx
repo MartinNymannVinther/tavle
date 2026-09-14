@@ -42,7 +42,7 @@ import { useFolded } from "./use-folded";
  * one order: the arrows move a story past its neighbour in the list,
  * which is the same move in the whole backlog.
  */
-export function BacklogView({ full }: { full: BoardFull }) {
+export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailable: boolean }) {
   const t = useTranslations("backlog");
   const g = useTranslations("backlog.grouping");
   const s = useTranslations("boards.structure");
@@ -197,6 +197,7 @@ export function BacklogView({ full }: { full: BoardFull }) {
         selection={selection}
         run={run}
         follow={follow}
+        aiAvailable={aiAvailable}
       />
       <div className={cn("grid", view.features && "@2xl:grid-cols-[17rem_minmax(0,1fr)]")}>
         {view.features && (

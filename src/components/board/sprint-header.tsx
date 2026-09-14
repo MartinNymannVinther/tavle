@@ -15,7 +15,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { diffDays, formatDateDa } from "@/core/dates";
 import type { Sprint } from "@/core/db/schema";
 import { closeSprintAction } from "@/modules/boards/actions-sprints";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import type { Run } from "./use-board-actions";
 
@@ -47,6 +47,7 @@ export function SprintHeader({
   run: Run;
 }) {
   const t = useTranslations("boards.sprint");
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [target, setTarget] = useState<string>("");
   const [pending, setPending] = useState(false);
@@ -60,9 +61,14 @@ export function SprintHeader({
 
   async function close() {
     setPending(true);
-    await run(() => closeSprintAction({ sprintId: sprint.id, moveUnfinishedTo: target || null }));
+    const ok = await run(() =>
+      closeSprintAction({ sprintId: sprint.id, moveUnfinishedTo: target || null }),
+    );
     setPending(false);
     setOpen(false);
+    // The ritual continues where it belongs: the closed sprint's page,
+    // with the numbers, the story and the retro — not an empty board.
+    if (ok) router.push(`/boards/${boardId}/sprints/${sprint.id}`);
   }
 
   return (

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { VelocityChart } from "@/components/charts/bar-charts";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { requireOrgContext } from "@/core/auth/guard";
@@ -44,7 +45,15 @@ export default async function SprintsPage({ params }: Params) {
         </Card>
       )}
       {sprints.length === 0 ? (
-        <EmptyState title={t("emptyTitle")} hint={t("emptyBody")} />
+        <EmptyState
+          title={t("emptyTitle")}
+          hint={t("emptyBody")}
+          action={
+            <Link href={`/boards/${id}/backlog`} className={buttonVariants({ size: "sm" })}>
+              {t("emptyCta")}
+            </Link>
+          }
+        />
       ) : (
         <ul className="flex flex-col gap-3">
           {sprints.map((sprint) => (

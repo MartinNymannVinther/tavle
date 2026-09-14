@@ -38,7 +38,7 @@ function suggestKey(name: string): string {
  * A new board in one dialog: a name, a short key for the card numbers and
  * the one choice that shapes everything after it — a flow, or sprints.
  */
-export function NewBoardDialog() {
+export function NewBoardDialog({ aiAvailable }: { aiAvailable: boolean }) {
   const t = useTranslations("boards.new");
   const modes = useTranslations("boards.mode");
   const structure = useTranslations("boardSettings.structure");
@@ -53,17 +53,21 @@ export function NewBoardDialog() {
   const [view, setView] = useState<StructureViewInput>(DEFAULT_VIEW);
   const [aiStart, setAiStart] = useState(false);
   const [pending, setPending] = useState(false);
+  // The starting point proposes features, so a cards-only board has
+  // nowhere to put it — and without a model the promise would be empty.
+  const aiPossible = aiAvailable && view.structureLevels !== "card";
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
+    const wantsAi = aiStart && aiPossible;
     const ok = await run(
       () => createBoardAction({ name, key, mode, firstArea, ...view }),
       (boardId) => {
         setOpen(false);
         // Straight into the AI starting point when asked: the backlog
         // opens with the bootstrap dialog already up (docs/adr/0021).
-        router.push(aiStart ? `/boards/${boardId}/backlog?ai=start` : `/boards/${boardId}`);
+        router.push(wantsAi ? `/boards/${boardId}/backlog?ai=start` : `/boards/${boardId}`);
       },
     );
     setPending(false);
@@ -165,16 +169,26 @@ export function NewBoardDialog() {
             <p className="text-meta mb-1 text-[0.8125rem] leading-snug">{structure("body")}</p>
             <StructureViewFields value={view} onChange={setView} compact />
           </fieldset>
-          <label className="flex items-start gap-2 text-sm">
+          <label
+            className={cn("flex items-start gap-2 text-sm", !aiPossible && "text-meta")}
+            aria-disabled={!aiPossible}
+          >
             <input
               type="checkbox"
-              checked={aiStart}
+              checked={aiStart && aiPossible}
+              disabled={!aiPossible}
               onChange={(event) => setAiStart(event.target.checked)}
               className="mt-0.5 accent-[var(--primary)]"
             />
             <span>
               {t("aiStart")}
-              <span className="text-meta block text-[0.72rem]">{t("aiStartHint")}</span>
+              <span className="text-meta block text-[0.72rem]">
+                {!aiAvailable
+                  ? t("aiStartNoModel")
+                  : aiPossible
+                    ? t("aiStartHint")
+                    : t("aiStartNeedsLevels")}
+              </span>
             </span>
           </label>
           <DialogFooter>

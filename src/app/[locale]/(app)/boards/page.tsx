@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireOrgContext } from "@/core/auth/guard";
+import { modelConfigured } from "@/modules/ai/service";
 import { formatDateDa } from "@/core/dates";
 import { listBoards } from "@/modules/boards/read-lists";
 import { Link } from "@/i18n/navigation";
@@ -26,16 +27,25 @@ export default async function BoardsPage() {
   const modes = await getTranslations("boards.mode");
   const context = await requireOrgContext();
   const boards = context ? await listBoards(context) : [];
+  const aiAvailable = context ? await modelConfigured(context) : false;
   const live = boards.filter((b) => !b.archivedAt);
   const archived = boards.filter((b) => b.archivedAt);
 
   return (
     <div className="flex flex-col gap-[26px]">
-      <PageHeader title={t("title")} subtitle={t("subtitle")} actions={<NewBoardDialog />} />
+      <PageHeader
+        title={t("title")}
+        subtitle={t("subtitle")}
+        actions={<NewBoardDialog aiAvailable={aiAvailable} />}
+      />
       <PasskeyPrompt />
 
       {live.length === 0 ? (
-        <EmptyState title={t("emptyTitle")} hint={t("emptyBody")} action={<NewBoardDialog />} />
+        <EmptyState
+          title={t("emptyTitle")}
+          hint={t("emptyBody")}
+          action={<NewBoardDialog aiAvailable={aiAvailable} />}
+        />
       ) : (
         <ul className="grid gap-3 @lg:grid-cols-2 @4xl:grid-cols-3">
           {live.map((board) => (

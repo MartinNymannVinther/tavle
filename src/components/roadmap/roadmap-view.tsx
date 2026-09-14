@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { NativeSelect } from "@/components/ui/native-select";
+import { SegmentedChoice } from "@/components/ui/segmented";
 import { ThemeChip } from "@/components/board/bits";
 import { TypeIcon } from "@/components/board/type-icon";
 import { TypeLegend } from "@/components/board/type-legend";
@@ -38,10 +39,12 @@ export function RoadmapView({ full }: { full: BoardFull }) {
   const s = useTranslations("boards.structure");
   const { run } = useBoardActions();
   const scrum = full.board.mode === "scrum";
+  const view = structureView(full.board);
   // Two ways of looking at time: the epics on quarters, the features on
   // sprints (docs/adr/0023). Scrum boards have both; Kanban has no
-  // sprints to plan against yet.
-  const [axis, setAxis] = useState<"epics" | "features">("epics");
+  // sprints to plan against yet. A board that hides epics but shows
+  // features opens straight on the sprint axis.
+  const [axis, setAxis] = useState<"epics" | "features">(view.epics ? "epics" : "features");
   const [areaId, setAreaId] = useState("");
   // Its own fold memory, apart from the backlog's: two pages, two looks.
   const folded = useFolded(`${full.board.id}:roadmap`);
@@ -76,7 +79,6 @@ export function RoadmapView({ full }: { full: BoardFull }) {
   const unplanned = areaId
     ? data.unplanned.filter((r) => r.epic.areaId === areaId)
     : data.unplanned;
-  const view = structureView(full.board);
   const areas = view.areas ? full.areas.filter((a) => a.active) : [];
   const columns = data.quarters.length;
   const themesUsed = view.themes
@@ -86,28 +88,23 @@ export function RoadmapView({ full }: { full: BoardFull }) {
     : [];
 
   if (!view.epics) {
-    return <p className="text-meta text-sm">{t("noEpics")}</p>;
+    // On a Scrum board the sprint axis stands on its own even when the
+    // board hides epics (docs/adr/0023); Kanban has no axis without them.
+    if (!scrum) return <p className="text-meta text-sm">{t("noEpics")}</p>;
+    return <FeaturePlan full={full} />;
   }
 
   const toggle = scrum && (
-    <div className="border-border bg-secondary/60 flex w-fit gap-0.5 rounded-lg border p-0.5">
-      {(["epics", "features"] as const).map((option) => (
-        <button
-          key={option}
-          type="button"
-          aria-pressed={axis === option}
-          onClick={() => setAxis(option)}
-          className={cn(
-            "rounded-md px-2.5 py-1 text-[0.78rem] font-medium transition-colors",
-            axis === option
-              ? "bg-card shadow-[var(--surface-shadow)]"
-              : "text-meta hover:text-foreground",
-          )}
-        >
-          {t(option === "epics" ? "axisEpics" : "axisFeatures")}
-        </button>
-      ))}
-    </div>
+    <SegmentedChoice
+      value={axis}
+      onChange={setAxis}
+      label={t("axisLabel")}
+      options={[
+        { value: "epics", label: t("axisEpics") },
+        { value: "features", label: t("axisFeatures") },
+      ]}
+      className="w-fit"
+    />
   );
 
   if (axis === "features") {

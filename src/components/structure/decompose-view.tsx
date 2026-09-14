@@ -25,7 +25,7 @@ import { EpicTree, FeatureTree, type DragItem } from "./decompose-tree";
  * beside it, and a drag either way is the same placement every other
  * page writes. The backlog keeps the order; this page keeps the shape.
  */
-export function DecomposeView({ full }: { full: BoardFull }) {
+export function DecomposeView({ full, aiAvailable }: { full: BoardFull; aiAvailable: boolean }) {
   const t = useTranslations("decompose");
   const { run } = useBoardActions();
   const { board } = full;
@@ -145,7 +145,7 @@ export function DecomposeView({ full }: { full: BoardFull }) {
             <ZoomIn />
           </Button>
         </div>
-        <BootstrapDialog boardId={board.id} run={run} />
+        <BootstrapDialog boardId={board.id} run={run} available={aiAvailable} />
         <Button
           type="button"
           variant="outline"

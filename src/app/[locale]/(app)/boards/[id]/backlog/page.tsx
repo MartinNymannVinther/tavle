@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { BacklogView } from "@/components/backlog/backlog-view";
 import { requireOrgContext } from "@/core/auth/guard";
+import { modelConfigured } from "@/modules/ai/service";
 import { getBoardFull } from "@/modules/boards/read";
 
 type Params = { params: Promise<{ id: string }> };
@@ -19,5 +20,5 @@ export default async function BacklogPage({ params }: Params) {
   const { id } = await params;
   const full = await getBoardFull(context, id);
   if (!full) notFound();
-  return <BacklogView full={full} />;
+  return <BacklogView full={full} aiAvailable={await modelConfigured(context)} />;
 }

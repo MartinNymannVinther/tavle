@@ -94,5 +94,11 @@ export function BoardTabs({
       active: pathname.startsWith(`${base}/settings`),
     },
   ];
-  return <SegmentedFilter items={items} />;
+  // Up to nine tabs; on a phone the track scrolls sideways instead of
+  // stretching the whole page.
+  return (
+    <div className="max-w-full min-w-0 overflow-x-auto">
+      <SegmentedFilter items={items} />
+    </div>
+  );
 }

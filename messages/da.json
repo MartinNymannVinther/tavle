@@ -528,7 +528,9 @@
       "firstAreaPlaceholder": "Betalinger",
       "firstAreaHint": "Den del af produktet tavlen handler om. Kort uden forælder skal høre til et område, så tavlen starter med ét, som I selv navngiver. Flere kan tilføjes under indstillinger.",
       "aiStart": "Få hjælp af AI til at komme i gang",
-      "aiStartHint": "Backloggen åbner med “Byg et udgangspunkt”: beskriv produktet, og modellen foreslår epics, features og kort, som du beskærer, før noget oprettes."
+      "aiStartHint": "Backloggen åbner med “Byg et udgangspunkt”: beskriv produktet, og modellen foreslår epics, features og kort, som du beskærer, før noget oprettes.",
+      "aiStartNoModel": "Ingen sprogmodel sat op — vælg en under Indstillinger → AI, så kan tavlen begynde med et forslag.",
+      "aiStartNeedsLevels": "Kræver at tavlen viser features — vælg et strukturniveau over “kun kort”."
     },
     "view": {
       "noSprintTitle": "Ingen sprint i gang",
@@ -878,6 +880,7 @@
     "velocityBody": "Point færdiggjort pr. afsluttet sprint. Gennemsnit af de sidste tre: {average}.",
     "emptyTitle": "Ingen sprints endnu",
     "emptyBody": "Sprints planlægges i backloggen. Her ligger de, når de er kørt.",
+    "emptyCta": "Gå til backloggen",
     "closedPoints": "{completed} af {committed} point",
     "committedPoints": "{committed} point lovet",
     "state": {
@@ -1201,15 +1204,19 @@
       },
       "kanban": {
         "title": "Kanban",
-        "body": "Kolonnerne er jeres flow: Backlog, Klar, I gang, Færdig som udgangspunkt, og I kan tilføje flere under tavlens indstillinger. Sæt en WIP-grænse på de kolonner hvor arbejdet udføres. Bliver kolonnen fuld, farves den, og det er tegnet på at gøre noget færdigt før I starter mere."
+        "body": "Kolonnerne er jeres flow: Backlog, Klar, I gang, Færdig som udgangspunkt, og I kan tilføje flere under tavlens indstillinger. Sæt en WIP-grænse på de kolonner hvor arbejdet udføres. Bliver kolonnen fuld, farves den, og det er tegnet på at gøre noget færdigt før I starter mere. Tavlen kan også deles i vandrette svømmebaner — efter art, tema, område eller jeres egne navngivne baner — under tavlens indstillinger."
       },
       "scrum": {
         "title": "Scrum",
-        "body": "Kortene ligger i backloggen, indtil I lægger dem i en sprint. Planlæg sprinten under Backlog, vælg kortene, og start den. Tavlen viser kun den sprint der kører. Når I afslutter den, skrives velocity ned, og de ufærdige kort ryger tilbage øverst i backloggen eller ind i den næste sprint."
+        "body": "Kortene ligger i backloggen, indtil I lægger dem i en sprint. Planlæg sprinten under Backlog, vælg kortene, og start den. Tavlen viser kun den sprint der kører. Når I afslutter den, skrives velocity ned, og de ufærdige kort ryger tilbage øverst i backloggen eller ind i den næste sprint. Kommende sprints kan lægges forud i én serie under Roadmap, så features kan planlægges hen over dem, før kortene findes."
       },
       "cards": {
         "title": "Kort",
         "body": "Et kort skal bare have en titel for at findes. Klik på titlen for at åbne kortet: her sætter I ansvarlig, estimat, prioritet, deadline, acceptkriterier og tjekliste, og vælger hvilken feature kortet er del af, eller hvilket område det hører til, og skriver til hinanden i kommentarerne. Alt gemmes med det samme. Et blokeret kort får en rød kant, så det ikke bliver overset."
+      },
+      "undo": {
+        "title": "Fortryd",
+        "body": "Hver ændring står i aktiviteten på kortet eller emnet med en Fortryd-knap. Fortryd kører den modsatte handling gennem de samme regler som alt andet — er verden gået videre, fordi kortet er slettet eller featuren lukket, siger værktøjet nej i stedet for at gætte. Det fortrudte streges over i aktiviteten, og fortrydelsen selv skrives ned."
       },
       "backlog": {
         "title": "Backloggen",
@@ -1221,11 +1228,11 @@
       },
       "team": {
         "title": "Teamet",
-        "body": "Inviter kollegerne under Indstillinger → Arbejdsrum. Du får et link, som du selv sender. Har personen ingen konto, bliver den oprettet gennem linket. Ejere og administratorer kan ændre tavlernes kolonner og labels, invitere og fjerne medlemmer; alle andre kan alt det andet."
+        "body": "Inviter kollegerne under Indstillinger → Arbejdsrum. Du får et link, som du selv sender. Har personen ingen konto, bliver den oprettet gennem linket. Ejere og administratorer kan ændre tavlernes kolonner, svømmebaner, temaer og områder, invitere og fjerne medlemmer; alle andre kan alt det andet."
       },
       "ai": {
         "title": "AI-hjælpen",
-        "body": "Er der sat en sprogmodel op, kan den skrive et kort færdigt, foreslå at dele et stort kort op, og skrive sprintens historie. Alt vises som et forslag, du retter i og siger ja til. Intet gemmes uden dig, og alt den skriver mærkes i aktiviteten."
+        "body": "Er der sat en sprogmodel op, kan den skrive et kort færdigt, foreslå at dele et stort kort op, skrive sprintens historie — og lægge et udgangspunkt for backlog og roadmap ud fra jeres egen beskrivelse af produktet, også i det øjeblik en ny tavle oprettes. Alt vises som et forslag, du retter i og siger ja til. Intet gemmes uden dig, og alt den skriver mærkes i aktiviteten. Uden en model siger knapperne det ærligt, og alt andet virker."
       },
       "data": {
         "title": "Dine data",
@@ -1233,11 +1240,11 @@
       },
       "structure": {
         "title": "Epics, features, temaer og områder",
-        "body": "Backloggen har ét hierarki med tre niveauer: en epic er et resultat teamet kan nå på et til to kvartaler, en feature er en frigivelig skive af den, et kort er den mindste leverance og passer i ét sprint. Alle tre har en art, Business eller Enabler. Overblik og gruppering løses med to felter på det enkelte item: Tema svarer på hvorfor, Område på hvor. To tests afgør hvor noget hører hjemme, og værktøjet håndhæver dem: kan det blive færdigt, er det i hierarkiet; kan det aldrig blive færdigt, er det et tema eller et område. Har det præcis én forælder, er det hierarki; kan det høre til flere på én gang, er det en kategori."
+        "body": "Backloggen har ét hierarki med tre niveauer: en epic er et resultat teamet kan nå på et til to kvartaler, en feature er en frigivelig skive af den, et kort er den mindste leverance og passer i ét sprint. Alle tre har en art, Business eller Enabler. Overblik og gruppering løses med to felter på det enkelte item: Tema svarer på hvorfor, Område på hvor. To tests afgør hvor noget hører hjemme, og værktøjet håndhæver dem: kan det blive færdigt, er det i hierarkiet; kan det aldrig blive færdigt, er det et tema eller et område. Har det præcis én forælder, er det hierarki; kan det høre til flere på én gang, er det en kategori. Under fanen Nedbrydning tegnes hierarkiet som et diagram: epics øverst, features og kort nedenunder, og alt uden forælder venter i bakken. Træk tingene på plads, eller brug menuen på hvert kort — og zoom ud, når hele billedet skal med."
       },
       "roadmap": {
         "title": "Roadmap og overblik",
-        "body": "Roadmappet tegner epics på en linje af kvartaler, farvet efter deres første tema. En epic uden målkvartal tegnes ikke, den listes nedenunder. Overblikket viser hvor det åbne arbejde ligger pr. tema, område og art, enabler-andelen som ét tal, og fem mål på om strukturen holder: andelen uden forælder, epics til revision, items uden område, enabler-andelen, og temaer og områder ingen bruger."
+        "body": "Roadmappet tegner epics på en linje af kvartaler, farvet efter deres første tema. Træk i baren: midten flytter epicen, kanterne ændrer varigheden. En epic uden målkvartal tegnes ikke, den listes nedenunder. På en Scrum-tavle kan visningen skiftes til features på sprints: læg sprints forud, og læg hver feature der hvor I regner med at bygge den — foldes en epic ud, ses dens features tegnet der hvor deres sprints ligger. Overblikket viser hvor det åbne arbejde ligger pr. tema, område og art, enabler-andelen som ét tal, og fem mål på om strukturen holder: andelen uden forælder, epics til revision, items uden område, enabler-andelen, og temaer og områder ingen bruger."
       },
       "map": {
         "title": "Story mappet",
@@ -1373,7 +1380,8 @@
     "noPlanned": "Ingen features er planlagt endnu. Vælg en sprint på en feature herunder.",
     "unplannedFeatures": "Uplanlagte features ({count})",
     "unplannedWord": "Vælg sprint …",
-    "featureUnplanned": "uplanlagt"
+    "featureUnplanned": "uplanlagt",
+    "axisLabel": "Visning"
   },
   "overview": {
     "title": "Overblik",

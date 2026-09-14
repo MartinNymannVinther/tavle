@@ -36,7 +36,12 @@ export default async function BoardLayout({
         description={board.description || undefined}
         scrum={board.mode === "scrum"}
         map={board.structureLevels !== "card"}
-        roadmap={board.structureLevels === "epic"}
+        roadmap={
+          // Epics give the quarter axis; on Scrum, features alone give the
+          // sprint axis and the way to lay sprints ahead (docs/adr/0023).
+          board.structureLevels === "epic" ||
+          (board.mode === "scrum" && board.structureLevels !== "card")
+        }
       />
       {children}
     </div>

@@ -528,7 +528,9 @@
       "firstAreaPlaceholder": "Payments",
       "firstAreaHint": "The part of the product the board is about. Cards without a parent must belong to an area, so the board starts with one you name yourselves. More can be added under settings.",
       "aiStart": "Get AI help to get started",
-      "aiStartHint": "The backlog opens with “Build a starting point”: describe the product and the model proposes epics, features and cards, which you prune before anything is created."
+      "aiStartHint": "The backlog opens with “Build a starting point”: describe the product and the model proposes epics, features and cards, which you prune before anything is created.",
+      "aiStartNoModel": "No language model set up — choose one under Settings → AI, and the board can begin with a proposal.",
+      "aiStartNeedsLevels": "Needs the board to show features — choose a structure level above “cards alone”."
     },
     "view": {
       "noSprintTitle": "No sprint running",
@@ -878,6 +880,7 @@
     "velocityBody": "Points completed per closed sprint. Average of the last three: {average}.",
     "emptyTitle": "No sprints yet",
     "emptyBody": "Sprints are planned in the backlog. They are listed here once they have run.",
+    "emptyCta": "Go to the backlog",
     "closedPoints": "{completed} of {committed} points",
     "committedPoints": "{committed} points committed",
     "state": {
@@ -1201,15 +1204,19 @@
       },
       "kanban": {
         "title": "Kanban",
-        "body": "The columns are your flow: Backlog, Ready, In progress, Done to begin with, and you can add more under the board's settings. Put a WIP limit on the columns where the work happens. When a column fills up it changes colour, and that is the sign to finish something before starting more."
+        "body": "The columns are your flow: Backlog, Ready, In progress, Done to begin with, and you can add more under the board's settings. Put a WIP limit on the columns where the work happens. When a column fills up it changes colour, and that is the sign to finish something before starting more. The board can also split into horizontal swimlanes — by kind, theme, area or your own named lanes — under the board's settings."
       },
       "scrum": {
         "title": "Scrum",
-        "body": "Cards sit in the backlog until you put them in a sprint. Plan the sprint under Backlog, pick the cards, and start it. The board shows only the running sprint. When you close it, the velocity is written down and the unfinished cards go back to the top of the backlog or into the next sprint."
+        "body": "Cards sit in the backlog until you put them in a sprint. Plan the sprint under Backlog, pick the cards, and start it. The board shows only the running sprint. When you close it, the velocity is written down and the unfinished cards go back to the top of the backlog or into the next sprint. Future sprints can be laid ahead in one series under Roadmap, so features can be planned across them before the cards exist."
       },
       "cards": {
         "title": "Cards",
         "body": "A card only needs a title to exist. Click the title to open it: here you set the assignee, estimate, priority, due date, acceptance criteria and checklist, and choose which feature the card is part of, or which area it belongs to, and write to each other in the comments. Everything saves immediately. A blocked card gets a red edge so it is not overlooked."
+      },
+      "undo": {
+        "title": "Undo",
+        "body": "Every change stands in the activity of its card or item with an Undo button. Undo runs the opposite action through the same rules as everything else — if the world has moved on because the card was deleted or the feature closed, the tool says no instead of guessing. What was undone is struck through in the activity, and the undo itself is written down."
       },
       "backlog": {
         "title": "The backlog",
@@ -1221,11 +1228,11 @@
       },
       "team": {
         "title": "The team",
-        "body": "Invite colleagues under Settings → Workspace. You get a link you send yourself. If the person has no account, it is created through the link. Owners and admins can change the boards' columns and labels, invite and remove members; everyone else can do everything else."
+        "body": "Invite colleagues under Settings → Workspace. You get a link you send yourself. If the person has no account, it is created through the link. Owners and admins can change the boards' columns, swimlanes, themes and areas, invite and remove members; everyone else can do everything else."
       },
       "ai": {
         "title": "The AI help",
-        "body": "With a language model set up, it can finish writing a card, suggest splitting a big card, and write the sprint's story. Everything is shown as a proposal you edit and say yes to. Nothing is saved without you, and everything it writes is marked in the activity."
+        "body": "With a language model set up, it can finish writing a card, suggest splitting a big card, write the sprint's story — and lay a starting point for backlog and roadmap from your own description of the product, right when a new board is created. Everything is shown as a proposal you edit and say yes to. Nothing is saved without you, and everything it writes is marked in the activity. Without a model the buttons say so honestly, and everything else works."
       },
       "data": {
         "title": "Your data",
@@ -1233,11 +1240,11 @@
       },
       "structure": {
         "title": "Epics, features, themes and areas",
-        "body": "The backlog has one hierarchy with three levels: an epic is a result the team can reach in one or two quarters, a feature is a releasable slice of it, a card is the smallest deliverable and fits in one sprint. All three have a kind, Business or Enabler. Overview and grouping are handled by two fields on each item: Theme answers why, Area answers where. Two tests decide where something belongs, and the tool enforces them: if it can be finished, it is in the hierarchy; if it can never be finished, it is a theme or an area. If it has exactly one parent, it is hierarchy; if it can belong to several at once, it is a category."
+        "body": "The backlog has one hierarchy with three levels: an epic is a result the team can reach in one or two quarters, a feature is a releasable slice of it, a card is the smallest deliverable and fits in one sprint. All three have a kind, Business or Enabler. Overview and grouping are handled by two fields on each item: Theme answers why, Area answers where. Two tests decide where something belongs, and the tool enforces them: if it can be finished, it is in the hierarchy; if it can never be finished, it is a theme or an area. If it has exactly one parent, it is hierarchy; if it can belong to several at once, it is a category. The Breakdown tab draws the hierarchy as a chart: epics on top, features and cards below, and everything without a parent waits in the tray. Drag things into place, or use the menu on each card — and zoom out when you need the whole picture."
       },
       "roadmap": {
         "title": "Roadmap and overview",
-        "body": "The roadmap draws epics on a line of quarters, coloured by their first theme. An epic without a target quarter is not drawn; it is listed underneath. The overview shows where the open work sits by theme, area and kind, the enabler share as one number, and five measures of whether the structure holds: the share without a parent, epics for review, items without an area, the enabler share, and themes and areas nobody uses."
+        "body": "The roadmap draws epics on a line of quarters, coloured by their first theme. Drag the bar: the middle moves the epic, the edges change its duration. An epic without a target quarter is not drawn; it is listed underneath. On a Scrum board the view can switch to features on sprints: lay sprints ahead, and put each feature where you expect to build it — unfold an epic to see its features drawn where their sprints lie. The overview shows where the open work sits by theme, area and kind, the enabler share as one number, and five measures of whether the structure holds: the share without a parent, epics for review, items without an area, the enabler share, and themes and areas nobody uses."
       },
       "map": {
         "title": "The story map",
@@ -1373,7 +1380,8 @@
     "noPlanned": "No features are planned yet. Pick a sprint on one below.",
     "unplannedFeatures": "Unplanned features ({count})",
     "unplannedWord": "Pick a sprint …",
-    "featureUnplanned": "unplanned"
+    "featureUnplanned": "unplanned",
+    "axisLabel": "View"
   },
   "overview": {
     "title": "Overview",
