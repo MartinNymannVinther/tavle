@@ -5,6 +5,7 @@ import { requireOrgContext } from "@/core/auth/guard";
 import { withOrgContext } from "@/core/db/tenant";
 import { canManage, roleOf } from "@/modules/boards/members";
 import { getItemFull } from "@/modules/boards/structure/read";
+import { itemTitle } from "@/modules/boards/read-titles";
 
 type Params = { params: Promise<{ id: string; number: string }> };
 
@@ -12,8 +13,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const context = await requireOrgContext();
   if (!context) return {};
   const { id, number } = await params;
-  const full = await getItemFull(context, id, Number(number));
-  return { title: full ? `${full.board.key}-${full.item.number} ${full.item.title}` : undefined };
+  return { title: (await itemTitle(context, id, Number(number))) ?? undefined };
 }
 
 /** One epic or feature, by the board's number; a card's number is not found here. */

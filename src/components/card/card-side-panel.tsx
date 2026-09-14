@@ -8,7 +8,7 @@ import { PropertyGroup, PropertyRow } from "@/components/ui/property-row";
 import { Textarea } from "@/components/ui/textarea";
 import type { Area, Column, Priority, Sprint, Theme } from "@/core/db/schema";
 import { PRIORITIES } from "@/core/db/schema";
-import type { CardView, ItemView, Member } from "@/modules/boards/types";
+import type { CardDetail, ItemView, Member } from "@/modules/boards/types";
 import { moveCardAction, updateCardAction } from "@/modules/boards/actions-cards";
 import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
 import type { Run } from "@/components/board/use-board-actions";
@@ -36,7 +36,7 @@ export function CardSidePanel({
   view,
   run,
 }: {
-  card: CardView;
+  card: CardDetail;
   boardKey: string;
   columns: Column[];
   themes: Theme[];

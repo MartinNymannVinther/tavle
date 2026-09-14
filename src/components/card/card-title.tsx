@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { CardView } from "@/modules/boards/types";
+import type { CardDetail } from "@/modules/boards/types";
 import { updateCardAction } from "@/modules/boards/actions-cards";
 import type { Run } from "@/components/board/use-board-actions";
 
@@ -14,7 +14,7 @@ import type { Run } from "@/components/board/use-board-actions";
  * pencil is pressed; the save carries the row's timestamp so an edit made
  * on top of somebody else's is refused rather than overwritten.
  */
-export function CardTitle({ card, run }: { card: CardView; run: Run }) {
+export function CardTitle({ card, run }: { card: CardDetail; run: Run }) {
   const t = useTranslations("cards.title");
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(card.title);

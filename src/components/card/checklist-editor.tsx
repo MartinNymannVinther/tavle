@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { ChecklistItem } from "@/core/db/schema";
-import type { CardView } from "@/modules/boards/types";
+import type { CardDetail } from "@/modules/boards/types";
 import { updateChecklistAction } from "@/modules/boards/actions-cards";
 import type { Run } from "@/components/board/use-board-actions";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
  * change writes the whole list, which is small, so a tick is one round
  * trip and the order is whatever the person made it.
  */
-export function ChecklistEditor({ card, run }: { card: CardView; run: Run }) {
+export function ChecklistEditor({ card, run }: { card: CardDetail; run: Run }) {
   const t = useTranslations("cards.checklist");
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState(false);

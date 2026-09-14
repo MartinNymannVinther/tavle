@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { CardView } from "@/modules/boards/types";
+import type { CardDetail } from "@/modules/boards/types";
 import {
   applyDraftAction,
   applySplitAction,
@@ -37,7 +37,7 @@ export function AiPanel({
   available,
   run,
 }: {
-  card: CardView;
+  card: CardDetail;
   boardId: string;
   available: boolean;
   run: Run;

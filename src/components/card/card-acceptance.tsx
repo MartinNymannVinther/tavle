@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { AddAffordance } from "@/components/ui/add-affordance";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import type { CardView } from "@/modules/boards/types";
+import type { CardDetail } from "@/modules/boards/types";
 import { updateCardAction } from "@/modules/boards/actions-cards";
 import type { Run } from "@/components/board/use-board-actions";
 
@@ -14,7 +14,7 @@ import type { Run } from "@/components/board/use-board-actions";
  * or asked for, so a card that does not need them is not a form with an
  * empty box. Same shape as the description, on purpose.
  */
-export function CardAcceptance({ card, run }: { card: CardView; run: Run }) {
+export function CardAcceptance({ card, run }: { card: CardDetail; run: Run }) {
   const t = useTranslations("cards.acceptance");
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(card.acceptance);

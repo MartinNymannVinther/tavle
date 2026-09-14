@@ -112,7 +112,7 @@ export async function updateSwimlane(
 export async function applySwimlaneAssignment(
   tx: AppTransaction,
   ctx: OrgContext,
-  card: Card,
+  card: Pick<Card, "id" | "boardId" | "number" | "title" | "kind" | "areaId" | "swimlaneId">,
   assignment: SwimlaneAssignment,
 ): Promise<void> {
   const board = await boardInWorkspace(tx, card.boardId);

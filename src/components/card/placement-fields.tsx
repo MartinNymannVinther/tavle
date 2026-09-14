@@ -9,7 +9,7 @@ import { PropertyRow } from "@/components/ui/property-row";
 import { ENABLER_TYPES, type Area, type Theme } from "@/core/db/schema";
 import { placeCardAction, updateCardAction } from "@/modules/boards/actions-cards";
 import { FULL_VIEW, type StructureView } from "@/modules/boards/structure/view";
-import type { CardView, ItemView } from "@/modules/boards/types";
+import type { CardDetail, ItemView } from "@/modules/boards/types";
 import { cn } from "@/lib/utils";
 
 /**
@@ -237,7 +237,7 @@ export function PlacementFields({
   view = FULL_VIEW,
   run,
 }: {
-  card: CardView;
+  card: CardDetail;
   boardKey: string;
   themes: Theme[];
   areas: Area[];

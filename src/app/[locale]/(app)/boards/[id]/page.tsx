@@ -4,6 +4,7 @@ import { BoardView } from "@/components/board/board-view";
 import { requireOrgContext } from "@/core/auth/guard";
 import { todayInCopenhagen } from "@/core/dates";
 import { getBoardFull } from "@/modules/boards/read";
+import { boardTitle } from "@/modules/boards/read-titles";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -11,8 +12,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const context = await requireOrgContext();
   if (!context) return {};
   const { id } = await params;
-  const full = await getBoardFull(context, id);
-  return { title: full?.board.name };
+  return { title: (await boardTitle(context, id)) ?? undefined };
 }
 
 /** The board: columns and cards, with the active sprint on top when there is one. */

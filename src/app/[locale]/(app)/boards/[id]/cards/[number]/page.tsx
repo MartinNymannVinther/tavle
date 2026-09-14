@@ -6,6 +6,7 @@ import { withOrgContext } from "@/core/db/tenant";
 import { modelConfigured } from "@/modules/ai/service";
 import { canManage, roleOf } from "@/modules/boards/members";
 import { getCardFull } from "@/modules/boards/read";
+import { cardTitle } from "@/modules/boards/read-titles";
 
 type Params = { params: Promise<{ id: string; number: string }> };
 
@@ -13,8 +14,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const context = await requireOrgContext();
   if (!context) return {};
   const { id, number } = await params;
-  const full = await getCardFull(context, id, Number(number));
-  return { title: full ? `${full.board.key}-${full.card.number} ${full.card.title}` : undefined };
+  return { title: (await cardTitle(context, id, Number(number))) ?? undefined };
 }
 
 /**

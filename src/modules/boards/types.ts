@@ -23,13 +23,23 @@ export { fail, ok } from "@/core/result";
 
 export type Member = { userId: string; name: string; email: string; role: string };
 
-export type CardView = Card & {
+/**
+ * The list surfaces ship every card of the board to the client, so the
+ * view carries only what a board, backlog, map or roadmap renders — the
+ * prose (description, acceptance, the raw checklist, the blocked reason)
+ * stays on the server and travels only with the one card a page opens.
+ */
+export type CardView = Omit<Card, "description" | "acceptance" | "checklist" | "blockedReason"> & {
   assigneeName: string | null;
   themeIds: string[];
   checklistDone: number;
   checklistTotal: number;
   commentCount: number;
 };
+
+/** The whole card, for its own page: the view plus the prose. */
+export type CardDetail = CardView &
+  Pick<Card, "description" | "acceptance" | "checklist" | "blockedReason">;
 
 /** An epic or a feature with its themes resolved to ids. */
 export type ItemView = BacklogItem & { themeIds: string[] };
@@ -53,7 +63,7 @@ export type BoardFull = {
 export type CommentView = Comment & { authorName: string | null };
 
 export type CardFull = {
-  card: CardView;
+  card: CardDetail;
   board: Board;
   columns: Column[];
   themes: Theme[];

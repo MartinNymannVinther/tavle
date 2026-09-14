@@ -1,4 +1,4 @@
-import { and, asc, eq, isNull } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
 import {
   backlogItems,
   cards,
@@ -9,7 +9,7 @@ import {
   type Sprint,
   type Theme,
 } from "@/core/db/schema";
-import { withOrgContext, type AppTransaction, type OrgContext } from "@/core/db/tenant";
+import { withOrgContext, type OrgContext } from "@/core/db/tenant";
 import { itemEvents } from "../events";
 import { boardAreas, boardInWorkspace, boardThemes, itemViews, membersOf } from "../read";
 import type { BoardEvent } from "@/core/db/schema";
@@ -80,6 +80,7 @@ export async function getItemFull(
       : undefined;
     const [parent] = parentRow ? await itemViews(tx, [parentRow]) : [null];
 
+    const members = await membersOf(tx, ctx.orgId);
     const features: ChildFeature[] = [];
     const stories: ChildStory[] = [];
     let doneStories = 0;
@@ -90,9 +91,41 @@ export async function getItemFull(
         .where(eq(backlogItems.parentId, row.id))
         .orderBy(asc(backlogItems.sort), asc(backlogItems.number));
       const views = await itemViews(tx, featureRows);
+      // One grouped count for every feature at once, not one round trip each.
+      const countRows =
+        featureRows.length > 0
+          ? await tx
+              .select({
+                featureId: cards.featureId,
+                category: columns.category,
+                n: sql<number>`count(*)::int`,
+              })
+              .from(cards)
+              .innerJoin(columns, eq(columns.id, cards.columnId))
+              .where(
+                and(
+                  inArray(
+                    cards.featureId,
+                    featureRows.map((f) => f.id),
+                  ),
+                  isNull(cards.archivedAt),
+                ),
+              )
+              .groupBy(cards.featureId, columns.category)
+          : [];
+      const countsOf = new Map<string, { openStories: number; doneStories: number }>();
+      for (const count of countRows) {
+        if (!count.featureId) continue;
+        const tally = countsOf.get(count.featureId) ?? { openStories: 0, doneStories: 0 };
+        if (count.category === "done") tally.doneStories += Number(count.n);
+        else tally.openStories += Number(count.n);
+        countsOf.set(count.featureId, tally);
+      }
       for (const view of views) {
-        const counts = await storyCounts(tx, view.id);
-        features.push({ ...view, ...counts });
+        features.push({
+          ...view,
+          ...(countsOf.get(view.id) ?? { openStories: 0, doneStories: 0 }),
+        });
       }
     } else {
       const storyRows = await tx
@@ -113,7 +146,6 @@ export async function getItemFull(
         .innerJoin(columns, eq(columns.id, cards.columnId))
         .where(and(eq(cards.featureId, row.id), isNull(cards.archivedAt)))
         .orderBy(asc(columns.sort), asc(cards.sort), asc(cards.number));
-      const members = await membersOf(tx, ctx.orgId);
       const nameOf = new Map(members.map((m) => [m.userId, m.name]));
       for (const story of storyRows) {
         if (story.category === "done") doneStories += 1;
@@ -148,23 +180,9 @@ export async function getItemFull(
         .from(sprints)
         .where(eq(sprints.boardId, boardId))
         .orderBy(asc(sprints.startDate)),
-      members: await membersOf(tx, ctx.orgId),
+      members,
       events: await itemEvents(tx, row.id),
       reviewDue: reviewDue(row, board.epicReviewDays),
     };
   });
-}
-
-/** Open and done stories under a feature; archived ones are neither. */
-export async function storyCounts(
-  tx: AppTransaction,
-  featureId: string,
-): Promise<{ openStories: number; doneStories: number }> {
-  const rows = await tx
-    .select({ category: columns.category })
-    .from(cards)
-    .innerJoin(columns, eq(columns.id, cards.columnId))
-    .where(and(eq(cards.featureId, featureId), isNull(cards.archivedAt)));
-  const done = rows.filter((r) => r.category === "done").length;
-  return { openStories: rows.length - done, doneStories: done };
 }

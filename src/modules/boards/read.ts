@@ -70,12 +70,14 @@ export async function toViews(tx: AppTransaction, rows: Card[]): Promise<CardVie
     themesOf.set(row.cardId, [...(themesOf.get(row.cardId) ?? []), row.themeId]);
   }
   const commentsOf = new Map(commentRows.map((r) => [r.cardId, Number(r.n)]));
-  return rows.map((card) => ({
+  // The prose stays behind: six surfaces ship every card to the client,
+  // and none of them renders a description or a checklist item.
+  return rows.map(({ description, acceptance, blockedReason, checklist, ...card }) => ({
     ...card,
     assigneeName: card.assigneeUserId ? (nameOf.get(card.assigneeUserId) ?? null) : null,
     themeIds: themesOf.get(card.id) ?? [],
-    checklistDone: card.checklist.filter((item) => item.done).length,
-    checklistTotal: card.checklist.length,
+    checklistDone: checklist.filter((item) => item.done).length,
+    checklistTotal: checklist.length,
     commentCount: commentsOf.get(card.id) ?? 0,
   }));
 }
@@ -211,7 +213,13 @@ export async function getCardFull(
       cardEvents(tx, row.id),
     ]);
     return {
-      card: view!,
+      card: {
+        ...view!,
+        description: row.description,
+        acceptance: row.acceptance,
+        checklist: row.checklist,
+        blockedReason: row.blockedReason,
+      },
       board,
       columns: columnRows,
       themes: themeRows,
