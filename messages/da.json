@@ -1403,7 +1403,9 @@
     "noParent": "Uden forælder",
     "tray": "Uden forælder",
     "trayHint": "Features og kort uden plads i nedbrydningen. Træk dem ind — eller ud hertil.",
-    "trayEmpty": "Alt har en forælder."
+    "trayEmpty": "Alt har en forælder.",
+    "fullscreen": "Fuld skærm",
+    "exitFullscreen": "Luk fuld skærm"
   },
   "aiBootstrap": {
     "cta": "Byg et udgangspunkt",

@@ -99,7 +99,7 @@ export function ChartNode({
       {...dragProps}
       {...(drop?.props ?? {})}
       className={cn(
-        "border-border bg-card group/box flex w-[13rem] items-center gap-1.5 rounded-lg border px-2.5 py-1.5 shadow-[var(--surface-shadow)] transition-colors",
+        "border-border bg-card group/box flex w-[15rem] items-center gap-1.5 rounded-lg border px-2.5 py-1.5 shadow-[var(--surface-shadow)] transition-colors",
         emphasis && "border-foreground/25",
         dragProps?.draggable && "cursor-grab active:cursor-grabbing",
         dragging && "opacity-40",
@@ -111,7 +111,7 @@ export function ChartNode({
       <Link
         href={href}
         className={cn(
-          "min-w-0 flex-1 truncate text-[0.8125rem] hover:underline",
+          "line-clamp-2 min-w-0 flex-1 text-[0.8125rem] leading-snug hover:underline",
           emphasis && "font-semibold",
           strike && "text-meta line-through",
         )}
@@ -173,7 +173,7 @@ export function EpicTree({
           </Branch>
         ))}
         <Branch>
-          <div className="border-border w-[13rem] rounded-lg border border-dashed p-1.5">
+          <div className="border-border w-[15rem] rounded-lg border border-dashed p-1.5">
             <NewFeature onAdd={(title) => h.onAddFeature(epic.id, title)} />
           </div>
         </Branch>
@@ -248,7 +248,7 @@ export function FeatureTree({
           </Branch>
         ))}
         <Branch>
-          <div className="border-border w-[13rem] rounded-lg border border-dashed p-1">
+          <div className="border-border w-[15rem] rounded-lg border border-dashed p-1">
             <QuickAdd
               compact
               structure={structure}

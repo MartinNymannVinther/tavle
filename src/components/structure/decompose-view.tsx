@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { structureOf } from "@/components/board/card-chips";
 import { legendTypes, TypeLegend } from "@/components/board/type-legend";
@@ -11,6 +12,7 @@ import { ItemForm } from "@/components/backlog/item-form";
 import { createCardAction, placeCardAction } from "@/modules/boards/actions-cards";
 import { createItemAction, placeItemAction } from "@/modules/boards/actions-structure";
 import type { BoardFull, CardView } from "@/modules/boards/types";
+import { cn } from "@/lib/utils";
 import { DecomposeTray } from "./decompose-tray";
 import { EpicTree, FeatureTree, type DragItem } from "./decompose-tree";
 
@@ -29,6 +31,15 @@ export function DecomposeView({ full }: { full: BoardFull }) {
   const structure = structureOf(full);
   const { view } = structure;
   const [drag, setDrag] = useState<DragItem>(null);
+  // Full screen on a desktop: the chart takes the whole display, tray
+  // included so a drag still has somewhere to land.
+  const surface = useRef<HTMLDivElement>(null);
+  const [fullscreen, setFullscreen] = useState(false);
+  useEffect(() => {
+    const onChange = () => setFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
 
   const epics = full.items
     .filter((i) => i.level === "epic" && i.state === "open")
@@ -73,11 +84,27 @@ export function DecomposeView({ full }: { full: BoardFull }) {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
+    <div
+      ref={surface}
+      className={cn("flex flex-col gap-4", fullscreen && "bg-background overflow-auto p-6")}
+    >
+      <div className="flex justify-end gap-2">
         <BootstrapDialog boardId={board.id} run={run} />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="max-sm:hidden"
+          onClick={() => {
+            if (document.fullscreenElement) void document.exitFullscreen();
+            else void surface.current?.requestFullscreen();
+          }}
+        >
+          {fullscreen ? <Minimize2 data-slot="icon" /> : <Maximize2 data-slot="icon" />}
+          {fullscreen ? t("exitFullscreen") : t("fullscreen")}
+        </Button>
       </div>
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+      <div className="flex flex-col gap-4">
         <div className="-mx-5 min-w-0 flex-1 overflow-x-auto px-5 pb-2 sm:-mx-7 sm:px-7 lg:mx-0 lg:px-0">
           {view.epics ? (
             <div className="flex flex-col gap-10">

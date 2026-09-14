@@ -52,7 +52,7 @@ export function DecomposeTray({
         else h.onPlaceCard(h.drag.id, null);
       }}
       className={cn(
-        "border-border bg-secondary/40 flex w-full shrink-0 flex-col gap-3 overflow-x-auto rounded-xl border border-dashed p-3 transition-colors lg:w-[22rem]",
+        "border-border bg-secondary/40 flex w-full flex-col gap-3 rounded-xl border border-dashed p-3 transition-colors",
         over && "border-primary bg-accent/60",
       )}
     >
@@ -65,30 +65,32 @@ export function DecomposeTray({
           {t("trayEmpty")}
         </p>
       )}
-      {features.map((feature) => (
-        <FeatureTree
-          key={feature.id}
-          feature={feature}
-          boardKey={boardKey}
-          boardId={boardId}
-          structure={structure}
-          cards={cardsOf(feature.id)}
-          doneOf={doneOf}
-          h={h}
-        />
-      ))}
-      <div className="flex flex-col items-start gap-1.5">
-        {cards.map((card) => (
-          <CardNode
-            key={card.id}
-            card={card}
+      <div className="flex flex-wrap items-start gap-x-8 gap-y-3">
+        {features.map((feature) => (
+          <FeatureTree
+            key={feature.id}
+            feature={feature}
             boardKey={boardKey}
             boardId={boardId}
-            done={doneOf(card)}
             structure={structure}
+            cards={cardsOf(feature.id)}
+            doneOf={doneOf}
             h={h}
           />
         ))}
+        <div className="flex flex-wrap items-start gap-1.5">
+          {cards.map((card) => (
+            <CardNode
+              key={card.id}
+              card={card}
+              boardKey={boardKey}
+              boardId={boardId}
+              done={doneOf(card)}
+              structure={structure}
+              h={h}
+            />
+          ))}
+        </div>
       </div>
     </aside>
   );

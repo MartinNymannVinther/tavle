@@ -1403,7 +1403,9 @@
     "noParent": "Without a parent",
     "tray": "Without a parent",
     "trayHint": "Features and cards with no place in the breakdown. Drag them in — or out to here.",
-    "trayEmpty": "Everything has a parent."
+    "trayEmpty": "Everything has a parent.",
+    "fullscreen": "Full screen",
+    "exitFullscreen": "Exit full screen"
   },
   "aiBootstrap": {
     "cta": "Build a starting point",
