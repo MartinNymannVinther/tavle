@@ -6,6 +6,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { themeSwatch } from "@/components/board/tokens";
 import { TypeIcon } from "@/components/board/type-icon";
 import type { Run } from "@/components/board/use-board-actions";
+import { FoldButton } from "@/components/backlog/backlog-bits";
 import { quarterOptions } from "@/components/backlog/quarters";
 import { updateItemAction } from "@/modules/boards/actions-structure";
 import type { RoadmapRow } from "@/modules/boards/structure/roadmap";
@@ -32,6 +33,7 @@ export function RoadmapLine({
   boardId,
   boardKey,
   onPlan,
+  fold,
 }: {
   row: RoadmapRow;
   quarters: string[];
@@ -39,6 +41,8 @@ export function RoadmapLine({
   boardId: string;
   boardKey: string;
   onPlan: PlanSpan;
+  /** Folds the epic's features and cards out underneath. */
+  fold?: { open: boolean; onToggle: () => void };
 }) {
   const t = useTranslations("roadmap");
   const s = useTranslations("boards.structure");
@@ -94,11 +98,9 @@ export function RoadmapLine({
   }
 
   return (
-    <li
-      className="border-hairline grid items-center border-b last:border-b-0"
-      style={{ gridTemplateColumns: "16rem minmax(0, 1fr)" }}
-    >
+    <div className="grid items-center" style={{ gridTemplateColumns: "16rem minmax(0, 1fr)" }}>
       <div className="flex min-w-0 items-start gap-2 px-4 py-2">
+        {fold && <FoldButton open={fold.open} onToggle={fold.onToggle} />}
         <TypeIcon type="epic" className="mt-0.5" />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <Link
@@ -178,7 +180,7 @@ export function RoadmapLine({
           </>
         )}
       </div>
-    </li>
+    </div>
   );
 }
 

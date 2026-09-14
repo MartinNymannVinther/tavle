@@ -14,6 +14,8 @@ import { updateItemAction } from "@/modules/boards/actions-structure";
 import { roadmap } from "@/modules/boards/structure/roadmap";
 import type { RoadmapRow } from "@/modules/boards/structure/roadmap";
 import { structureView } from "@/modules/boards/structure/view";
+import { useFolded } from "@/components/backlog/use-folded";
+import { RoadmapChildren } from "./roadmap-children";
 import { QuarterSelect, RoadmapLine, type PlanSpan } from "./roadmap-line";
 import type { BoardFull } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
@@ -35,6 +37,8 @@ export function RoadmapView({ full }: { full: BoardFull }) {
   const s = useTranslations("boards.structure");
   const { run } = useBoardActions();
   const [areaId, setAreaId] = useState("");
+  // Its own fold memory, apart from the backlog's: two pages, two looks.
+  const folded = useFolded(`${full.board.id}:roadmap`);
   // A dragged bar lands where it was dropped, before the server answers;
   // fresh rows from the server clear the overrides.
   const [seed, setSeed] = useState(full.items);
@@ -158,15 +162,23 @@ export function RoadmapView({ full }: { full: BoardFull }) {
           ) : (
             <ol>
               {rows.map((row) => (
-                <RoadmapLine
-                  key={row.epic.id}
-                  row={row}
-                  quarters={data.quarters}
-                  current={data.current}
-                  boardId={full.board.id}
-                  boardKey={full.board.key}
-                  onPlan={plan}
-                />
+                <li key={row.epic.id} className="border-hairline border-b last:border-b-0">
+                  <RoadmapLine
+                    row={row}
+                    quarters={data.quarters}
+                    current={data.current}
+                    boardId={full.board.id}
+                    boardKey={full.board.key}
+                    onPlan={plan}
+                    fold={{
+                      open: folded.isOpen(row.epic.id),
+                      onToggle: () => folded.toggle(row.epic.id),
+                    }}
+                  />
+                  {folded.isOpen(row.epic.id) && (
+                    <RoadmapChildren epicId={row.epic.id} full={full} />
+                  )}
+                </li>
               ))}
             </ol>
           )}

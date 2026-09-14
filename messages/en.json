@@ -1342,7 +1342,8 @@
     "newEpic": "New epic",
     "addInQuarter": "New epic in {quarter}",
     "planQuarter": "Quarter for {title}",
-    "planStart": "Start of {title}"
+    "planStart": "Start of {title}",
+    "featureCards": "{done} of {total} cards"
   },
   "overview": {
     "title": "Overview",

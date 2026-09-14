@@ -1342,7 +1342,8 @@
     "newEpic": "Ny epic",
     "addInQuarter": "Ny epic i {quarter}",
     "planQuarter": "Kvartal for {title}",
-    "planStart": "Start for {title}"
+    "planStart": "Start for {title}",
+    "featureCards": "{done} af {total} kort"
   },
   "overview": {
     "title": "Overblik",
