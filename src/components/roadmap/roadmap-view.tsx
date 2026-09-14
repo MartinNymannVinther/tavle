@@ -6,15 +6,15 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { NativeSelect } from "@/components/ui/native-select";
 import { ThemeChip } from "@/components/board/bits";
-import { themeSwatch } from "@/components/board/tokens";
 import { TypeIcon } from "@/components/board/type-icon";
 import { TypeLegend } from "@/components/board/type-legend";
-import { useBoardActions, type Run } from "@/components/board/use-board-actions";
+import { useBoardActions } from "@/components/board/use-board-actions";
 import { ItemForm } from "@/components/backlog/item-form";
-import { quarterOptions } from "@/components/backlog/quarters";
 import { updateItemAction } from "@/modules/boards/actions-structure";
-import { roadmap, type RoadmapRow } from "@/modules/boards/structure/roadmap";
+import { roadmap } from "@/modules/boards/structure/roadmap";
+import type { RoadmapRow } from "@/modules/boards/structure/roadmap";
 import { structureView } from "@/modules/boards/structure/view";
+import { QuarterSelect, RoadmapLine, type PlanSpan } from "./roadmap-line";
 import type { BoardFull } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -35,8 +35,34 @@ export function RoadmapView({ full }: { full: BoardFull }) {
   const s = useTranslations("boards.structure");
   const { run } = useBoardActions();
   const [areaId, setAreaId] = useState("");
+  // A dragged bar lands where it was dropped, before the server answers;
+  // fresh rows from the server clear the overrides.
+  const [seed, setSeed] = useState(full.items);
+  const [plans, setPlans] = useState<Map<string, { start: string; target: string }>>(new Map());
+  if (seed !== full.items) {
+    setSeed(full.items);
+    setPlans(new Map());
+  }
+  const plan: PlanSpan = (epicId, startQuarter, targetQuarter) => {
+    setPlans((prev) => new Map(prev).set(epicId, { start: startQuarter, target: targetQuarter }));
+    void run(() => updateItemAction({ itemId: epicId, startQuarter, targetQuarter })).then((ok) => {
+      if (!ok) {
+        setPlans((prev) => {
+          const next = new Map(prev);
+          next.delete(epicId);
+          return next;
+        });
+      }
+    });
+  };
   const data = roadmap(full);
-  const rows = areaId ? data.rows.filter((r) => r.epic.areaId === areaId) : data.rows;
+  const planned = (row: RoadmapRow): RoadmapRow => {
+    const override = plans.get(row.epic.id);
+    return override ? { ...row, startQuarter: override.start, endQuarter: override.target } : row;
+  };
+  const rows = (areaId ? data.rows.filter((r) => r.epic.areaId === areaId) : data.rows).map(
+    planned,
+  );
   const unplanned = areaId
     ? data.unplanned.filter((r) => r.epic.areaId === areaId)
     : data.unplanned;
@@ -139,7 +165,7 @@ export function RoadmapView({ full }: { full: BoardFull }) {
                   current={data.current}
                   boardId={full.board.id}
                   boardKey={full.board.key}
-                  run={run}
+                  onPlan={plan}
                 />
               ))}
             </ol>
@@ -177,120 +203,5 @@ export function RoadmapView({ full }: { full: BoardFull }) {
       )}
       <TypeLegend types={["epic"]} />
     </div>
-  );
-}
-
-/** The epic's quarter as a control on its row: planning without leaving the page. */
-function QuarterSelect({ epic, run }: { epic: RoadmapRow["epic"]; run: Run }) {
-  const t = useTranslations("roadmap");
-  const s = useTranslations("boards.structure");
-  if (epic.state !== "open") return null;
-  const options = [
-    ...(epic.targetQuarter && !quarterOptions().includes(epic.targetQuarter)
-      ? [epic.targetQuarter]
-      : []),
-    ...quarterOptions(),
-  ];
-  return (
-    <NativeSelect
-      variant="sm"
-      value={epic.targetQuarter ?? ""}
-      onChange={(event) =>
-        void run(() =>
-          updateItemAction({ itemId: epic.id, targetQuarter: event.target.value || null }),
-        )
-      }
-      aria-label={t("planQuarter", { title: epic.title })}
-      className="h-7 w-fit text-[0.72rem]"
-    >
-      <option value="">{s("noQuarter")}</option>
-      {options.map((quarter) => (
-        <option key={quarter} value={quarter}>
-          {quarter}
-        </option>
-      ))}
-    </NativeSelect>
-  );
-}
-
-function RoadmapLine({
-  row,
-  quarters,
-  current,
-  boardId,
-  boardKey,
-  run,
-}: {
-  row: RoadmapRow;
-  quarters: string[];
-  current: string;
-  boardId: string;
-  boardKey: string;
-  run: Run;
-}) {
-  const t = useTranslations("roadmap");
-  const s = useTranslations("boards.structure");
-  const start = Math.max(0, quarters.indexOf(row.startQuarter));
-  const end = Math.max(start, quarters.indexOf(row.endQuarter));
-  const closed = row.epic.state === "closed";
-  const total = row.openStories + row.doneStories;
-  const progress = total > 0 ? row.doneStories / total : 0;
-  return (
-    <li
-      className="border-hairline grid items-center border-b last:border-b-0"
-      style={{ gridTemplateColumns: `16rem repeat(${quarters.length}, minmax(0, 1fr))` }}
-    >
-      <div className="flex min-w-0 items-start gap-2 px-4 py-2">
-        <TypeIcon type="epic" className="mt-0.5" />
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <Link
-            href={`/boards/${boardId}/items/${row.epic.number}`}
-            className={cn("truncate text-sm font-medium hover:underline", closed && "text-meta")}
-          >
-            {row.epic.title}
-          </Link>
-          <p className="text-meta flex flex-wrap items-center gap-2 text-[0.69rem] tabular-nums">
-            <span className="font-mono">
-              {boardKey}-{row.epic.number}
-            </span>
-            {row.theme && <span>{row.theme.name}</span>}
-            <span>{t("counts", { features: row.features, done: row.doneStories, total })}</span>
-          </p>
-        </div>
-        <QuarterSelect epic={row.epic} run={run} />
-      </div>
-      {quarters.map((quarter, index) => (
-        <div
-          key={quarter}
-          className={cn(
-            "border-hairline relative h-12 border-l",
-            quarter === current && "bg-secondary/40",
-          )}
-        >
-          {index === start && (
-            <div
-              className={cn(
-                "absolute inset-y-3 left-1 flex items-center overflow-hidden rounded-md px-2 text-[0.69rem] font-medium text-white",
-                closed && "opacity-60",
-              )}
-              style={{
-                width: `calc(${(end - start + 1) * 100}% - 0.5rem)`,
-                background: row.theme ? themeSwatch(row.theme.color) : "var(--label)",
-              }}
-              title={`${row.startQuarter} – ${row.endQuarter}`}
-            >
-              <span
-                aria-hidden
-                className="absolute inset-y-0 left-0 bg-white/25"
-                style={{ width: `${Math.round(progress * 100)}%` }}
-              />
-              <span className="relative truncate">
-                {closed ? t("closed") : row.reviewDue ? s("forReview") : row.epic.targetQuarter}
-              </span>
-            </div>
-          )}
-        </div>
-      ))}
-    </li>
   );
 }

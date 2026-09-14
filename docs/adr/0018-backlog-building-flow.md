@@ -40,10 +40,10 @@ selection, written with replaceState. The way back from a card page
 lands where the person left.
 
 **Rule 4 moves to the close.** "An epic or feature says when it is
-done" used to block creation, which interrupted backlog *shaping* with
-backlog *specification* — you could not jot a feature down without
+done" used to block creation, which interrupted backlog _shaping_ with
+backlog _specification_ — you could not jot a feature down without
 writing acceptance prose first. The rule's point is the first of the
-two tests: *can it be finished*. That claim is made when the item
+two tests: _can it be finished_. That claim is made when the item
 closes, so that is where the rule now refuses; until the done-when is
 written, the item carries a warning mark in the heading and on its
 page. The trade-off accepted: an item can exist for a while without
@@ -61,7 +61,7 @@ actions as everywhere else.
 - **A combobox with search for the place select.** A dependency and a
   new control for what grouping the existing select already fixes.
 - **Keeping rule 4 at creation with an "empty allowed" flag.** A rule
-  with a bypass teaches that the rule is negotiable; moving *when* it
+  with a bypass teaches that the rule is negotiable; moving _when_ it
   binds keeps it absolute.
 - **Server-remembered navigator selection.** A way of looking belongs
   to the browser (ADR 0013); the URL is enough for the return trip.

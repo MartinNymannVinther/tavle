@@ -1341,7 +1341,8 @@
     "noEpics": "The board does not show epics, so there is no roadmap to draw. Switch epics on under Settings → Structure.",
     "newEpic": "New epic",
     "addInQuarter": "New epic in {quarter}",
-    "planQuarter": "Quarter for {title}"
+    "planQuarter": "Quarter for {title}",
+    "planStart": "Start of {title}"
   },
   "overview": {
     "title": "Overview",

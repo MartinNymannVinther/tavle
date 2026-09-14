@@ -146,6 +146,8 @@ export const backlogItems = pgTable(
     closedAt: timestamp("closed_at", { withTimezone: true }),
     /** Epics only: where the roadmap draws it, e.g. 2027-Q1. */
     targetQuarter: text("target_quarter"),
+    /** Epics only: the planned start the roadmap draws from; null falls back to the creation quarter. */
+    startQuarter: text("start_quarter"),
     /** The last time an owner said "still a result"; the review clock counts from here, or from creation. */
     reviewConfirmedAt: timestamp("review_confirmed_at", { withTimezone: true }),
     /** Position within its level on the board. One order per level, business and enabler alike. */
@@ -164,11 +166,16 @@ export const backlogItems = pgTable(
       "backlog_items_epic_has_no_parent_ck",
       sql`${t.level} = 'feature' or ${t.parentId} is null`,
     ),
-    check("backlog_items_done_when_ck", sql`${t.doneWhen} <> ''`),
+    // done_when may be empty while an item is shaped; rule 4 refuses at
+    // the close instead (docs/adr/0018), so the old <> '' check is gone.
     check("backlog_items_enabler_type_ck", sql`${t.enablerType} is null or ${t.kind} = 'enabler'`),
     check(
       "backlog_items_target_quarter_ck",
       sql`${t.targetQuarter} is null or ${t.targetQuarter} ~ '^[0-9]{4}-Q[1-4]$'`,
+    ),
+    check(
+      "backlog_items_start_quarter_ck",
+      sql`${t.startQuarter} is null or ${t.startQuarter} ~ '^[0-9]{4}-Q[1-4]$'`,
     ),
   ],
 );

@@ -60,7 +60,8 @@ export function roadmap(full: BoardFull, now: Date = new Date()): Roadmap {
     const row: RoadmapRow = {
       epic,
       theme: epic.themeIds[0] ? (themeOf.get(epic.themeIds[0]) ?? null) : null,
-      startQuarter: quarterOf(epic.createdAt.toISOString().slice(0, 10)),
+      // The planned start wins; without one the creation quarter is the honest fallback.
+      startQuarter: epic.startQuarter ?? quarterOf(epic.createdAt.toISOString().slice(0, 10)),
       endQuarter: endQuarter ?? current,
       reviewDue: reviewDue(epic, full.board.epicReviewDays, now),
       openStories: stories.length - done,
@@ -91,6 +92,10 @@ export function roadmap(full: BoardFull, now: Date = new Date()): Roadmap {
     shift(current, QUARTERS_AHEAD),
   );
   return { quarters: quartersBetween(first, last), current, rows, unplanned };
+}
+
+export function shiftQuarter(quarter: string, by: number): string {
+  return shift(quarter, by);
 }
 
 function shift(quarter: string, by: number): string {

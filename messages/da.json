@@ -1341,7 +1341,8 @@
     "noEpics": "Tavlen viser ikke epics, så der er intet roadmap at tegne. Slå epics til under Indstillinger → Struktur.",
     "newEpic": "Ny epic",
     "addInQuarter": "Ny epic i {quarter}",
-    "planQuarter": "Kvartal for {title}"
+    "planQuarter": "Kvartal for {title}",
+    "planStart": "Start for {title}"
   },
   "overview": {
     "title": "Overblik",

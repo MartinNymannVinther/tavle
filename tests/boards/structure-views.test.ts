@@ -20,7 +20,7 @@ import {
 import { deviatingPlace, structureOf } from "@/components/board/card-chips";
 import { structureView } from "@/modules/boards/structure/view";
 import { overview } from "@/modules/boards/structure/overview";
-import { roadmap } from "@/modules/boards/structure/roadmap";
+import { roadmap, shiftQuarter } from "@/modules/boards/structure/roadmap";
 import { quarterOf, quarterRange, quartersBetween } from "@/modules/boards/structure/rules";
 import { board, now } from "../helpers/structure-board";
 
@@ -223,7 +223,18 @@ describe("the roadmap", () => {
     expect(data.quarters.at(-1)).toBe("2027-Q2");
   });
 
+  it("draws the planned span when a start is chosen, over the creation quarter", () => {
+    const planned = {
+      ...board,
+      items: board.items.map((i) => (i.number === 1 ? { ...i, startQuarter: "2026-Q2" } : i)),
+    };
+    const data = roadmap(planned, now);
+    expect(data.rows.find((r) => r.epic.number === 1)?.startQuarter).toBe("2026-Q2");
+  });
+
   it("does quarter arithmetic", () => {
+    expect(shiftQuarter("2026-Q4", -2)).toBe("2026-Q2");
+    expect(shiftQuarter("2026-Q4", 2)).toBe("2027-Q2");
     expect(quarterOf("2026-09-11")).toBe("2026-Q3");
     expect(quarterOf("2026-12-31")).toBe("2026-Q4");
     expect(quartersBetween("2026-Q3", "2027-Q1")).toEqual(["2026-Q3", "2026-Q4", "2027-Q1"]);

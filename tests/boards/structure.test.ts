@@ -88,10 +88,10 @@ describe("the two tests: can it finish, does it have one parent", () => {
         level: "epic",
         title: "Kunder kan betale med MobilePay",
         areaId: area,
-        doneWhen: "  ",
+        doneWhen: "",
       }),
     );
-    expect(item.doneWhen.trim()).toBe("");
+    expect(item.doneWhen).toBe("");
     expect(await violation(run((tx) => closeItem(tx, ctx, item.id, undefined)))).toBe(
       "doneWhenRequired",
     );
@@ -177,7 +177,9 @@ describe("the two tests: can it finish, does it have one parent", () => {
   });
 
   it("a card under the feature inherits too, and a card cannot hang under an epic", async () => {
-    const [epic, feature] = (await getBoardFull(ctx, boardId))!.items;
+    const items = (await getBoardFull(ctx, boardId))!.items;
+    const epic = items.find((i) => i.level === "epic");
+    const feature = items.find((i) => i.level === "feature");
     const card = await run((tx) =>
       createCard(tx, ctx, { boardId, title: "Vis MobilePay-knappen", featureId: feature!.id }),
     );
@@ -519,5 +521,23 @@ describe("the story map's backbone", () => {
     expect(await violation(run((tx) => placeOnMap(tx, ctx, epic.id, undefined)))).toBe(
       "parentLevel",
     );
+  });
+});
+
+describe("the roadmap's plan", () => {
+  it("keeps a span the right way round, and only on epics", async () => {
+    const items = (await getBoardFull(ctx, boardId))!.items;
+    const epic = items.find((i) => i.level === "epic");
+    const feature = items.find((i) => i.level === "feature");
+    // Dragged past its own end: the span the person drew, swapped quietly.
+    await run((tx) =>
+      updateItem(tx, ctx, { itemId: epic!.id, targetQuarter: "2027-Q1", startQuarter: "2027-Q3" }),
+    );
+    let fresh = (await getBoardFull(ctx, boardId))!.items.find((i) => i.id === epic!.id)!;
+    expect([fresh.startQuarter, fresh.targetQuarter]).toEqual(["2027-Q1", "2027-Q3"]);
+    // A feature has no bar; the quarters are quietly not its fields.
+    await run((tx) => updateItem(tx, ctx, { itemId: feature!.id, startQuarter: "2027-Q1" }));
+    fresh = (await getBoardFull(ctx, boardId))!.items.find((i) => i.id === feature!.id)!;
+    expect(fresh.startQuarter).toBeNull();
   });
 });

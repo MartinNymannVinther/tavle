@@ -28,6 +28,7 @@ export function item(
     state: "open",
     closedAt: null,
     targetQuarter: null,
+    startQuarter: null,
     reviewConfirmedAt: null,
     sort: 1000,
     mapSort: null,

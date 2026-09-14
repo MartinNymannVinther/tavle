@@ -37,6 +37,8 @@ export const ItemUpdateSchema = z.object({
   kind: kind.optional(),
   enablerType: enablerType.optional(),
   targetQuarter: quarter.nullable().optional(),
+  /** Epics only: the planned start the roadmap draws from. */
+  startQuarter: quarter.nullable().optional(),
   expectedUpdatedAt: z.string().optional(),
 });
 

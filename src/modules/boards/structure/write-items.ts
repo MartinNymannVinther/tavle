@@ -6,7 +6,7 @@ import { assertFresh, nextNumber } from "../lanes";
 import { boardInWorkspace } from "../read";
 import { inheritedFrom, resolveNew } from "./inherit";
 import { itemInBoard, itemInWorkspace, levelLane, placeItem, setItemThemes } from "./items";
-import { assertPlaced, enablerTypeFor, RuleViolation } from "./rules";
+import { assertPlaced, compareQuarters, enablerTypeFor, RuleViolation } from "./rules";
 import type { ItemUpdateInput, NewItemInput } from "./validation";
 import { activeAreaInBoard, activeThemesInBoard, settleArea } from "./write-lists";
 
@@ -117,6 +117,20 @@ export async function updateItem(
       patch.targetQuarter = input.targetQuarter;
       changed.push("targetQuarter");
     }
+  }
+  if (item.level === "epic" && input.startQuarter !== undefined) {
+    if (input.startQuarter !== item.startQuarter) {
+      patch.startQuarter = input.startQuarter;
+      changed.push("startQuarter");
+    }
+  }
+  // Quarters the wrong way round are swapped rather than refused; a bar
+  // dragged past its own end means the span the person drew.
+  const start = patch.startQuarter !== undefined ? patch.startQuarter : item.startQuarter;
+  const target = patch.targetQuarter !== undefined ? patch.targetQuarter : item.targetQuarter;
+  if (start && target && compareQuarters(start, target) > 0) {
+    patch.startQuarter = target;
+    patch.targetQuarter = start;
   }
   if (changed.length === 0) return item;
   await tx.update(backlogItems).set(patch).where(eq(backlogItems.id, item.id));
