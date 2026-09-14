@@ -1363,7 +1363,8 @@
     "noSprints": "No open sprints. Create a run ahead so the features have a timeline to lie on.",
     "noPlanned": "No features are planned yet. Pick a sprint on one below.",
     "unplannedFeatures": "Unplanned features ({count})",
-    "unplannedWord": "Pick a sprint …"
+    "unplannedWord": "Pick a sprint …",
+    "featureUnplanned": "unplanned"
   },
   "overview": {
     "title": "Overview",

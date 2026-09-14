@@ -2,23 +2,35 @@
 
 import { useTranslations } from "next-intl";
 import { Points } from "@/components/board/bits";
+import { themeSwatch } from "@/components/board/tokens";
 import { TypeIcon } from "@/components/board/type-icon";
-import type { BoardFull } from "@/modules/boards/types";
+import { quarterPosition } from "@/modules/boards/structure/roadmap";
+import type { BoardFull, ItemView } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 /**
- * What an unfolded epic holds on the roadmap: its features, and the
- * cards under each. Quiet, indented rows — no bars, because features
- * and cards have no quarters; the read is "what is this epic made of
- * and how far is it", one link from anything.
+ * What an unfolded epic holds on the roadmap: its features on the same
+ * quarter axis as the epic's own bar, each drawn roughly where its
+ * planned sprints lie (docs/adr/0023) — an unplanned feature says so
+ * instead of pretending — and the cards under each, one link from
+ * anything. The read is "what is this epic made of, and when".
  */
-export function RoadmapChildren({ epicId, full }: { epicId: string; full: BoardFull }) {
+export function RoadmapChildren({
+  epicId,
+  full,
+  quarters,
+}: {
+  epicId: string;
+  full: BoardFull;
+  quarters: string[];
+}) {
   const t = useTranslations("roadmap");
   const nav = useTranslations("backlog.nav");
   const boardId = full.board.id;
   const key = full.board.key;
   const category = new Map(full.columns.map((c) => [c.id, c.category]));
+  const sprintOf = new Map(full.sprints.map((s) => [s.id, s]));
   const features = full.items
     .filter((i) => i.level === "feature" && i.parentId === epicId)
     .sort((a, b) => a.sort - b.sort || a.number - b.number);
@@ -31,6 +43,19 @@ export function RoadmapChildren({ epicId, full }: { epicId: string; full: BoardF
     );
   }
 
+  const barFor = (feature: ItemView) => {
+    const start = feature.startSprintId ? sprintOf.get(feature.startSprintId) : null;
+    const end = feature.targetSprintId ? sprintOf.get(feature.targetSprintId) : null;
+    if (!start || !end) return null;
+    const left = (quarterPosition(start.startDate, quarters) / quarters.length) * 100;
+    const right = (quarterPosition(end.endDate, quarters) / quarters.length) * 100;
+    return {
+      left,
+      width: Math.max(right - left, 1.5),
+      title: `${start.name} – ${end.name}`,
+    };
+  };
+
   return (
     <div className="bg-secondary/20 divide-hairline flex flex-col divide-y">
       {features.map((feature) => {
@@ -38,26 +63,64 @@ export function RoadmapChildren({ epicId, full }: { epicId: string; full: BoardF
           .filter((c) => c.featureId === feature.id)
           .sort((a, b) => a.sort - b.sort || a.number - b.number);
         const done = cards.filter((c) => category.get(c.columnId) === "done").length;
+        const theme = feature.themeIds[0]
+          ? (full.themes.find((th) => th.id === feature.themeIds[0]) ?? null)
+          : null;
+        const bar = barFor(feature);
         return (
           <div key={feature.id} className="flex flex-col py-1">
-            <p className="flex items-center gap-2 py-1 pr-4 pl-12 text-[0.8125rem]">
-              <TypeIcon type="feature" />
-              <span className="text-meta font-mono shrink-0 text-[0.72rem] tabular-nums">
-                {key}-{feature.number}
-              </span>
-              <Link
-                href={`/boards/${boardId}/items/${feature.number}`}
-                className={cn(
-                  "min-w-0 flex-1 truncate font-medium hover:underline",
-                  feature.state === "closed" && "text-meta line-through",
+            <div
+              className="grid items-center"
+              style={{ gridTemplateColumns: "16rem minmax(0, 1fr)" }}
+            >
+              <p className="flex items-center gap-2 py-1 pr-4 pl-12 text-[0.8125rem]">
+                <TypeIcon type="feature" />
+                <span className="text-meta font-mono shrink-0 text-[0.72rem] tabular-nums">
+                  {key}-{feature.number}
+                </span>
+                <Link
+                  href={`/boards/${boardId}/items/${feature.number}`}
+                  className={cn(
+                    "min-w-0 flex-1 truncate font-medium hover:underline",
+                    feature.state === "closed" && "text-meta line-through",
+                  )}
+                >
+                  {feature.title}
+                </Link>
+                <span className="text-meta shrink-0 text-[0.72rem] tabular-nums">
+                  {t("featureCards", { done, total: cards.length })}
+                </span>
+              </p>
+              <div className="relative h-7">
+                <div
+                  aria-hidden
+                  className="absolute inset-0 grid"
+                  style={{ gridTemplateColumns: `repeat(${quarters.length}, minmax(0, 1fr))` }}
+                >
+                  {quarters.map((quarter) => (
+                    <div key={quarter} className="border-hairline border-l" />
+                  ))}
+                </div>
+                {bar ? (
+                  <div
+                    className={cn(
+                      "absolute inset-y-2 rounded-full opacity-80",
+                      feature.state === "closed" && "opacity-40",
+                    )}
+                    style={{
+                      left: `calc(${bar.left}% + 0.25rem)`,
+                      width: `calc(${bar.width}% - 0.25rem)`,
+                      background: theme ? themeSwatch(theme.color) : "var(--label)",
+                    }}
+                    title={bar.title}
+                  />
+                ) : (
+                  <span className="text-meta absolute inset-y-0 left-2 flex items-center text-[0.69rem]">
+                    {t("featureUnplanned")}
+                  </span>
                 )}
-              >
-                {feature.title}
-              </Link>
-              <span className="text-meta shrink-0 text-[0.72rem] tabular-nums">
-                {t("featureCards", { done, total: cards.length })}
-              </span>
-            </p>
+              </div>
+            </div>
             {cards.map((card) => {
               const cardDone = category.get(card.columnId) === "done";
               return (

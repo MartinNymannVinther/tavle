@@ -213,7 +213,7 @@ export function RoadmapView({ full }: { full: BoardFull }) {
                     }}
                   />
                   {folded.isOpen(row.epic.id) && (
-                    <RoadmapChildren epicId={row.epic.id} full={full} />
+                    <RoadmapChildren epicId={row.epic.id} full={full} quarters={data.quarters} />
                   )}
                 </li>
               ))}

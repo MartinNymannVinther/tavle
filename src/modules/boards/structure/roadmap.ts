@@ -1,7 +1,14 @@
 import type { Theme } from "@/core/db/schema";
-import { todayInCopenhagen } from "@/core/dates";
+import { diffDays, todayInCopenhagen } from "@/core/dates";
 import type { BoardFull, ItemView } from "../types";
-import { compareQuarters, nextQuarter, quarterOf, quartersBetween, reviewDue } from "./rules";
+import {
+  compareQuarters,
+  nextQuarter,
+  quarterOf,
+  quarterRange,
+  quartersBetween,
+  reviewDue,
+} from "./rules";
 
 /**
  * The roadmap: epics on a line of quarters, coloured by their first
@@ -92,6 +99,23 @@ export function roadmap(full: BoardFull, now: Date = new Date()): Roadmap {
     shift(current, QUARTERS_AHEAD),
   );
   return { quarters: quartersBetween(first, last), current, rows, unplanned };
+}
+
+/**
+ * Where a date falls on the roadmap's quarter axis, as a fraction of
+ * columns: 1.5 is halfway through the second quarter. Clamped to the
+ * axis, so a span reaching outside is drawn to the edge rather than
+ * into nothing (docs/adr/0023: the features' sprints on the epics'
+ * quarters).
+ */
+export function quarterPosition(dateIso: string, quarters: string[]): number {
+  if (quarters.length === 0) return 0;
+  const q = quarterOf(dateIso);
+  const index = quarters.indexOf(q);
+  if (index === -1) return compareQuarters(q, quarters[0]!) < 0 ? 0 : quarters.length;
+  const range = quarterRange(q);
+  const days = diffDays(range.start, range.end) + 1;
+  return index + diffDays(range.start, dateIso) / days;
 }
 
 export function shiftQuarter(quarter: string, by: number): string {

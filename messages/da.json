@@ -1363,7 +1363,8 @@
     "noSprints": "Ingen åbne sprints. Opret en række forud, så featurene har en tidslinje at ligge på.",
     "noPlanned": "Ingen features er planlagt endnu. Vælg en sprint på en feature herunder.",
     "unplannedFeatures": "Uplanlagte features ({count})",
-    "unplannedWord": "Vælg sprint …"
+    "unplannedWord": "Vælg sprint …",
+    "featureUnplanned": "uplanlagt"
   },
   "overview": {
     "title": "Overblik",
