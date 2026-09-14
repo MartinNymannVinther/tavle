@@ -61,7 +61,14 @@ export function useFolded(boardId: string) {
     },
     [boardId, open],
   );
+  /** Folds one section out, for following a newly made feature to its epic. */
+  const unfold = useCallback(
+    (id: string) => {
+      if (!open.has(id)) write(boardId, new Set([...open, id]));
+    },
+    [boardId, open],
+  );
   const openAll = useCallback((ids: string[]) => write(boardId, new Set(ids)), [boardId]);
   const closeAll = useCallback(() => write(boardId, NONE), [boardId]);
-  return { isOpen, toggle, openAll, closeAll, anyOpen: open.size > 0 };
+  return { isOpen, toggle, unfold, openAll, closeAll, anyOpen: open.size > 0 };
 }

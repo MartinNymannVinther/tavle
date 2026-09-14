@@ -27,8 +27,8 @@ export async function createItem(
 ): Promise<BacklogItem> {
   const board = await boardInWorkspace(tx, input.boardId);
   if (!board) throw new Error("notFound");
-  // Rule 4, again after the schema: an item that cannot say when it is done is a category.
-  if (!input.doneWhen.trim()) throw new RuleViolation("doneWhenRequired");
+  // Rule 4 has moved to the close (docs/adr/0018): an item may be jotted
+  // down without its done-when and carries a mark until it is written.
   // Rule 1: a feature's parent is an epic; an epic has no parent at all.
   let parent: BacklogItem | null = null;
   if (input.level === "feature" && input.parentId) {
@@ -108,7 +108,6 @@ export async function updateItem(
     changed.push("description");
   }
   if (input.doneWhen !== undefined && input.doneWhen !== item.doneWhen) {
-    if (!input.doneWhen.trim()) throw new RuleViolation("doneWhenRequired");
     patch.doneWhen = input.doneWhen;
     changed.push("doneWhen");
   }

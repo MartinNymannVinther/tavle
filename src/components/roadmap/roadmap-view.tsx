@@ -1,12 +1,18 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
 import { NativeSelect } from "@/components/ui/native-select";
 import { ThemeChip } from "@/components/board/bits";
 import { themeSwatch } from "@/components/board/tokens";
 import { TypeIcon } from "@/components/board/type-icon";
 import { TypeLegend } from "@/components/board/type-legend";
+import { useBoardActions, type Run } from "@/components/board/use-board-actions";
+import { ItemForm } from "@/components/backlog/item-form";
+import { quarterOptions } from "@/components/backlog/quarters";
+import { updateItemAction } from "@/modules/boards/actions-structure";
 import { roadmap, type RoadmapRow } from "@/modules/boards/structure/roadmap";
 import { structureView } from "@/modules/boards/structure/view";
 import type { BoardFull } from "@/modules/boards/types";
@@ -19,11 +25,15 @@ import { cn } from "@/lib/utils";
  * not as one SVG, so every title is a link, the page reads on a phone
  * and a screen reader gets a list rather than a picture. An epic due
  * for review says so on its bar; an epic with no target quarter is
- * listed underneath as unplanned rather than drawn to nowhere.
+ * listed underneath as unplanned rather than drawn to nowhere. The
+ * backlog can be built from here too: a new epic from the header or
+ * from a quarter's own "+", and every open epic's quarter is a select
+ * on its row, so planning is a change here rather than a trip away.
  */
 export function RoadmapView({ full }: { full: BoardFull }) {
   const t = useTranslations("roadmap");
   const s = useTranslations("boards.structure");
+  const { run } = useBoardActions();
   const [areaId, setAreaId] = useState("");
   const data = roadmap(full);
   const rows = areaId ? data.rows.filter((r) => r.epic.areaId === areaId) : data.rows;
@@ -67,6 +77,17 @@ export function RoadmapView({ full }: { full: BoardFull }) {
             <ThemeChip key={theme.id} theme={theme} />
           ))}
         </div>
+        <span className="flex-1" />
+        <ItemForm
+          full={full}
+          level="epic"
+          run={run}
+          trigger={
+            <Button type="button" variant="outline" size="sm">
+              {t("newEpic")}
+            </Button>
+          }
+        />
       </div>
 
       <section className="border-border bg-card overflow-x-auto rounded-xl border shadow-[var(--surface-shadow)]">
@@ -80,11 +101,29 @@ export function RoadmapView({ full }: { full: BoardFull }) {
               <div
                 key={quarter}
                 className={cn(
-                  "border-hairline border-l px-2 py-2 text-center text-[0.72rem] font-medium tabular-nums",
+                  "border-hairline group/quarter flex items-center justify-center gap-1 border-l px-2 py-2 text-center text-[0.72rem] font-medium tabular-nums",
                   quarter === data.current ? "text-foreground bg-secondary/60" : "text-label",
                 )}
               >
                 {quarter}
+                {quarter >= data.current && (
+                  <ItemForm
+                    full={full}
+                    level="epic"
+                    targetQuarter={quarter}
+                    run={run}
+                    trigger={
+                      <button
+                        type="button"
+                        aria-label={t("addInQuarter", { quarter })}
+                        title={t("addInQuarter", { quarter })}
+                        className="text-meta hover:text-foreground [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/quarter:opacity-100 [@media(hover:hover)]:focus-visible:opacity-100"
+                      >
+                        <Plus className="size-3.5" aria-hidden />
+                      </button>
+                    }
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -100,6 +139,7 @@ export function RoadmapView({ full }: { full: BoardFull }) {
                   current={data.current}
                   boardId={full.board.id}
                   boardKey={full.board.key}
+                  run={run}
                 />
               ))}
             </ol>
@@ -129,6 +169,7 @@ export function RoadmapView({ full }: { full: BoardFull }) {
                     {s("forReview")}
                   </span>
                 )}
+                <QuarterSelect epic={row.epic} run={run} />
               </li>
             ))}
           </ul>
@@ -139,18 +180,53 @@ export function RoadmapView({ full }: { full: BoardFull }) {
   );
 }
 
+/** The epic's quarter as a control on its row: planning without leaving the page. */
+function QuarterSelect({ epic, run }: { epic: RoadmapRow["epic"]; run: Run }) {
+  const t = useTranslations("roadmap");
+  const s = useTranslations("boards.structure");
+  if (epic.state !== "open") return null;
+  const options = [
+    ...(epic.targetQuarter && !quarterOptions().includes(epic.targetQuarter)
+      ? [epic.targetQuarter]
+      : []),
+    ...quarterOptions(),
+  ];
+  return (
+    <NativeSelect
+      variant="sm"
+      value={epic.targetQuarter ?? ""}
+      onChange={(event) =>
+        void run(() =>
+          updateItemAction({ itemId: epic.id, targetQuarter: event.target.value || null }),
+        )
+      }
+      aria-label={t("planQuarter", { title: epic.title })}
+      className="h-7 w-fit text-[0.72rem]"
+    >
+      <option value="">{s("noQuarter")}</option>
+      {options.map((quarter) => (
+        <option key={quarter} value={quarter}>
+          {quarter}
+        </option>
+      ))}
+    </NativeSelect>
+  );
+}
+
 function RoadmapLine({
   row,
   quarters,
   current,
   boardId,
   boardKey,
+  run,
 }: {
   row: RoadmapRow;
   quarters: string[];
   current: string;
   boardId: string;
   boardKey: string;
+  run: Run;
 }) {
   const t = useTranslations("roadmap");
   const s = useTranslations("boards.structure");
@@ -181,6 +257,7 @@ function RoadmapLine({
             <span>{t("counts", { features: row.features, done: row.doneStories, total })}</span>
           </p>
         </div>
+        <QuarterSelect epic={row.epic} run={run} />
       </div>
       {quarters.map((quarter, index) => (
         <div

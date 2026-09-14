@@ -27,11 +27,11 @@ export function ItemTextarea({
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(item[field]);
   const [pending, setPending] = useState(false);
-  const required = field === "doneWhen";
+  // Rule 4 bites at the close, not here (docs/adr/0018): the done-when
+  // may stand empty while the item is being shaped.
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (required && !value.trim()) return;
     setPending(true);
     const ok = await run(() =>
       updateItemAction({
@@ -73,10 +73,9 @@ export function ItemTextarea({
             maxLength={field === "doneWhen" ? 500 : 8000}
             placeholder={t("placeholder")}
             aria-label={t("title")}
-            required={required}
           />
           <div className="flex gap-2">
-            <Button type="submit" size="sm" disabled={pending || (required && !value.trim())}>
+            <Button type="submit" size="sm" disabled={pending}>
               {t("save")}
             </Button>
             <Button type="button" size="sm" variant="ghost" onClick={() => setEditing(false)}>

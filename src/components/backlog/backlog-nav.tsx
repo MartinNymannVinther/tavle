@@ -1,6 +1,7 @@
 "use client";
 
 import { CircleDashed } from "lucide-react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { NativeSelect } from "@/components/ui/native-select";
 import { TypeIcon } from "@/components/board/type-icon";
@@ -29,6 +30,10 @@ export type NavProps = {
   showClosed: boolean;
   onShowClosed: (show: boolean) => void;
   onRank: (itemId: string, siblingId: string, after: boolean) => void;
+  /** A dragged backlog card dropped on a feature (or on "no parent": null). */
+  onDropCard?: (featureId: string | null) => void;
+  /** Renders the "new feature" affordance for an epic without any. */
+  newFeature?: (epicId: string) => React.ReactNode;
 };
 
 const same = (a: Selection, b: Selection) => selectionKey(a) === selectionKey(b);
@@ -43,6 +48,7 @@ function Node({
   arrows,
   depth = 0,
   className,
+  onDropCard,
 }: {
   selected: boolean;
   onClick: () => void;
@@ -53,15 +59,35 @@ function Node({
   arrows?: { onUp?: () => void; onDown?: () => void };
   depth?: number;
   className?: string;
+  /** The node takes a dragged card: dropping it here sets its parent. */
+  onDropCard?: () => void;
 }) {
+  const [over, setOver] = useState(false);
   return (
     <div
       className={cn(
         "group/row flex items-start gap-1 rounded-md pr-1",
         selected ? "bg-card font-semibold shadow-[var(--surface-shadow)]" : "hover:bg-card/60",
+        onDropCard && over && "ring-primary bg-accent/60 ring-1",
         className,
       )}
       style={{ paddingLeft: `${depth * 1.25}rem` }}
+      {...(onDropCard && {
+        onDragOver: (event: React.DragEvent) => {
+          event.preventDefault();
+          setOver(true);
+        },
+        onDragLeave: (event: React.DragEvent) => {
+          if (!event.currentTarget.contains(event.relatedTarget as globalThis.Node)) {
+            setOver(false);
+          }
+        },
+        onDrop: (event: React.DragEvent) => {
+          event.preventDefault();
+          setOver(false);
+          onDropCard();
+        },
+      })}
     >
       {fold ? (
         <FoldButton open={fold.open} onToggle={fold.onToggle} />
@@ -104,6 +130,9 @@ function FeatureNodes({ nodes, depth, p }: { nodes: FeatureNode[]; depth: number
               onDown: after ? () => p.onRank(feature.id, after, true) : undefined,
             }}
             className={feature.state === "closed" ? "text-meta line-through" : undefined}
+            onDropCard={
+              p.onDropCard && feature.state === "open" ? () => p.onDropCard!(feature.id) : undefined
+            }
           />
         );
       })}
@@ -148,7 +177,10 @@ export function BacklogNav(p: NavProps) {
               <FeatureNodes nodes={node.features} depth={1} p={p} />
             )}
             {open && node.features.length === 0 && (
-              <p className="text-meta py-1 pl-12 text-[0.72rem]">{t("noFeatures")}</p>
+              <p className="text-meta flex items-center gap-2 py-1 pl-12 text-[0.72rem]">
+                {t("noFeatures")}
+                {epic.state === "open" && p.newFeature?.(epic.id)}
+              </p>
             )}
           </div>
         );
@@ -170,6 +202,7 @@ export function BacklogNav(p: NavProps) {
             }
             title={t("noParent")}
             count={tree.looseStories.length}
+            onDropCard={p.onDropCard ? () => p.onDropCard!(null) : undefined}
           />
           {p.isOpen("loose") && <FeatureNodes nodes={tree.looseFeatures} depth={1} p={p} />}
         </div>

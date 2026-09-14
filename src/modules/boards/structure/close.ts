@@ -80,6 +80,9 @@ export async function closeItem(
   const item = await itemInWorkspace(tx, itemId);
   if (!item) return null;
   if (item.state === "closed") return { closed: true };
+  // Rule 4, where it bites (docs/adr/0018): finished is a claim against
+  // the done-when, so an item cannot close without one.
+  if (!item.doneWhen.trim()) throw new RuleViolation("doneWhenRequired");
   const board = (await boardInWorkspace(tx, item.boardId))!;
   const open = await openChildrenOf(tx, board, item);
 

@@ -19,7 +19,7 @@ export const NewItemSchema = z.object({
   level: z.enum(ITEM_LEVELS),
   title: shortText(160).min(1),
   description: shortText(8000).optional(),
-  doneWhen: shortText(500).min(1),
+  doneWhen: shortText(500),
   kind: kind.optional(),
   enablerType: enablerType.optional(),
   /** The epic a feature is part of; ignored on an epic, which has no parent. */
@@ -33,7 +33,7 @@ export const ItemUpdateSchema = z.object({
   itemId: id,
   title: shortText(160).min(1).optional(),
   description: shortText(8000).optional(),
-  doneWhen: shortText(500).min(1).optional(),
+  doneWhen: shortText(500).optional(),
   kind: kind.optional(),
   enablerType: enablerType.optional(),
   targetQuarter: quarter.nullable().optional(),

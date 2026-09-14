@@ -556,7 +556,8 @@
       "where": "Belongs to",
       "partOfFeature": "Part of a feature",
       "noParentInArea": "No parent, in area",
-      "inArea": "In area"
+      "inArea": "In area",
+      "looseFeatures": "Features without an epic"
     },
     "filters": {
       "search": "Search cards",
@@ -641,7 +642,8 @@
       "themes": "Themes",
       "applyToChildren": "Also update the children when the area or themes change",
       "targetQuarter": "Target quarter",
-      "noQuarter": "No target yet"
+      "noQuarter": "No target yet",
+      "missingDoneWhen": "Missing its “done when”"
     },
     "rules": {
       "parentLevel": "A parent is always exactly one level up: a feature belongs to an epic, a card to a feature, on the same board.",
@@ -664,7 +666,8 @@
       "doneWhenPlaceholder": "80 % of checkout payments can be completed with MobilePay in production",
       "inherits": "Area and themes are inherited from the epic and can be changed afterwards.",
       "create": "Create",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "doneWhenHint": "Can be written later — but must be there before it can close."
     },
     "types": {
       "epic": "Epic",
@@ -854,7 +857,10 @@
       "epicCounts": "{features, plural, one {# feature} other {# features}} · {cards, plural, one {# card} other {# cards}} in the backlog · {points} points",
       "featureCounts": "{cards, plural, one {# card} other {# cards}} in the backlog · {points} points · {open} under way",
       "looseHint": "Cards that are not part of a feature yet"
-    }
+    },
+    "place": "Put under feature",
+    "placeTarget": "Feature",
+    "noParentOption": "Without a parent"
   },
   "sprints": {
     "title": "Sprints",
@@ -1299,7 +1305,7 @@
       "newFeature": "New feature under this",
       "noFeatures": "No features yet. Create the first one that can be released on its own.",
       "storyCounts": "{open} open · {done} done",
-      "noStories": "No cards yet. Create them from the backlog or the board and choose this feature."
+      "noStories": "No cards yet. Add the first one below."
     },
     "close": {
       "button": "Close",
@@ -1332,7 +1338,10 @@
     "unplannedHint": "An epic without a target is not drawn. A roadmap that shows bars without an end is lying.",
     "counts": "{features, plural, one {# feature} other {# features}} · {done} of {total} cards done",
     "closed": "Closed",
-    "noEpics": "The board does not show epics, so there is no roadmap to draw. Switch epics on under Settings → Structure."
+    "noEpics": "The board does not show epics, so there is no roadmap to draw. Switch epics on under Settings → Structure.",
+    "newEpic": "New epic",
+    "addInQuarter": "New epic in {quarter}",
+    "planQuarter": "Quarter for {title}"
   },
   "overview": {
     "title": "Overview",

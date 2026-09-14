@@ -74,6 +74,15 @@ export function ItemHeading({
             {t("looksLikeTheme")}
           </span>
         )}
+        {item.state === "open" && !item.doneWhen.trim() && (
+          <span
+            className="text-warning inline-flex items-center gap-1 text-[0.69rem] font-medium"
+            title={t("missingDoneWhen")}
+          >
+            <TriangleAlert className="size-3.5" aria-hidden />
+            {t("missingDoneWhen")}
+          </span>
+        )}
         {reviewDue && (
           <span className="bg-warning-tint text-warning rounded-full px-2 py-0.5 text-[0.69rem] font-medium whitespace-nowrap">
             {t("forReview")}

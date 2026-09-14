@@ -167,6 +167,13 @@ export const ChecklistSchema = z.object({
   checklist: z.array(checklistItemSchema).max(50),
 });
 
+/** Ticked cards put under one feature (or none) in one gesture, from the backlog. */
+export const CardsPlacementSchema = z.object({
+  cardIds: z.array(id).min(1).max(100),
+  /** Null puts them without a parent; each card keeps its area. */
+  featureId: id.nullable(),
+});
+
 export const CardSprintSchema = z.object({
   cardIds: z.array(id).min(1).max(100),
   /** Null sends the cards back to the backlog. */

@@ -48,6 +48,27 @@ export function QuickAdd({
   const [title, setTitle] = useState("");
   const [where, setWhere] = useState<string>(defaultWhere ?? (areas[0] ? `a:${areas[0].id}` : ""));
   const [pending, setPending] = useState(false);
+  // The place follows where the person is looking, but a half-typed
+  // sentence is theirs: a navigator click retargets the select and
+  // leaves the title standing.
+  const [seedWhere, setSeedWhere] = useState(defaultWhere);
+  if (seedWhere !== defaultWhere) {
+    setSeedWhere(defaultWhere);
+    if (defaultWhere) setWhere(defaultWhere);
+  }
+
+  // The features stand under their epics, as in the navigator, so the
+  // select reads as the decomposition rather than as an unsorted pile.
+  const epics = view.epics ? structure.items.filter((i) => i.level === "epic") : [];
+  const featureGroups = epics
+    .map((epic) => ({
+      key: epic.id,
+      label: epic.title,
+      features: features.filter((f) => f.parentId === epic.id),
+    }))
+    .filter((group) => group.features.length > 0);
+  const grouped = new Set(featureGroups.flatMap((g) => g.features.map((f) => f.id)));
+  const loose = features.filter((f) => !grouped.has(f.id));
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -102,9 +123,18 @@ export function QuickAdd({
           onChange={(event) => setWhere(event.target.value)}
           aria-label={t("where")}
         >
-          {features.length > 0 && (
-            <optgroup label={t("partOfFeature")}>
-              {features.map((feature) => (
+          {featureGroups.map((group) => (
+            <optgroup key={group.key} label={group.label}>
+              {group.features.map((feature) => (
+                <option key={feature.id} value={`f:${feature.id}`}>
+                  {feature.title}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+          {loose.length > 0 && (
+            <optgroup label={featureGroups.length > 0 ? t("looseFeatures") : t("partOfFeature")}>
+              {loose.map((feature) => (
                 <option key={feature.id} value={`f:${feature.id}`}>
                   {feature.title}
                 </option>

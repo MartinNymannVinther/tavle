@@ -69,11 +69,22 @@ export function StoryRows({
   );
 }
 
-export function BacklogList({ stories, rows }: { stories: CardView[]; rows: StoryRowProps }) {
+export function BacklogList({
+  stories,
+  rows,
+  emptyText,
+}: {
+  stories: CardView[];
+  rows: StoryRowProps;
+  /** What an empty list says; the whole-backlog wording differs from a narrowed one's. */
+  emptyText?: string;
+}) {
   const t = useTranslations("backlog");
   if (stories.length === 0) {
     return (
-      <p className="text-meta border-hairline border-t px-4 py-3 text-sm">{t("nothingHere")}</p>
+      <p className="text-meta border-hairline border-t px-4 py-3 text-sm">
+        {emptyText ?? t("nothingHere")}
+      </p>
     );
   }
   return (

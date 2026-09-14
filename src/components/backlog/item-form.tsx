@@ -39,15 +39,21 @@ export function ItemForm({
   full,
   level,
   parentId,
+  targetQuarter: quarterPrefill,
   trigger,
   run,
+  onCreated,
 }: {
   full: ItemFormSource;
   level: ItemLevel;
   /** For a feature: the epic it starts under, if any. */
   parentId?: string | null;
+  /** For an epic: the quarter it starts aimed at — the roadmap's "+" fills this in. */
+  targetQuarter?: string;
   trigger: React.ReactElement;
   run: Run;
+  /** The page follows the new item, so what was just made is what is looked at. */
+  onCreated?: (item: { id: string; parentId: string | null }) => void;
 }) {
   const t = useTranslations("boards.itemForm");
   const s = useTranslations("boards.structure");
@@ -60,7 +66,7 @@ export function ItemForm({
   const [themeIds, setThemeIds] = useState<string[]>([]);
   const [kind, setKind] = useState<Kind>("business");
   const [enablerType, setEnablerType] = useState<EnablerType | "">("");
-  const [targetQuarter, setTargetQuarter] = useState("");
+  const [targetQuarter, setTargetQuarter] = useState(quarterPrefill ?? "");
 
   const view = structureView(full.board);
   const epics = view.epics
@@ -77,18 +83,21 @@ export function ItemForm({
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
-    const ok = await run(() =>
-      createItemAction({
-        boardId: full.board.id,
-        level,
-        title,
-        doneWhen,
-        kind,
-        enablerType: kind === "enabler" ? enablerType || null : null,
-        parentId: level === "feature" ? parent || null : null,
-        ...(parentChosen ? {} : { areaId: view.areas ? areaId || null : null, themeIds }),
-        targetQuarter: level === "epic" ? targetQuarter || null : null,
-      }),
+    const ok = await run(
+      () =>
+        createItemAction({
+          boardId: full.board.id,
+          level,
+          title,
+          doneWhen,
+          kind,
+          enablerType: kind === "enabler" ? enablerType || null : null,
+          parentId: level === "feature" ? parent || null : null,
+          ...(parentChosen ? {} : { areaId: view.areas ? areaId || null : null, themeIds }),
+          targetQuarter: level === "epic" ? targetQuarter || null : null,
+        }),
+      (created) =>
+        onCreated?.({ id: created.id, parentId: level === "feature" ? parent || null : null }),
     );
     setPending(false);
     if (ok) {
@@ -127,11 +136,11 @@ export function ItemForm({
                 id="item-done-when"
                 value={doneWhen}
                 onChange={(e) => setDoneWhen(e.target.value)}
-                required
                 rows={2}
                 maxLength={500}
                 placeholder={t("doneWhenPlaceholder")}
               />
+              <p className="text-meta text-[0.72rem]">{t("doneWhenHint")}</p>
             </Field>
             {level === "feature" && view.epics && (
               <Field>
@@ -244,7 +253,13 @@ export function ItemForm({
                     onChange={(e) => setTargetQuarter(e.target.value)}
                   >
                     <option value="">{s("noQuarter")}</option>
-                    {quarterOptions().map((quarter) => (
+                    {/* A prefill from the roadmap may name a quarter outside the coming ones. */}
+                    {[
+                      ...(quarterPrefill && !quarterOptions().includes(quarterPrefill)
+                        ? [quarterPrefill]
+                        : []),
+                      ...quarterOptions(),
+                    ].map((quarter) => (
                       <option key={quarter} value={quarter}>
                         {quarter}
                       </option>
@@ -255,10 +270,7 @@ export function ItemForm({
             </div>
           </FieldGroup>
           <DialogFooter>
-            <Button
-              type="submit"
-              disabled={pending || !title.trim() || !doneWhen.trim() || needsArea}
-            >
+            <Button type="submit" disabled={pending || !title.trim() || needsArea}>
               {t("create")}
             </Button>
             <Button type="button" variant="ghost" onClick={() => setOpen(false)}>

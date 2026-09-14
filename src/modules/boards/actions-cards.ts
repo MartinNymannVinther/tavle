@@ -10,6 +10,7 @@ import {
   CardIdSchema,
   CardMoveSchema,
   CardUpdateSchema,
+  CardsPlacementSchema,
   ChecklistSchema,
   CommentIdSchema,
   NewCardSchema,
@@ -70,6 +71,21 @@ export async function placeCardAction(raw: unknown): Promise<Result<string>> {
     const card = found(await placeCardInStructure(tx, ctx, input));
     touch(card.boardId);
     return card.boardId;
+  });
+}
+
+/** The ticked cards under one feature, one transaction; every id checked like the single move. */
+export async function placeCardsAction(raw: unknown): Promise<Result<string>> {
+  return action(CardsPlacementSchema, raw, async (tx, ctx, input, touch) => {
+    let boardId = "";
+    for (const cardId of input.cardIds) {
+      const card = found(
+        await placeCardInStructure(tx, ctx, { cardId, featureId: input.featureId }),
+      );
+      boardId = card.boardId;
+    }
+    touch(boardId);
+    return boardId;
   });
 }
 

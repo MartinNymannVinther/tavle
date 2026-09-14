@@ -73,17 +73,32 @@ afterAll(async () => {
 });
 
 describe("the two tests: can it finish, does it have one parent", () => {
-  it("rule 4: an epic and a feature say when they are done", async () => {
-    const empty = {
-      boardId,
-      level: "epic" as const,
-      title: "Kunder kan betale med MobilePay",
-      areaId: payments,
-    };
-    // The schema refuses it at the boundary, the service again, the database last.
-    expect(await violation(run((tx) => createItem(tx, ctx, { ...empty, doneWhen: "  " })))).toBe(
+  it("rule 4: an item may start without its done-when, but cannot close without it", async () => {
+    // Its own board: the suite's other tests count the shared board's
+    // items and numbers, and this one is about a rule, not the board.
+    const own = await run((tx) =>
+      createBoard(tx, ctx, { name: "Regel 4", key: "RFIR", mode: "kanban", firstArea: "Alt" }),
+    );
+    const area = (await getBoardFull(ctx, own.id))!.areas[0]!.id;
+    // Jotting down is allowed (docs/adr/0018); finishing is the claim
+    // that needs the criterion, so the close is where the rule bites.
+    const item = await run((tx) =>
+      createItem(tx, ctx, {
+        boardId: own.id,
+        level: "epic",
+        title: "Kunder kan betale med MobilePay",
+        areaId: area,
+        doneWhen: "  ",
+      }),
+    );
+    expect(item.doneWhen.trim()).toBe("");
+    expect(await violation(run((tx) => closeItem(tx, ctx, item.id, undefined)))).toBe(
       "doneWhenRequired",
     );
+    await run((tx) =>
+      updateItem(tx, ctx, { itemId: item.id, doneWhen: "Betalingen virker i produktion" }),
+    );
+    expect((await run((tx) => closeItem(tx, ctx, item.id, undefined)))?.closed).toBe(true);
   });
 
   it("rule 3: an item without a parent needs an area", async () => {

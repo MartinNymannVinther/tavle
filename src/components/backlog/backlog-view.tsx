@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
 import { applyFilters, NO_FILTERS, type Filters } from "@/components/board/board-filters";
 import { structureOf } from "@/components/board/card-chips";
 import { QuickAdd } from "@/components/board/quick-add";
@@ -10,22 +9,19 @@ import { legendTypes, TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
 import { cn } from "@/lib/utils";
 import type { BoardFull } from "@/modules/boards/types";
-import { createCardAction } from "@/modules/boards/actions-cards";
+import {
+  createCardAction,
+  placeCardAction,
+  placeCardsAction,
+} from "@/modules/boards/actions-cards";
 import { reorderItemAction } from "@/modules/boards/actions-structure";
 import { reorderBacklogAction, setCardsSprintAction } from "@/modules/boards/actions-sprints";
+import { BacklogHeader } from "./backlog-header";
 import { BacklogHeading } from "./backlog-heading";
 import { BacklogList, type StoryRowProps } from "./backlog-list";
 import { BacklogNav, BacklogNavSelect } from "./backlog-nav";
-import {
-  ALL,
-  crumbFor,
-  crumbOf,
-  navCounts,
-  selectStories,
-  selectionKey,
-  stillThere,
-  type Selection,
-} from "./backlog-selection";
+import { crumbFor, crumbOf, navCounts, selectStories, stillThere } from "./backlog-selection";
+import { useChosen } from "./use-chosen";
 import { BacklogToolbar } from "./backlog-toolbar";
 import { backlogStories, grouped, hierarchy, type Group, type Grouping } from "./group-backlog";
 import { GroupedList } from "./grouped-list";
@@ -54,7 +50,7 @@ export function BacklogView({ full }: { full: BoardFull }) {
   const scrum = board.mode === "scrum";
   const structure = structureOf(full);
   const folded = useFolded(board.id);
-  const [chosen, setChosen] = useState<Selection>(ALL);
+  const [chosen, choose] = useChosen();
   const [grouping, setGrouping] = useState<Grouping>("list");
   const [showClosed, setShowClosed] = useState(false);
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
@@ -82,11 +78,28 @@ export function BacklogView({ full }: { full: BoardFull }) {
     });
   }
 
+  // Only the backlog's own ticks: the sprint panels share the selection
+  // set, and neither gesture should quietly take their cards along.
+  const backlogIds = all.filter((c) => selected.has(c.id)).map((c) => c.id);
+
   async function commit() {
-    const ids = [...selected];
-    if (ids.length === 0 || !target) return;
-    const ok = await run(() => setCardsSprintAction({ cardIds: ids, sprintId: target }));
+    if (backlogIds.length === 0 || !target) return;
+    const ok = await run(() => setCardsSprintAction({ cardIds: backlogIds, sprintId: target }));
     if (ok) setSelected(new Set());
+  }
+
+  async function place(featureId: string | null) {
+    if (backlogIds.length === 0) return;
+    const ok = await run(() => placeCardsAction({ cardIds: backlogIds, featureId }));
+    if (ok) setSelected(new Set());
+  }
+
+  /** A card dropped on the navigator: the same placement as the story map's drag. */
+  function dropOnNav(featureId: string | null) {
+    const id = dragId;
+    setDragId(null);
+    if (!id) return;
+    void run(() => placeCardAction({ cardId: id, featureId }));
   }
 
   /** The backlog's own order is the only order; a nudge is a move past the sibling in it. */
@@ -119,7 +132,7 @@ export function BacklogView({ full }: { full: BoardFull }) {
     boardId: board.id,
     structure,
     selected,
-    onSelect: scrum ? select : undefined,
+    onSelect: select,
     onNudge: nudge,
     dragId,
     setDragId,
@@ -134,13 +147,18 @@ export function BacklogView({ full }: { full: BoardFull }) {
       : grouping === "area" && group.key !== "none"
         ? { areaId: group.key }
         : undefined;
-  const backlogSelected = all.filter((c) => selected.has(c.id)).length;
+  /** After a create the page follows the new item: epic unfolded, node chosen, quick add primed. */
+  const follow = (level: "epic" | "feature") => (item: { id: string; parentId: string | null }) => {
+    if (item.parentId) folded.unfold(item.parentId);
+    choose({ kind: level, id: item.id });
+  };
   const newFeature = (epicId: string) => (
     <ItemForm
       full={full}
       level="feature"
       parentId={epicId}
       run={run}
+      onCreated={follow("feature")}
       trigger={
         <button type="button" className="text-meta hover:text-foreground font-medium">
           + {t("newFeature")}
@@ -148,12 +166,13 @@ export function BacklogView({ full }: { full: BoardFull }) {
       }
     />
   );
+  const openFeatures = structure.items.filter((i) => i.level === "feature" && i.state === "open");
   const navProps = {
     tree,
     counts,
     total: all.length,
     selection,
-    onSelect: setChosen,
+    onSelect: choose,
   };
   const quickAddWhere =
     selection.kind === "feature"
@@ -164,41 +183,14 @@ export function BacklogView({ full }: { full: BoardFull }) {
 
   const list = (
     <section className="border-border bg-card @container flex min-w-0 flex-col rounded-xl border shadow-[var(--surface-shadow)]">
-      <header className="border-hairline flex flex-wrap items-center gap-3 border-b px-4 py-3">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-base font-semibold">{t("title")}</h2>
-          <p className="text-meta text-sm tabular-nums">
-            {t("holds", {
-              cards: all.length,
-              points: all.reduce((total, c) => total + (c.estimate ?? 0), 0),
-            })}
-          </p>
-        </div>
-        {view.epics && (
-          <ItemForm
-            full={full}
-            level="epic"
-            run={run}
-            trigger={
-              <Button type="button" variant="outline" size="sm">
-                {t("newEpic")}
-              </Button>
-            }
-          />
-        )}
-        {view.features && (
-          <ItemForm
-            full={full}
-            level="feature"
-            run={run}
-            trigger={
-              <Button type="button" variant="outline" size="sm">
-                {t("newFeature")}
-              </Button>
-            }
-          />
-        )}
-      </header>
+      <BacklogHeader
+        full={full}
+        view={view}
+        all={all}
+        selection={selection}
+        run={run}
+        follow={follow}
+      />
       <div className={cn("grid", view.features && "@2xl:grid-cols-[17rem_minmax(0,1fr)]")}>
         {view.features && (
           <aside className="bg-secondary/60 border-hairline hidden border-r p-2 @2xl:block">
@@ -209,6 +201,8 @@ export function BacklogView({ full }: { full: BoardFull }) {
               showClosed={showClosed}
               onShowClosed={setShowClosed}
               onRank={rank}
+              onDropCard={dropOnNav}
+              newFeature={newFeature}
             />
           </aside>
         )}
@@ -237,28 +231,19 @@ export function BacklogView({ full }: { full: BoardFull }) {
             members={full.members}
             structure={structure}
           />
-          {scrum && (
-            <SelectionBar
-              count={backlogSelected}
-              sprints={open}
-              target={target}
-              onTarget={setTarget}
-              onCommit={() => void commit()}
-              onClear={() => setSelected(new Set())}
-            />
-          )}
-          {grouping === "list" ? (
-            <BacklogList stories={stories} rows={rows} />
-          ) : (
-            <GroupedList
-              groups={grouped(full, stories, grouping, groupNames)}
-              rows={rows}
-              contextOf={contextOf}
-            />
-          )}
-          <div className="border-hairline mt-auto border-t px-2 py-2">
+          <SelectionBar
+            count={backlogIds.length}
+            scrum={scrum}
+            sprints={scrum ? open : []}
+            target={target}
+            onTarget={setTarget}
+            onCommit={() => void commit()}
+            features={view.features ? openFeatures : []}
+            onPlace={(featureId) => void place(featureId)}
+            onClear={() => setSelected(new Set())}
+          />
+          <div className="border-hairline border-b px-2 py-2">
             <QuickAdd
-              key={selectionKey(selection)}
               onAdd={(title, place) =>
                 run(() => createCardAction({ boardId: board.id, title, ...place }))
               }
@@ -267,6 +252,19 @@ export function BacklogView({ full }: { full: BoardFull }) {
               defaultWhere={quickAddWhere}
             />
           </div>
+          {grouping === "list" ? (
+            <BacklogList
+              stories={stories}
+              rows={rows}
+              emptyText={all.length === 0 ? t("empty") : undefined}
+            />
+          ) : (
+            <GroupedList
+              groups={grouped(full, stories, grouping, groupNames)}
+              rows={rows}
+              contextOf={contextOf}
+            />
+          )}
         </div>
       </div>
       <TypeLegend types={legendTypes(view)} className="border-hairline border-t px-4 py-2" />

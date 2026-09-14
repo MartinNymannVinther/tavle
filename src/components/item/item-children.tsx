@@ -3,9 +3,12 @@
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Initials, Points } from "@/components/board/bits";
+import { structureOf } from "@/components/board/card-chips";
+import { QuickAdd } from "@/components/board/quick-add";
 import { TypeIcon } from "@/components/board/type-icon";
 import type { Run } from "@/components/board/use-board-actions";
 import { ItemForm, type ItemFormSource } from "@/components/backlog/item-form";
+import { createCardAction } from "@/modules/boards/actions-cards";
 import type { ItemFull } from "@/modules/boards/structure/read";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -100,6 +103,15 @@ export function ItemChildren({ full, run }: { full: ItemFull; run: Run }) {
             </li>
           ))}
         </ol>
+      )}
+      {!epic && item.state === "open" && (
+        <QuickAdd
+          onAdd={(title) =>
+            run(() => createCardAction({ boardId: board.id, title, featureId: item.id }))
+          }
+          structure={structureOf(source)}
+          fixed={{ featureId: item.id }}
+        />
       )}
     </section>
   );

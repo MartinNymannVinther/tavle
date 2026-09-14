@@ -556,7 +556,8 @@
       "where": "Hører til",
       "partOfFeature": "Del af feature",
       "noParentInArea": "Uden forælder, i område",
-      "inArea": "I område"
+      "inArea": "I område",
+      "looseFeatures": "Features uden epic"
     },
     "filters": {
       "search": "Søg i kort",
@@ -641,7 +642,8 @@
       "themes": "Temaer",
       "applyToChildren": "Opdatér også børnene, når område eller temaer ændres",
       "targetQuarter": "Målkvartal",
-      "noQuarter": "Intet mål endnu"
+      "noQuarter": "Intet mål endnu",
+      "missingDoneWhen": "Mangler “Færdig når”"
     },
     "rules": {
       "parentLevel": "En forælder er altid præcis ét niveau op: en feature hører til en epic, et kort til en feature, på samme tavle.",
@@ -664,7 +666,8 @@
       "doneWhenPlaceholder": "80 % af betalingerne i checkout kan gennemføres med MobilePay i produktion",
       "inherits": "Område og temaer arves fra epic'en og kan rettes bagefter.",
       "create": "Opret",
-      "cancel": "Annuller"
+      "cancel": "Annuller",
+      "doneWhenHint": "Kan udfyldes senere — men skal være skrevet, før den kan lukkes."
     },
     "types": {
       "epic": "Epic",
@@ -854,7 +857,10 @@
       "epicCounts": "{features, plural, one {# feature} other {# features}} · {cards, plural, one {# kort} other {# kort}} i backloggen · {points} point",
       "featureCounts": "{cards, plural, one {# kort} other {# kort}} i backloggen · {points} point · {open} i gang",
       "looseHint": "Kort der ikke er del af en feature endnu"
-    }
+    },
+    "place": "Læg under feature",
+    "placeTarget": "Feature",
+    "noParentOption": "Uden forælder"
   },
   "sprints": {
     "title": "Sprints",
@@ -1299,7 +1305,7 @@
       "newFeature": "Ny feature under denne",
       "noFeatures": "Ingen features endnu. Opret den første, der kan frigives for sig.",
       "storyCounts": "{open} åbne · {done} færdige",
-      "noStories": "Ingen kort endnu. Opret dem fra backloggen eller tavlen og vælg denne feature."
+      "noStories": "Ingen kort endnu. Tilføj det første herunder."
     },
     "close": {
       "button": "Luk",
@@ -1332,7 +1338,10 @@
     "unplannedHint": "En epic uden mål tegnes ikke. Et roadmap, der viser bjælker uden ende, lyver.",
     "counts": "{features, plural, one {# feature} other {# features}} · {done} af {total} kort færdige",
     "closed": "Lukket",
-    "noEpics": "Tavlen viser ikke epics, så der er intet roadmap at tegne. Slå epics til under Indstillinger → Struktur."
+    "noEpics": "Tavlen viser ikke epics, så der er intet roadmap at tegne. Slå epics til under Indstillinger → Struktur.",
+    "newEpic": "Ny epic",
+    "addInQuarter": "Ny epic i {quarter}",
+    "planQuarter": "Kvartal for {title}"
   },
   "overview": {
     "title": "Overblik",
