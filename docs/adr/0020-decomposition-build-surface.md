@@ -18,11 +18,14 @@ whenever the board shows features. It is a derived view: no new tables,
 no new fields, and every write goes through the placements and creates
 every other page already uses.
 
-**Containment instead of connector lines.** Epics stand as columns;
-each epic's box holds its feature boxes, each feature box holds its
-card rows. A WBS drawn as boxes-in-boxes reads on a phone, works for a
-screen reader, and needs no SVG. The symbols are the family's (ADR
-0012).
+**Drawn as a chart.** Each epic is its own WBS tree: the epic on top,
+its features on a rail beneath, each feature's cards beneath it, joined
+by real connector lines — drawn with CSS borders on ordinary nested
+markup, so every node is a link, the page reads for a screen reader,
+and no chart library is added. The first cut used containment
+(boxes-in-boxes); the owner asked for the chart, and the connector
+lines carry the "breakdown" reading better. Wide trees scroll
+sideways, one epic per band. The symbols are the family's (ADR 0012).
 
 **The tray is the honest pile.** Parentless features and cards stand in
 "Uden forælder" beside the columns, draggable into the structure — and

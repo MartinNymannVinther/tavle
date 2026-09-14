@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import type { StructureLookup } from "@/components/board/card-chips";
 import type { CardView, ItemView } from "@/modules/boards/types";
 import { cn } from "@/lib/utils";
-import { CardRow, FeatureBox, type DecomposeHandlers } from "./decompose-epic";
+import { CardNode, FeatureTree, type DecomposeHandlers } from "./decompose-tree";
 
 /**
  * What has no parent, gathered where it can be seen and dragged into
@@ -34,7 +34,6 @@ export function DecomposeTray({
 }) {
   const t = useTranslations("decompose");
   const [over, setOver] = useState(false);
-  const openFeatures = structure.items.filter((i) => i.level === "feature" && i.state === "open");
   return (
     <aside
       aria-label={t("tray")}
@@ -53,7 +52,7 @@ export function DecomposeTray({
         else h.onPlaceCard(h.drag.id, null);
       }}
       className={cn(
-        "border-border bg-secondary/40 flex w-full shrink-0 flex-col gap-2 rounded-xl border border-dashed p-3 transition-colors lg:w-[20rem]",
+        "border-border bg-secondary/40 flex w-full shrink-0 flex-col gap-3 overflow-x-auto rounded-xl border border-dashed p-3 transition-colors lg:w-[22rem]",
         over && "border-primary bg-accent/60",
       )}
     >
@@ -67,7 +66,7 @@ export function DecomposeTray({
         </p>
       )}
       {features.map((feature) => (
-        <FeatureBox
+        <FeatureTree
           key={feature.id}
           feature={feature}
           boardKey={boardKey}
@@ -75,21 +74,22 @@ export function DecomposeTray({
           structure={structure}
           cards={cardsOf(feature.id)}
           doneOf={doneOf}
-          epics={structure.items.filter((i) => i.level === "epic" && i.state === "open")}
           h={h}
         />
       ))}
-      {cards.map((card) => (
-        <CardRow
-          key={card.id}
-          card={card}
-          boardKey={boardKey}
-          boardId={boardId}
-          done={doneOf(card)}
-          features={openFeatures}
-          h={h}
-        />
-      ))}
+      <div className="flex flex-col items-start gap-1.5">
+        {cards.map((card) => (
+          <CardNode
+            key={card.id}
+            card={card}
+            boardKey={boardKey}
+            boardId={boardId}
+            done={doneOf(card)}
+            structure={structure}
+            h={h}
+          />
+        ))}
+      </div>
     </aside>
   );
 }

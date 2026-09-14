@@ -11,13 +11,13 @@ import { createCardAction, placeCardAction } from "@/modules/boards/actions-card
 import { createItemAction, placeItemAction } from "@/modules/boards/actions-structure";
 import type { BoardFull, CardView } from "@/modules/boards/types";
 import { DecomposeTray } from "./decompose-tray";
-import { EpicColumn, FeatureBox, type DragItem } from "./decompose-epic";
+import { EpicTree, FeatureTree, type DragItem } from "./decompose-tree";
 
 /**
- * The decomposition as a surface to build on (docs/adr/0020): epics as
- * columns holding their features, features holding their cards —
- * containment instead of connector lines, so the breakdown reads on a
- * phone and for a screen reader. What has no parent waits in the tray
+ * The decomposition as a surface to build on (docs/adr/0020, amended by
+ * the owner to read as a chart): each epic drawn as a WBS tree — the
+ * epic on top, features on a rail below it, cards below each feature,
+ * joined by real connector lines. What has no parent waits in the tray
  * beside it, and a drag either way is the same placement every other
  * page writes. The backlog keeps the order; this page keeps the shape.
  */
@@ -76,49 +76,49 @@ export function DecomposeView({ full }: { full: BoardFull }) {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
         <div className="-mx-5 min-w-0 flex-1 overflow-x-auto px-5 pb-2 sm:-mx-7 sm:px-7 lg:mx-0 lg:px-0">
           {view.epics ? (
-            <div
-              className="flex items-start gap-3"
-              style={{ minWidth: `${(epics.length + 1) * 20.75}rem` }}
-            >
+            <div className="flex flex-col gap-10">
               {epics.map((epic) => (
-                <EpicColumn
-                  key={epic.id}
-                  epic={epic}
-                  features={featuresOf(epic.id)}
-                  boardKey={board.key}
-                  boardId={board.id}
-                  structure={structure}
-                  cardsOf={cardsOf}
-                  doneOf={doneOf}
-                  h={h}
-                />
+                <div key={epic.id} className="overflow-x-auto pb-1">
+                  <EpicTree
+                    epic={epic}
+                    features={featuresOf(epic.id)}
+                    boardKey={board.key}
+                    boardId={board.id}
+                    structure={structure}
+                    cardsOf={cardsOf}
+                    doneOf={doneOf}
+                    h={h}
+                  />
+                </div>
               ))}
-              <ItemForm
-                full={full}
-                level="epic"
-                run={run}
-                trigger={
-                  <Button type="button" variant="outline" size="sm" className="mt-1 shrink-0">
-                    {t("newEpic")}
-                  </Button>
-                }
-              />
+              <div>
+                <ItemForm
+                  full={full}
+                  level="epic"
+                  run={run}
+                  trigger={
+                    <Button type="button" variant="outline" size="sm">
+                      {t("newEpic")}
+                    </Button>
+                  }
+                />
+              </div>
             </div>
           ) : (
             // Without epics the features are the top of the breakdown.
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="flex flex-wrap items-start gap-8">
               {features.map((feature) => (
-                <FeatureBox
-                  key={feature.id}
-                  feature={feature}
-                  boardKey={board.key}
-                  boardId={board.id}
-                  structure={structure}
-                  cards={cardsOf(feature.id)}
-                  doneOf={doneOf}
-                  epics={[]}
-                  h={h}
-                />
+                <div key={feature.id} className="overflow-x-auto pb-1">
+                  <FeatureTree
+                    feature={feature}
+                    boardKey={board.key}
+                    boardId={board.id}
+                    structure={structure}
+                    cards={cardsOf(feature.id)}
+                    doneOf={doneOf}
+                    h={h}
+                  />
+                </div>
               ))}
             </div>
           )}
