@@ -202,7 +202,7 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
   ).length;
 
   const columnStrip = (laneKey: string | null, withLanes: boolean) => (
-    <div className="flex items-start gap-3" style={{ minWidth: `${columns.length * 17.75}rem` }}>
+    <div className="flex items-stretch gap-3" style={{ minWidth: `${columns.length * 15.75}rem` }}>
       {columns.map((column) => (
         <BoardColumn
           key={column.id}
@@ -216,6 +216,7 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
           laneKey={laneKey}
           laneOptions={withLanes ? laneOptions : undefined}
           wipCount={withLanes ? lane(column.id).length : undefined}
+          dense={withLanes}
           dragId={dragId}
           dropTarget={dropTarget}
           setDropTarget={setDropTarget}
@@ -267,15 +268,27 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
         {laneMode === "none" ? (
           columnStrip(null, false)
         ) : (
-          <div className="flex flex-col gap-5">
-            {lanes.map((swimlane) => (
-              <section key={swimlane.key ?? ""} aria-label={laneLabel(swimlane)}>
-                <h2 className="text-label mb-2 text-[0.72rem] font-semibold tracking-wide uppercase">
-                  {laneLabel(swimlane)}
-                </h2>
-                {columnStrip(swimlane.key, true)}
-              </section>
-            ))}
+          <div className="flex w-fit min-w-full flex-col gap-4">
+            {lanes.map((swimlane) => {
+              const inLane = onBoard.filter(
+                (c) => laneKeyOf(c, laneMode, full.themes) === swimlane.key,
+              ).length;
+              return (
+                <section
+                  key={swimlane.key ?? ""}
+                  aria-label={laneLabel(swimlane)}
+                  className="border-border bg-card/60 rounded-2xl border p-3 shadow-[var(--surface-shadow)]"
+                >
+                  <header className="flex items-baseline gap-2 px-1 pb-2.5">
+                    <h2 className="font-heading text-sm font-semibold tracking-[-0.01em]">
+                      {laneLabel(swimlane)}
+                    </h2>
+                    <span className="text-label text-xs tabular-nums">{inLane}</span>
+                  </header>
+                  {columnStrip(swimlane.key, true)}
+                </section>
+              );
+            })}
           </div>
         )}
       </div>

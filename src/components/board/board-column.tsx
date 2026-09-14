@@ -33,6 +33,7 @@ export function BoardColumn({
   laneKey = null,
   laneOptions,
   wipCount,
+  dense,
   dragId,
   dropTarget,
   setDropTarget,
@@ -53,6 +54,8 @@ export function BoardColumn({
   laneKey?: string | null;
   laneOptions?: LaneOption[];
   wipCount?: number;
+  /** Inside a swimlane row: lower, and quiet about being empty. */
+  dense?: boolean;
   dragId: string | null;
   dropTarget: DropTarget;
   setDropTarget: (target: DropTarget) => void;
@@ -90,7 +93,8 @@ export function BoardColumn({
         onDrop(column.id, isTarget ? (dropTarget?.index ?? cards.length) : cards.length);
       }}
       className={cn(
-        "flex min-h-[12rem] w-[17rem] shrink-0 flex-col rounded-xl border p-2.5 transition-colors",
+        "flex min-w-[15rem] flex-1 basis-0 flex-col rounded-xl border p-2.5 transition-colors",
+        dense ? "min-h-[6rem]" : "min-h-[12rem]",
         over ? "border-warning bg-warning-tint/40" : "border-border bg-secondary/60",
         isTarget && "border-primary bg-accent/60",
       )}
@@ -116,11 +120,17 @@ export function BoardColumn({
         )}
       </header>
       <div className="flex flex-1 flex-col gap-2">
-        {cards.length === 0 && !isTarget && (
-          <p className="border-border text-meta rounded-xl border border-dashed p-3 text-center text-xs">
-            {t("empty")}
-          </p>
-        )}
+        {cards.length === 0 &&
+          !isTarget &&
+          (dense ? (
+            // A board of many lanes says "no cards here" often enough with
+            // the dashed slot alone.
+            <div className="border-border min-h-9 rounded-xl border border-dashed" aria-hidden />
+          ) : (
+            <p className="border-border text-meta rounded-xl border border-dashed p-3 text-center text-xs">
+              {t("empty")}
+            </p>
+          ))}
         {cards.map((card, index) => (
           <div key={card.id} className="relative">
             {isTarget && dropTarget?.index === index && dragId !== card.id && (
