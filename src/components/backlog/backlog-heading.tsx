@@ -80,8 +80,8 @@ export function BacklogHeading({
   if (selection.kind === "all") return null;
   return (
     <div className="flex flex-col gap-0.5 px-4 py-3">
-      <h2 className="text-[0.95rem] leading-snug font-semibold">{nav("noParent")}</h2>
-      <p className="text-meta text-[0.8125rem] tabular-nums">
+      <h2 className="text-reading leading-snug font-semibold">{nav("noParent")}</h2>
+      <p className="text-meta text-2sm tabular-nums">
         {h("looseHint")} · {t("holds", { cards, points })}
       </p>
     </div>

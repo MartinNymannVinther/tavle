@@ -84,7 +84,7 @@ export function ItemTextarea({
           </div>
         </form>
       ) : item[field] ? (
-        <p className="text-[0.9375rem] leading-relaxed whitespace-pre-wrap">{item[field]}</p>
+        <p className="text-reading leading-relaxed whitespace-pre-wrap">{item[field]}</p>
       ) : (
         <AddAffordance
           label={t("write")}

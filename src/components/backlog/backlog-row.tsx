@@ -145,7 +145,7 @@ export function BacklogRow({
           )}
         </span>
         {parts.length > 0 && (
-          <p className="text-meta mt-0.5 flex items-center gap-1 text-[0.69rem]">
+          <p className="text-meta mt-0.5 flex items-center gap-1 text-2xs">
             {parts.map((part, index) => (
               <span key={index} className="inline-flex min-w-0 items-center gap-1">
                 {index > 0 && (
@@ -162,10 +162,7 @@ export function BacklogRow({
       <span className="flex shrink-0 items-center gap-2">
         {columnName && (
           <span
-            className={cn(
-              "text-meta text-[0.72rem] whitespace-nowrap",
-              !quiet && "hidden @md:inline",
-            )}
+            className={cn("text-meta text-xs whitespace-nowrap", !quiet && "hidden @md:inline")}
           >
             {columnName}
           </span>

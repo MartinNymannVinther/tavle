@@ -143,7 +143,7 @@ export function AccessAdmin({
       {fresh ? (
         <div className="border-primary/40 bg-accent rounded-lg border p-4">
           <p className="text-sm font-semibold">{t("linkTitle", { email: fresh.email })}</p>
-          <p className="text-meta mt-1 text-[0.78rem] leading-relaxed">{t("linkBody")}</p>
+          <p className="text-meta mt-1 text-2sm leading-relaxed">{t("linkBody")}</p>
           <div className="mt-3 flex gap-2">
             <Input readOnly value={fresh.url} className="min-w-0 flex-1 font-mono text-xs" />
             <Button type="button" size="sm" onClick={copyFresh}>
@@ -181,7 +181,7 @@ export function AccessAdmin({
                         {request.message}
                       </p>
                     ) : null}
-                    <p className="text-meta mt-1 text-[0.75rem]">
+                    <p className="text-meta mt-1 text-xs">
                       {t("applied", { date: formatDate(request.createdAt) })}
                     </p>
                   </div>
@@ -264,7 +264,7 @@ export function AccessAdmin({
                           · {invitation.organizationName}
                         </span>
                       </p>
-                      <p className="text-meta text-[0.75rem]">
+                      <p className="text-meta text-xs">
                         {state === "used" && invitation.usedAt
                           ? t("used", { date: formatDate(invitation.usedAt) })
                           : t("expires", { date: formatDate(invitation.expiresAt) })}

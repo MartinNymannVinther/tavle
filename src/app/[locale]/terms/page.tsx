@@ -44,19 +44,19 @@ export default async function TermsPage() {
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 pb-20">
         <h1 className="font-heading text-3xl font-semibold">{t("title")}</h1>
         <p className="text-meta mt-2 text-sm">{t("updated")}</p>
-        <p className="mt-6 text-[15px] leading-relaxed">{t("intro")}</p>
+        <p className="mt-6 text-reading leading-relaxed">{t("intro")}</p>
 
         {SECTIONS.map((key) => (
           <section key={key}>
             <h2 className="font-heading mt-8 text-lg font-semibold">{t(`${key}.title`)}</h2>
-            <p className="mt-1.5 text-[15px] leading-relaxed">{t(`${key}.body`)}</p>
+            <p className="mt-1.5 text-reading leading-relaxed">{t(`${key}.body`)}</p>
           </section>
         ))}
 
         {demoEnabled() && (
           <section>
             <h2 className="font-heading mt-8 text-lg font-semibold">{t("demo.title")}</h2>
-            <p className="mt-1.5 text-[15px] leading-relaxed">
+            <p className="mt-1.5 text-reading leading-relaxed">
               {t("demo.body", { hours: DEMO_TTL_HOURS })}
             </p>
           </section>
@@ -64,7 +64,7 @@ export default async function TermsPage() {
 
         <section>
           <h2 className="font-heading mt-8 text-lg font-semibold">{t("contact.title")}</h2>
-          <p className="mt-1.5 text-[15px] leading-relaxed">{t("contact.body")}</p>
+          <p className="mt-1.5 text-reading leading-relaxed">{t("contact.body")}</p>
         </section>
 
         <p className="text-meta mt-10 text-sm">

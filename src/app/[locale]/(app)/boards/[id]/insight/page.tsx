@@ -38,9 +38,9 @@ export default async function InsightPage({ params }: Params) {
 
   const stat = (label: string, value: string, hint?: string) => (
     <div className="flex flex-col gap-0.5">
-      <p className="text-label text-[0.72rem] font-medium">{label}</p>
+      <p className="text-label text-xs font-medium">{label}</p>
       <p className="text-[1.375rem] leading-none font-semibold tabular-nums">{value}</p>
-      {hint && <p className="text-meta text-[0.72rem]">{hint}</p>}
+      {hint && <p className="text-meta text-xs">{hint}</p>}
     </div>
   );
 

@@ -17,7 +17,7 @@ export default async function SecurityPage() {
     <div className="flex max-w-2xl flex-col gap-5">
       <div className="flex flex-col gap-1.5">
         <h2 className="text-base font-semibold">{t("title")}</h2>
-        <p className="text-meta text-[0.78rem] leading-relaxed">{t("subtitle")}</p>
+        <p className="text-meta text-2sm leading-relaxed">{t("subtitle")}</p>
       </div>
       <PasskeyManager />
       <TotpManager initialEnabled={Boolean(session?.user.twoFactorEnabled)} />

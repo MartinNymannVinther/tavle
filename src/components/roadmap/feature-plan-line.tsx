@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { NativeSelect } from "@/components/ui/native-select";
-import { themeSwatch } from "@/components/board/tokens";
+import { themeInk, themeSwatch } from "@/components/board/tokens";
 import { TypeIcon } from "@/components/board/type-icon";
 import type { Sprint, Theme } from "@/core/db/schema";
 import type { ItemView } from "@/modules/boards/types";
@@ -115,11 +115,11 @@ export function FeaturePlanLine({
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <Link
             href={`/boards/${boardId}/items/${feature.number}`}
-            className="truncate text-sm font-medium hover:underline"
+            className="focus-ring truncate text-sm font-medium hover:underline"
           >
             {feature.title}
           </Link>
-          <p className="text-meta flex flex-wrap items-center gap-2 text-[0.69rem] tabular-nums">
+          <p className="text-meta flex flex-wrap items-center gap-2 text-2xs tabular-nums">
             <span className="font-mono">
               {boardKey}-{feature.number}
             </span>
@@ -132,7 +132,7 @@ export function FeaturePlanLine({
               label={t("planStart", { title: feature.title })}
               onChange={(sprintId) => onPlan(feature.id, sprintId, sprints[span.end]!.id)}
             />
-            <span className="text-meta text-[0.69rem]">–</span>
+            <span className="text-meta text-2xs">–</span>
             <SprintSelect
               value={sprints[span.end]!.id}
               sprints={sprints}
@@ -169,13 +169,14 @@ export function FeaturePlanLine({
         <div
           onPointerDown={down("move")}
           className={cn(
-            "absolute inset-y-3 flex cursor-grab touch-none items-center overflow-hidden rounded-md px-2 text-[0.69rem] font-medium text-white select-none active:cursor-grabbing",
+            "absolute inset-y-3 flex cursor-grab touch-none items-center overflow-hidden rounded-md px-2 text-2xs font-medium select-none active:cursor-grabbing",
             drag && "ring-primary ring-2",
           )}
           style={{
             left: `calc(${(span.start / sprints.length) * 100}% + 0.25rem)`,
             width: `calc(${((span.end - span.start + 1) / sprints.length) * 100}% - 0.5rem)`,
             background: theme ? themeSwatch(theme.color) : "var(--label)",
+            color: themeInk(theme?.color),
           }}
           title={`${offAxisStart?.name ?? sprints[span.start]!.name} – ${sprints[span.end]!.name}`}
         >
@@ -237,7 +238,7 @@ export function SprintSelect({
       value={value}
       onChange={(event) => onChange(event.target.value)}
       aria-label={label}
-      className="h-6 w-fit text-[0.69rem]"
+      className="h-6 w-fit text-2xs"
     >
       {allowNone && <option value="">{allowNone.word}</option>}
       {sprints.map((sprint) => (

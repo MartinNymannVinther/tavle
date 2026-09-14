@@ -106,7 +106,7 @@ export function AiPanel({
   if (!available) {
     return (
       <section>
-        <p className="text-meta flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.78rem]">
+        <p className="text-meta flex flex-wrap items-center gap-x-2 gap-y-1 text-2sm">
           <Sparkles className="size-3.5 shrink-0" aria-hidden />
           <span className="font-medium">{t("title")}:</span>
           <span>{t("noModelShort")}</span>
@@ -131,7 +131,7 @@ export function AiPanel({
           {t("split")}
         </Button>
       </div>
-      <p className="text-meta text-[0.72rem]">{t("principle")}</p>
+      <p className="text-meta text-xs">{t("principle")}</p>
 
       <Dialog open={kind !== null} onOpenChange={(open) => !open && setKind(null)}>
         <DialogContent className="sm:max-w-lg">
@@ -171,7 +171,7 @@ export function AiPanel({
                           ),
                         })
                       }
-                      className="h-9 text-[0.8125rem]"
+                      className="h-9 text-2sm"
                     />
                   ))}
                 </div>
@@ -191,7 +191,7 @@ export function AiPanel({
                             ),
                           })
                         }
-                        className="h-9 text-[0.8125rem]"
+                        className="h-9 text-2sm"
                       />
                       <Button
                         type="button"
@@ -236,7 +236,7 @@ export function AiPanel({
                             ),
                           )
                         }
-                        className="h-9 text-[0.8125rem]"
+                        className="h-9 text-2sm"
                       />
                       <Input
                         type="number"
@@ -257,10 +257,10 @@ export function AiPanel({
                           )
                         }
                         aria-label={t("points")}
-                        className="h-9 w-20 text-[0.8125rem]"
+                        className="h-9 w-20 text-2sm"
                       />
                     </div>
-                    {piece.note && <p className="text-meta text-[0.75rem]">{piece.note}</p>}
+                    {piece.note && <p className="text-meta text-xs">{piece.note}</p>}
                   </div>
                 </li>
               ))}
@@ -291,7 +291,7 @@ export function AiPanel({
             </Button>
           </DialogFooter>
           {engine && (draft || pieces.length > 0) && (
-            <p className="text-meta text-[0.69rem]">{t("engine", { engine })}</p>
+            <p className="text-meta text-2xs">{t("engine", { engine })}</p>
           )}
         </DialogContent>
       </Dialog>

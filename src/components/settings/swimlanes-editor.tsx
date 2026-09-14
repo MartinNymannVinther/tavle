@@ -36,7 +36,7 @@ export function SwimlanesEditor({
 
   return (
     <div className="flex flex-col gap-3">
-      {swimlanes.length === 0 && <p className="text-meta text-[0.8125rem]">{t("empty")}</p>}
+      {swimlanes.length === 0 && <p className="text-meta text-2sm">{t("empty")}</p>}
       <ul className="divide-hairline flex flex-col divide-y">
         {swimlanes.map((lane) => (
           <SwimlaneRow key={lane.id} lane={lane} canManage={canManage} run={run} />
@@ -51,7 +51,7 @@ export function SwimlanesEditor({
             maxLength={40}
             placeholder={t("placeholder")}
             aria-label={t("name")}
-            className="h-9 w-44 text-[0.8125rem]"
+            className="h-9 w-44 text-2sm"
           />
           <Button type="submit" size="sm" variant="outline" disabled={!name.trim()}>
             {t("add")}
@@ -77,7 +77,7 @@ function SwimlaneRow({ lane, canManage, run }: { lane: Swimlane; canManage: bool
             onChange={(e) => setName(e.target.value)}
             maxLength={40}
             aria-label={t("name")}
-            className="h-9 w-44 text-[0.8125rem]"
+            className="h-9 w-44 text-2sm"
           />
           {dirty && (
             <Button type="button" size="sm" onClick={() => void save(lane.active)}>
@@ -97,7 +97,7 @@ function SwimlaneRow({ lane, canManage, run }: { lane: Swimlane; canManage: bool
       ) : (
         <span className="text-sm">{lane.name}</span>
       )}
-      {!lane.active && <span className="text-meta text-[0.72rem]">{t("inactive")}</span>}
+      {!lane.active && <span className="text-meta text-xs">{t("inactive")}</span>}
     </li>
   );
 }

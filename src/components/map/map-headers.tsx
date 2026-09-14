@@ -86,7 +86,7 @@ export function FeatureNote({
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
         className={cn(
-          "bg-sticky text-sticky-ink relative w-full cursor-grab rounded-[0.3rem] px-3 pt-2.5 pb-2 shadow-[0_1px_2px_rgba(36,34,30,0.12),0_6px_14px_-8px_rgba(36,34,30,0.35)] transition",
+          "bg-sticky text-sticky-ink relative w-full cursor-grab rounded-xs px-3 pt-2.5 pb-2 shadow-[var(--note-shadow)] transition",
           tilt < 0 ? "-rotate-[0.6deg]" : "rotate-[0.5deg]",
           dragging && "opacity-40",
           canDrop && "outline-primary/40 outline-dashed outline-offset-4",
@@ -98,7 +98,7 @@ export function FeatureNote({
           <Link
             href={href}
             className={cn(
-              "line-clamp-3 min-w-0 flex-1 text-[0.85rem] leading-snug font-semibold hover:underline",
+              "focus-ring line-clamp-3 min-w-0 flex-1 text-2sm leading-snug font-semibold hover:underline",
               feature.state === "closed" && "line-through",
             )}
           >
@@ -125,7 +125,7 @@ export function FeatureNote({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="mt-2 flex items-center gap-2 text-[0.69rem] tabular-nums opacity-80">
+        <div className="mt-2 flex items-center gap-2 text-2xs tabular-nums opacity-80">
           <span className="min-w-0 flex-1 truncate">
             {area ? `${area.name} · ` : ""}
             {h("progressShort", { done: progress.done, total: progress.total })}
@@ -191,7 +191,7 @@ export function LooseHead({
     >
       <div
         className={cn(
-          "border-input flex w-full items-start gap-1.5 rounded-[0.3rem] border border-dashed px-3 pt-2.5 pb-2",
+          "border-input flex w-full items-start gap-1.5 rounded-xs border border-dashed px-3 pt-2.5 pb-2",
           canDrop && "outline-primary/40 outline-dashed outline-offset-4",
         )}
       >
@@ -199,8 +199,8 @@ export function LooseHead({
           <CircleDashed className="size-3.5" aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[0.85rem] leading-snug font-semibold">{t("noParent")}</p>
-          <p className="text-meta mt-0.5 text-[0.69rem]">{t("noParentHint", { count })}</p>
+          <p className="text-2sm leading-snug font-semibold">{t("noParent")}</p>
+          <p className="text-meta mt-0.5 text-2xs">{t("noParentHint", { count })}</p>
         </div>
       </div>
     </div>
@@ -211,10 +211,10 @@ export function RowLabel({ row, cards, points }: { row: MapRow; cards: number; p
   const t = useTranslations("map");
   const sprint = useTranslations("backlog.sprint");
   return (
-    <div className="bg-card sticky left-0 z-10 flex flex-col gap-0.5 px-4 py-4 text-[0.72rem]">
+    <div className="bg-card sticky left-0 z-10 flex flex-col gap-0.5 px-4 py-4 text-xs">
       {row.kind === "sprint" && (
         <>
-          <span className="text-[0.85rem] font-semibold">{row.sprint.name}</span>
+          <span className="text-2sm font-semibold">{row.sprint.name}</span>
           <span className="text-chart-2 font-medium">
             {formatDateDa(row.sprint.startDate)} – {formatDateDa(row.sprint.endDate)}
           </span>
@@ -223,12 +223,8 @@ export function RowLabel({ row, cards, points }: { row: MapRow; cards: number; p
           </span>
         </>
       )}
-      {row.kind === "backlog" && (
-        <span className="text-[0.85rem] font-semibold">{t("backlog")}</span>
-      )}
-      {row.kind === "column" && (
-        <span className="text-[0.85rem] font-semibold">{row.column.name}</span>
-      )}
+      {row.kind === "backlog" && <span className="text-2sm font-semibold">{t("backlog")}</span>}
+      {row.kind === "column" && <span className="text-2sm font-semibold">{row.column.name}</span>}
       <span className="text-meta mt-1 tabular-nums">{t("rowCounts", { cards, points })}</span>
     </div>
   );

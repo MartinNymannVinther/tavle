@@ -204,7 +204,7 @@ export function MembersAdmin({
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   maxLength={320}
-                  className="h-9 w-64 text-[0.8125rem]"
+                  className="h-9 w-64 text-2sm"
                 />
               </label>
               <label className="flex flex-col gap-1 text-xs">

@@ -70,7 +70,7 @@ export function ThemesEditor({
             maxLength={40}
             placeholder={t("placeholder")}
             aria-label={t("name")}
-            className="h-9 w-44 text-[0.8125rem]"
+            className="h-9 w-44 text-2sm"
           />
           <Swatches value={color} onChange={setColor} />
           <OwnerSelect value={owner} onChange={setOwner} members={members} label={t("owner")} />
@@ -111,7 +111,7 @@ function ThemeRow({
   return (
     <li className={cn("flex flex-wrap items-center gap-2 py-2", !theme.active && "opacity-60")}>
       <ThemeChip theme={{ name: name || theme.name, color }} />
-      {!theme.active && <span className="text-meta text-[0.72rem]">{t("inactive")}</span>}
+      {!theme.active && <span className="text-meta text-xs">{t("inactive")}</span>}
       {canManage ? (
         <>
           <Input
@@ -119,7 +119,7 @@ function ThemeRow({
             onChange={(e) => setName(e.target.value)}
             maxLength={40}
             aria-label={t("name")}
-            className="h-9 w-44 text-[0.8125rem]"
+            className="h-9 w-44 text-2sm"
           />
           <Swatches value={color} onChange={setColor} />
           <OwnerSelect value={owner} onChange={setOwner} members={members} label={t("owner")} />
@@ -141,7 +141,7 @@ function ThemeRow({
         </>
       ) : (
         theme.ownerUserId && (
-          <span className="text-meta text-[0.72rem]">
+          <span className="text-meta text-xs">
             {members.find((m) => m.userId === theme.ownerUserId)?.name}
           </span>
         )

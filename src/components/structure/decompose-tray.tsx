@@ -52,16 +52,16 @@ export function DecomposeTray({
         else h.onPlaceCard(h.drag.id, null);
       }}
       className={cn(
-        "border-border bg-secondary/40 flex w-full flex-col gap-3 rounded-xl border border-dashed p-3 transition-colors",
+        "border-input bg-secondary/40 flex w-full flex-col gap-3 rounded-xl border border-dashed p-3 transition-colors",
         over && "border-primary bg-accent/60",
       )}
     >
       <header>
         <h2 className="text-sm font-semibold">{t("tray")}</h2>
-        <p className="text-meta text-[0.72rem]">{t("trayHint")}</p>
+        <p className="text-meta text-xs">{t("trayHint")}</p>
       </header>
       {features.length === 0 && cards.length === 0 && (
-        <p className="border-border text-meta rounded-lg border border-dashed p-3 text-center text-xs">
+        <p className="border-input text-meta rounded-lg border border-dashed p-3 text-xs">
           {t("trayEmpty")}
         </p>
       )}

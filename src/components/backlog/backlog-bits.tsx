@@ -15,7 +15,7 @@ import type { Progress } from "./group-backlog";
 /** The key, in the mono face so WEB-12 and WEB-9 read as the same width. */
 export function Key({ boardKey, number }: { boardKey: string; number: number }) {
   return (
-    <span className="text-meta font-mono shrink-0 text-[0.72rem] font-normal tabular-nums">
+    <span className="text-meta font-mono shrink-0 text-xs font-normal tabular-nums">
       {boardKey}-{number}
     </span>
   );
@@ -97,7 +97,7 @@ export function ProgressBar({
   const share = Math.round((progress.done / progress.total) * 100);
   return (
     <span
-      className={cn("text-meta inline-flex shrink-0 items-center gap-2 text-[0.72rem]", className)}
+      className={cn("text-meta inline-flex shrink-0 items-center gap-2 text-xs", className)}
       title={h("progress", { done: progress.done, total: progress.total })}
     >
       <span

@@ -99,7 +99,7 @@ export function BootstrapReview({
         <div className="grid gap-3 sm:grid-cols-2">
           {(["areas", "themes"] as const).map((kind) => (
             <fieldset key={kind} className="flex flex-col gap-1">
-              <legend className="text-label mb-1 text-[0.72rem] font-medium">
+              <legend className="text-label mb-1 text-xs font-medium">
                 {t(kind === "areas" ? "areas" : "themes")}
               </legend>
               {tree[kind].map((item, i) => (
@@ -148,16 +148,16 @@ export function BootstrapReview({
                   value={epic.title}
                   onChange={(e) => setEpic({ title: e.target.value })}
                   maxLength={160}
-                  className="h-8 flex-1 text-[0.8125rem] font-medium"
+                  className="h-8 flex-1 text-2sm font-medium"
                 />
                 {epic.targetQuarter && (
-                  <span className="text-meta shrink-0 text-[0.72rem] tabular-nums">
+                  <span className="text-meta shrink-0 text-xs tabular-nums">
                     {epic.targetQuarter}
                   </span>
                 )}
               </div>
               {epic.doneWhen && (
-                <p className="text-meta pl-6 text-[0.72rem]">
+                <p className="text-meta pl-6 text-xs">
                   {t("doneWhen")} {epic.doneWhen}
                 </p>
               )}
@@ -184,7 +184,7 @@ export function BootstrapReview({
                         value={feature.title}
                         onChange={(e) => setFeature({ title: e.target.value })}
                         maxLength={160}
-                        className="h-7 flex-1 text-[0.78rem]"
+                        className="h-7 flex-1 text-2sm"
                       />
                     </div>
                     {feature.cards.map((card, ci) => (
@@ -213,7 +213,7 @@ export function BootstrapReview({
                             })
                           }
                           maxLength={160}
-                          className="h-7 flex-1 text-[0.78rem]"
+                          className="h-7 flex-1 text-2sm"
                         />
                       </div>
                     ))}

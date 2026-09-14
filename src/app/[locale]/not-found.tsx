@@ -13,7 +13,7 @@ export default async function NotFoundPage() {
         <h1 className="text-[1.625rem] leading-tight font-semibold tracking-[-0.02em]">
           {t("title")}
         </h1>
-        <p className="text-muted-foreground text-[0.906rem] leading-relaxed">{t("body")}</p>
+        <p className="text-muted-foreground text-reading leading-relaxed">{t("body")}</p>
       </div>
       <Link href="/" className={buttonVariants({ variant: "outline" })}>
         {t("cta")}

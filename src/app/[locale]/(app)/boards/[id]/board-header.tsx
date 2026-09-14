@@ -39,10 +39,10 @@ export function BoardHeader({
     return (
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
         <p className="flex min-w-0 items-baseline gap-2">
-          <span className="text-chart-2 text-[0.78rem] font-medium">{kicker}</span>
+          <span className="text-chart-2 text-2sm font-medium">{kicker}</span>
           <Link
             href={base}
-            className="truncate text-[0.95rem] font-semibold tracking-[-0.01em] hover:underline"
+            className="truncate text-reading font-semibold tracking-[-0.01em] hover:underline"
           >
             {name}
           </Link>

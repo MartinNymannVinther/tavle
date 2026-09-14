@@ -26,6 +26,32 @@ export const THEME_SWATCH: Record<ThemeColor, string> = {
 export const themeSwatch = (color: string) =>
   THEME_SWATCH[color as ThemeColor] ?? THEME_SWATCH.moss;
 
+/**
+ * Ink that reads on each swatch: paper ink on the deep ones, the page's
+ * own ink on the light ones (sand, sage, clay) — white on sand is not
+ * writing, and 2a never asks anyone to squint.
+ */
+export const THEME_INK: Record<ThemeColor, string> = {
+  moss: "var(--primary-foreground)",
+  sage: "var(--foreground)",
+  clay: "var(--foreground)",
+  rust: "var(--primary-foreground)",
+  sand: "var(--foreground)",
+  stone: "var(--primary-foreground)",
+  ink: "var(--background)",
+  forest: "var(--primary-foreground)",
+};
+
+export const themeInk = (color: string | null | undefined) =>
+  (color && THEME_INK[color as ThemeColor]) || THEME_INK.moss;
+
+/**
+ * The three grounds one recessed idea is drawn in, so the same shade
+ * means the same thing on every page: well = bg-secondary/60 (column and
+ * nav surfaces), band = bg-secondary/40 (the current quarter, sprint or
+ * column), inset = bg-secondary/20 (nested child strips).
+ */
+
 export const PRIORITY_ORDER: Priority[] = ["urgent", "high", "normal", "low"];
 
 /** The small mark next to a title; "normal" has none, which is the point of it. */

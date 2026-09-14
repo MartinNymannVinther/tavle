@@ -58,7 +58,7 @@ export default async function MyCardsPage() {
                   const overdue = Boolean(card.dueDate && card.dueDate < today);
                   return (
                     <li key={card.id} className="flex items-center gap-3 px-4 py-2 text-sm">
-                      <span className="text-meta w-16 shrink-0 text-[0.72rem] tabular-nums">
+                      <span className="text-meta w-16 shrink-0 text-xs tabular-nums">
                         {card.boardKey}-{card.number}
                       </span>
                       <Link
@@ -67,9 +67,7 @@ export default async function MyCardsPage() {
                       >
                         {card.title}
                       </Link>
-                      <span className="text-meta hidden text-[0.72rem] sm:inline">
-                        {card.columnName}
-                      </span>
+                      <span className="text-meta hidden text-xs sm:inline">{card.columnName}</span>
                       <PriorityMark
                         priority={card.priority as Priority}
                         label={priorities(card.priority)}
@@ -79,7 +77,7 @@ export default async function MyCardsPage() {
                       {card.dueDate && (
                         <span
                           className={cn(
-                            "text-[0.72rem] tabular-nums",
+                            "text-xs tabular-nums",
                             overdue ? "text-destructive font-medium" : "text-meta",
                           )}
                         >

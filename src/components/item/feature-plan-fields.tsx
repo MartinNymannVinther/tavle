@@ -53,7 +53,7 @@ export function FeaturePlanFields({
       {select(item.startSprintId, t("planStart", { title: item.title }), (id) =>
         plan(id, id ? item.targetSprintId : null),
       )}
-      <span className="text-meta text-[0.72rem]">–</span>
+      <span className="text-meta text-xs">–</span>
       {select(item.targetSprintId, t("planTarget", { title: item.title }), (id) =>
         plan(id ? item.startSprintId : null, id),
       )}

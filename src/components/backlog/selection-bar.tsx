@@ -40,7 +40,7 @@ export function SelectionBar({
   const [featureId, setFeatureId] = useState("");
   if (count === 0) return null;
   return (
-    <div className="bg-accent text-accent-foreground mx-4 mb-3 flex flex-wrap items-center gap-2 rounded-md px-3 py-2 text-[0.8125rem] font-medium">
+    <div className="bg-accent text-accent-foreground mx-4 mb-3 flex flex-wrap items-center gap-2 rounded-md px-3 py-2 text-2sm font-medium">
       <span className="tabular-nums">{t("selected", { count })}</span>
       <span className="flex-1" />
       {features.length > 0 && (
@@ -90,7 +90,7 @@ export function SelectionBar({
           </Button>
         </>
       ) : scrum ? (
-        <span className="text-accent-foreground/80 text-[0.78rem]">{t("noSprint")}</span>
+        <span className="text-accent-foreground/80 text-2sm">{t("noSprint")}</span>
       ) : null}
       <Button type="button" variant="ghost" size="xs" className="h-8" onClick={onClear}>
         {t("clearSelection")}

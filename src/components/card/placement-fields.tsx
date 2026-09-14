@@ -158,7 +158,7 @@ export function StructureFields({
       )}
 
       {offerCascade && (view.areas || view.themes) && (
-        <label className="text-meta flex items-center gap-2 py-1 text-[0.72rem]">
+        <label className="text-meta flex items-center gap-2 py-1 text-xs">
           <input
             type="checkbox"
             checked={cascade}
@@ -217,7 +217,7 @@ export function StructureFields({
               onChange={(event) => onKind({ bug: event.target.checked })}
               className="accent-[var(--warning)]"
             />
-            <span className={cn("text-[0.8125rem]", bug && "text-warning font-medium")}>
+            <span className={cn("text-2sm", bug && "text-warning font-medium")}>
               {t("bugFlag")}
             </span>
           </label>

@@ -98,7 +98,7 @@ export function BootstrapDialog({
 
   if (!available) {
     return (
-      <p className="text-meta flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.78rem]">
+      <p className="text-meta flex flex-wrap items-center gap-x-1.5 gap-y-1 text-2sm">
         <Sparkles className="size-3.5 shrink-0" aria-hidden />
         <span className="font-medium">{t("cta")}:</span>
         <span>{ai("noModelShort")}</span>
@@ -134,7 +134,7 @@ export function BootstrapDialog({
           <div className="flex flex-col gap-4">
             <BootstrapReview tree={tree} onChange={setTree} />
             {/* What the AI made is marked in the activity feed and can be pruned here first. */}
-            <p className="text-meta text-[0.72rem]">{t("marked", { engine })}</p>
+            <p className="text-meta text-xs">{t("marked", { engine })}</p>
             <DialogFooter>
               <Button type="button" onClick={() => void apply()} disabled={pending}>
                 {t("apply")}

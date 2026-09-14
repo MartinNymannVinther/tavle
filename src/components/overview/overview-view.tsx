@@ -24,7 +24,7 @@ export function OverviewView({ full }: { full: BoardFull }) {
   const share = (part: number, total: number) => (total > 0 ? percent(part / total) : "–");
   const tile = (label: string, value: string, hint: string, warn = false) => (
     <div key={label} className="flex flex-col gap-0.5">
-      <p className="text-label text-[0.72rem] font-medium">{label}</p>
+      <p className="text-label text-xs font-medium">{label}</p>
       <p
         className={cn(
           "text-[1.375rem] leading-none font-semibold tabular-nums",
@@ -33,7 +33,7 @@ export function OverviewView({ full }: { full: BoardFull }) {
       >
         {value}
       </p>
-      <p className="text-meta text-[0.72rem]">{hint}</p>
+      <p className="text-meta text-xs">{hint}</p>
     </div>
   );
   const idleThemes = view.themes ? data.health.idleThemes : [];
@@ -103,7 +103,7 @@ export function OverviewView({ full }: { full: BoardFull }) {
           <CardContent className="border-hairline flex flex-col gap-1 border-t pt-4 text-sm">
             {reviewEpics.map((epic) => (
               <p key={epic.id}>
-                <span className="text-meta mr-2 text-[0.72rem] tabular-nums">
+                <span className="text-meta mr-2 text-xs tabular-nums">
                   {full.board.key}-{epic.number}
                 </span>
                 <Link
@@ -112,9 +112,7 @@ export function OverviewView({ full }: { full: BoardFull }) {
                 >
                   {epic.title}
                 </Link>
-                <span className="text-warning ml-2 text-[0.72rem] font-medium">
-                  {s("forReview")}
-                </span>
+                <span className="text-warning ml-2 text-xs font-medium">{s("forReview")}</span>
               </p>
             ))}
             {idleThemes.length > 0 && (
@@ -172,7 +170,7 @@ function Bars({
               <span className={cn("truncate", bucket.key === "none" && "text-meta")}>
                 {name(bucket)}
               </span>
-              <span className="text-meta shrink-0 text-[0.78rem] tabular-nums">
+              <span className="text-meta shrink-0 text-2sm tabular-nums">
                 {t("bucketValue", { cards: bucket.cards, points: bucket.points })}
                 {total > 0 && ` · ${Math.round((value / total) * 100)} %`}
               </span>

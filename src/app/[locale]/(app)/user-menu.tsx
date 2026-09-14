@@ -79,8 +79,8 @@ export function UserMenu({
                 {initials(name)}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[0.8125rem] font-semibold">{name}</span>
-                <span className="text-meta block truncate text-[0.72rem] font-normal">{email}</span>
+                <span className="block truncate text-2sm font-semibold">{name}</span>
+                <span className="text-meta block truncate text-xs font-normal">{email}</span>
               </span>
               <ChevronsUpDown data-slot="icon" className="shrink-0 opacity-50" />
             </Button>

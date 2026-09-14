@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { NativeSelect } from "@/components/ui/native-select";
-import { themeSwatch } from "@/components/board/tokens";
+import { themeInk, themeSwatch } from "@/components/board/tokens";
 import { TypeIcon } from "@/components/board/type-icon";
 import type { Run } from "@/components/board/use-board-actions";
 import { FoldButton } from "@/components/backlog/backlog-bits";
@@ -111,11 +111,14 @@ export function RoadmapLine({
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <Link
             href={`/boards/${boardId}/items/${row.epic.number}`}
-            className={cn("truncate text-sm font-medium hover:underline", closed && "text-meta")}
+            className={cn(
+              "focus-ring truncate text-sm font-medium hover:underline",
+              closed && "text-meta",
+            )}
           >
             {row.epic.title}
           </Link>
-          <p className="text-meta flex flex-wrap items-center gap-2 text-[0.69rem] tabular-nums">
+          <p className="text-meta flex flex-wrap items-center gap-2 text-2xs tabular-nums">
             <span className="font-mono">
               {boardKey}-{row.epic.number}
             </span>
@@ -154,7 +157,7 @@ export function RoadmapLine({
         <div
           onPointerDown={down("move")}
           className={cn(
-            "absolute inset-y-3 flex items-center overflow-hidden rounded-md px-2 text-[0.69rem] font-medium text-white select-none",
+            "absolute inset-y-3 flex items-center overflow-hidden rounded-md px-2 text-2xs font-medium select-none",
             closed && "opacity-60",
             planned && "cursor-grab touch-none active:cursor-grabbing",
             drag && "ring-primary ring-2",
@@ -163,12 +166,13 @@ export function RoadmapLine({
             left: `calc(${(span.start / quarters.length) * 100}% + 0.25rem)`,
             width: `calc(${((span.end - span.start + 1) / quarters.length) * 100}% - 0.5rem)`,
             background: row.theme ? themeSwatch(row.theme.color) : "var(--label)",
+            color: themeInk(row.theme?.color),
           }}
           title={`${quarters[span.start]} – ${quarters[span.end]}`}
         >
           <span
             aria-hidden
-            className="absolute inset-y-0 left-0 bg-white/25"
+            className="absolute inset-y-0 left-0 bg-current opacity-15"
             style={{ width: `${Math.round(progress * 100)}%` }}
           />
           <span className="relative truncate">
@@ -245,7 +249,7 @@ function SpanSelects({
         value={startQuarter}
         onChange={(event) => onPlan(epic.id, event.target.value, targetQuarter)}
         aria-label={t("planStart", { title: epic.title })}
-        className="h-6 w-fit text-[0.69rem]"
+        className="h-6 w-fit text-2xs"
       >
         {options(startQuarter).map((quarter) => (
           <option key={quarter} value={quarter}>
@@ -253,13 +257,13 @@ function SpanSelects({
           </option>
         ))}
       </NativeSelect>
-      <span className="text-meta text-[0.69rem]">–</span>
+      <span className="text-meta text-2xs">–</span>
       <NativeSelect
         variant="sm"
         value={targetQuarter}
         onChange={(event) => onPlan(epic.id, startQuarter, event.target.value)}
         aria-label={t("planQuarter", { title: epic.title })}
-        className="h-6 w-fit text-[0.69rem]"
+        className="h-6 w-fit text-2xs"
       >
         {options(targetQuarter).map((quarter) => (
           <option key={quarter} value={quarter}>
@@ -292,7 +296,7 @@ export function QuarterSelect({ epic, run }: { epic: RoadmapRow["epic"]; run: Ru
         )
       }
       aria-label={t("planQuarter", { title: epic.title })}
-      className="h-7 w-fit text-[0.72rem]"
+      className="h-7 w-fit text-xs"
     >
       <option value="">{s("noQuarter")}</option>
       {options.map((quarter) => (

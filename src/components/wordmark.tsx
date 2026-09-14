@@ -59,7 +59,7 @@ export function WordmarkLockup({ organization }: { organization?: string }) {
           {PRODUCT_NAME}
         </span>
         {organization ? (
-          <span className="text-meta mt-1 truncate text-[0.72rem] leading-none font-normal">
+          <span className="text-meta mt-1 truncate text-xs leading-none font-normal">
             {organization}
           </span>
         ) : null}

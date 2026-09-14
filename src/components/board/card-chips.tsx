@@ -113,7 +113,7 @@ export function PartOf({
     structure.view.features && featureId ? structure.items.find((i) => i.id === featureId) : null;
   if (!feature) return null;
   return (
-    <p className="text-meta mt-1 flex items-center gap-1 text-[0.69rem]">
+    <p className="text-meta mt-1 flex items-center gap-1 text-2xs">
       <TypeGlyph type="feature" />
       <span className="truncate">
         {t("partOf", { key: `${boardKey}-${feature.number}`, title: feature.title })}

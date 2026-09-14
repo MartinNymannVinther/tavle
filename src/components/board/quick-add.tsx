@@ -114,7 +114,7 @@ export function QuickAdd({
         placeholder={placeholder ?? t("placeholder")}
         maxLength={160}
         aria-label={t("label")}
-        className="h-9 text-[0.8125rem]"
+        className="h-9 text-2sm"
       />
       {choice && (
         <NativeSelect

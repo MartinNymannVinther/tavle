@@ -66,7 +66,7 @@ export function FlowChart({
           ) : null,
         )}
       </Frame>
-      <ul className="text-meta flex flex-wrap gap-x-4 gap-y-1 text-[0.72rem]">
+      <ul className="text-meta flex flex-wrap gap-x-4 gap-y-1 text-xs">
         {order.map((key) => (
           <li key={key} className="flex items-center gap-1.5">
             <span

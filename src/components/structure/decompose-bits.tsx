@@ -52,7 +52,7 @@ export function MoveTo({
         <DropdownMenuLabel>{label}</DropdownMenuLabel>
         {options.map((option) => (
           <DropdownMenuItem key={option.id} onClick={() => onMove(option.id)}>
-            <span className="text-meta mr-1 font-mono text-[0.72rem]">{keyOf(option)}</span>
+            <span className="text-meta mr-1 font-mono text-xs">{keyOf(option)}</span>
             {option.title}
           </DropdownMenuItem>
         ))}
@@ -106,7 +106,7 @@ export function NewFeature({ onAdd }: { onAdd: (title: string) => Promise<boolea
         placeholder={t("newFeaturePlaceholder")}
         aria-label={t("newFeature")}
         maxLength={160}
-        className="h-8 text-[0.78rem]"
+        className="h-8 text-2sm"
       />
       <Button type="submit" size="sm" variant="outline" disabled={pending || !title.trim()}>
         {t("add")}

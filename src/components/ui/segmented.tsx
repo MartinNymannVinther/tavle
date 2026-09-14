@@ -5,10 +5,11 @@ type Href = React.ComponentProps<typeof Link>["href"];
 
 const track =
   "bg-secondary border-border inline-flex shrink-0 items-center gap-0.5 rounded-md border p-1";
+export { track as segmentedTrack };
 
 const segment = (active: boolean) =>
   cn(
-    "rounded-sm px-3 py-1.5 text-[0.8125rem] whitespace-nowrap transition-colors duration-[120ms] ease-out",
+    "rounded-sm px-3 py-1.5 text-2sm whitespace-nowrap transition-colors duration-[120ms] ease-out",
     active
       ? "bg-card text-foreground shadow-[var(--surface-shadow)] font-semibold"
       : "text-meta hover:text-foreground",

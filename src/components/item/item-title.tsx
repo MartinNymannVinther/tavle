@@ -106,7 +106,7 @@ export function ItemTitle({
         </div>
       )}
       {warnings.length > 0 && (
-        <p className="text-warning text-[0.78rem] font-medium">{s("looksLikeTheme")}</p>
+        <p className="text-warning text-2sm font-medium">{s("looksLikeTheme")}</p>
       )}
     </div>
   );

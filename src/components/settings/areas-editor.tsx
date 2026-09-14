@@ -64,7 +64,7 @@ export function AreasEditor({
             maxLength={40}
             placeholder={t("placeholder")}
             aria-label={t("name")}
-            className="h-9 w-44 text-[0.8125rem]"
+            className="h-9 w-44 text-2sm"
           />
           <OwnerSelect value={owner} onChange={setOwner} members={members} label={t("owner")} />
           <Button type="submit" size="sm" variant="outline" disabled={!name.trim()}>
@@ -98,7 +98,7 @@ function AreaRow({
   return (
     <li className={cn("flex flex-wrap items-center gap-2 py-2", !area.active && "opacity-60")}>
       <AreaChip name={name || area.name} />
-      {!area.active && <span className="text-meta text-[0.72rem]">{t("inactive")}</span>}
+      {!area.active && <span className="text-meta text-xs">{t("inactive")}</span>}
       {canManage ? (
         <>
           <Input
@@ -106,7 +106,7 @@ function AreaRow({
             onChange={(e) => setName(e.target.value)}
             maxLength={40}
             aria-label={t("name")}
-            className="h-9 w-44 text-[0.8125rem]"
+            className="h-9 w-44 text-2sm"
           />
           <OwnerSelect value={owner} onChange={setOwner} members={members} label={t("owner")} />
           {dirty && (
@@ -128,7 +128,7 @@ function AreaRow({
         </>
       ) : (
         area.ownerUserId && (
-          <span className="text-meta text-[0.72rem]">
+          <span className="text-meta text-xs">
             {members.find((m) => m.userId === area.ownerUserId)?.name}
           </span>
         )

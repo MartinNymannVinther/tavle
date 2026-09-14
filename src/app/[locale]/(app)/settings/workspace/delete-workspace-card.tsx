@@ -26,7 +26,7 @@ export function DeleteWorkspaceCard({ workspaceName }: { workspaceName: string }
         <CardDescription>{t("body")}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
-        <p className="text-meta text-[0.78rem] leading-relaxed">{t("exportFirst")}</p>
+        <p className="text-meta text-2sm leading-relaxed">{t("exportFirst")}</p>
         <label htmlFor="confirm-name" className="text-sm">
           {t("typeName", { name: workspaceName })}
         </label>

@@ -63,7 +63,7 @@ export default async function SprintsPage({ params }: Params) {
                 className="border-border bg-card hover:border-primary/40 focus-visible:ring-ring flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border px-4 py-3 shadow-[var(--surface-shadow)] transition focus-visible:ring-2 focus-visible:outline-none"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="text-chart-2 text-[0.72rem] font-medium">
+                  <p className="text-chart-2 text-xs font-medium">
                     {formatDateDa(sprint.startDate)} – {formatDateDa(sprint.endDate)}
                   </p>
                   <p className="truncate text-base font-semibold">{sprint.name}</p>
@@ -71,7 +71,7 @@ export default async function SprintsPage({ params }: Params) {
                 </div>
                 <span
                   className={cn(
-                    "rounded-full px-2 py-0.5 text-[0.69rem] font-medium",
+                    "rounded-full px-2 py-0.5 text-2xs font-medium",
                     sprint.state === "active" && "bg-accent text-accent-foreground",
                     sprint.state === "planned" && "bg-muted text-secondary-foreground",
                     sprint.state === "closed" && "bg-success-tint text-success",

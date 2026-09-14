@@ -117,9 +117,7 @@ export function BoardColumn({
           {column.wipLimit === null ? count : `${count}/${column.wipLimit}`}
         </span>
         {over && (
-          <span className="text-destructive ml-auto text-[0.69rem] font-medium">
-            {t("overLimit")}
-          </span>
+          <span className="text-destructive ml-auto text-2xs font-medium">{t("overLimit")}</span>
         )}
       </header>
       <div className="flex flex-1 flex-col gap-2">
@@ -128,9 +126,9 @@ export function BoardColumn({
           (dense ? (
             // A board of many lanes says "no cards here" often enough with
             // the dashed slot alone.
-            <div className="border-border min-h-9 rounded-xl border border-dashed" aria-hidden />
+            <div className="border-input min-h-9 rounded-xl border border-dashed" aria-hidden />
           ) : (
-            <p className="border-border text-meta rounded-xl border border-dashed p-3 text-center text-xs">
+            <p className="border-input text-meta rounded-xl border border-dashed p-3 text-xs">
               {t("empty")}
             </p>
           ))}

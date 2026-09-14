@@ -21,8 +21,8 @@ function NativeSelect({
       className={cn(
         "border-input bg-card text-foreground focus-visible:border-ring focus-visible:ring-ring/18 w-full min-w-0 cursor-pointer appearance-none rounded-md border pr-8 pl-3 text-sm transition-colors duration-[120ms] ease-out outline-none focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-45",
         variant === "default" && "h-[2.625rem]",
-        variant === "sm" && "h-9 text-[0.8125rem]",
-        variant === "xs" && "h-8 rounded-sm text-[0.8125rem]",
+        variant === "sm" && "h-9 text-2sm",
+        variant === "xs" && "h-8 rounded-sm text-2sm",
         className,
       )}
       style={{

@@ -37,9 +37,7 @@ export function RoadmapChildren({
 
   if (features.length === 0) {
     return (
-      <p className="text-meta bg-secondary/20 px-4 py-2 pl-12 text-[0.78rem]">
-        {nav("noFeatures")}
-      </p>
+      <p className="text-meta bg-secondary/20 px-4 py-2 pl-12 text-2sm">{nav("noFeatures")}</p>
     );
   }
 
@@ -76,9 +74,9 @@ export function RoadmapChildren({
               className="grid items-center"
               style={{ gridTemplateColumns: "16rem minmax(0, 1fr)" }}
             >
-              <p className="flex items-center gap-2 py-1 pr-4 pl-12 text-[0.8125rem]">
+              <p className="flex items-center gap-2 py-1 pr-4 pl-12 text-2sm">
                 <TypeIcon type="feature" />
-                <span className="text-meta font-mono shrink-0 text-[0.72rem] tabular-nums">
+                <span className="text-meta font-mono shrink-0 text-xs tabular-nums">
                   {key}-{feature.number}
                 </span>
                 <Link
@@ -90,7 +88,7 @@ export function RoadmapChildren({
                 >
                   {feature.title}
                 </Link>
-                <span className="text-meta shrink-0 text-[0.72rem] tabular-nums">
+                <span className="text-meta shrink-0 text-xs tabular-nums">
                   {t("featureCards", { done, total: cards.length })}
                 </span>
               </p>
@@ -118,7 +116,7 @@ export function RoadmapChildren({
                     title={bar.title}
                   />
                 ) : (
-                  <span className="text-meta absolute inset-y-0 left-2 flex items-center text-[0.69rem]">
+                  <span className="text-meta absolute inset-y-0 left-2 flex items-center text-2xs">
                     {t("featureUnplanned")}
                   </span>
                 )}
@@ -127,12 +125,9 @@ export function RoadmapChildren({
             {cards.map((card) => {
               const cardDone = category.get(card.columnId) === "done";
               return (
-                <p
-                  key={card.id}
-                  className="flex items-center gap-2 py-0.5 pr-4 pl-20 text-[0.78rem]"
-                >
+                <p key={card.id} className="flex items-center gap-2 py-0.5 pr-4 pl-20 text-2sm">
                   <TypeIcon type={card.bug ? "bug" : "card"} />
-                  <span className="text-meta font-mono shrink-0 text-[0.69rem] tabular-nums">
+                  <span className="text-meta font-mono shrink-0 text-2xs tabular-nums">
                     {key}-{card.number}
                   </span>
                   <Link

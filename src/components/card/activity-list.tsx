@@ -45,14 +45,14 @@ export function ActivityList({
           return (
             <li
               key={event.id}
-              className="text-meta group/event flex flex-wrap items-baseline gap-x-3 py-1.5 text-[0.78rem]"
+              className="text-meta group/event flex flex-wrap items-baseline gap-x-3 py-1.5 text-2sm"
             >
               <span
                 className={cn("text-foreground/80 min-w-0 flex-1", wasUndone && "line-through")}
               >
                 {renderEvent(lines, event)}
                 {event.actorKind === "ai" && (
-                  <span className="bg-accent text-accent-foreground ml-2 rounded-full px-1.5 py-0.5 text-[0.65rem] font-medium">
+                  <span className="bg-accent text-accent-foreground ml-2 rounded-full px-1.5 py-0.5 text-2xs font-medium">
                     {t("byAi")}
                   </span>
                 )}

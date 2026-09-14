@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Maximize2, Minimize2, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { segmentedTrack } from "@/components/ui/segmented";
 import { structureOf } from "@/components/board/card-chips";
 import { legendTypes, TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
@@ -120,7 +121,7 @@ export function DecomposeView({ full, aiAvailable }: { full: BoardFull; aiAvaila
       )}
     >
       <div className="flex items-center justify-end gap-2">
-        <div className="border-border bg-secondary/60 flex items-center gap-0.5 rounded-lg border p-0.5">
+        <div className={segmentedTrack}>
           <Button
             type="button"
             variant="ghost"
@@ -131,7 +132,7 @@ export function DecomposeView({ full, aiAvailable }: { full: BoardFull; aiAvaila
           >
             <ZoomOut />
           </Button>
-          <span className="text-meta w-10 text-center text-[0.72rem] tabular-nums">
+          <span className="text-meta w-10 text-center text-xs tabular-nums">
             {Math.round(zoom * 100)}%
           </span>
           <Button

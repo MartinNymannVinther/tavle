@@ -25,11 +25,11 @@ export function MapTray({
   const t = useTranslations("map");
   return (
     <div className="border-hairline flex flex-wrap items-center gap-x-3 gap-y-2 border-b px-4 py-2.5">
-      <span className="text-label text-[0.72rem] font-medium tracking-[0.02em] uppercase">
+      <span className="text-label text-xs font-medium tracking-[0.02em] uppercase">
         {t("tray")}
       </span>
       {features.length === 0 ? (
-        <span className="text-meta text-[0.78rem]">{t("trayEmpty")}</span>
+        <span className="text-meta text-2sm">{t("trayEmpty")}</span>
       ) : (
         features.map((feature) => (
           <button
@@ -37,9 +37,9 @@ export function MapTray({
             type="button"
             onClick={() => onPutUp(feature.id)}
             title={t("putUp")}
-            className="bg-sticky/60 text-sticky-ink hover:bg-sticky inline-flex max-w-72 items-center gap-1.5 rounded-[0.3rem] px-2.5 py-1 text-[0.78rem] shadow-[0_1px_2px_rgba(36,34,30,0.1)] transition"
+            className="bg-sticky/60 text-sticky-ink hover:bg-sticky inline-flex max-w-72 items-center gap-1.5 rounded-xs px-2.5 py-1 text-2sm shadow-[var(--note-shadow)] transition"
           >
-            <TypeIcon type="feature" className="size-4 rounded-[0.25rem] bg-white/40" />
+            <TypeIcon type="feature" className="size-4 rounded-xs bg-white/40" />
             <span className="truncate">{feature.title}</span>
             <span className="tabular-nums opacity-70">{countOf(feature.id)}</span>
             <Plus className="size-3.5 opacity-70" aria-hidden />

@@ -52,7 +52,7 @@ export function Frame({
       viewBox={`0 0 ${CHART.width} ${CHART.height}`}
       role="img"
       aria-label={ariaLabel}
-      className="h-auto w-full max-w-full text-[11px]"
+      className="h-auto w-full max-w-full text-2xs"
     >
       {ticks.map((tick) => (
         <g key={tick}>

@@ -126,7 +126,7 @@ export function ItemForm({
                 maxLength={160}
                 placeholder={t("titlePlaceholder")}
               />
-              <p className={cn("text-[0.72rem]", warnings.length ? "text-warning" : "text-meta")}>
+              <p className={cn("text-xs", warnings.length ? "text-warning" : "text-meta")}>
                 {warnings.length ? s("looksLikeTheme") : t("titleHint")}
               </p>
             </Field>
@@ -140,7 +140,7 @@ export function ItemForm({
                 maxLength={500}
                 placeholder={t("doneWhenPlaceholder")}
               />
-              <p className="text-meta text-[0.72rem]">{t("doneWhenHint")}</p>
+              <p className="text-meta text-xs">{t("doneWhenHint")}</p>
             </Field>
             {level === "feature" && view.epics && (
               <Field>
@@ -157,7 +157,7 @@ export function ItemForm({
                     </option>
                   ))}
                 </NativeSelect>
-                {parent && <p className="text-meta text-[0.72rem]">{t("inherits")}</p>}
+                {parent && <p className="text-meta text-xs">{t("inherits")}</p>}
               </Field>
             )}
             {!parentChosen && (

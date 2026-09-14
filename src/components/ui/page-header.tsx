@@ -22,9 +22,7 @@ function PageHeader({
   return (
     <div className={cn("flex flex-wrap items-start justify-between gap-x-6 gap-y-3", className)}>
       <div className="flex min-w-0 flex-col gap-1.5">
-        {kicker ? (
-          <p className="text-chart-2 text-[0.78rem] leading-none font-medium">{kicker}</p>
-        ) : null}
+        {kicker ? <p className="text-chart-2 text-2sm leading-none font-medium">{kicker}</p> : null}
         <h1
           className={cn(
             "leading-[1.1] font-semibold tracking-[-0.02em]",
@@ -36,7 +34,7 @@ function PageHeader({
           {title}
         </h1>
         {subtitle ? (
-          <p className="text-muted-foreground text-[0.906rem] leading-normal">{subtitle}</p>
+          <p className="text-muted-foreground text-reading leading-normal">{subtitle}</p>
         ) : null}
       </div>
       {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}

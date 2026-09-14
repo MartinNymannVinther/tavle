@@ -24,7 +24,7 @@ function EmptyState({
     <div data-slot="empty-state" className={cn("flex flex-col items-start gap-2", className)}>
       <p className="text-base font-semibold">{title}</p>
       {hint ? (
-        <p className="text-muted-foreground max-w-prose text-[0.8125rem] leading-relaxed text-pretty">
+        <p className="text-muted-foreground max-w-prose text-2sm leading-relaxed text-pretty">
           {hint}
         </p>
       ) : null}

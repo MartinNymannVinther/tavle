@@ -81,7 +81,7 @@ export function ColumnsEditor({
               onChange={(e) => setName(e.target.value)}
               required
               maxLength={40}
-              className="h-9 w-44 text-[0.8125rem]"
+              className="h-9 w-44 text-2sm"
             />
           </label>
           <label className="flex flex-col gap-1 text-xs">
@@ -107,7 +107,7 @@ export function ColumnsEditor({
               max={99}
               value={limit}
               onChange={(e) => setLimit(e.target.value)}
-              className="h-9 w-20 text-[0.8125rem]"
+              className="h-9 w-20 text-2sm"
             />
           </label>
           <Button type="submit" size="sm" variant="outline" disabled={!name.trim()}>
@@ -175,7 +175,7 @@ function ColumnRow({
         maxLength={40}
         disabled={!canManage}
         aria-label={t("name")}
-        className="h-9 w-44 text-[0.8125rem]"
+        className="h-9 w-44 text-2sm"
       />
       <NativeSelect
         variant="sm"
@@ -200,7 +200,7 @@ function ColumnRow({
         disabled={!canManage}
         aria-label={t("wip")}
         placeholder="–"
-        className="h-9 w-20 text-[0.8125rem]"
+        className="h-9 w-20 text-2sm"
       />
       {canManage && dirty && (
         <Button

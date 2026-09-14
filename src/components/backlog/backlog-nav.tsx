@@ -98,11 +98,11 @@ function Node({
         type="button"
         onClick={onClick}
         aria-current={selected ? "true" : undefined}
-        className="flex min-w-0 flex-1 items-start gap-2 py-1.5 text-left text-[0.8125rem] leading-snug"
+        className="flex min-w-0 flex-1 items-start gap-2 py-1.5 text-left text-2sm leading-snug"
       >
         <span className="mt-px shrink-0">{icon}</span>
         <span className="line-clamp-2 min-w-0 flex-1">{title}</span>
-        <span className="text-meta shrink-0 text-[0.72rem] font-normal tabular-nums">{count}</span>
+        <span className="text-meta shrink-0 text-xs font-normal tabular-nums">{count}</span>
       </button>
       {arrows && <RankArrows onUp={arrows.onUp} onDown={arrows.onDown} />}
     </div>
@@ -177,7 +177,7 @@ export function BacklogNav(p: NavProps) {
               <FeatureNodes nodes={node.features} depth={1} p={p} />
             )}
             {open && node.features.length === 0 && (
-              <p className="text-meta flex items-center gap-2 py-1 pl-12 text-[0.72rem]">
+              <p className="text-meta flex items-center gap-2 py-1 pl-12 text-xs">
                 {t("noFeatures")}
                 {epic.state === "open" && p.newFeature?.(epic.id)}
               </p>
@@ -196,7 +196,7 @@ export function BacklogNav(p: NavProps) {
                 : undefined
             }
             icon={
-              <span className="text-label border-input inline-flex size-[1.125rem] shrink-0 items-center justify-center rounded-[0.3rem] border border-dashed">
+              <span className="text-label border-input inline-flex size-[1.125rem] shrink-0 items-center justify-center rounded-xs border border-dashed">
                 <CircleDashed className="size-3" aria-hidden />
               </span>
             }
@@ -207,7 +207,7 @@ export function BacklogNav(p: NavProps) {
           {p.isOpen("loose") && <FeatureNodes nodes={tree.looseFeatures} depth={1} p={p} />}
         </div>
       )}
-      <label className="text-meta mt-3 flex items-center gap-1.5 px-2 text-[0.78rem]">
+      <label className="text-meta mt-3 flex items-center gap-1.5 px-2 text-2sm">
         <input
           type="checkbox"
           checked={p.showClosed}

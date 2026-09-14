@@ -63,7 +63,7 @@ export function StructureViewFields({
   return (
     <div className={cn("grid gap-4", !compact && "sm:grid-cols-2")}>
       <fieldset className="flex flex-col gap-1.5">
-        <legend className="text-label mb-1.5 text-[0.72rem] font-medium">{t("levels")}</legend>
+        <legend className="text-label mb-1.5 text-xs font-medium">{t("levels")}</legend>
         {STRUCTURE_LEVELS.map((level) => (
           <label key={level} className="flex items-center gap-2 text-sm">
             <input
@@ -80,7 +80,7 @@ export function StructureViewFields({
         ))}
       </fieldset>
       <fieldset className="flex flex-col gap-1.5">
-        <legend className="text-label mb-1.5 text-[0.72rem] font-medium">{t("fields")}</legend>
+        <legend className="text-label mb-1.5 text-xs font-medium">{t("fields")}</legend>
         {fields.map(([key, label]) => (
           <label key={key} className="flex items-center gap-2 text-sm">
             <input
@@ -102,13 +102,11 @@ export function StructureViewFields({
             {label}
           </label>
         ))}
-        {!compact && !value.showAreas && (
-          <p className="text-meta text-[0.72rem]">{t("areasHint")}</p>
-        )}
+        {!compact && !value.showAreas && <p className="text-meta text-xs">{t("areasHint")}</p>}
       </fieldset>
       {withSwimlanes && (
         <fieldset className="flex flex-col gap-1.5">
-          <legend className="text-label mb-1.5 text-[0.72rem] font-medium">{t("swimlanes")}</legend>
+          <legend className="text-label mb-1.5 text-xs font-medium">{t("swimlanes")}</legend>
           {SWIMLANE_MODES.map((mode) => {
             const field = LANE_FIELD[mode];
             const hidden = field ? !value[field] : false;
@@ -129,7 +127,7 @@ export function StructureViewFields({
               </label>
             );
           })}
-          <p className="text-meta text-[0.72rem]">{t("swimlanesHint")}</p>
+          <p className="text-meta text-xs">{t("swimlanesHint")}</p>
         </fieldset>
       )}
     </div>

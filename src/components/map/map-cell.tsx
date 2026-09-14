@@ -54,7 +54,7 @@ export function MapCell({
       }}
       className={cn(
         "flex min-h-28 flex-col gap-2.5 px-2.5 py-3",
-        band && "bg-secondary/50",
+        band && "bg-secondary/40",
         active && "bg-accent/30",
         active && band && "bg-accent/45",
         dragId && "outline-primary/30 -outline-offset-4 outline-dashed",

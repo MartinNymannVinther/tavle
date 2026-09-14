@@ -31,7 +31,7 @@ const TINT: Record<ItemType, string> = {
 };
 
 const SIZE = {
-  sm: { box: "size-[1.125rem] rounded-[0.3rem]", glyph: "size-3" },
+  sm: { box: "size-[1.125rem] rounded-xs", glyph: "size-3" },
   md: { box: "size-6 rounded-md", glyph: "size-3.5" },
 } as const;
 

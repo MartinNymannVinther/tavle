@@ -34,15 +34,15 @@ export function GroupedList({
                 style={{ background: themeSwatch(group.color) }}
               />
             )}
-            <span className="text-[0.95rem] font-semibold">{group.name}</span>
-            <span className="text-meta text-[0.72rem] tabular-nums">
+            <span className="text-reading font-semibold">{group.name}</span>
+            <span className="text-meta text-xs tabular-nums">
               {t("groupCount", { count: group.stories.length })}
             </span>
           </p>
           {group.stories.length > 0 ? (
             <StoryRows stories={group.stories} rows={rows} context={contextOf(group)} />
           ) : (
-            <p className="text-meta px-3 py-2 text-[0.78rem]">{t("groupEmpty")}</p>
+            <p className="text-meta px-3 py-2 text-2sm">{t("groupEmpty")}</p>
           )}
         </li>
       ))}

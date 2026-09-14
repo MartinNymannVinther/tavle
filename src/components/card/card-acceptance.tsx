@@ -87,7 +87,7 @@ export function CardAcceptance({ card, run }: { card: CardDetail; run: Run }) {
           </div>
         </form>
       ) : (
-        <p className="text-[0.9375rem] leading-relaxed whitespace-pre-wrap">{card.acceptance}</p>
+        <p className="text-reading leading-relaxed whitespace-pre-wrap">{card.acceptance}</p>
       )}
     </section>
   );

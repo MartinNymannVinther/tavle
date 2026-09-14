@@ -84,7 +84,7 @@ export function BoardCard({
     >
       <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1">
-          <p className="text-meta flex items-center gap-1.5 text-[0.69rem] tabular-nums">
+          <p className="text-meta flex items-center gap-1.5 text-2xs tabular-nums">
             <span className="font-mono">
               {boardKey}-{card.number}
             </span>
@@ -100,7 +100,7 @@ export function BoardCard({
           <Link
             href={href}
             className={cn(
-              "focus-visible:ring-ring mt-0.5 block rounded-sm text-sm leading-snug font-medium text-pretty focus-visible:ring-2 focus-visible:outline-none",
+              "focus-ring mt-0.5 block text-sm leading-snug font-medium text-pretty",
               card.doneAt && "text-secondary-foreground",
             )}
           >
@@ -128,12 +128,12 @@ export function BoardCard({
           className="mt-2 flex flex-wrap gap-1"
         />
       )}
-      <div className="text-meta mt-2 flex items-center gap-2 text-[0.72rem]">
+      <div className="text-meta mt-2 flex items-center gap-2 text-xs">
         {card.assigneeName ? (
           <Initials name={card.assigneeName} />
         ) : (
           <span
-            className="border-border inline-flex size-6 items-center justify-center rounded-full border border-dashed"
+            className="border-input inline-flex size-6 items-center justify-center rounded-full border border-dashed"
             title={t("unassigned")}
           />
         )}

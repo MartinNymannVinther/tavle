@@ -109,12 +109,12 @@ export function CloseItemButton({
                     <span className="text-meta mr-2 tabular-nums">{child.key}</span>
                     <span className="font-medium">{child.title}</span>
                     {child.level === "feature" && child.openStories > 0 && (
-                      <span className="text-meta ml-2 text-[0.78rem]">
+                      <span className="text-meta ml-2 text-2sm">
                         {t("openStories", { count: child.openStories })}
                       </span>
                     )}
                     {child.columnName && (
-                      <span className="text-meta ml-2 text-[0.78rem]">{child.columnName}</span>
+                      <span className="text-meta ml-2 text-2sm">{child.columnName}</span>
                     )}
                   </p>
                   <div className="flex flex-wrap gap-2">

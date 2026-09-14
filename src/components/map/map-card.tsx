@@ -53,18 +53,18 @@ export function MapCard({
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       className={cn(
-        "bg-card flex cursor-grab gap-1.5 rounded-[0.3rem] px-2.5 py-2 shadow-[0_1px_2px_rgba(36,34,30,0.1),0_5px_12px_-8px_rgba(36,34,30,0.3)] transition",
-        "hover:shadow-[0_1px_2px_rgba(36,34,30,0.12),0_8px_18px_-8px_rgba(36,34,30,0.4)] focus-within:shadow-[0_1px_2px_rgba(36,34,30,0.12),0_8px_18px_-8px_rgba(36,34,30,0.4)]",
+        "bg-card flex cursor-grab gap-1.5 rounded-xs px-2.5 py-2 shadow-[var(--note-shadow)] transition",
+        "hover:shadow-[var(--note-shadow-hover)] focus-within:shadow-[var(--note-shadow-hover)]",
         done && "opacity-55",
         dragging && "opacity-40",
       )}
     >
-      <TypeIcon type={card.bug ? "bug" : "card"} className="mt-px size-4 rounded-[0.25rem]" />
+      <TypeIcon type={card.bug ? "bug" : "card"} className="mt-px size-4 rounded-xs" />
       <div className="min-w-0 flex-1">
         <Link
           href={`/boards/${boardId}/cards/${card.number}`}
           className={cn(
-            "line-clamp-2 text-[0.8125rem] leading-snug hover:underline",
+            "focus-ring line-clamp-2 text-2sm leading-snug hover:underline",
             done && "line-through",
           )}
         >

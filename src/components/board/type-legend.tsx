@@ -36,12 +36,7 @@ export function TypeLegend({
 }) {
   const t = useTranslations("boards.types");
   return (
-    <p
-      className={cn(
-        "text-meta flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.72rem]",
-        className,
-      )}
-    >
+    <p className={cn("text-meta flex flex-wrap items-center gap-x-3 gap-y-1 text-xs", className)}>
       <span className="text-label">{t("legend")}</span>
       {types.map((type) => (
         <span key={type} className="inline-flex items-center gap-1">
@@ -65,12 +60,7 @@ export function ThemeLegend({
   const active = themes.filter((theme) => theme.active);
   if (active.length === 0) return null;
   return (
-    <p
-      className={cn(
-        "text-meta flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.72rem]",
-        className,
-      )}
-    >
+    <p className={cn("text-meta flex flex-wrap items-center gap-x-3 gap-y-1 text-xs", className)}>
       <span className="text-label">{t("themes")}</span>
       {active.map((theme) => (
         <span key={theme.id} className="inline-flex items-center gap-1.5">

@@ -55,7 +55,7 @@ export function ItemChildren({ full, run }: { full: ItemFull; run: Run }) {
             {features.map((feature) => (
               <li key={feature.id} className="flex items-center gap-2 px-3 py-2 text-sm">
                 <TypeIcon type="feature" />
-                <span className="text-meta font-mono shrink-0 text-[0.72rem] tabular-nums">
+                <span className="text-meta font-mono shrink-0 text-xs tabular-nums">
                   {board.key}-{feature.number}
                 </span>
                 <Link
@@ -67,7 +67,7 @@ export function ItemChildren({ full, run }: { full: ItemFull; run: Run }) {
                 >
                   {feature.title}
                 </Link>
-                <span className="text-meta text-[0.72rem] tabular-nums">
+                <span className="text-meta text-xs tabular-nums">
                   {t("storyCounts", { open: feature.openStories, done: feature.doneStories })}
                 </span>
               </li>
@@ -81,7 +81,7 @@ export function ItemChildren({ full, run }: { full: ItemFull; run: Run }) {
           {stories.map((story) => (
             <li key={story.id} className="flex items-center gap-2 px-3 py-2 text-sm">
               <TypeIcon type={story.bug ? "bug" : "card"} />
-              <span className="text-meta font-mono shrink-0 text-[0.72rem] tabular-nums">
+              <span className="text-meta font-mono shrink-0 text-xs tabular-nums">
                 {board.key}-{story.number}
               </span>
               <Link
@@ -93,7 +93,7 @@ export function ItemChildren({ full, run }: { full: ItemFull; run: Run }) {
               >
                 {story.title}
               </Link>
-              <span className="text-meta hidden text-[0.72rem] sm:inline">{story.columnName}</span>
+              <span className="text-meta hidden text-xs sm:inline">{story.columnName}</span>
               <Points estimate={story.estimate} />
               {story.assigneeName ? (
                 <Initials name={story.assigneeName} />

@@ -58,7 +58,7 @@ export default async function BoardsPage() {
                   <h2 className="min-w-0 flex-1 truncate text-base font-semibold">{board.name}</h2>
                   <span
                     className={cn(
-                      "rounded-full px-2 py-0.5 text-[0.69rem] font-medium",
+                      "rounded-full px-2 py-0.5 text-2xs font-medium",
                       board.mode === "scrum"
                         ? "bg-accent text-accent-foreground"
                         : "bg-muted text-secondary-foreground",

@@ -99,7 +99,7 @@ export function ChecklistEditor({ card, run }: { card: CardDetail; run: Run }) {
             placeholder={t("placeholder")}
             aria-label={t("add")}
             maxLength={200}
-            className="h-9 text-[0.8125rem]"
+            className="h-9 text-2sm"
           />
           <Button type="submit" size="sm" variant="outline" disabled={pending || !draft.trim()}>
             {t("add")}

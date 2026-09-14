@@ -3,6 +3,7 @@
 import { useFormatter, useTranslations } from "next-intl";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 import { panel, surface } from "@/components/ui/detail-surfaces";
+import { StatusChip } from "@/components/board/bits";
 import { Button } from "@/components/ui/button";
 import { TypeIcon } from "@/components/board/type-icon";
 import { legendTypes, TypeLegend } from "@/components/board/type-legend";
@@ -54,7 +55,7 @@ export function CardPage({
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
       <div className="flex flex-col gap-1.5">
-        <p className="text-meta flex flex-wrap items-center gap-2 text-[0.78rem]">
+        <p className="text-meta flex flex-wrap items-center gap-2 text-2sm">
           <Link href={`/boards/${board.id}`} className="hover:text-foreground">
             {board.name}
           </Link>
@@ -69,11 +70,7 @@ export function CardPage({
               <span>{column.name}</span>
             </>
           )}
-          {card.archivedAt && (
-            <span className="bg-warning-tint text-destructive rounded-full px-2 py-0.5 text-[0.69rem] font-medium">
-              {t("archived")}
-            </span>
-          )}
+          {card.archivedAt && <StatusChip tone="warning">{t("archived")}</StatusChip>}
         </p>
         <CardTitle card={card} run={run} />
       </div>
@@ -110,7 +107,7 @@ export function CardPage({
             view={view}
             run={run}
           />
-          <div className="border-hairline text-meta flex flex-col gap-0.5 border-t px-4 py-3 text-[0.72rem]">
+          <div className="border-hairline text-meta flex flex-col gap-0.5 border-t px-4 py-3 text-xs">
             <p>
               {t("created", { date: format.dateTime(card.createdAt, { dateStyle: "medium" }) })}
             </p>

@@ -42,13 +42,15 @@ export default async function HelpPage() {
       <h2 className="mt-10 text-xl font-semibold">{t("howToTitle")}</h2>
       {HOW_TO.map((key) => (
         <section key={key}>
-          <h3 className="text-primary mt-5 text-[15px] font-semibold">{t(`howTo.${key}.title`)}</h3>
-          <p className="mt-1.5 text-[15px] leading-relaxed">{t(`howTo.${key}.body`)}</p>
+          <h3 className="text-primary mt-5 text-reading font-semibold">
+            {t(`howTo.${key}.title`)}
+          </h3>
+          <p className="mt-1.5 text-reading leading-relaxed">{t(`howTo.${key}.body`)}</p>
         </section>
       ))}
       <section>
-        <h3 className="text-primary mt-5 text-[15px] font-semibold">{t("symbols.title")}</h3>
-        <p className="mt-1.5 text-[15px] leading-relaxed">{t("symbols.body")}</p>
+        <h3 className="text-primary mt-5 text-reading font-semibold">{t("symbols.title")}</h3>
+        <p className="mt-1.5 text-reading leading-relaxed">{t("symbols.body")}</p>
         <TypeLegend className="mt-3" />
       </section>
 
@@ -66,10 +68,10 @@ export default async function HelpPage() {
             </svg>
           </div>
           <div className="min-w-0">
-            <h3 className="text-primary text-[15px] font-semibold">
+            <h3 className="text-primary text-reading font-semibold">
               {i + 1}. {t(`abc.${i}.title`)}
             </h3>
-            <p className="mt-1 text-[15px] leading-relaxed">{t(`abc.${i}.body`)}</p>
+            <p className="mt-1 text-reading leading-relaxed">{t(`abc.${i}.body`)}</p>
           </div>
         </div>
       ))}

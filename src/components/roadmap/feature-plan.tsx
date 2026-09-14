@@ -116,14 +116,12 @@ export function FeaturePlan({ full }: { full: BoardFull }) {
               className="border-hairline grid border-b"
               style={{ gridTemplateColumns: `16rem repeat(${axis.length}, minmax(0, 1fr))` }}
             >
-              <div className="text-label px-4 py-2 text-[0.72rem] font-medium">
-                {t("featureColumn")}
-              </div>
+              <div className="text-label px-4 py-2 text-xs font-medium">{t("featureColumn")}</div>
               {axis.map((sprint) => (
                 <div
                   key={sprint.id}
                   className={cn(
-                    "border-hairline border-l px-2 py-2 text-center text-[0.72rem] font-medium",
+                    "border-hairline border-l px-2 py-2 text-center text-xs font-medium",
                     sprint.id === currentId
                       ? "text-foreground bg-secondary/60"
                       : sprint.endDate < today
@@ -174,7 +172,7 @@ export function FeaturePlan({ full }: { full: BoardFull }) {
             {unplanned.map((feature) => (
               <li key={feature.id} className="flex items-center gap-3 px-3 py-2 text-sm">
                 <TypeIcon type="feature" />
-                <span className="text-meta font-mono shrink-0 text-[0.72rem] tabular-nums">
+                <span className="text-meta font-mono shrink-0 text-xs tabular-nums">
                   {board.key}-{feature.number}
                 </span>
                 <Link

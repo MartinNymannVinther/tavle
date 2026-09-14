@@ -2,7 +2,7 @@
 
 import { ArrowUpRight, TriangleAlert } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { AreaChip, FlagChip, ThemeChip } from "@/components/board/bits";
+import { AreaChip, FlagChip, StatusChip, ThemeChip } from "@/components/board/bits";
 import type { StructureLookup } from "@/components/board/card-chips";
 import { TypeIcon } from "@/components/board/type-icon";
 import type { Theme } from "@/core/db/schema";
@@ -55,7 +55,7 @@ export function ItemHeading({
 
   return (
     <div className="flex flex-col gap-1.5 px-4 py-3">
-      <p className="text-[0.95rem] leading-snug font-semibold text-pretty [&>*]:mr-2 [&>*]:align-middle [&>*:last-child]:mr-0">
+      <p className="text-reading leading-snug font-semibold text-pretty [&>*]:mr-2 [&>*]:align-middle [&>*:last-child]:mr-0">
         <TypeIcon type={level} />
         <Key boardKey={boardKey} number={item.number} />
         <Link
@@ -67,7 +67,7 @@ export function ItemHeading({
         </Link>
         {warns && (
           <span
-            className="text-warning inline-flex items-center gap-1 text-[0.69rem] font-medium"
+            className="text-warning inline-flex items-center gap-1 text-2xs font-medium"
             title={t("looksLikeTheme")}
           >
             <TriangleAlert className="size-3.5" aria-hidden />
@@ -76,7 +76,7 @@ export function ItemHeading({
         )}
         {item.state === "open" && !item.doneWhen.trim() && (
           <span
-            className="text-warning inline-flex items-center gap-1 text-[0.69rem] font-medium"
+            className="text-warning inline-flex items-center gap-1 text-2xs font-medium"
             title={t("missingDoneWhen")}
           >
             <TriangleAlert className="size-3.5" aria-hidden />
@@ -84,17 +84,17 @@ export function ItemHeading({
           </span>
         )}
         {reviewDue && (
-          <span className="bg-warning-tint text-warning rounded-full px-2 py-0.5 text-[0.69rem] font-medium whitespace-nowrap">
+          <StatusChip tone="warning" className="whitespace-nowrap">
             {t("forReview")}
-          </span>
+          </StatusChip>
         )}
       </p>
       {item.doneWhen && (
-        <p className="text-meta text-[0.8125rem]">
+        <p className="text-meta text-2sm">
           <span className="text-label">{h("doneWhen")}</span> {item.doneWhen}
         </p>
       )}
-      <div className="text-meta flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.72rem]">
+      <div className="text-meta flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs">
         {item.kind === "enabler" && (
           <FlagChip tone="enabler">
             {item.enablerType ? t(`enablerType.${item.enablerType}`) : t("kind.enabler")}

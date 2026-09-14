@@ -24,11 +24,11 @@ function PropertyRow({
     <div
       className={cn("grid grid-cols-[6.5rem_minmax(0,1fr)] items-center gap-x-3 py-1", className)}
     >
-      <Label htmlFor={htmlFor} className="text-label truncate text-[0.72rem] font-medium">
+      <Label htmlFor={htmlFor} className="text-label truncate text-xs font-medium">
         {label}
       </Label>
       <div className="min-w-0">{children}</div>
-      {hint && <p className="text-meta col-start-2 mt-1 text-[0.72rem]">{hint}</p>}
+      {hint && <p className="text-meta col-start-2 mt-1 text-xs">{hint}</p>}
     </div>
   );
 }

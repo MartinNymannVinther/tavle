@@ -51,7 +51,7 @@ export default async function WorkspaceSettingsPage() {
     <div className="flex max-w-3xl flex-col gap-5">
       <div className="flex flex-col gap-1.5">
         <h2 className="text-base font-semibold">{workspace?.name ?? t("title")}</h2>
-        <p className="text-meta text-[0.78rem] leading-relaxed">
+        <p className="text-meta text-2sm leading-relaxed">
           {workspace
             ? t("createdOn", { date: formatDateDa(workspace.createdAt.toISOString().slice(0, 10)) })
             : t("subtitle")}

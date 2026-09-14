@@ -52,6 +52,16 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  /* The small-text scale (docs/adr/0024): four named steps below text-sm.
+     2xs: keys, pills, chips, bar labels · xs: property labels, meta lines
+     2sm: compact controls and list-row titles · reading: prose surfaces.
+     An arbitrary text-[...] size is drift; pick a step. */
+  --text-2xs: 0.69rem;
+  --text-xs: 0.72rem;
+  --text-2sm: 0.8125rem;
+  --text-reading: 0.9375rem;
+  /* The sticky note's corner (ADR 0016) — the one radius below sm. */
+  --radius-xs: 0.3rem;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -91,6 +101,12 @@
 }
 
 @layer components {
+  /* One focus for every link and card-like thing; text inputs keep the
+     field components' soft ring. */
+  .focus-ring {
+    @apply rounded-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring;
+  }
+
   /* Full-bleed tables placed directly in a card align their gutter with the
      card's padding; tables inside padded card content keep symmetric cells. */
   [data-slot="card"]

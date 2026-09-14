@@ -50,13 +50,13 @@ export function SprintPlan({
   return (
     <section className="border-border bg-card @container rounded-xl border shadow-[var(--surface-shadow)]">
       <header className="flex flex-col gap-1 px-4 py-3">
-        <p className="text-chart-2 text-[0.72rem] font-medium">
+        <p className="text-chart-2 text-xs font-medium">
           {formatDateDa(sprint.startDate)} – {formatDateDa(sprint.endDate)}
           {active ? ` · ${t("activeLabel")}` : ` · ${t("plannedLabel")}`}
         </p>
         <div className="flex flex-wrap items-baseline gap-x-2">
           <h2 className="text-base font-semibold">{sprint.name}</h2>
-          <p className="text-meta text-[0.8125rem] tabular-nums">
+          <p className="text-meta text-2sm tabular-nums">
             {t("holds", { cards: cards.length, points })}
           </p>
         </div>
@@ -78,7 +78,7 @@ export function SprintPlan({
           {active ? (
             <Link
               href={`/boards/${boardId}`}
-              className="text-primary text-[0.8125rem] underline-offset-4 hover:underline"
+              className="text-primary text-2sm underline-offset-4 hover:underline"
             >
               {t("toBoard")}
             </Link>

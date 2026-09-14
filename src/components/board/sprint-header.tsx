@@ -74,7 +74,7 @@ export function SprintHeader({
   return (
     <div className="bg-card border-border flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border px-4 py-3 shadow-[var(--surface-shadow)]">
       <div className="min-w-0 flex-1">
-        <p className="text-chart-2 text-[0.72rem] font-medium">
+        <p className="text-chart-2 text-xs font-medium">
           {t("kicker", {
             start: formatDateDa(sprint.startDate),
             end: formatDateDa(sprint.endDate),
@@ -87,13 +87,13 @@ export function SprintHeader({
       </div>
       <div className="flex items-center gap-5 text-sm">
         <div>
-          <p className="text-label text-[0.69rem]">{t("daysLeft")}</p>
+          <p className="text-label text-2xs">{t("daysLeft")}</p>
           <p className={cn("font-semibold tabular-nums", daysLeft < 0 && "text-destructive")}>
             {daysLeft < 0 ? t("overdue", { days: -daysLeft }) : daysLeft}
           </p>
         </div>
         <div>
-          <p className="text-label text-[0.69rem]">{t("progress")}</p>
+          <p className="text-label text-2xs">{t("progress")}</p>
           <p className="font-semibold tabular-nums">
             {totalPoints > 0
               ? `${donePoints}/${totalPoints} ${t("points")}`

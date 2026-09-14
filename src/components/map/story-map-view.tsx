@@ -141,7 +141,7 @@ export function StoryMapView({ full }: { full: BoardFull }) {
           members={full.members}
           structure={structure}
         />
-        <label className="text-meta flex items-center gap-1.5 text-[0.78rem]">
+        <label className="text-meta flex items-center gap-1.5 text-2sm">
           <input
             type="checkbox"
             checked={showClosed}

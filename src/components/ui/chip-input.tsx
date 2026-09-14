@@ -54,7 +54,7 @@ export function ChipInput({
       {values.map((value) => (
         <span
           key={value}
-          className="bg-accent text-accent-foreground flex items-center gap-1 rounded-sm py-0.5 pr-1 pl-2 text-[0.78rem] font-medium"
+          className="bg-accent text-accent-foreground flex items-center gap-1 rounded-sm py-0.5 pr-1 pl-2 text-2sm font-medium"
         >
           {value}
           <button

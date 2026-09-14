@@ -74,7 +74,7 @@ export function CardDescription({ card, run }: { card: CardDetail; run: Run }) {
           </div>
         </form>
       ) : card.description ? (
-        <p className="text-[0.9375rem] leading-relaxed whitespace-pre-wrap">{card.description}</p>
+        <p className="text-reading leading-relaxed whitespace-pre-wrap">{card.description}</p>
       ) : (
         <AddAffordance
           label={t("write")}

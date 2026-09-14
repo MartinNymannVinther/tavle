@@ -56,6 +56,12 @@
   --radius: 0.75rem;
   --surface-shadow: 0 1px 2px oklch(0.245 0.008 75 / 0.04);
   --dialog-shadow: 0 24px 60px -24px oklch(0.245 0.008 75 / 0.28);
+  /* One dimming for every layer over the page: dialog and sheet alike. */
+  --scrim: oklch(0.245 0.008 75 / 0.32);
+  /* The sticky notes' lift (ADR 0016), in ink that follows the palette. */
+  --note-shadow: 0 1px 2px oklch(0.245 0.008 75 / 0.1), 0 5px 12px -8px oklch(0.245 0.008 75 / 0.3);
+  --note-shadow-hover:
+    0 1px 2px oklch(0.245 0.008 75 / 0.12), 0 8px 18px -8px oklch(0.245 0.008 75 / 0.4);
   --sidebar: oklch(0.953 0.007 85); /* #f2efe9 */
   --sidebar-foreground: oklch(0.375 0.008 80);
   --sidebar-primary: oklch(0.505 0.055 150);
@@ -105,6 +111,9 @@
   --chart-5: oklch(0.33 0.008 82);
   --surface-shadow: 0 1px 2px oklch(0 0 0 / 0.3);
   --dialog-shadow: 0 24px 60px -24px oklch(0 0 0 / 0.6);
+  --scrim: oklch(0 0 0 / 0.5);
+  --note-shadow: 0 1px 2px oklch(0 0 0 / 0.35), 0 5px 12px -8px oklch(0 0 0 / 0.5);
+  --note-shadow-hover: 0 1px 2px oklch(0 0 0 / 0.4), 0 8px 18px -8px oklch(0 0 0 / 0.6);
   --sidebar: oklch(0.21 0.006 82);
   --sidebar-foreground: oklch(0.9 0.006 85);
   --sidebar-primary: oklch(0.66 0.075 150);

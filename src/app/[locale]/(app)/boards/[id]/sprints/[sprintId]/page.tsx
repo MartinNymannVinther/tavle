@@ -73,7 +73,7 @@ export default async function SprintPage({ params }: Params) {
           {formatDateDa(sprint.startDate)} – {formatDateDa(sprint.endDate)} · {states(sprint.state)}
         </span>
       </div>
-      {sprint.goal && <p className="text-[0.9375rem]">{sprint.goal}</p>}
+      {sprint.goal && <p className="text-reading">{sprint.goal}</p>}
 
       <div className="grid gap-5 @3xl:grid-cols-2">
         <Card>
@@ -102,7 +102,7 @@ export default async function SprintPage({ params }: Params) {
               <ul className="divide-hairline flex flex-col divide-y">
                 {rows.map((row) => (
                   <li key={row.id} className="flex items-center gap-3 py-1.5 text-sm">
-                    <span className="text-meta w-16 shrink-0 text-[0.72rem] tabular-nums">
+                    <span className="text-meta w-16 shrink-0 text-xs tabular-nums">
                       {header.board.key}-{row.number}
                     </span>
                     <Link
@@ -114,9 +114,9 @@ export default async function SprintPage({ params }: Params) {
                     >
                       {row.title}
                     </Link>
-                    <span className="text-meta text-[0.72rem]">{row.columnName}</span>
+                    <span className="text-meta text-xs">{row.columnName}</span>
                     {row.estimate !== null && (
-                      <span className="bg-muted rounded-full px-1.5 text-[0.69rem] font-semibold tabular-nums">
+                      <span className="bg-muted rounded-full px-1.5 text-2xs font-semibold tabular-nums">
                         {row.estimate}
                       </span>
                     )}

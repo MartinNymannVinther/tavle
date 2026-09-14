@@ -4,7 +4,34 @@ import { PRIORITY_MARK, themeSwatch } from "./tokens";
 import { TypeGlyph } from "./type-icon";
 
 const chip =
-  "inline-flex h-5 max-w-[11rem] items-center gap-1 truncate rounded-full px-2 text-[0.69rem] font-medium";
+  "inline-flex h-5 max-w-[11rem] items-center gap-1 truncate rounded-full px-2 text-2xs font-medium";
+
+/**
+ * The one status pill: closed things wear the success tint, things that
+ * ask for a look wear the warning tint — the same two chips on every
+ * page, never hand-rolled hues that drift apart in dark mode.
+ */
+export function StatusChip({
+  tone,
+  className,
+  children,
+}: {
+  tone: "success" | "warning";
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <span
+      className={cn(
+        chip,
+        tone === "success" ? "bg-success-tint text-success" : "bg-warning-tint text-warning",
+        className,
+      )}
+    >
+      {children}
+    </span>
+  );
+}
 
 /** A theme as a small pill with its colour as a dot; the name is always written out. */
 export function ThemeChip({
@@ -99,11 +126,7 @@ export function PriorityMark({ priority, label }: { priority: Priority; label: s
   const mark = PRIORITY_MARK[priority];
   if (!mark) return null;
   return (
-    <span
-      className={cn("text-[0.75rem] font-semibold", mark.className)}
-      title={label}
-      aria-label={label}
-    >
+    <span className={cn("text-xs font-semibold", mark.className)} title={label} aria-label={label}>
       {mark.glyph}
     </span>
   );
@@ -128,7 +151,7 @@ export function Initials({
       title={title ?? name}
       aria-label={name}
       className={cn(
-        "bg-accent text-accent-foreground inline-flex size-6 shrink-0 items-center justify-center rounded-full text-[0.65rem] font-semibold",
+        "bg-accent text-accent-foreground inline-flex size-6 shrink-0 items-center justify-center rounded-full text-2xs font-semibold",
         className,
       )}
     >
@@ -143,7 +166,7 @@ export function Points({ estimate, className }: { estimate: number | null; class
   return (
     <span
       className={cn(
-        "bg-muted text-secondary-foreground inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[0.69rem] font-semibold tabular-nums",
+        "bg-muted text-secondary-foreground inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-2xs font-semibold tabular-nums",
         className,
       )}
     >

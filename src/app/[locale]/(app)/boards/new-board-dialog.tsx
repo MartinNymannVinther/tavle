@@ -157,16 +157,14 @@ export function NewBoardDialog({ aiAvailable }: { aiAvailable: boolean }) {
                 />
                 <span className="flex flex-col gap-0.5 text-sm">
                   <span className="font-semibold">{modes(option)}</span>
-                  <span className="text-meta text-[0.8125rem] leading-snug">
-                    {t(`${option}Hint`)}
-                  </span>
+                  <span className="text-meta text-2sm leading-snug">{t(`${option}Hint`)}</span>
                 </span>
               </label>
             ))}
           </fieldset>
           <fieldset className="flex flex-col gap-2">
             <legend className="mb-1 text-sm font-medium">{structure("title")}</legend>
-            <p className="text-meta mb-1 text-[0.8125rem] leading-snug">{structure("body")}</p>
+            <p className="text-meta mb-1 text-2sm leading-snug">{structure("body")}</p>
             <StructureViewFields value={view} onChange={setView} compact />
           </fieldset>
           <label
@@ -182,7 +180,7 @@ export function NewBoardDialog({ aiAvailable }: { aiAvailable: boolean }) {
             />
             <span>
               {t("aiStart")}
-              <span className="text-meta block text-[0.72rem]">
+              <span className="text-meta block text-xs">
                 {!aiAvailable
                   ? t("aiStartNoModel")
                   : aiPossible

@@ -74,7 +74,7 @@ export function BoardFilters({
         onChange={(event) => onChange({ ...filters, text: event.target.value })}
         placeholder={t("search")}
         aria-label={t("search")}
-        className="h-9 w-56 text-[0.8125rem]"
+        className="h-9 w-56 text-2sm"
       />
       <NativeSelect
         variant="sm"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useFormatter, useTranslations } from "next-intl";
+import { StatusChip } from "@/components/board/bits";
 import { Button } from "@/components/ui/button";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 import { NativeSelect } from "@/components/ui/native-select";
@@ -51,7 +52,7 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
       <div className="flex flex-col gap-1.5">
-        <p className="text-meta flex flex-wrap items-center gap-2 text-[0.78rem]">
+        <p className="text-meta flex flex-wrap items-center gap-2 text-2sm">
           <Link href={backlog} className="hover:text-foreground">
             {board.name}
           </Link>
@@ -73,16 +74,8 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
           </span>
           <span aria-hidden>·</span>
           <span>{s(`level.${item.level}`)}</span>
-          {item.state === "closed" && (
-            <span className="bg-success-tint text-success rounded-full px-2 py-0.5 text-[0.69rem] font-medium">
-              {t("closed")}
-            </span>
-          )}
-          {reviewDue && (
-            <span className="bg-warning-tint text-warning rounded-full px-2 py-0.5 text-[0.69rem] font-medium">
-              {s("forReview")}
-            </span>
-          )}
+          {item.state === "closed" && <StatusChip tone="success">{t("closed")}</StatusChip>}
+          {reviewDue && <StatusChip tone="warning">{s("forReview")}</StatusChip>}
         </p>
         <ItemTitle item={item} categoryNames={categoryNames} run={run} />
         {reviewDue && (
@@ -171,7 +164,7 @@ export function ItemPage({ full, canManage }: { full: ItemFull; canManage: boole
               </PropertyRow>
             </PropertyGroup>
           )}
-          <div className="border-hairline text-meta flex flex-col gap-0.5 border-t px-4 py-3 text-[0.72rem]">
+          <div className="border-hairline text-meta flex flex-col gap-0.5 border-t px-4 py-3 text-xs">
             <p>
               {t("created", { date: format.dateTime(item.createdAt, { dateStyle: "medium" }) })}
             </p>

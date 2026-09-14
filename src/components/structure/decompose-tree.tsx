@@ -113,7 +113,7 @@ export function ChartNode({
       {...dragProps}
       {...(drop?.props ?? {})}
       className={cn(
-        "border-border group/box flex w-[11.5rem] items-center gap-1.5 rounded-lg border px-2 py-1.5 shadow-[var(--surface-shadow)] transition-colors",
+        "border-border group/box hover:border-primary/40 focus-within:border-primary/40 flex w-[11.5rem] items-center gap-1.5 rounded-xl border px-2 py-1.5 shadow-[var(--surface-shadow)] transition-colors",
         emphasis ? "bg-accent/70 border-primary/30" : "bg-card",
         stripe && "border-l-4",
         dragProps?.draggable && "cursor-grab active:cursor-grabbing",
@@ -123,11 +123,11 @@ export function ChartNode({
       style={stripe ? { borderLeftColor: stripe } : undefined}
     >
       {icon}
-      <span className="text-meta font-mono shrink-0 text-[0.69rem] tabular-nums">{keyLabel}</span>
+      <span className="text-meta font-mono shrink-0 text-2xs tabular-nums">{keyLabel}</span>
       <Link
         href={href}
         className={cn(
-          "line-clamp-2 min-w-0 flex-1 text-[0.78rem] leading-snug hover:underline",
+          "focus-ring line-clamp-2 min-w-0 flex-1 text-2sm leading-snug hover:underline",
           emphasis && "font-semibold",
           strike && "text-meta line-through",
         )}
@@ -190,7 +190,7 @@ export function EpicTree({
           </Branch>
         ))}
         <Branch>
-          <div className="border-border w-[11.5rem] rounded-lg border border-dashed p-1.5">
+          <div className="border-input w-[11.5rem] rounded-lg border border-dashed p-1.5">
             <NewFeature onAdd={(title) => h.onAddFeature(epic.id, title)} />
           </div>
         </Branch>
@@ -271,7 +271,7 @@ export function FeatureTree({
           </Branch>
         ))}
         <Branch>
-          <div className="border-border w-[11.5rem] rounded-lg border border-dashed p-1">
+          <div className="border-input w-[11.5rem] rounded-lg border border-dashed p-1">
             <QuickAdd
               compact
               structure={structure}

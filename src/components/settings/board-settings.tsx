@@ -119,7 +119,7 @@ export function BoardSettings({ full, canManage }: { full: BoardFull; canManage:
                   disabled={!canManage}
                   className="w-24"
                 />
-                <p className="text-meta text-[0.72rem]">{t("about.reviewDaysHint")}</p>
+                <p className="text-meta text-xs">{t("about.reviewDaysHint")}</p>
               </Field>
             </FieldGroup>
             {canManage && (

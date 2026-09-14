@@ -93,7 +93,7 @@ export function SprintNotes({
               {error}
             </p>
           )}
-          {engine && <p className="text-meta text-[0.72rem]">{t("drafted", { engine })}</p>}
+          {engine && <p className="text-meta text-xs">{t("drafted", { engine })}</p>}
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
@@ -115,7 +115,7 @@ export function SprintNotes({
                 {busy ? t("thinking") : t("draft")}
               </Button>
             ) : (
-              <p className="text-meta self-center text-[0.78rem]">
+              <p className="text-meta self-center text-2sm">
                 {t("noModel")}{" "}
                 <Link
                   href="/settings/ai"

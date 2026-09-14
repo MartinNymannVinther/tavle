@@ -56,7 +56,7 @@ export function CommentsPanel({
           <li key={comment.id} className="flex gap-3">
             <Initials name={comment.authorName ?? "?"} className="mt-0.5" />
             <div className="min-w-0 flex-1">
-              <p className="text-[0.78rem]">
+              <p className="text-2sm">
                 <span className="font-semibold">{comment.authorName ?? t("unknown")}</span>
                 <span className="text-meta ml-2">
                   {format.dateTime(comment.createdAt, { dateStyle: "medium", timeStyle: "short" })}

@@ -53,7 +53,7 @@ export function CardSidePanel({
   const [reason, setReason] = useState(card.blockedReason);
   const update = (fields: Record<string, unknown>) =>
     run(() => updateCardAction({ cardId: card.id, ...fields }));
-  const control = "h-8 text-[0.8125rem]";
+  const control = "h-8 text-2sm";
 
   return (
     <>
@@ -191,9 +191,7 @@ export function CardSidePanel({
               }
               className="accent-[var(--destructive)]"
             />
-            <span
-              className={cn("text-[0.8125rem]", card.blocked && "text-destructive font-medium")}
-            >
+            <span className={cn("text-2sm", card.blocked && "text-destructive font-medium")}>
               {card.blocked ? t("blockedYes") : t("blockedNo")}
             </span>
           </label>
@@ -210,7 +208,7 @@ export function CardSidePanel({
             maxLength={300}
             placeholder={t("blockedReason")}
             aria-label={t("blockedReason")}
-            className="mt-1 text-[0.8125rem]"
+            className="mt-1 text-2sm"
           />
         )}
       </PropertyGroup>

@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { NativeSelect } from "@/components/ui/native-select";
 import { SegmentedChoice } from "@/components/ui/segmented";
-import { ThemeChip } from "@/components/board/bits";
+import { StatusChip, ThemeChip } from "@/components/board/bits";
 import { TypeIcon } from "@/components/board/type-icon";
 import { TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
@@ -160,12 +160,12 @@ export function RoadmapView({ full }: { full: BoardFull }) {
             className="border-hairline grid border-b"
             style={{ gridTemplateColumns: `16rem repeat(${columns}, minmax(0, 1fr))` }}
           >
-            <div className="text-label px-4 py-2 text-[0.72rem] font-medium">{t("epic")}</div>
+            <div className="text-label px-4 py-2 text-xs font-medium">{t("epic")}</div>
             {data.quarters.map((quarter) => (
               <div
                 key={quarter}
                 className={cn(
-                  "border-hairline group/quarter flex items-center justify-center gap-1 border-l px-2 py-2 text-center text-[0.72rem] font-medium tabular-nums",
+                  "border-hairline group/quarter flex items-center justify-center gap-1 border-l px-2 py-2 text-center text-xs font-medium tabular-nums",
                   quarter === data.current ? "text-foreground bg-secondary/60" : "text-label",
                 )}
               >
@@ -227,7 +227,7 @@ export function RoadmapView({ full }: { full: BoardFull }) {
             {unplanned.map((row) => (
               <li key={row.epic.id} className="flex items-center gap-3 px-3 py-2 text-sm">
                 <TypeIcon type="epic" />
-                <span className="text-meta font-mono shrink-0 text-[0.72rem] tabular-nums">
+                <span className="text-meta font-mono shrink-0 text-xs tabular-nums">
                   {full.board.key}-{row.epic.number}
                 </span>
                 <Link
@@ -236,11 +236,7 @@ export function RoadmapView({ full }: { full: BoardFull }) {
                 >
                   {row.epic.title}
                 </Link>
-                {row.reviewDue && (
-                  <span className="bg-warning-tint text-warning rounded-full px-2 py-0.5 text-[0.69rem] font-medium">
-                    {s("forReview")}
-                  </span>
-                )}
+                {row.reviewDue && <StatusChip tone="warning">{s("forReview")}</StatusChip>}
                 <QuarterSelect epic={row.epic} run={run} />
               </li>
             ))}
