@@ -158,7 +158,11 @@ export function RoadmapLine({
             style={{ width: `${Math.round(progress * 100)}%` }}
           />
           <span className="relative truncate">
-            {closed ? t("closed") : row.reviewDue ? s("forReview") : quarters[span.end]}
+            {closed
+              ? t("closed")
+              : row.reviewDue
+                ? `${row.epic.title} · ${s("forReview")}`
+                : row.epic.title}
           </span>
         </div>
         {planned && (
