@@ -42,6 +42,12 @@ export function BoardTabs({
     ...(map
       ? [
           {
+            key: "structure",
+            label: t("structure"),
+            href: `${base}/structure`,
+            active: pathname.startsWith(`${base}/structure`),
+          },
+          {
             key: "map",
             label: t("map"),
             href: `${base}/map`,

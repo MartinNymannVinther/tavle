@@ -498,7 +498,8 @@
       "archived": "arkiveret",
       "roadmap": "Roadmap",
       "overview": "Overblik",
-      "map": "Story map"
+      "map": "Story map",
+      "structure": "Nedbrydning"
     },
     "list": {
       "title": "Tavler",
@@ -1388,5 +1389,19 @@
     "underway": "{open} i gang",
     "emptyTray": "Mappet er tomt. Klik på en feature i bakken for at sætte den op.",
     "empty": "Ingen features endnu. Opret en feature, så kan den sættes op på mappet."
+  },
+  "decompose": {
+    "title": "Nedbrydning",
+    "newEpic": "Ny epic",
+    "newFeature": "Ny feature",
+    "newFeaturePlaceholder": "Ny feature …",
+    "add": "Tilføj",
+    "epicEmpty": "Ingen features endnu. Skriv den første herunder, eller træk én hertil.",
+    "moveToEpic": "Flyt til epic",
+    "moveToFeature": "Flyt til feature",
+    "noParent": "Uden forælder",
+    "tray": "Uden forælder",
+    "trayHint": "Features og kort uden plads i nedbrydningen. Træk dem ind — eller ud hertil.",
+    "trayEmpty": "Alt har en forælder."
   }
 }

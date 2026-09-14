@@ -128,7 +128,7 @@ codebase to:
   services that take an `OrgContext`, the backlog structure's rules and
   services in `src/modules/boards/structure`; server actions next to their
   services as `actions*.ts`; pages in `src/app/[locale]` and components in
-  `src/components/{board,card,backlog,map,item,roadmap,overview,sprint,charts,settings}`.
+  `src/components/{board,card,backlog,map,item,roadmap,overview,sprint,charts,settings,structure}`.
 - Trade-off accepted: the foundation is a copy of Ajour's copy of Haij's,
   not a shared package. Three products, three lifecycles, one set of rules
   (ADR 0001).

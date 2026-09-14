@@ -498,7 +498,8 @@
       "archived": "archived",
       "roadmap": "Roadmap",
       "overview": "Overview",
-      "map": "Story map"
+      "map": "Story map",
+      "structure": "Breakdown"
     },
     "list": {
       "title": "Boards",
@@ -1388,5 +1389,19 @@
     "underway": "{open} underway",
     "emptyTray": "The map is empty. Click a feature in the tray to put it up.",
     "empty": "No features yet. Create a feature, and it can go up on the map."
+  },
+  "decompose": {
+    "title": "Breakdown",
+    "newEpic": "New epic",
+    "newFeature": "New feature",
+    "newFeaturePlaceholder": "New feature …",
+    "add": "Add",
+    "epicEmpty": "No features yet. Write the first one below, or drag one here.",
+    "moveToEpic": "Move to epic",
+    "moveToFeature": "Move to feature",
+    "noParent": "Without a parent",
+    "tray": "Without a parent",
+    "trayHint": "Features and cards with no place in the breakdown. Drag them in — or out to here.",
+    "trayEmpty": "Everything has a parent."
   }
 }
