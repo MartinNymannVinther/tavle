@@ -85,6 +85,12 @@ export function RoadmapLine({
 
   function move(event: React.PointerEvent) {
     if (!drag) return;
+    // A drag the browser took over must never keep steering the bar
+    // into a later click.
+    if (event.buttons === 0) {
+      setDrag(null);
+      return;
+    }
     const delta = Math.round((event.clientX - drag.from) / drag.cell);
     if (delta !== drag.delta) setDrag({ ...drag, delta });
   }
@@ -126,7 +132,13 @@ export function RoadmapLine({
           )}
         </div>
       </div>
-      <div className="relative h-12" data-strip onPointerMove={move} onPointerUp={up}>
+      <div
+        className="relative h-12"
+        data-strip
+        onPointerMove={move}
+        onPointerUp={up}
+        onPointerCancel={() => setDrag(null)}
+      >
         <div
           aria-hidden
           className="absolute inset-0 grid"

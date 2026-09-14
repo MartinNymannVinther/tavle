@@ -547,6 +547,8 @@
       "unassigned": "Ingen ansvarlig",
       "menu": "Menu for kortet",
       "open": "Åbn kortet",
+      "moveUp": "Flyt op",
+      "moveDown": "Flyt ned",
       "moveTo": "Flyt til",
       "moveToLane": "Flyt til bane"
     },
@@ -950,7 +952,8 @@
       "todo": "Klar",
       "doing": "I gang",
       "done": "Færdig"
-    }
+    },
+    "weekPrefix": "U"
   },
   "boardSettings": {
     "title": "Tavlens indstillinger",
@@ -1357,6 +1360,7 @@
     "newEpic": "Ny epic",
     "addInQuarter": "Ny epic i {quarter}",
     "planQuarter": "Kvartal for {title}",
+    "planSprint": "Sprint for {title}",
     "planStart": "Start for {title}",
     "featureCards": "{done} af {total} kort",
     "axisEpics": "Epics · kvartaler",
@@ -1451,7 +1455,7 @@
     "thinking": "Modellen tænker …",
     "apply": "Opret valgte",
     "back": "Tilbage",
-    "cancel": "Annullér",
+    "cancel": "Annuller",
     "areas": "Områder",
     "themes": "Temaer",
     "doneWhen": "Færdig når:",

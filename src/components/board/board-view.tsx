@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -53,9 +53,26 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
   const { board, columns, members, activeSprint } = full;
   const structure = structureOf(full);
   const scrum = board.mode === "scrum";
-  const onBoard = scrum ? cards.filter((c) => c.sprintId === activeSprint?.id) : cards;
+  const onBoard = useMemo(
+    () => (scrum ? cards.filter((c) => c.sprintId === activeSprint?.id) : cards),
+    [scrum, cards, activeSprint?.id],
+  );
   const visible = applyFilters(onBoard, filters);
   const planned = full.sprints.filter((s) => s.state === "planned");
+  // Grouped and sorted once per data change, not once per column per
+  // render — a dragover and a filter keystroke both redraw the board.
+  const byColumn = useMemo(() => {
+    const grouped = new Map<string, CardView[]>();
+    for (const card of onBoard) {
+      const list = grouped.get(card.columnId);
+      if (list) list.push(card);
+      else grouped.set(card.columnId, [card]);
+    }
+    for (const list of grouped.values()) {
+      list.sort((a, b) => a.sort - b.sort || a.number - b.number);
+    }
+    return grouped;
+  }, [onBoard]);
 
   const laneMode = effectiveSwimlaneMode(board);
   const lanes = boardLanes(
@@ -74,9 +91,7 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
     .map((lane) => ({ key: lane.key, label: laneLabel(lane) }));
 
   function lane(columnId: string): CardView[] {
-    return onBoard
-      .filter((c) => c.columnId === columnId)
-      .sort((a, b) => a.sort - b.sort || a.number - b.number);
+    return byColumn.get(columnId) ?? [];
   }
 
   function cell(columnId: string, laneKey: string | null): CardView[] {
@@ -122,6 +137,16 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
     moveLocally(cardId, columnId, index, assignment);
     const ok = await run(() => moveCardAction({ cardId, columnId, index, swimlane: assignment }));
     if (!ok) setCards(before);
+  }
+
+  /** One step past a visible neighbour, indexed in the lane the server orders. */
+  function nudge(cardId: string, neighbourId: string, delta: -1 | 1) {
+    const card = onBoard.find((c) => c.id === cardId);
+    if (!card) return;
+    const order = lane(card.columnId).filter((c) => c.id !== cardId);
+    const at = order.findIndex((c) => c.id === neighbourId);
+    if (at < 0) return;
+    void move(cardId, card.columnId, delta > 0 ? at + 1 : at);
   }
 
   function onDrop(columnId: string, index: number) {
@@ -227,6 +252,7 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
           }}
           onDrop={onDrop}
           onMove={(cardId, columnId, index) => void move(cardId, columnId, index)}
+          onNudge={nudge}
           onMoveToLane={
             withLanes
               ? (cardId, key) => {

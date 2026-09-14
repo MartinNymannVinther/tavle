@@ -32,6 +32,7 @@ export function FeaturePlanLine({
   boardId,
   boardKey,
   crumb,
+  offAxisStart = null,
   onPlan,
 }: {
   feature: ItemView;
@@ -42,6 +43,8 @@ export function FeaturePlanLine({
   boardKey: string;
   /** The epic's key, said once under the title. */
   crumb: string | null;
+  /** The plan's start when it lies in a closed sprint, off the drawn axis; kept unless the start itself is changed. */
+  offAxisStart?: Sprint | null;
   onPlan: PlanFeatureSpan;
 }) {
   const t = useTranslations("roadmap");
@@ -50,6 +53,9 @@ export function FeaturePlanLine({
   const start = Math.max(0, index(feature.startSprintId));
   const end = Math.max(start, index(feature.targetSprintId));
   const last = sprints.length - 1;
+  // Changing only the end must not quietly rewrite a start that sits in
+  // a closed sprint; the old start rides along untouched.
+  const keptStart = offAxisStart?.id ?? null;
 
   const span = (() => {
     if (!drag) return { start, end };
@@ -79,15 +85,26 @@ export function FeaturePlanLine({
 
   function move(event: React.PointerEvent) {
     if (!drag) return;
+    // A drag the browser took over (touch gesture, window losing the
+    // pointer) must never keep steering the bar into a later click.
+    if (event.buttons === 0) {
+      setDrag(null);
+      return;
+    }
     const delta = Math.round((event.clientX - drag.from) / drag.cell);
     if (delta !== drag.delta) setDrag({ ...drag, delta });
   }
 
   function up() {
     if (!drag) return;
+    const endOnly = drag.mode === "end";
     setDrag(null);
     if (span.start !== start || span.end !== end) {
-      onPlan(feature.id, sprints[span.start]!.id, sprints[span.end]!.id);
+      onPlan(
+        feature.id,
+        endOnly && keptStart ? keptStart : sprints[span.start]!.id,
+        sprints[span.end]!.id,
+      );
     }
   }
 
@@ -110,8 +127,8 @@ export function FeaturePlanLine({
           </p>
           <p className="flex flex-wrap items-center gap-1">
             <SprintSelect
-              value={sprints[span.start]!.id}
-              sprints={sprints}
+              value={keptStart ?? sprints[span.start]!.id}
+              sprints={offAxisStart ? [offAxisStart, ...sprints] : sprints}
               label={t("planStart", { title: feature.title })}
               onChange={(sprintId) => onPlan(feature.id, sprintId, sprints[span.end]!.id)}
             />
@@ -119,13 +136,21 @@ export function FeaturePlanLine({
             <SprintSelect
               value={sprints[span.end]!.id}
               sprints={sprints}
-              label={t("planQuarter", { title: feature.title })}
-              onChange={(sprintId) => onPlan(feature.id, sprints[span.start]!.id, sprintId)}
+              label={t("planSprint", { title: feature.title })}
+              onChange={(sprintId) =>
+                onPlan(feature.id, keptStart ?? sprints[span.start]!.id, sprintId)
+              }
             />
           </p>
         </div>
       </div>
-      <div className="relative h-12" data-strip onPointerMove={move} onPointerUp={up}>
+      <div
+        className="relative h-12"
+        data-strip
+        onPointerMove={move}
+        onPointerUp={up}
+        onPointerCancel={() => setDrag(null)}
+      >
         <div
           aria-hidden
           className="absolute inset-0 grid"
@@ -152,7 +177,7 @@ export function FeaturePlanLine({
             width: `calc(${((span.end - span.start + 1) / sprints.length) * 100}% - 0.5rem)`,
             background: theme ? themeSwatch(theme.color) : "var(--label)",
           }}
-          title={`${sprints[span.start]!.name} – ${sprints[span.end]!.name}`}
+          title={`${offAxisStart?.name ?? sprints[span.start]!.name} – ${sprints[span.end]!.name}`}
         >
           <span className="relative truncate">{feature.title}</span>
         </div>

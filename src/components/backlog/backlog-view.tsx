@@ -67,7 +67,11 @@ export function BacklogView({ full }: { full: BoardFull }) {
   const counts = navCounts(tree);
   const open = sprints.filter((sp) => sp.state !== "closed").sort((a, b) => a.number - b.number);
   const active = sprints.find((sp) => sp.state === "active") ?? null;
+  // The chosen sprint holds as long as it exists; otherwise the first
+  // open one steps in — a first sprint created on this very page must be
+  // committable without a reload.
   const [target, setTarget] = useState<string>(open[0]?.id ?? "");
+  const commitTarget = open.some((sp) => sp.id === target) ? target : (open[0]?.id ?? "");
   const points = stories.reduce((total, c) => total + (c.estimate ?? 0), 0);
 
   function select(cardId: string, checked: boolean) {
@@ -84,8 +88,10 @@ export function BacklogView({ full }: { full: BoardFull }) {
   const backlogIds = all.filter((c) => selected.has(c.id)).map((c) => c.id);
 
   async function commit() {
-    if (backlogIds.length === 0 || !target) return;
-    const ok = await run(() => setCardsSprintAction({ cardIds: backlogIds, sprintId: target }));
+    if (backlogIds.length === 0 || !commitTarget) return;
+    const ok = await run(() =>
+      setCardsSprintAction({ cardIds: backlogIds, sprintId: commitTarget }),
+    );
     if (ok) setSelected(new Set());
   }
 
@@ -241,7 +247,7 @@ export function BacklogView({ full }: { full: BoardFull }) {
             count={backlogIds.length}
             scrum={scrum}
             sprints={scrum ? open : []}
-            target={target}
+            target={commitTarget}
             onTarget={setTarget}
             onCommit={() => void commit()}
             features={view.features ? openFeatures : []}

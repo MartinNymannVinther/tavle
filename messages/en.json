@@ -547,6 +547,8 @@
       "unassigned": "Unassigned",
       "menu": "Card menu",
       "open": "Open the card",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
       "moveTo": "Move to",
       "moveToLane": "Move to lane"
     },
@@ -950,7 +952,8 @@
       "todo": "Ready",
       "doing": "In progress",
       "done": "Done"
-    }
+    },
+    "weekPrefix": "W"
   },
   "boardSettings": {
     "title": "Board settings",
@@ -1357,6 +1360,7 @@
     "newEpic": "New epic",
     "addInQuarter": "New epic in {quarter}",
     "planQuarter": "Quarter for {title}",
+    "planSprint": "Sprint for {title}",
     "planStart": "Start of {title}",
     "featureCards": "{done} of {total} cards",
     "axisEpics": "Epics · quarters",

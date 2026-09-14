@@ -30,6 +30,9 @@ export function MoveMenu({
   currentLaneKey = null,
   laneOptions,
   onMoveToLane,
+  onNudge,
+  canUp = false,
+  canDown = false,
 }: {
   columns: Column[];
   currentColumnId: string;
@@ -38,6 +41,10 @@ export function MoveMenu({
   currentLaneKey?: string | null;
   laneOptions?: LaneOption[];
   onMoveToLane?: (laneKey: string | null) => void;
+  /** One step up or down inside the card's own column — the drag's order, as a menu. */
+  onNudge?: (delta: -1 | 1) => void;
+  canUp?: boolean;
+  canDown?: boolean;
 }) {
   const t = useTranslations("boards.card");
   const router = useRouter();
@@ -59,6 +66,19 @@ export function MoveMenu({
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={() => router.push(href)}>{t("open")}</DropdownMenuItem>
         </DropdownMenuGroup>
+        {onNudge && (canUp || canDown) && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem disabled={!canUp} onClick={() => onNudge(-1)}>
+                {t("moveUp")}
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled={!canDown} onClick={() => onNudge(1)}>
+                {t("moveDown")}
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuLabel>{t("moveTo")}</DropdownMenuLabel>

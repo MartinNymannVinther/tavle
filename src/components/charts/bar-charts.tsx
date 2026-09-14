@@ -58,8 +58,16 @@ export function VelocityChart({ data, ariaLabel }: { data: Velocity; ariaLabel: 
   );
 }
 
-/** Cards finished per week, oldest first. */
-export function ThroughputChart({ data, ariaLabel }: { data: WeekCount[]; ariaLabel: string }) {
+/** Cards finished per week, oldest first. The week word's short form comes translated from the page. */
+export function ThroughputChart({
+  data,
+  ariaLabel,
+  weekPrefix,
+}: {
+  data: WeekCount[];
+  ariaLabel: string;
+  weekPrefix: string;
+}) {
   const yMax = Math.max(1, ...data.map((w) => w.count));
   const slot = plotWidth() / Math.max(data.length, 1);
   const width = Math.min(40, slot * 0.6);
@@ -89,7 +97,7 @@ export function ThroughputChart({ data, ariaLabel }: { data: WeekCount[]; ariaLa
                 {week.count}
               </text>
             )}
-            <XLabel x={cx} label={week.week.replace(/^\d{4}-W/, "U")} />
+            <XLabel x={cx} label={week.week.replace(/^\d{4}-W/, weekPrefix)} />
           </g>
         );
       })}

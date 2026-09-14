@@ -42,6 +42,7 @@ export function BoardColumn({
   onDrop,
   onMove,
   onMoveToLane,
+  onNudge,
   onAdd,
 }: {
   column: Column;
@@ -64,6 +65,8 @@ export function BoardColumn({
   onDrop: (columnId: string, index: number) => void;
   onMove: (cardId: string, columnId: string, index?: number) => void;
   onMoveToLane?: (cardId: string, laneKey: string | null) => void;
+  /** Reordering past a visible neighbour, for the menu path drag cannot cover. */
+  onNudge?: (cardId: string, neighbourId: string, delta: -1 | 1) => void;
   onAdd: (
     columnId: string,
     title: string,
@@ -160,10 +163,29 @@ export function BoardColumn({
                 event.stopPropagation();
                 const rect = event.currentTarget.getBoundingClientRect();
                 const below = event.clientY > rect.top + rect.height / 2;
-                setDropTarget({ columnId: column.id, index: index + (below ? 1 : 0), laneKey });
+                const at = index + (below ? 1 : 0);
+                // dragover fires continuously; only a changed target is
+                // worth a render of the whole board.
+                if (
+                  dropTarget?.columnId !== column.id ||
+                  dropTarget.index !== at ||
+                  dropTarget.laneKey !== laneKey
+                ) {
+                  setDropTarget({ columnId: column.id, index: at, laneKey });
+                }
               }}
               onMove={(columnId, at) => onMove(card.id, columnId, at)}
               onMoveToLane={onMoveToLane ? (key) => onMoveToLane(card.id, key) : undefined}
+              onNudge={
+                onNudge
+                  ? (delta) => {
+                      const neighbour = cards[index + delta];
+                      if (neighbour) onNudge(card.id, neighbour.id, delta);
+                    }
+                  : undefined
+              }
+              canUp={index > 0}
+              canDown={index < cards.length - 1}
             />
           </div>
         ))}

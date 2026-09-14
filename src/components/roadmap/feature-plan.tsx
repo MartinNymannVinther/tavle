@@ -38,6 +38,7 @@ export function FeaturePlan({ full }: { full: BoardFull }) {
   const axis = full.sprints
     .filter((s) => s.state !== "closed")
     .sort((a, b) => a.startDate.localeCompare(b.startDate));
+  const sprintOf = new Map(full.sprints.map((s) => [s.id, s]));
   const currentId = full.sprints.find((s) => s.state === "active")?.id ?? null;
   const themeOf = (feature: ItemView) =>
     feature.themeIds[0] ? (full.themes.find((th) => th.id === feature.themeIds[0]) ?? null) : null;
@@ -149,6 +150,11 @@ export function FeaturePlan({ full }: { full: BoardFull }) {
                       boardId={board.id}
                       boardKey={board.key}
                       crumb={crumbOf(feature)}
+                      offAxisStart={
+                        feature.startSprintId && !axisIds.has(feature.startSprintId)
+                          ? (sprintOf.get(feature.startSprintId) ?? null)
+                          : null
+                      }
                       onPlan={plan}
                     />
                   </li>
@@ -180,7 +186,7 @@ export function FeaturePlan({ full }: { full: BoardFull }) {
                 <SprintSelect
                   value=""
                   sprints={axis}
-                  label={t("planQuarter", { title: feature.title })}
+                  label={t("planSprint", { title: feature.title })}
                   allowNone={{ word: t("unplannedWord") }}
                   onChange={(sprintId) => {
                     if (sprintId) plan(feature.id, sprintId, sprintId);

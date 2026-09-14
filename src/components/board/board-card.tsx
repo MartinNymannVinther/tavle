@@ -36,6 +36,9 @@ export function BoardCard({
   onDragOver,
   onMove,
   onMoveToLane,
+  onNudge,
+  canUp,
+  canDown,
 }: {
   card: CardView;
   boardKey: string;
@@ -51,6 +54,9 @@ export function BoardCard({
   onDragOver: (event: React.DragEvent) => void;
   onMove: (columnId: string, index?: number) => void;
   onMoveToLane?: (laneKey: string | null) => void;
+  onNudge?: (delta: -1 | 1) => void;
+  canUp?: boolean;
+  canDown?: boolean;
 }) {
   const t = useTranslations("boards.card");
   const priorities = useTranslations("boards.priority");
@@ -110,6 +116,9 @@ export function BoardCard({
           currentLaneKey={laneKey}
           laneOptions={laneOptions}
           onMoveToLane={onMoveToLane}
+          onNudge={onNudge}
+          canUp={canUp}
+          canDown={canDown}
         />
       </div>
       {(card.bug || (structure.view.kind && card.kind === "enabler")) && (

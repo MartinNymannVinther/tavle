@@ -92,7 +92,11 @@ export default async function InsightPage({ params }: Params) {
           <CardDescription>{t("throughputBody")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <ThroughputChart data={insight.throughput} ariaLabel={t("throughputTitle")} />
+          <ThroughputChart
+            data={insight.throughput}
+            ariaLabel={t("throughputTitle")}
+            weekPrefix={t("weekPrefix")}
+          />
         </CardContent>
       </Card>
       <Card>

@@ -47,11 +47,14 @@ export function RoadmapChildren({
     const start = feature.startSprintId ? sprintOf.get(feature.startSprintId) : null;
     const end = feature.targetSprintId ? sprintOf.get(feature.targetSprintId) : null;
     if (!start || !end) return null;
-    const left = (quarterPosition(start.startDate, quarters) / quarters.length) * 100;
-    const right = (quarterPosition(end.endDate, quarters) / quarters.length) * 100;
+    const at = (date: string) => (quarterPosition(date, quarters) / quarters.length) * 100;
+    // Pinned inside the strip: a plan past the horizon ends AT the last
+    // quarter instead of painting a sliver beyond it.
+    const right = Math.min(at(end.endDate), 100);
+    const width = Math.max(right - at(start.startDate), 1.5);
     return {
-      left,
-      width: Math.max(right - left, 1.5),
+      left: Math.min(at(start.startDate), 100 - width),
+      width,
       title: `${start.name} – ${end.name}`,
     };
   };

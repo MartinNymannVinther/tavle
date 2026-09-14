@@ -46,6 +46,9 @@ export function StoryMapView({ full }: { full: BoardFull }) {
   const cards = applyFilters(full.cards, filters);
   const map = storyMap(full, structure.items, cards, { showClosed });
   const onMap = backbone(structure.items, { showClosed });
+  // The server orders the whole lane, hidden closed features included, so
+  // every index sent up is a position in that lane, not in the view.
+  const wholeLane = backbone(structure.items, { showClosed: true });
   const waiting = tray(structure.items);
   const doneColumns = new Set(full.columns.filter((c) => c.category === "done").map((c) => c.id));
   const doneIds = new Set(full.cards.filter((c) => doneColumns.has(c.columnId)).map((c) => c.id));
@@ -77,18 +80,23 @@ export function StoryMapView({ full }: { full: BoardFull }) {
     const id = drag?.kind === "feature" ? drag.id : null;
     setDrag(null);
     if (!id || id === beforeId) return;
-    const order = onMap.map((f) => f.id).filter((f) => f !== id);
+    const order = wholeLane.map((f) => f.id).filter((f) => f !== id);
     const index = beforeId ? order.indexOf(beforeId) : order.length;
     if (index < 0) return;
     void run(() => placeOnMapAction({ itemId: id, index }));
   }
 
   function nudgeFeature(featureId: string, delta: -1 | 1) {
-    const order = onMap.map((f) => f.id);
-    const at = order.indexOf(featureId);
+    const visible = onMap.map((f) => f.id);
+    const at = visible.indexOf(featureId);
     if (at < 0) return;
-    const index = Math.max(0, Math.min(order.length - 1, at + delta));
-    if (index === at) return;
+    // One step means past the visible neighbour, even when a hidden
+    // closed feature sits between them in the lane.
+    const neighbour = visible[at + delta];
+    if (!neighbour) return;
+    const order = wholeLane.map((f) => f.id).filter((f) => f !== featureId);
+    const index = delta > 0 ? order.indexOf(neighbour) + 1 : order.indexOf(neighbour);
+    if (index < 0) return;
     void run(() => placeOnMapAction({ itemId: featureId, index }));
   }
 

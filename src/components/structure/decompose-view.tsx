@@ -89,8 +89,15 @@ export function DecomposeView({ full }: { full: BoardFull }) {
       .filter((s) => s.state !== "closed")
       .sort((a, b) => a.startDate.localeCompare(b.startDate)),
     onPlanFeature: (featureId: string, sprintId: string | null) => {
+      // One pick sets the end; a span that already has a start keeps it,
+      // so choosing the bolded current sprint never collapses S1–S3 to S3.
+      const item = full.items.find((i) => i.id === featureId);
       void run(() =>
-        planFeatureAction({ itemId: featureId, startSprintId: sprintId, targetSprintId: sprintId }),
+        planFeatureAction({
+          itemId: featureId,
+          startSprintId: sprintId === null ? null : (item?.startSprintId ?? sprintId),
+          targetSprintId: sprintId,
+        }),
       );
     },
     onAddFeature: (epicId: string, title: string) =>
