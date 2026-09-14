@@ -146,6 +146,10 @@ export function securityHeaders(production: boolean): Array<{ key: string; value
 const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
+  // Dev only: `next dev` refuses to serve its own assets to any host but
+  // localhost, and a dev server reached from another machine (motor.local)
+  // otherwise renders as script-less HTML. Ignored by `next build`.
+  allowedDevOrigins: ["motor.local", "motor"],
   env: {
     TAVLE_VERSION: pkg.version,
     TAVLE_COMMIT: commit,

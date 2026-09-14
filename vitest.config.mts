@@ -33,6 +33,9 @@ export default defineConfig({
     // tests/auth/signup-gate.
     env: {
       ...testDatabaseUrls,
+      // Invitation links embed this origin; a developer whose .env points
+      // at the machine's network name would otherwise fail the assertions.
+      BETTER_AUTH_URL: "http://localhost:3000",
       SIGNUP: "open",
       // The demo suite exercises the demo end to end; that the shipped
       // default is "off" is proven in tests/core/env.
