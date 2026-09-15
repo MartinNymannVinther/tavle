@@ -212,110 +212,124 @@ export function ItemBacklog({
     );
   };
 
-  const cardRows = (node: FeatureNode, depth: number) => (
-    <div className="border-hairline ml-4 border-l" style={{ marginLeft: `${depth * 1.25}rem` }}>
-      {node.stories.length === 0 ? (
-        <p
-          onDragOver={(event) => {
-            if (drag?.kind === "card" && drag.featureId !== node.feature.id) {
-              event.preventDefault();
-              if (hover?.kind !== "feature" || hover.id !== node.feature.id) {
-                setHover({ kind: "feature", id: node.feature.id });
-              }
-            }
-          }}
-          onDrop={() => {
-            if (drag?.kind === "card" && drag.featureId !== node.feature.id) {
-              onMoveCard(drag.id, node.feature.id, null, false);
-            }
-            settle();
-          }}
-          className={cn(
-            "text-meta px-4 py-1.5 text-xs",
-            hover?.kind === "feature" && hover.id === node.feature.id && "bg-accent/60",
-          )}
-        >
-          {t("levels.noStories")}
-        </p>
-      ) : (
-        <ol>
-          {node.stories.map((card, index) => (
-            <BacklogRow
-              key={card.id}
-              card={card}
-              boardKey={board.key}
-              boardId={board.id}
-              structure={structure}
-              context={{ areaId: node.feature.areaId, themeIds: node.feature.themeIds }}
-              draggable
-              onDragStart={() => setDrag({ kind: "card", id: card.id, featureId: node.feature.id })}
-              onDragOver={(event) => {
-                // The drop stays inside the feature's own fold-out: a
-                // cross-feature drag would reorder invisibly, and moving a
-                // card to another feature is placement, not rank.
-                if (
-                  drag?.kind === "card" &&
-                  drag.featureId === node.feature.id &&
-                  drag.id !== card.id
-                ) {
-                  event.preventDefault();
+  const cardRows = (node: FeatureNode, depth: number) => {
+    // The feature's committed cards stand at their rank among the free
+    // ones — one priority, the sprint's name saying why these rows
+    // neither drag nor tick.
+    const merged = [
+      ...node.stories.map((card) => ({ card, committed: false })),
+      ...allocatedOf(node.feature.id).map((card) => ({ card, committed: true })),
+    ].sort((a, b) => a.card.sort - b.card.sort || a.card.number - b.card.number);
+    const rankIndex = new Map(node.stories.map((card, index) => [card.id, index]));
+    return (
+      <div className="border-hairline ml-4 border-l" style={{ marginLeft: `${depth * 1.25}rem` }}>
+        {merged.length === 0 ? (
+          <p
+            onDragOver={(event) => {
+              if (drag?.kind === "card" && drag.featureId !== node.feature.id) {
+                event.preventDefault();
+                if (hover?.kind !== "feature" || hover.id !== node.feature.id) {
+                  setHover({ kind: "feature", id: node.feature.id });
                 }
-              }}
-              onDrop={() => {
-                if (
-                  drag?.kind === "card" &&
-                  drag.featureId === node.feature.id &&
-                  drag.id !== card.id
-                ) {
-                  onNudgeCard(drag.id, card.id, false);
-                }
-                setDrag(null);
-              }}
-              dragging={drag?.kind === "card" && drag.id === card.id}
-              onMoveUp={
-                index > 0
-                  ? () => onNudgeCard(card.id, node.stories[index - 1]!.id, false)
-                  : undefined
               }
-              onMoveDown={
-                index < node.stories.length - 1
-                  ? () => onNudgeCard(card.id, node.stories[index + 1]!.id, true)
-                  : undefined
+            }}
+            onDrop={() => {
+              if (drag?.kind === "card" && drag.featureId !== node.feature.id) {
+                onMoveCard(drag.id, node.feature.id, null, false);
               }
-            />
-          ))}
-        </ol>
-      )}
-      {allocatedOf(node.feature.id).length > 0 && (
-        <ol className="divide-hairline border-hairline divide-y border-t">
-          {allocatedOf(node.feature.id).map((card) =>
-            markedRow(card, { areaId: node.feature.areaId, themeIds: node.feature.themeIds }),
-          )}
-        </ol>
-      )}
-      {board.mode === "scrum"
-        ? node.elsewhere.done > 0 && (
-            <p className="text-meta px-4 pb-1.5 text-2xs">
-              {t("levels.doneElsewhere", { done: node.elsewhere.done })}
-            </p>
-          )
-        : (node.elsewhere.open > 0 || node.elsewhere.done > 0) && (
-            <p className="text-meta px-4 pb-1.5 text-2xs">
-              {t("levels.elsewhere", { open: node.elsewhere.open, done: node.elsewhere.done })}
-            </p>
-          )}
-      <div className="px-3 pb-2">
-        <QuickAdd
-          onAdd={(title) =>
-            run(() => createCardAction({ boardId: board.id, title, featureId: node.feature.id }))
-          }
-          structure={structure}
-          fixed={{ featureId: node.feature.id }}
-          compact
-        />
+              settle();
+            }}
+            className={cn(
+              "text-meta px-4 py-1.5 text-xs",
+              hover?.kind === "feature" && hover.id === node.feature.id && "bg-accent/60",
+            )}
+          >
+            {t("levels.noStories")}
+          </p>
+        ) : (
+          <ol>
+            {merged.map(({ card, committed }) => {
+              if (committed) {
+                return markedRow(card, {
+                  areaId: node.feature.areaId,
+                  themeIds: node.feature.themeIds,
+                });
+              }
+              const index = rankIndex.get(card.id)!;
+              return (
+                <BacklogRow
+                  key={card.id}
+                  card={card}
+                  boardKey={board.key}
+                  boardId={board.id}
+                  structure={structure}
+                  context={{ areaId: node.feature.areaId, themeIds: node.feature.themeIds }}
+                  draggable
+                  onDragStart={() =>
+                    setDrag({ kind: "card", id: card.id, featureId: node.feature.id })
+                  }
+                  onDragOver={(event) => {
+                    // The drop stays inside the feature's own fold-out: a
+                    // cross-feature drag would reorder invisibly, and moving a
+                    // card to another feature is placement, not rank.
+                    if (
+                      drag?.kind === "card" &&
+                      drag.featureId === node.feature.id &&
+                      drag.id !== card.id
+                    ) {
+                      event.preventDefault();
+                    }
+                  }}
+                  onDrop={() => {
+                    if (
+                      drag?.kind === "card" &&
+                      drag.featureId === node.feature.id &&
+                      drag.id !== card.id
+                    ) {
+                      onNudgeCard(drag.id, card.id, false);
+                    }
+                    setDrag(null);
+                  }}
+                  dragging={drag?.kind === "card" && drag.id === card.id}
+                  onMoveUp={
+                    index > 0
+                      ? () => onNudgeCard(card.id, node.stories[index - 1]!.id, false)
+                      : undefined
+                  }
+                  onMoveDown={
+                    index < node.stories.length - 1
+                      ? () => onNudgeCard(card.id, node.stories[index + 1]!.id, true)
+                      : undefined
+                  }
+                />
+              );
+            })}
+          </ol>
+        )}
+        {board.mode === "scrum"
+          ? node.elsewhere.done > 0 && (
+              <p className="text-meta px-4 pb-1.5 text-2xs">
+                {t("levels.doneElsewhere", { done: node.elsewhere.done })}
+              </p>
+            )
+          : (node.elsewhere.open > 0 || node.elsewhere.done > 0) && (
+              <p className="text-meta px-4 pb-1.5 text-2xs">
+                {t("levels.elsewhere", { open: node.elsewhere.open, done: node.elsewhere.done })}
+              </p>
+            )}
+        <div className="px-3 pb-2">
+          <QuickAdd
+            onAdd={(title) =>
+              run(() => createCardAction({ boardId: board.id, title, featureId: node.feature.id }))
+            }
+            structure={structure}
+            fixed={{ featureId: node.feature.id }}
+            compact
+          />
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const featureSection = (node: FeatureNode, scope: string, siblings: ItemView[], depth: number) =>
     itemRow(node.feature, {
@@ -395,16 +409,24 @@ export function ItemBacklog({
         <>
           {looseHeading(t("nav.noParent"))}
           <ol>
-            {tree.looseStories.map((card) => (
-              <BacklogRow
-                key={card.id}
-                card={card}
-                boardKey={board.key}
-                boardId={board.id}
-                structure={structure}
-              />
-            ))}
-            {allocatedOf(null).map((card) => markedRow(card))}
+            {[
+              ...tree.looseStories.map((card) => ({ card, committed: false })),
+              ...allocatedOf(null).map((card) => ({ card, committed: true })),
+            ]
+              .sort((a, b) => a.card.sort - b.card.sort || a.card.number - b.card.number)
+              .map(({ card, committed }) =>
+                committed ? (
+                  markedRow(card)
+                ) : (
+                  <BacklogRow
+                    key={card.id}
+                    card={card}
+                    boardKey={board.key}
+                    boardId={board.id}
+                    structure={structure}
+                  />
+                ),
+              )}
           </ol>
         </>
       )}

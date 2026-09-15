@@ -36,19 +36,44 @@ export function StoryRows({
   rows,
   context,
   groupDrop,
+  extras,
 }: {
   stories: CardView[];
   rows: StoryRowProps;
   context?: ChipContext;
   /** In a grouped view: what a card from another group lands as when dropped here. */
   groupDrop?: { onDrop: (cardId: string, siblingId: string | null, after: boolean) => void };
+  /** Sprint-committed cards, standing at their rank among the rows, marked, not ranked. */
+  extras?: { cards: CardView[]; sprintNameOf?: Map<string, string> };
 }) {
   // Where the dragged card will land, drawn as a line above or below the
   // row under the pointer — the drop should never be a guess.
   const [hover, setHover] = useState<{ id: string; after: boolean } | null>(null);
+  // Committed cards keep their place in the one priority (docs/adr/0013):
+  // the sequence merges on the rank itself, and only the free rows drag.
+  const merged = [
+    ...stories.map((card) => ({ card, committed: false })),
+    ...(extras?.cards ?? []).map((card) => ({ card, committed: true })),
+  ].sort((a, b) => a.card.sort - b.card.sort || a.card.number - b.card.number);
+  const rankIndex = new Map(stories.map((card, index) => [card.id, index]));
   return (
     <ol className="divide-hairline divide-y">
-      {stories.map((card, index) => {
+      {merged.map(({ card, committed }) => {
+        if (committed) {
+          return (
+            <BacklogRow
+              key={card.id}
+              card={card}
+              boardKey={rows.boardKey}
+              boardId={rows.boardId}
+              structure={rows.structure}
+              context={context ?? rows.context}
+              crumb={rows.crumbOf(card)}
+              sprintName={(card.sprintId && extras?.sprintNameOf?.get(card.sprintId)) || undefined}
+            />
+          );
+        }
+        const index = rankIndex.get(card.id)!;
         const before = stories[index - 1];
         const after = stories[index + 1];
         return (
@@ -117,7 +142,7 @@ export function BacklogList({
 }: {
   stories: CardView[];
   rows: StoryRowProps;
-  /** Cards already committed to an open sprint: shown after the ranked rows, marked, not ranked. */
+  /** Cards already committed to an open sprint: standing at their rank, marked, not draggable. */
   allocated?: CardView[];
   sprintNameOf?: Map<string, string>;
   /** What an empty list says; the whole-backlog wording differs from a narrowed one's. */
@@ -133,23 +158,7 @@ export function BacklogList({
   }
   return (
     <div className="border-hairline border-t">
-      <StoryRows stories={stories} rows={rows} />
-      {allocated.length > 0 && (
-        <ol className="divide-hairline border-hairline divide-y border-t">
-          {allocated.map((card) => (
-            <BacklogRow
-              key={card.id}
-              card={card}
-              boardKey={rows.boardKey}
-              boardId={rows.boardId}
-              structure={rows.structure}
-              context={rows.context}
-              crumb={rows.crumbOf(card)}
-              sprintName={(card.sprintId && sprintNameOf?.get(card.sprintId)) || undefined}
-            />
-          ))}
-        </ol>
-      )}
+      <StoryRows stories={stories} rows={rows} extras={{ cards: allocated, sprintNameOf }} />
     </div>
   );
 }

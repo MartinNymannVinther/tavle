@@ -71,6 +71,38 @@ describe("a Scrum board", () => {
     expect(await backlogTitles()).toEqual(["Betaling", "Login", "Søgning", "Kurv"]);
   });
 
+  it("keeps a card's backlog rank across a planned sprint and back", async () => {
+    // Allocation is a promise, not a new priority: committed to a sprint
+    // that has not begun, the card stands where it stood, and coming back
+    // it still does. Its own board, so the suite's sprint numbers and
+    // backlog order stay what the other tests expect.
+    const own = await run((tx) =>
+      createBoard(tx, ctx, { name: "Rang", key: "RANG", mode: "scrum", firstArea: "Alt" }),
+    );
+    const area = (await getBoardFull(ctx, own.id))!.areas[0]!.id;
+    for (const title of ["Et", "To", "Tre"]) {
+      await run((tx) => createCard(tx, ctx, { boardId: own.id, title, areaId: area }));
+    }
+    const sprint = (await run((tx) =>
+      createSprint(tx, ctx, {
+        boardId: own.id,
+        name: "Sprint 1",
+        goal: "",
+        startDate: "2026-08-31",
+        endDate: "2026-09-11",
+      }),
+    ))!;
+    const before = (await getBoardFull(ctx, own.id))!.cards.find((c) => c.title === "To")!;
+    await run((tx) => setCardsSprint(tx, ctx, [before.id], sprint.id));
+    const committed = (await getBoardFull(ctx, own.id))!.cards.find((c) => c.id === before.id)!;
+    expect(committed.sprintId).toBe(sprint.id);
+    expect(committed.sort).toBe(before.sort);
+    await run((tx) => setCardsSprint(tx, ctx, [before.id], null));
+    const back = (await getBoardFull(ctx, own.id))!.cards.find((c) => c.id === before.id)!;
+    expect(back.sprintId).toBeNull();
+    expect(back.sort).toBe(before.sort);
+  });
+
   it("plans a sprint, commits cards to it and freezes the points on start", async () => {
     const sprint = (await run((tx) =>
       createSprint(tx, ctx, {

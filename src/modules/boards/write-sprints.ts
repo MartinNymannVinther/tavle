@@ -209,20 +209,28 @@ export async function setCardsSprint(
   const first = await firstColumn(tx, board.id);
   const columnRows = await tx.select().from(columns).where(eq(columns.boardId, board.id));
   const categoryOf = new Map(columnRows.map((c) => [c.id, c]));
+  const active = await activeSprintOf(tx, board.id);
   let moved = 0;
   for (const card of rows) {
     if (card.boardId !== board.id || card.sprintId === (target?.id ?? null)) continue;
     const keepColumn = target?.state === "active";
     const column = keepColumn ? categoryOf.get(card.columnId) : first;
     if (!column) continue;
-    const sort = await joiningSort(
-      tx,
-      laneFor("scrum", {
-        boardId: card.boardId,
-        columnId: column.id,
-        sprintId: target?.id ?? null,
-      }),
-    );
+    // Between the backlog and a planned sprint the card keeps its rank:
+    // allocation is a promise, not a new priority, and the backlog shows
+    // the card standing where it stood. Only the active sprint's lanes
+    // are the board's own order and ask for a joining position.
+    const involvesActive = keepColumn || (active !== null && card.sprintId === active.id);
+    const sort = involvesActive
+      ? await joiningSort(
+          tx,
+          laneFor("scrum", {
+            boardId: card.boardId,
+            columnId: column.id,
+            sprintId: target?.id ?? null,
+          }),
+        )
+      : card.sort;
     if (column.id !== card.columnId) {
       const from = categoryOf.get(card.columnId) ?? null;
       await enterColumn(tx, ctx, card, from, column, { sprintId: target?.id ?? null, sort });
