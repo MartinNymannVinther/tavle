@@ -23,6 +23,9 @@ export { fail, ok } from "@/core/result";
 
 export type Member = { userId: string; name: string; email: string; role: string };
 
+/** A roster row as the views need it (docs/adr/0029): who work can be assigned to. */
+export type PersonRef = { id: string; name: string; userId: string | null };
+
 /**
  * The list surfaces ship every card of the board to the client, so the
  * view carries only what a board, backlog, map or roadmap renders — the
@@ -59,7 +62,10 @@ export type BoardFull = {
   cards: CardView[];
   sprints: Sprint[];
   activeSprint: Sprint | null;
+  /** Owners of themes and areas pick from these — logins with a role. */
   members: Member[];
+  /** Assignees pick from these — the roster, logins or not (docs/adr/0029). */
+  people: PersonRef[];
 };
 
 export type CommentView = Comment & { authorName: string | null };
@@ -74,7 +80,7 @@ export type CardFull = {
   features: ItemView[];
   /** Planned and active sprints a card can be moved to. */
   sprints: Sprint[];
-  members: Member[];
+  people: PersonRef[];
   comments: CommentView[];
   events: BoardEvent[];
 };

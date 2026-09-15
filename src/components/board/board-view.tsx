@@ -50,7 +50,7 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
   const [dragId, setDragId] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<DropTarget>(null);
 
-  const { board, columns, members, activeSprint } = full;
+  const { board, columns, people, activeSprint } = full;
   const structure = structureOf(full);
   const scrum = board.mode === "scrum";
   const onBoard = useMemo(
@@ -284,12 +284,7 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
           run={run}
         />
       )}
-      <BoardFilters
-        filters={filters}
-        onChange={setFilters}
-        members={members}
-        structure={structure}
-      />
+      <BoardFilters filters={filters} onChange={setFilters} people={people} structure={structure} />
       <div className="-mx-5 overflow-x-auto px-5 pb-4 sm:-mx-7 sm:px-7 lg:-mx-8 lg:px-8">
         {laneMode === "none" ? (
           columnStrip(null, false)

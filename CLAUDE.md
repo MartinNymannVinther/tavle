@@ -43,10 +43,12 @@ codebase to:
 
 ## Product principles
 
-- As few concepts as possible; each one must earn its place. Nine: board,
-  column, card, sprint, comment, and the four of the backlog structure —
-  epic, feature, theme, area. Everything else — the backlog, the roadmap,
-  the overview, the numbers, "my cards" — is a derived view.
+- As few concepts as possible; each one must earn its place. Ten: board,
+  column, card, sprint, comment, the person (the workspace's roster —
+  who work is assigned to, with or without a login; ADR 0029), and the
+  four of the backlog structure — epic, feature, theme, area. Everything
+  else — the backlog, the roadmap, the overview, the numbers, "my
+  cards" — is a derived view.
 - One backlog structure (ADR 0011). The hierarchy epic → feature → card
   is used only to break the product down; overview, grouping and
   belonging are fields on the item: kind (business/enabler), theme (why)

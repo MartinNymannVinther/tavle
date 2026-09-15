@@ -158,7 +158,7 @@ export async function applySplitAction(raw: unknown): Promise<Result<string>> {
           sprintId: original.sprintId,
           estimate: piece.estimate,
           priority: original.priority as "low" | "normal" | "high" | "urgent",
-          assigneeUserId: original.assigneeUserId,
+          assigneePersonId: original.assigneePersonId,
           // The pieces stay where the original belongs: same feature, same
           // area, same themes, same kind. A split changes the size, not the place.
           featureId: original.featureId,

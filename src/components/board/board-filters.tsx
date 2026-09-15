@@ -6,7 +6,7 @@ import { ListFilter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import type { CardView, Member } from "@/modules/boards/types";
+import type { CardView, PersonRef } from "@/modules/boards/types";
 import type { StructureLookup } from "./card-chips";
 
 export type Filters = {
@@ -25,11 +25,11 @@ export function applyFilters(cards: CardView[], filters: Filters): CardView[] {
   const text = filters.text.trim().toLowerCase();
   return cards.filter((card) => {
     if (text && !`${card.number} ${card.title}`.toLowerCase().includes(text)) return false;
-    if (filters.assignee === "unassigned" && card.assigneeUserId) return false;
+    if (filters.assignee === "unassigned" && card.assigneePersonId) return false;
     if (
       filters.assignee &&
       filters.assignee !== "unassigned" &&
-      card.assigneeUserId !== filters.assignee
+      card.assigneePersonId !== filters.assignee
     )
       return false;
     if (filters.themeId === "none" && card.themeIds.length > 0) return false;
@@ -56,13 +56,13 @@ export function hasFilters(filters: Filters): boolean {
 export function BoardFilters({
   filters,
   onChange,
-  members,
+  people,
   structure,
   collapsible = false,
 }: {
   filters: Filters;
   onChange: (filters: Filters) => void;
-  members: Member[];
+  people: PersonRef[];
   structure: StructureLookup;
   /** In a narrow column: only the search stands out; the selects wait behind a counted "Filtre" button. */
   collapsible?: boolean;
@@ -96,9 +96,9 @@ export function BoardFilters({
       >
         <option value="">{t("anyone")}</option>
         <option value="unassigned">{t("unassigned")}</option>
-        {members.map((member) => (
-          <option key={member.userId} value={member.userId}>
-            {member.name}
+        {people.map((person) => (
+          <option key={person.id} value={person.id}>
+            {person.name}
           </option>
         ))}
       </NativeSelect>

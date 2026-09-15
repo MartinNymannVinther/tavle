@@ -8,7 +8,7 @@ import { PropertyGroup, PropertyRow } from "@/components/ui/property-row";
 import { Textarea } from "@/components/ui/textarea";
 import type { Area, Column, Priority, Sprint, Theme } from "@/core/db/schema";
 import { PRIORITIES } from "@/core/db/schema";
-import type { CardDetail, ItemView, Member } from "@/modules/boards/types";
+import type { CardDetail, ItemView, PersonRef } from "@/modules/boards/types";
 import { moveCardAction, updateCardAction } from "@/modules/boards/actions-cards";
 import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
 import type { Run } from "@/components/board/use-board-actions";
@@ -31,7 +31,7 @@ export function CardSidePanel({
   areas,
   features,
   sprints,
-  members,
+  people,
   scrum,
   view,
   run,
@@ -43,7 +43,7 @@ export function CardSidePanel({
   areas: Area[];
   features: ItemView[];
   sprints: Sprint[];
-  members: Member[];
+  people: PersonRef[];
   scrum: boolean;
   view: StructureView;
   run: Run;
@@ -108,13 +108,13 @@ export function CardSidePanel({
           <NativeSelect
             id="card-assignee"
             variant="xs"
-            value={card.assigneeUserId ?? ""}
-            onChange={(event) => void update({ assigneeUserId: event.target.value || null })}
+            value={card.assigneePersonId ?? ""}
+            onChange={(event) => void update({ assigneePersonId: event.target.value || null })}
           >
             <option value="">{t("nobody")}</option>
-            {members.map((member) => (
-              <option key={member.userId} value={member.userId}>
-                {member.name}
+            {people.map((person) => (
+              <option key={person.id} value={person.id}>
+                {person.name}
               </option>
             ))}
           </NativeSelect>

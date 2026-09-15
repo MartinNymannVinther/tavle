@@ -429,6 +429,27 @@
         "invalid": "Skriv en gyldig e-mailadresse.",
         "generic": "Det gik galt. Prøv igen."
       }
+    },
+    "people": {
+      "title": "Personer",
+      "body": "Dem arbejdet kan lægges hos — med eller uden login. En kollega kan stå her, før de er inviteret; når deres login kommer, tilknyttes det selv via e-mailadressen.",
+      "name": "Navn",
+      "email": "E-mail",
+      "login": "Login",
+      "linked": "Tilknyttet",
+      "unlinked": "Uden login",
+      "rename": "Omdøb",
+      "save": "Gem",
+      "cancel": "Annullér",
+      "link": "Tilknyt login…",
+      "unlink": "Fjern tilknytning",
+      "remove": "Fjern",
+      "addName": "Navn på ny person",
+      "addEmail": "E-mail (valgfri)",
+      "add": "Tilføj person",
+      "errors": {
+        "generic": "Det lykkedes ikke. Prøv igen."
+      }
     }
   },
   "demo": {

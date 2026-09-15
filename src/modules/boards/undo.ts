@@ -7,6 +7,7 @@ import { moveCard, updateCard, type CardUpdate } from "./write-cards";
 import { deleteComment } from "./comments";
 import { cardInWorkspace, columnInBoard, joiningSort, laneFor } from "./lanes";
 import { canManage, roleOf } from "./members";
+import { people } from "@/core/db/schema";
 import { closeItem, type CloseOutcome } from "./structure/close";
 import { placeCardInStructure } from "./structure/write-card-placement";
 import { placeItemInStructure, restoreSubtree } from "./structure/place-item";
@@ -66,11 +67,30 @@ async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): P
     case "card.place":
       if (!(await placeCardInStructure(tx, ctx, { ...step }))) throw new NotUndoable();
       return;
-    case "card.update":
-      if (!(await updateCard(tx, ctx, step.cardId, step.fields as CardUpdate))) {
+    case "card.update": {
+      // Steps written before docs/adr/0029 name the assignee by login;
+      // the person that login stands behind is the same fact today. A
+      // login that left no person means the world moved on: not undoable.
+      const { assigneeUserId, ...fields } = step.fields;
+      const update: CardUpdate = fields as CardUpdate;
+      if (assigneeUserId !== undefined) {
+        if (assigneeUserId === null) {
+          update.assigneePersonId = null;
+        } else {
+          const [person] = await tx
+            .select({ id: people.id })
+            .from(people)
+            .where(and(eq(people.orgId, ctx.orgId), eq(people.userId, assigneeUserId)))
+            .limit(1);
+          if (!person) throw new NotUndoable();
+          update.assigneePersonId = person.id;
+        }
+      }
+      if (!(await updateCard(tx, ctx, step.cardId, update))) {
         throw new NotUndoable();
       }
       return;
+    }
     case "card.delete":
       if (!(await deleteCard(tx, ctx, step.cardId))) throw new NotUndoable();
       return;

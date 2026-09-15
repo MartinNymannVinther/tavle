@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { addDaysIso, todayInCopenhagen } from "@/core/dates";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
+import { ownPerson } from "@/modules/boards/people";
 import { createBoard } from "@/modules/boards/write-boards";
 import { updateChecklist } from "@/modules/boards/write-card-details";
 import { createCard, moveCard, updateCard } from "@/modules/boards/write-cards";
@@ -33,11 +34,13 @@ export async function seedDemoWorkspace(
   locale: "da" | "en",
 ): Promise<string> {
   const words = locale === "da" ? DEMO_DA : DEMO_EN;
+  // The visitor's person: made by the membership trigger (docs/adr/0029).
+  const me = (await ownPerson(tx, ctx))?.id ?? null;
   const today = todayInCopenhagen();
   const day = (offset: number) => addDaysIso(today, offset);
 
-  const kanban = await seedKanban(tx, ctx, words);
-  const scrum = await seedScrum(tx, ctx, words, day);
+  const kanban = await seedKanban(tx, ctx, words, me);
+  const scrum = await seedScrum(tx, ctx, words, day, me);
   await shiftHistory(tx, ctx, [...kanban.seeded.aged, ...scrum.aged]);
   return kanban.boardId;
 }
@@ -46,6 +49,7 @@ async function seedKanban(
   tx: AppTransaction,
   ctx: OrgContext,
   words: DemoWords,
+  me: string | null,
 ): Promise<{ boardId: string; seeded: SeededStructure }> {
   const board = await createBoard(tx, ctx, {
     name: words.kanban.name,
@@ -67,7 +71,7 @@ async function seedKanban(
       priority: spec.priority ?? "normal",
       dueDate:
         spec.dueOffset === undefined ? null : addDaysIso(todayInCopenhagen(), spec.dueOffset),
-      assigneeUserId: i % 3 === 0 ? ctx.userId : null,
+      assigneePersonId: i % 3 === 0 ? me : null,
       bug: spec.bug ?? false,
       kind: spec.enabler ? "enabler" : undefined,
       enablerType: spec.enabler ?? null,
@@ -98,6 +102,7 @@ async function seedScrum(
   ctx: OrgContext,
   words: DemoWords,
   day: (offset: number) => string,
+  me: string | null,
 ): Promise<SeededStructure> {
   const board = await createBoard(tx, ctx, {
     name: words.scrum.name,
@@ -126,7 +131,7 @@ async function seedScrum(
         boardId: board.id,
         title: spec.title,
         estimate: spec.estimate,
-        assigneeUserId: ctx.userId,
+        assigneePersonId: me,
         bug: spec.bug ?? false,
         kind: spec.enabler ? "enabler" : undefined,
         enablerType: spec.enabler ?? null,
@@ -157,7 +162,7 @@ async function seedScrum(
       title: spec.title,
       estimate: spec.estimate,
       priority: spec.priority ?? "normal",
-      assigneeUserId: spec.mine ? ctx.userId : null,
+      assigneePersonId: spec.mine ? me : null,
       bug: spec.bug ?? false,
       kind: spec.enabler ? "enabler" : undefined,
       enablerType: spec.enabler ?? null,

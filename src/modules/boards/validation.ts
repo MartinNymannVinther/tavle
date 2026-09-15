@@ -97,7 +97,7 @@ export const NewCardSchema = z.object({
   estimate: estimate.optional(),
   priority: z.enum(PRIORITIES).optional(),
   dueDate: isoDate.nullable().optional(),
-  assigneeUserId: id.nullable().optional(),
+  assigneePersonId: id.nullable().optional(),
   /** Its place in the structure; a card without a feature needs an area. */
   featureId: id.nullable().optional(),
   areaId: id.nullable().optional(),
@@ -120,7 +120,7 @@ export const CardUpdateSchema = z.object({
   estimate: estimate.optional(),
   priority: z.enum(PRIORITIES).optional(),
   dueDate: isoDate.nullable().optional(),
-  assigneeUserId: id.nullable().optional(),
+  assigneePersonId: id.nullable().optional(),
   blocked: z.boolean().optional(),
   blockedReason: shortText(300).optional(),
   acceptance: shortText(4000).optional(),
@@ -233,6 +233,15 @@ export const RetroSchema = z.object({
 });
 
 export const SprintSummarySchema = z.object({ sprintId: id, summary: shortText(6000) });
+
+/** The roster (docs/adr/0029): a person by name, a login attached by hand. */
+export const PersonCreateSchema = z.object({
+  name: shortText(80).min(1),
+  email: z.union([z.email().max(320), z.literal("")]).optional(),
+});
+export const PersonRenameSchema = z.object({ personId: id, name: shortText(80).min(1) });
+export const PersonIdSchema = z.object({ personId: id });
+export const PersonLinkSchema = z.object({ personId: id, userId: z.string().min(1).max(64) });
 
 /** Dates the wrong way round are swapped rather than refused; people type fast. */
 export function orderedDates(start: string, end: string): [string, string] {

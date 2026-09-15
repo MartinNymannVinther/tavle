@@ -17,6 +17,7 @@ import { createTheme } from "@/modules/boards/structure/write-lists";
 import { archiveCard, deleteCard, restoreCard } from "@/modules/boards/write-card-lifecycle";
 import { createCard, moveCard, updateCard } from "@/modules/boards/write-cards";
 import { Conflict } from "@/modules/boards/lanes";
+import { ownPerson } from "@/modules/boards/people";
 import { adminPool } from "../helpers/db";
 import { seedMember, seedWorkspace } from "../helpers/workspace";
 
@@ -36,6 +37,10 @@ let areaId: string;
 let colId: Record<string, string>;
 
 const run = <T>(fn: Parameters<typeof withOrgContext<T>>[1], as = ctx) => withOrgContext(as, fn);
+
+/** The person the membership trigger made for a login (docs/adr/0029). */
+const personOf = (as: OrgContext, userId: string) =>
+  run(async (tx) => (await ownPerson(tx, { orgId: as.orgId, userId }))!.id, as);
 
 beforeAll(async () => {
   admin = adminPool();
@@ -127,13 +132,14 @@ describe("a Kanban board", () => {
 
   it("edits the fields, names the assignee, and refuses a stale edit", async () => {
     const before = (await getCardFull(ctx, boardId, 2))!.card;
+    const a2 = await personOf(ctx, "user_flow_a2");
     await run((tx) =>
       updateCard(tx, ctx, before.id, {
         title: "Anden, omdøbt",
         estimate: 5,
         priority: "high",
         dueDate: "2026-10-01",
-        assigneeUserId: "user_flow_a2",
+        assigneePersonId: a2,
         blocked: true,
         blockedReason: "Venter på design",
       }),
@@ -162,11 +168,10 @@ describe("a Kanban board", () => {
     expect(events).toContain("card.blocked");
   });
 
-  it("refuses an assignee who is not a member of the workspace", async () => {
+  it("refuses an assignee from another workspace's roster", async () => {
     const card = (await getCardFull(ctx, boardId, 2))!.card;
-    const result = await run((tx) =>
-      updateCard(tx, ctx, card.id, { assigneeUserId: other.userId }),
-    );
+    const foreign = await personOf(other, other.userId);
+    const result = await run((tx) => updateCard(tx, ctx, card.id, { assigneePersonId: foreign }));
     expect(result).toBeNull();
   });
 

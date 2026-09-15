@@ -1,5 +1,5 @@
 import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
-import { boards, cards, columns, sprints, type BoardMode } from "@/core/db/schema";
+import { boards, cards, columns, people, sprints, type BoardMode } from "@/core/db/schema";
 import { withOrgContext, type OrgContext } from "@/core/db/tenant";
 import { toViews } from "./read";
 import type { BoardSummary, MyCard } from "./types";
@@ -72,9 +72,11 @@ export async function listMyCards(ctx: OrgContext): Promise<MyCard[]> {
       .from(cards)
       .innerJoin(boards, eq(boards.id, cards.boardId))
       .innerJoin(columns, eq(columns.id, cards.columnId))
+      // "Mine" means the person my login stands behind (docs/adr/0029).
+      .innerJoin(people, eq(people.id, cards.assigneePersonId))
       .where(
         and(
-          eq(cards.assigneeUserId, ctx.userId),
+          eq(people.userId, ctx.userId),
           isNull(cards.archivedAt),
           isNull(boards.archivedAt),
           sql`${columns.category} <> 'done'`,

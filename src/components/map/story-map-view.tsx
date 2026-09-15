@@ -163,7 +163,7 @@ export function StoryMapView({ full }: { full: BoardFull }) {
         <BoardFilters
           filters={filters}
           onChange={setFilters}
-          members={full.members}
+          people={full.people}
           structure={structure}
         />
         <label className="text-meta flex items-center gap-1.5 text-2sm">

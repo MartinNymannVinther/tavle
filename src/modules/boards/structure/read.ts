@@ -11,9 +11,9 @@ import {
 } from "@/core/db/schema";
 import { withOrgContext, type OrgContext } from "@/core/db/tenant";
 import { itemEvents } from "../events";
-import { boardAreas, boardInWorkspace, boardThemes, itemViews, membersOf } from "../read";
+import { boardAreas, boardInWorkspace, boardThemes, itemViews, rosterOf } from "../read";
 import type { BoardEvent } from "@/core/db/schema";
-import type { ItemView, Member } from "../types";
+import type { ItemView } from "../types";
 import { reviewDue } from "./rules";
 
 /**
@@ -55,7 +55,6 @@ export type ItemFull = {
   areas: Area[];
   /** The board's sprints, oldest first — the axis a feature plans on (docs/adr/0023). */
   sprints: Sprint[];
-  members: Member[];
   events: BoardEvent[];
   reviewDue: boolean;
 };
@@ -80,7 +79,7 @@ export async function getItemFull(
       : undefined;
     const [parent] = parentRow ? await itemViews(tx, [parentRow]) : [null];
 
-    const members = await membersOf(tx, ctx.orgId);
+    const roster = await rosterOf(tx, ctx.orgId);
     const features: ChildFeature[] = [];
     const stories: ChildStory[] = [];
     let doneStories = 0;
@@ -138,7 +137,7 @@ export async function getItemFull(
           blocked: cards.blocked,
           areaId: cards.areaId,
           sprintId: cards.sprintId,
-          assigneeUserId: cards.assigneeUserId,
+          assigneePersonId: cards.assigneePersonId,
           columnName: columns.name,
           category: columns.category,
         })
@@ -146,13 +145,13 @@ export async function getItemFull(
         .innerJoin(columns, eq(columns.id, cards.columnId))
         .where(and(eq(cards.featureId, row.id), isNull(cards.archivedAt)))
         .orderBy(asc(columns.sort), asc(cards.sort), asc(cards.number));
-      const nameOf = new Map(members.map((m) => [m.userId, m.name]));
+      const nameOf = new Map(roster.map((p) => [p.id, p.name]));
       for (const story of storyRows) {
         if (story.category === "done") doneStories += 1;
-        const { assigneeUserId, ...rest } = story;
+        const { assigneePersonId, ...rest } = story;
         stories.push({
           ...rest,
-          assigneeName: assigneeUserId ? (nameOf.get(assigneeUserId) ?? null) : null,
+          assigneeName: assigneePersonId ? (nameOf.get(assigneePersonId) ?? null) : null,
         });
       }
     }
@@ -180,7 +179,6 @@ export async function getItemFull(
         .from(sprints)
         .where(eq(sprints.boardId, boardId))
         .orderBy(asc(sprints.startDate)),
-      members,
       events: await itemEvents(tx, row.id),
       reviewDue: reviewDue(row, board.epicReviewDays),
     };

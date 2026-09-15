@@ -56,7 +56,7 @@ export function card(partial: Partial<CardView> & Pick<CardView, "id" | "title">
     bug: false,
     number: 1,
     sort: 1000,
-    assigneeUserId: null,
+    assigneePersonId: null,
     estimate: null,
     priority: "normal",
     dueDate: null,
@@ -258,4 +258,5 @@ export const board: BoardFull = {
   sprints: [],
   activeSprint: null,
   members: [],
+  people: [],
 };

@@ -8,6 +8,7 @@ import {
   columns,
   comments,
   memberships,
+  people,
   sprints,
   swimlanes,
   themes,
@@ -20,7 +21,7 @@ import {
 import { withOrgContext, type AppTransaction, type OrgContext } from "@/core/db/tenant";
 import { cardEvents } from "./events";
 import { themeIdsByItem } from "./structure/items";
-import type { BoardFull, CardFull, CardView, ItemView, Member } from "./types";
+import type { BoardFull, CardFull, CardView, ItemView, Member, PersonRef } from "./types";
 
 /**
  * Everything the pages read, through the workspace's own context. A board
@@ -43,6 +44,15 @@ export async function membersOf(tx: AppTransaction, orgId: string): Promise<Memb
     .orderBy(asc(users.name));
 }
 
+/** The roster as the pickers need it: id, name, and whether a login stands behind it. */
+export async function rosterOf(tx: AppTransaction, orgId: string): Promise<PersonRef[]> {
+  return tx
+    .select({ id: people.id, name: people.name, userId: people.userId })
+    .from(people)
+    .where(eq(people.orgId, orgId))
+    .orderBy(asc(people.name));
+}
+
 /** Resolves rows of cards into views: names, theme ids, checklist and comment counts. */
 export async function toViews(tx: AppTransaction, rows: Card[]): Promise<CardView[]> {
   if (rows.length === 0) return [];
@@ -56,15 +66,15 @@ export async function toViews(tx: AppTransaction, rows: Card[]): Promise<CardVie
     .from(comments)
     .where(inArray(comments.cardId, ids))
     .groupBy(comments.cardId);
-  const assigneeIds = [...new Set(rows.map((c) => c.assigneeUserId).filter(Boolean))] as string[];
-  const people =
+  const assigneeIds = [...new Set(rows.map((c) => c.assigneePersonId).filter(Boolean))] as string[];
+  const assignees =
     assigneeIds.length > 0
       ? await tx
-          .select({ id: users.id, name: users.name })
-          .from(users)
-          .where(inArray(users.id, assigneeIds))
+          .select({ id: people.id, name: people.name })
+          .from(people)
+          .where(inArray(people.id, assigneeIds))
       : [];
-  const nameOf = new Map(people.map((p) => [p.id, p.name]));
+  const nameOf = new Map(assignees.map((p) => [p.id, p.name]));
   const themesOf = new Map<string, string[]>();
   for (const row of themeRows) {
     themesOf.set(row.cardId, [...(themesOf.get(row.cardId) ?? []), row.themeId]);
@@ -75,7 +85,7 @@ export async function toViews(tx: AppTransaction, rows: Card[]): Promise<CardVie
   return rows.map(({ description, acceptance, blockedReason, checklist, ...card }) => ({
     ...card,
     descriptionPreview: description.replace(/\s+/g, " ").trim().slice(0, 200),
-    assigneeName: card.assigneeUserId ? (nameOf.get(card.assigneeUserId) ?? null) : null,
+    assigneeName: card.assigneePersonId ? (nameOf.get(card.assigneePersonId) ?? null) : null,
     themeIds: themesOf.get(card.id) ?? [],
     checklistDone: checklist.filter((item) => item.done).length,
     checklistTotal: checklist.length,
@@ -126,21 +136,31 @@ export async function getBoardFull(ctx: OrgContext, boardId: string): Promise<Bo
   return withOrgContext(ctx, async (tx) => {
     const board = await boardInWorkspace(tx, boardId);
     if (!board) return null;
-    const [columnRows, themeRows, areaRows, swimlaneRows, itemRows, sprintRows, cardRows, members] =
-      await Promise.all([
-        tx.select().from(columns).where(eq(columns.boardId, boardId)).orderBy(asc(columns.sort)),
-        boardThemes(tx, boardId),
-        boardAreas(tx, boardId),
-        boardSwimlanes(tx, boardId),
-        boardItems(tx, boardId),
-        tx.select().from(sprints).where(eq(sprints.boardId, boardId)).orderBy(desc(sprints.number)),
-        tx
-          .select()
-          .from(cards)
-          .where(and(eq(cards.boardId, boardId), isNull(cards.archivedAt)))
-          .orderBy(asc(cards.sort), asc(cards.number)),
-        membersOf(tx, ctx.orgId),
-      ]);
+    const [
+      columnRows,
+      themeRows,
+      areaRows,
+      swimlaneRows,
+      itemRows,
+      sprintRows,
+      cardRows,
+      members,
+      roster,
+    ] = await Promise.all([
+      tx.select().from(columns).where(eq(columns.boardId, boardId)).orderBy(asc(columns.sort)),
+      boardThemes(tx, boardId),
+      boardAreas(tx, boardId),
+      boardSwimlanes(tx, boardId),
+      boardItems(tx, boardId),
+      tx.select().from(sprints).where(eq(sprints.boardId, boardId)).orderBy(desc(sprints.number)),
+      tx
+        .select()
+        .from(cards)
+        .where(and(eq(cards.boardId, boardId), isNull(cards.archivedAt)))
+        .orderBy(asc(cards.sort), asc(cards.number)),
+      membersOf(tx, ctx.orgId),
+      rosterOf(tx, ctx.orgId),
+    ]);
     return {
       board,
       columns: columnRows,
@@ -152,6 +172,7 @@ export async function getBoardFull(ctx: OrgContext, boardId: string): Promise<Bo
       sprints: sprintRows,
       activeSprint: sprintRows.find((s) => s.state === "active") ?? null,
       members,
+      people: roster,
     };
   });
 }
@@ -178,7 +199,7 @@ export async function getCardFull(
       areaRows,
       featureRows,
       sprintRows,
-      members,
+      roster,
       commentRows,
       eventRows,
     ] = await Promise.all([
@@ -195,7 +216,7 @@ export async function getCardFull(
         .from(sprints)
         .where(and(eq(sprints.boardId, boardId), inArray(sprints.state, ["planned", "active"])))
         .orderBy(asc(sprints.number)),
-      membersOf(tx, ctx.orgId),
+      rosterOf(tx, ctx.orgId),
       tx
         .select({
           id: comments.id,
@@ -230,7 +251,7 @@ export async function getCardFull(
         featureRows.filter((f) => f.state === "open" || f.id === row.featureId),
       ),
       sprints: sprintRows,
-      members,
+      people: roster,
       comments: commentRows,
       events: eventRows,
     };

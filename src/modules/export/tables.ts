@@ -25,6 +25,7 @@ export type ExportTable = {
 };
 
 export const EXPORT_TABLES: ExportTable[] = [
+  { table: "people", sheet: "Personer", orderBy: "created_at" },
   { table: "boards", sheet: "Tavler", orderBy: "created_at" },
   { table: "columns", sheet: "Kolonner", orderBy: "board_id, sort" },
   { table: "backlog_items", sheet: "Epics og features", orderBy: "board_id, number" },

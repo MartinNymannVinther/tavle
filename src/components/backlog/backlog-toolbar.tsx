@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { SegmentedChoice } from "@/components/ui/segmented";
 import { BoardFilters, type Filters } from "@/components/board/board-filters";
 import type { StructureLookup } from "@/components/board/card-chips";
-import type { Member } from "@/modules/boards/types";
+import type { PersonRef } from "@/modules/boards/types";
 import { GROUPINGS, type Grouping } from "./group-backlog";
 
 /**
@@ -17,14 +17,14 @@ export function BacklogToolbar({
   onGrouping,
   filters,
   onFilters,
-  members,
+  people,
   structure,
 }: {
   grouping: Grouping;
   onGrouping: (grouping: Grouping) => void;
   filters: Filters;
   onFilters: (filters: Filters) => void;
-  members: Member[];
+  people: PersonRef[];
   structure: StructureLookup;
 }) {
   const g = useTranslations("backlog.grouping");
@@ -39,7 +39,7 @@ export function BacklogToolbar({
       <BoardFilters
         filters={filters}
         onChange={onFilters}
-        members={members}
+        people={people}
         structure={structure}
         collapsible
       />

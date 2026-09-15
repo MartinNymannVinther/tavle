@@ -404,7 +404,7 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
               onGrouping={setGrouping}
               filters={filters}
               onFilters={setFilters}
-              members={full.members}
+              people={full.people}
               structure={structure}
             />
             <SelectionBar

@@ -16,6 +16,8 @@ const cardFields = z
     priority: z.enum(["low", "normal", "high", "urgent"]),
     dueDate: z.string().nullable(),
     estimate: z.number().nullable(),
+    assigneePersonId: z.string().nullable(),
+    /** Written before docs/adr/0029; the undo maps the login to its person. */
     assigneeUserId: z.string().nullable(),
     blocked: z.boolean(),
     blockedReason: z.string(),

@@ -429,6 +429,27 @@
         "invalid": "Type a valid e-mail address.",
         "generic": "That went wrong. Try again."
       }
+    },
+    "people": {
+      "title": "People",
+      "body": "Who work can be assigned to — with or without a login. A colleague can stand here before they are invited; when their login arrives it attaches itself by the e-mail address.",
+      "name": "Name",
+      "email": "E-mail",
+      "login": "Login",
+      "linked": "Linked",
+      "unlinked": "No login",
+      "rename": "Rename",
+      "save": "Save",
+      "cancel": "Cancel",
+      "link": "Link login…",
+      "unlink": "Unlink",
+      "remove": "Remove",
+      "addName": "Name of new person",
+      "addEmail": "E-mail (optional)",
+      "add": "Add person",
+      "errors": {
+        "generic": "That did not work. Try again."
+      }
     }
   },
   "demo": {

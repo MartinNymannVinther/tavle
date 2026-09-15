@@ -21,7 +21,7 @@ import {
   nextNumber,
   placeCard,
 } from "./lanes";
-import { memberInWorkspace } from "./members";
+import { personInWorkspace } from "./people";
 import { boardInWorkspace } from "./read";
 import { inheritedFrom, resolveNew } from "./structure/inherit";
 import { itemInBoard } from "./structure/items";
@@ -49,7 +49,7 @@ export type NewCardInput = {
   estimate?: number | null;
   priority?: Priority;
   dueDate?: string | null;
-  assigneeUserId?: string | null;
+  assigneePersonId?: string | null;
   /** The feature the card is part of; area, themes and kind are inherited from it unless given. */
   featureId?: string | null;
   areaId?: string | null;
@@ -88,7 +88,7 @@ export async function createCard(
     if (sprint.state === "closed") throw new Error("invalid");
     sprintId = sprint.id;
   }
-  const assignee = await memberInWorkspace(tx, input.assigneeUserId);
+  const assignee = await personInWorkspace(tx, input.assigneePersonId);
   // Rule 1 and 3 of the structure: a parent is a feature on this board, and
   // a card without one needs an area. What the caller left out is the
   // parent's.
@@ -136,7 +136,7 @@ export async function createCard(
       title: input.title,
       description: input.description ?? "",
       sort,
-      assigneeUserId: assignee?.id ?? null,
+      assigneePersonId: assignee?.id ?? null,
       estimate: input.estimate ?? null,
       priority: input.priority ?? "normal",
       dueDate: input.dueDate ?? null,
@@ -228,7 +228,7 @@ export type CardUpdate = {
   estimate?: number | null;
   priority?: Priority;
   dueDate?: string | null;
-  assigneeUserId?: string | null;
+  assigneePersonId?: string | null;
   blocked?: boolean;
   blockedReason?: string;
   bug?: boolean;
@@ -337,23 +337,23 @@ export async function updateCard(
       },
     );
   }
-  if (input.assigneeUserId !== undefined && input.assigneeUserId !== card.assigneeUserId) {
-    const member = await memberInWorkspace(tx, input.assigneeUserId);
-    if (input.assigneeUserId && !member) return null;
-    patch.assigneeUserId = member?.id ?? null;
+  if (input.assigneePersonId !== undefined && input.assigneePersonId !== card.assigneePersonId) {
+    const person = await personInWorkspace(tx, input.assigneePersonId);
+    if (input.assigneePersonId && !person) return null;
+    patch.assigneePersonId = person?.id ?? null;
     await recordEvent(
       tx,
       ctx,
       card.boardId,
-      member ? "card.assigned" : "card.unassigned",
-      { key, title: card.title, name: member?.name ?? "" },
+      person ? "card.assigned" : "card.unassigned",
+      { key, title: card.title, name: person?.name ?? "" },
       {
         cardId: card.id,
         actor,
         undo: {
           kind: "card.update",
           cardId: card.id,
-          fields: { assigneeUserId: card.assigneeUserId },
+          fields: { assigneePersonId: card.assigneePersonId },
         },
       },
     );

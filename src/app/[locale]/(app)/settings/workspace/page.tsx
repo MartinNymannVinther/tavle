@@ -7,9 +7,11 @@ import { memberships, organizations } from "@/core/db/schema";
 import { withOrgContext } from "@/core/db/tenant";
 import { listPendingInvitations } from "@/core/team/service";
 import { redirect } from "@/i18n/navigation";
+import { peopleOf, unlinkedMembers } from "@/modules/boards/people";
 import { currentRole, listMembers } from "@/modules/export/workspace";
 import { DeleteWorkspaceCard } from "./delete-workspace-card";
 import { MembersAdmin } from "./members-admin";
+import { PeopleAdmin } from "./people-admin";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("settings.workspace");
@@ -30,7 +32,7 @@ export default async function WorkspaceSettingsPage() {
   }
 
   const t = await getTranslations("settings.workspace");
-  const [workspace, memberRows] = await withOrgContext(context, async (tx) => {
+  const [workspace, memberRows, roster, linkable] = await withOrgContext(context, async (tx) => {
     const [org] = await tx
       .select({ name: organizations.name, createdAt: organizations.createdAt })
       .from(organizations)
@@ -40,7 +42,12 @@ export default async function WorkspaceSettingsPage() {
       .select({ id: memberships.id, userId: memberships.userId })
       .from(memberships)
       .where(eq(memberships.organizationId, context.orgId));
-    return [org, rows] as const;
+    return [
+      org,
+      rows,
+      await peopleOf(tx, context.orgId),
+      await unlinkedMembers(tx, context),
+    ] as const;
   });
   const members = await listMembers(context);
   const role = (await currentRole(context)) ?? "member";
@@ -64,6 +71,12 @@ export default async function WorkspaceSettingsPage() {
         invitations={invitations}
         currentUserId={context.userId}
         role={role}
+      />
+
+      <PeopleAdmin
+        people={roster.map(({ id, name, email, userId }) => ({ id, name, email, userId }))}
+        linkable={linkable}
+        canManage={role === "owner" || role === "admin"}
       />
 
       {role === "owner" && workspace && <DeleteWorkspaceCard workspaceName={workspace.name} />}

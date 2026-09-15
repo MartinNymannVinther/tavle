@@ -62,6 +62,31 @@ export type ChecklistItem = { id: string; title: string; done: boolean };
 /** What the team wrote down at the end of a sprint. */
 export type Retro = { wentWell: string; improve: string; actions: string };
 
+/**
+ * The workspace's roster (docs/adr/0029): the people work is assigned
+ * to. A person may stand alone — a colleague not signed up yet — or
+ * carry a login through `user_id`; the invitation flow links the two by
+ * e-mail when the login arrives. Actors (who *did* something) stay real
+ * users; only responsibility points here.
+ */
+export const people = pgTable(
+  "people",
+  {
+    id: domainId("id"),
+    orgId: tenant(),
+    name: text("name").notNull(),
+    /** Where the invitation will go, and the key the auto-link matches on. */
+    email: text("email"),
+    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [
+    // One person per login per workspace; unlinked rows (null) may repeat.
+    uniqueIndex("people_org_user_uq").on(t.orgId, t.userId),
+    index("people_org_idx").on(t.orgId),
+  ],
+);
+
 export const boards = pgTable(
   "boards",
   {
@@ -209,7 +234,9 @@ export const cards = pgTable(
     description: text("description").notNull().default(""),
     /** Position within its lane (column, or the backlog). Rewritten as whole numbers on every move. */
     sort: doublePrecision("sort").notNull().default(0),
-    assigneeUserId: text("assignee_user_id").references(() => users.id, { onDelete: "set null" }),
+    assigneePersonId: text("assignee_person_id").references(() => people.id, {
+      onDelete: "set null",
+    }),
     /** Story points or any unit the team agrees on; null is unestimated. */
     estimate: integer("estimate"),
     priority: text("priority").notNull().default("normal"),
@@ -229,7 +256,7 @@ export const cards = pgTable(
     uniqueIndex("cards_board_number_uq").on(t.boardId, t.number),
     index("cards_board_column_idx").on(t.boardId, t.columnId, t.sort),
     index("cards_sprint_idx").on(t.sprintId),
-    index("cards_assignee_idx").on(t.assigneeUserId),
+    index("cards_assignee_idx").on(t.assigneePersonId),
     index("cards_feature_idx").on(t.featureId),
     // The FK's set-null on swimlane delete walks this; without it every
     // lane row deleted in a cascade seq-scans the whole cards table.
@@ -316,6 +343,7 @@ export const events = pgTable(
   ],
 );
 
+export type Person = typeof people.$inferSelect;
 export type Board = typeof boards.$inferSelect;
 export type Column = typeof columns.$inferSelect;
 export type Swimlane = typeof swimlanes.$inferSelect;
