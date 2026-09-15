@@ -6,12 +6,13 @@ import { formatDateDa } from "@/core/dates";
 import type { Sprint } from "@/core/db/schema";
 import type { StructureLookup } from "@/components/board/card-chips";
 import type { CardView } from "@/modules/boards/types";
-import { setCardsSprintAction, startSprintAction } from "@/modules/boards/actions-sprints";
+import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
 import { Link } from "@/i18n/navigation";
 import type { Run } from "@/components/board/use-board-actions";
 import { FoldButton } from "./backlog-bits";
 import { BacklogRow } from "./backlog-row";
 import { SprintForm } from "./sprint-form";
+import { StartSprint } from "./start-sprint";
 
 /**
  * A sprint on the planning page: its dates and goal, the points it
@@ -107,15 +108,7 @@ export function SprintPlan({
                 {t("toBoard")}
               </Link>
             ) : (
-              <Button
-                type="button"
-                size="xs"
-                disabled={!canStart}
-                title={canStart ? undefined : t("anotherActive")}
-                onClick={() => void run(() => startSprintAction({ sprintId: sprint.id }))}
-              >
-                {t("start")}
-              </Button>
+              <StartSprint sprint={sprint} canStart={canStart} run={run} />
             )}
           </div>
         )}

@@ -822,7 +822,11 @@
       "toBoard": "Se tavlen",
       "empty": "Ingen kort endnu. Vælg kort i backloggen og læg dem her.",
       "toBacklog": "Flyt {count, plural, one {# kort} other {# kort}} til backloggen",
-      "againstAverage": "snittet er {average}"
+      "againstAverage": "snittet er {average}",
+      "startAskTitle": "Start {name}",
+      "startAskBody": "Sprinten var planlagt til at starte {planned}. Skal datoerne flyttes, så den starter i dag ({today}) og beholder sin længde?",
+      "startKeep": "Behold de planlagte datoer",
+      "startToday": "Flyt til i dag og start"
     },
     "sprintForm": {
       "defaultName": "Sprint {number}",

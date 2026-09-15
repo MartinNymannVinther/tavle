@@ -822,7 +822,11 @@
       "toBoard": "See the board",
       "empty": "No cards yet. Select cards in the backlog and put them here.",
       "toBacklog": "Move {count, plural, one {# card} other {# cards}} to the backlog",
-      "againstAverage": "the average is {average}"
+      "againstAverage": "the average is {average}",
+      "startAskTitle": "Start {name}",
+      "startAskBody": "The sprint was planned to start {planned}. Move the dates so it starts today ({today}) and keeps its length?",
+      "startKeep": "Keep the planned dates",
+      "startToday": "Move to today and start"
     },
     "sprintForm": {
       "defaultName": "Sprint {number}",
