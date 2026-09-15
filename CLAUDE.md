@@ -72,7 +72,9 @@ codebase to:
   bug for a bug, a wrench for enabler work, each with its word for
   assistive technology. The backlog is one flat list in its own order
   with the decomposition as a navigator beside it (ADR 0013), and a row
-  says only what its heading has not. The story map is the team's wall
+  says only what its heading has not; a level picker can raise the list
+  to the feature or epic altitude, where the decomposition folds out as
+  the list itself (ADR 0027). The story map is the team's wall
   (ADR 0015, 0016): the features the team has put up, across the top in
   the story's own order (`map_sort`, never the backlog's rank), sprints
   or columns down, every card in one cell, and a drag on it is the same

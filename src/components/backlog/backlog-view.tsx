@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SegmentedChoice } from "@/components/ui/segmented";
 import { useTranslations } from "next-intl";
 import { applyFilters, NO_FILTERS, type Filters } from "@/components/board/board-filters";
 import { structureOf } from "@/components/board/card-chips";
@@ -27,9 +28,11 @@ import { BacklogToolbar } from "./backlog-toolbar";
 import { backlogStories, grouped, hierarchy, type Group, type Grouping } from "./group-backlog";
 import { GroupedList } from "./grouped-list";
 import { ItemForm } from "./item-form";
+import { ItemBacklog } from "./item-backlog";
 import { SelectionBar } from "./selection-bar";
 import { SprintColumn } from "./sprint-column";
 import { useFolded } from "./use-folded";
+import { usePref } from "./use-pref";
 
 /**
  * The backlog: the decomposition as a navigator on the left and the
@@ -57,6 +60,16 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [dragId, setDragId] = useState<string | null>(null);
+  // The backlog's altitude (docs/adr/0027) and whether the sprints stand
+  // beside it — both remembered per board, like the folds.
+  const [levelPref, setLevelPref] = usePref<"epics" | "features" | "cards">(
+    `tavle.backlog.${board.id}.level`,
+    "cards",
+  );
+  const [sprintsPref, setSprintsPref] = usePref<"on" | "off">(
+    `tavle.backlog.${board.id}.sprints`,
+    "on",
+  );
 
   const all = backlogStories(full);
   const filtered = applyFilters(all, filters);
@@ -126,6 +139,13 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
 
   const rank = (itemId: string, siblingId: string, after: boolean) =>
     void run(() => reorderItemAction({ itemId, siblingId, after }));
+
+  const levelChoice =
+    levelPref === "epics" && view.epics
+      ? "epics"
+      : levelPref === "features" && view.features
+        ? "features"
+        : "cards";
 
   const heading =
     selection.kind === "epic"
@@ -199,94 +219,149 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
         follow={follow}
         aiAvailable={aiAvailable}
       />
-      <div className={cn("grid", view.features && "@2xl:grid-cols-[17rem_minmax(0,1fr)]")}>
-        {view.features && (
-          <aside className="bg-secondary/60 border-hairline hidden border-r p-2 @2xl:block">
-            <BacklogNav
-              {...navProps}
-              isOpen={folded.isOpen}
-              toggle={folded.toggle}
-              showClosed={showClosed}
-              onShowClosed={setShowClosed}
-              onRank={rank}
-              onDropCard={dropOnNav}
-              newFeature={newFeature}
-            />
-          </aside>
-        )}
-        {view.features && (
-          <div className="border-hairline border-b px-4 pt-3 @2xl:hidden">
-            <BacklogNavSelect {...navProps} />
-          </div>
-        )}
-        <div className="flex min-w-0 flex-col">
-          <BacklogHeading
-            selection={selection}
-            tree={tree}
-            boardKey={board.key}
-            boardId={board.id}
-            structure={structure}
-            reviewDays={board.epicReviewDays}
-            cards={stories.length}
-            points={points}
-            newFeature={newFeature}
-            featurePlan={
-              scrum
-                ? (feature) => <FeaturePlanFields item={feature} sprints={full.sprints} run={run} />
-                : undefined
-            }
-          />
-          <BacklogToolbar
-            grouping={grouping}
-            onGrouping={setGrouping}
-            filters={filters}
-            onFilters={setFilters}
-            members={full.members}
-            structure={structure}
-          />
-          <SelectionBar
-            count={backlogIds.length}
-            scrum={scrum}
-            sprints={scrum ? open : []}
-            target={commitTarget}
-            onTarget={setTarget}
-            onCommit={() => void commit()}
-            features={view.features ? openFeatures : []}
-            onPlace={(featureId) => void place(featureId)}
-            onClear={() => setSelected(new Set())}
-          />
-          <div className="border-hairline border-b px-2 py-2">
-            <QuickAdd
-              onAdd={(title, place) =>
-                run(() => createCardAction({ boardId: board.id, title, ...place }))
-              }
-              structure={structure}
-              placeholder={t("addPlaceholder")}
-              defaultWhere={quickAddWhere}
-              boardId={board.id}
-              boardKey={board.key}
-            />
-          </div>
-          {grouping === "list" ? (
-            <BacklogList
-              stories={stories}
-              rows={rows}
-              emptyText={all.length === 0 ? t("empty") : undefined}
-            />
-          ) : (
-            <GroupedList
-              groups={grouped(full, stories, grouping, groupNames)}
-              rows={rows}
-              contextOf={contextOf}
+      {(view.features || scrum) && (
+        <div className="border-hairline flex flex-wrap items-center gap-x-4 gap-y-2 border-b px-4 py-2">
+          {view.features && (
+            <SegmentedChoice
+              value={levelChoice}
+              onChange={setLevelPref}
+              label={t("level.label")}
+              options={[
+                ...(view.epics ? [{ value: "epics" as const, label: t("level.epics") }] : []),
+                { value: "features" as const, label: t("level.features") },
+                { value: "cards" as const, label: t("level.cards") },
+              ]}
+              className="w-fit"
             />
           )}
+          {levelChoice !== "cards" && (
+            <label className="text-meta flex items-center gap-1.5 text-2sm">
+              <input
+                type="checkbox"
+                checked={showClosed}
+                onChange={(event) => setShowClosed(event.target.checked)}
+                className="accent-[var(--primary)]"
+              />
+              {t("nav.showClosed")}
+            </label>
+          )}
+          <span className="flex-1" />
+          {scrum && (
+            <label className="text-meta flex items-center gap-1.5 text-2sm">
+              <input
+                type="checkbox"
+                checked={sprintsPref === "on"}
+                onChange={(event) => setSprintsPref(event.target.checked ? "on" : "off")}
+                className="accent-[var(--primary)]"
+              />
+              {t("showSprints")}
+            </label>
+          )}
         </div>
-      </div>
+      )}
+      {levelChoice !== "cards" ? (
+        <ItemBacklog
+          full={full}
+          level={levelChoice === "epics" ? "epic" : "feature"}
+          structure={structure}
+          tree={tree}
+          run={run}
+          onRankItem={rank}
+          onNudgeCard={nudge}
+          newFeature={newFeature}
+        />
+      ) : (
+        <div className={cn("grid", view.features && "@2xl:grid-cols-[17rem_minmax(0,1fr)]")}>
+          {view.features && (
+            <aside className="bg-secondary/60 border-hairline hidden border-r p-2 @2xl:block">
+              <BacklogNav
+                {...navProps}
+                isOpen={folded.isOpen}
+                toggle={folded.toggle}
+                showClosed={showClosed}
+                onShowClosed={setShowClosed}
+                onRank={rank}
+                onDropCard={dropOnNav}
+                newFeature={newFeature}
+              />
+            </aside>
+          )}
+          {view.features && (
+            <div className="border-hairline border-b px-4 pt-3 @2xl:hidden">
+              <BacklogNavSelect {...navProps} />
+            </div>
+          )}
+          <div className="flex min-w-0 flex-col">
+            <BacklogHeading
+              selection={selection}
+              tree={tree}
+              boardKey={board.key}
+              boardId={board.id}
+              structure={structure}
+              reviewDays={board.epicReviewDays}
+              cards={stories.length}
+              points={points}
+              newFeature={newFeature}
+              featurePlan={
+                scrum
+                  ? (feature) => (
+                      <FeaturePlanFields item={feature} sprints={full.sprints} run={run} />
+                    )
+                  : undefined
+              }
+            />
+            <BacklogToolbar
+              grouping={grouping}
+              onGrouping={setGrouping}
+              filters={filters}
+              onFilters={setFilters}
+              members={full.members}
+              structure={structure}
+            />
+            <SelectionBar
+              count={backlogIds.length}
+              scrum={scrum}
+              sprints={scrum ? open : []}
+              target={commitTarget}
+              onTarget={setTarget}
+              onCommit={() => void commit()}
+              features={view.features ? openFeatures : []}
+              onPlace={(featureId) => void place(featureId)}
+              onClear={() => setSelected(new Set())}
+            />
+            <div className="border-hairline border-b px-2 py-2">
+              <QuickAdd
+                onAdd={(title, place) =>
+                  run(() => createCardAction({ boardId: board.id, title, ...place }))
+                }
+                structure={structure}
+                placeholder={t("addPlaceholder")}
+                defaultWhere={quickAddWhere}
+                boardId={board.id}
+                boardKey={board.key}
+              />
+            </div>
+            {grouping === "list" ? (
+              <BacklogList
+                stories={stories}
+                rows={rows}
+                emptyText={all.length === 0 ? t("empty") : undefined}
+              />
+            ) : (
+              <GroupedList
+                groups={grouped(full, stories, grouping, groupNames)}
+                rows={rows}
+                contextOf={contextOf}
+              />
+            )}
+          </div>
+        </div>
+      )}
       <TypeLegend types={legendTypes(view)} className="border-hairline border-t px-4 py-2" />
     </section>
   );
 
-  if (!scrum) return list;
+  if (!scrum || sprintsPref === "off") return list;
 
   return (
     <div className="grid gap-6 @5xl:grid-cols-[minmax(0,1fr)_20rem]">

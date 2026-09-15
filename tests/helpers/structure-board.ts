@@ -67,6 +67,7 @@ export function card(partial: Partial<CardView> & Pick<CardView, "id" | "title">
     createdBy: null,
     createdAt: at(5),
     updatedAt: at(5),
+    descriptionPreview: "",
     assigneeName: null,
     themeIds: [],
     checklistDone: 0,

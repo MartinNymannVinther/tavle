@@ -127,8 +127,7 @@ export function BacklogRow({
           <Link
             href={`/boards/${boardId}/cards/${card.number}`}
             className={cn(
-              "min-w-0 text-sm hover:underline",
-              quiet ? "line-clamp-2 leading-snug" : "truncate",
+              "line-clamp-2 min-w-0 text-sm leading-snug hover:underline",
               card.doneAt && "text-meta line-through",
             )}
           >
@@ -144,6 +143,11 @@ export function BacklogRow({
             </FlagChip>
           )}
         </span>
+        {!quiet && card.descriptionPreview && (
+          <p className="text-meta mt-0.5 hidden text-xs @3xl:line-clamp-1">
+            {card.descriptionPreview}
+          </p>
+        )}
         {parts.length > 0 && (
           <p className="text-meta mt-0.5 flex items-center gap-1 text-2xs">
             {parts.map((part, index) => (

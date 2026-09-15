@@ -74,6 +74,7 @@ export async function toViews(tx: AppTransaction, rows: Card[]): Promise<CardVie
   // and none of them renders a description or a checklist item.
   return rows.map(({ description, acceptance, blockedReason, checklist, ...card }) => ({
     ...card,
+    descriptionPreview: description.replace(/\s+/g, " ").trim().slice(0, 200),
     assigneeName: card.assigneeUserId ? (nameOf.get(card.assigneeUserId) ?? null) : null,
     themeIds: themesOf.get(card.id) ?? [],
     checklistDone: checklist.filter((item) => item.done).length,

@@ -877,7 +877,18 @@
     },
     "place": "Put under feature",
     "placeTarget": "Feature",
-    "noParentOption": "Without a parent"
+    "noParentOption": "Without a parent",
+    "level": {
+      "label": "Level",
+      "epics": "Epics",
+      "features": "Features",
+      "cards": "Cards"
+    },
+    "showSprints": "Show sprints",
+    "levels": {
+      "noStories": "No cards in the backlog here",
+      "elsewhere": "{open} under way · {done} done outside the backlog"
+    }
   },
   "sprints": {
     "title": "Sprints",
@@ -1225,7 +1236,7 @@
       },
       "backlog": {
         "title": "The backlog",
-        "body": "The backlog is the ordered list of what the team does next, most important at the top. Drag the cards, or use the arrows. Select cards with the checkbox and put them in a sprint with one button."
+        "body": "The backlog is the ordered list of what the team does next, most important at the top. Drag the cards, or use the arrows. Select cards with the checkbox and put them in a sprint with one button. At the top of the list the level can switch: the epic backlog folds out to features and on to cards, the feature backlog to cards — and on a Scrum board the sprint panels can be shown or hidden, giving the list the whole width."
       },
       "insight": {
         "title": "Insight",

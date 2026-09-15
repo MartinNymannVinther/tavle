@@ -877,7 +877,18 @@
     },
     "place": "Læg under feature",
     "placeTarget": "Feature",
-    "noParentOption": "Uden forælder"
+    "noParentOption": "Uden forælder",
+    "level": {
+      "label": "Niveau",
+      "epics": "Epics",
+      "features": "Features",
+      "cards": "Kort"
+    },
+    "showSprints": "Vis sprints",
+    "levels": {
+      "noStories": "Ingen kort i backloggen her",
+      "elsewhere": "{open} i gang · {done} færdige uden for backloggen"
+    }
   },
   "sprints": {
     "title": "Sprints",
@@ -1225,7 +1236,7 @@
       },
       "backlog": {
         "title": "Backloggen",
-        "body": "Backloggen er den prioriterede liste over det næste, teamet skal lave, øverst er vigtigst. Træk kortene, eller brug pilene. Vælg kort med afkrydsningen og læg dem i en sprint med én knap."
+        "body": "Backloggen er den prioriterede liste over det næste, teamet skal lave, øverst er vigtigst. Træk kortene, eller brug pilene. Vælg kort med afkrydsningen og læg dem i en sprint med én knap. Øverst i listen kan niveauet skiftes: epic-backloggen folder ud til features og videre til kort, feature-backloggen til kort — og på en Scrum-tavle kan sprint-panelerne vises eller skjules, så listen får hele bredden."
       },
       "insight": {
         "title": "Indsigt",

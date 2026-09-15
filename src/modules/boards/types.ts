@@ -30,6 +30,8 @@ export type Member = { userId: string; name: string; email: string; role: string
  * stays on the server and travels only with the one card a page opens.
  */
 export type CardView = Omit<Card, "description" | "acceptance" | "checklist" | "blockedReason"> & {
+  /** The description's first ~200 characters, for a list line; the whole prose stays on the card page. */
+  descriptionPreview: string;
   assigneeName: string | null;
   themeIds: string[];
   checklistDone: number;
