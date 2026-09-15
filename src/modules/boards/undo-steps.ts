@@ -90,6 +90,13 @@ export const UndoStepSchema = z.discriminatedUnion("kind", [
     targetSprintId: id.nullable(),
   }),
   z.object({ kind: z.literal("item.reopen"), itemId: id }),
+  z.object({
+    kind: z.literal("items.order"),
+    boardId: id,
+    level: z.enum(["epic", "feature"]),
+    /** The whole lane's ids in the order that held before the rewrite. */
+    order: z.array(id).max(2000),
+  }),
   z.object({ kind: z.literal("item.close"), itemId: id }),
   z.object({
     kind: z.literal("board.view"),

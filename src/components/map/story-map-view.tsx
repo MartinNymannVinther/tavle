@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { ArrowDownUp } from "lucide-react";
 import { ItemForm } from "@/components/backlog/item-form";
 import {
   applyFilters,
@@ -16,7 +17,7 @@ import { useBoardActions } from "@/components/board/use-board-actions";
 import { Button } from "@/components/ui/button";
 import type { BoardFull } from "@/modules/boards/types";
 import { createCardAction, moveCardAction, placeCardAction } from "@/modules/boards/actions-cards";
-import { placeOnMapAction } from "@/modules/boards/actions-structure";
+import { alignBacklogToMapAction, placeOnMapAction } from "@/modules/boards/actions-structure";
 import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
 import { MapGrid, type Drag } from "./map-grid";
 import { MapTray } from "./map-tray";
@@ -78,6 +79,12 @@ export function StoryMapView({ full }: { full: BoardFull }) {
     });
   const doneIds = new Set(full.cards.filter((c) => doneColumns.has(c.columnId)).map((c) => c.id));
   const countOf = (featureId: string) => full.cards.filter((c) => c.featureId === featureId).length;
+  // The wall and the rank answer different questions, so differing is
+  // allowed — but worth a glance. The notice says so; the button is the
+  // one-way offer to let the backlog follow the map.
+  const rankOrder = [...onMap].sort((a, b) => a.sort - b.sort || a.number - b.number);
+  const drifted =
+    onMap.length > 1 && onMap.some((feature, index) => feature.id !== rankOrder[index]!.id);
 
   /** A card's drop is at most two moves: a new feature, and a new sprint or column. */
   async function dropCard(row: MapRow, columnKey: string) {
@@ -179,6 +186,20 @@ export function StoryMapView({ full }: { full: BoardFull }) {
       {onMap.length === 0 && (
         <p className="text-meta border-hairline border-b px-4 py-6 text-center text-sm">
           {waiting.length > 0 ? t("emptyTray") : t("empty")}
+        </p>
+      )}
+      {drifted && (
+        <p className="text-meta border-hairline flex flex-wrap items-center gap-x-3 gap-y-1 border-b px-4 py-2 text-2sm">
+          <ArrowDownUp className="size-3.5 shrink-0" aria-hidden />
+          <span className="min-w-0">{t("orderDrift")}</span>
+          <Button
+            type="button"
+            size="xs"
+            variant="outline"
+            onClick={() => void run(() => alignBacklogToMapAction({ boardId: board.id }))}
+          >
+            {t("alignBacklog")}
+          </Button>
         </p>
       )}
       <MapGrid

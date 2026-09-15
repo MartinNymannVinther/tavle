@@ -16,6 +16,7 @@ import {
   NewThemeSchema,
   ThemeUpdateSchema,
 } from "./structure/validation";
+import { BoardIdSchema } from "./validation";
 import { placeItemInStructure } from "./structure/place-item";
 import {
   confirmReview,
@@ -26,7 +27,7 @@ import {
   updateItem,
 } from "./structure/write-items";
 import { createArea, createTheme, updateArea, updateTheme } from "./structure/write-lists";
-import { placeOnMap } from "./structure/write-map";
+import { alignBacklogToMap, placeOnMap } from "./structure/write-map";
 
 /**
  * Everything a person can do to the backlog structure: epics and
@@ -75,6 +76,15 @@ export async function placeOnMapAction(raw: unknown): Promise<Result<string>> {
     const item = found(await placeOnMap(tx, ctx, input.itemId, input.index));
     touch(item.boardId);
     return item.boardId;
+  });
+}
+
+/** The drift notice's one button: the backlog takes the map's order (docs/adr/0016). */
+export async function alignBacklogToMapAction(raw: unknown): Promise<Result<number>> {
+  return action(BoardIdSchema, raw, async (tx, ctx, input, touch) => {
+    const moved = found(await alignBacklogToMap(tx, ctx, input.boardId));
+    touch(input.boardId);
+    return moved;
   });
 }
 

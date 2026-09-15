@@ -1,5 +1,11 @@
 import { and, eq, sql } from "drizzle-orm";
-import { events, swimlanes, themes as themesTable, areas as areasTable } from "@/core/db/schema";
+import {
+  backlogItems as backlogItemsTable,
+  events,
+  swimlanes,
+  themes as themesTable,
+  areas as areasTable,
+} from "@/core/db/schema";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 import { applySwimlaneAssignment, updateSwimlane } from "./write-swimlanes";
 import { archiveCard, deleteCard, restoreCard } from "./write-card-lifecycle";
@@ -9,6 +15,8 @@ import { cardInWorkspace, columnInBoard, joiningSort, laneFor } from "./lanes";
 import { canManage, roleOf } from "./members";
 import { people } from "@/core/db/schema";
 import { closeItem, type CloseOutcome } from "./structure/close";
+import { levelLane } from "./structure/items";
+import { STEP } from "./ordering";
 import { placeCardInStructure } from "./structure/write-card-placement";
 import { placeItemInStructure, restoreSubtree } from "./structure/place-item";
 import { planFeature } from "./structure/plan-feature";
@@ -140,6 +148,24 @@ async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): P
     case "item.plan":
       if (!(await planFeature(tx, ctx, { ...step }))) throw new NotUndoable();
       return;
+    case "items.order": {
+      // Back to the order that held: saved ids first, in their saved
+      // order; whatever has arrived since keeps its place after them.
+      const lane = await levelLane(tx, step.boardId, step.level);
+      const rank = new Map(step.order.map((itemId, index) => [itemId, index]));
+      const sorted = [...lane].sort(
+        (a, b) =>
+          (rank.get(a.id) ?? step.order.length + lane.indexOf(a)) -
+          (rank.get(b.id) ?? step.order.length + lane.indexOf(b)),
+      );
+      for (const [index, row] of sorted.entries()) {
+        const sort = (index + 1) * STEP;
+        if (row.sort !== sort) {
+          await tx.update(backlogItemsTable).set({ sort }).where(eq(backlogItemsTable.id, row.id));
+        }
+      }
+      return;
+    }
     case "item.reopen":
       if (!(await reopenItem(tx, ctx, step.itemId))) throw new NotUndoable();
       return;

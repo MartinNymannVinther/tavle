@@ -2,7 +2,7 @@ import { and, asc, eq, isNotNull } from "drizzle-orm";
 import { backlogItems, type BacklogItem } from "@/core/db/schema";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 import { recordEvent } from "../events";
-import { placeInLane, type Positioned } from "../ordering";
+import { placeInLane, STEP, type Positioned } from "../ordering";
 import { boardInWorkspace } from "../read";
 import { itemInWorkspace } from "./items";
 import { RuleViolation } from "./rules";
@@ -84,4 +84,61 @@ export async function placeOnMap(
     );
   }
   return item;
+}
+
+/**
+ * Rewrites the backlog's feature order so the mapped features stand in
+ * the map's order, in the slots they already occupy — the unmapped
+ * keep their places. The map stays untouched: the offer runs one way,
+ * and only when a person asks (the drift notice on the map). Returns
+ * how many rows moved, or null for a foreign board.
+ */
+export async function alignBacklogToMap(
+  tx: AppTransaction,
+  ctx: OrgContext,
+  boardId: string,
+): Promise<number | null> {
+  const board = await boardInWorkspace(tx, boardId);
+  if (!board) return null;
+  const lane = await tx
+    .select({
+      id: backlogItems.id,
+      sort: backlogItems.sort,
+      mapSort: backlogItems.mapSort,
+      number: backlogItems.number,
+    })
+    .from(backlogItems)
+    .where(and(eq(backlogItems.boardId, boardId), eq(backlogItems.level, "feature")))
+    .orderBy(asc(backlogItems.sort), asc(backlogItems.number));
+  const mapped = lane
+    .filter((f) => f.mapSort !== null)
+    .sort((a, b) => a.mapSort! - b.mapSort! || a.number - b.number);
+  const mappedIds = new Set(mapped.map((f) => f.id));
+  let cursor = 0;
+  const target = lane.map((f) => (mappedIds.has(f.id) ? mapped[cursor++]! : f));
+  const changes: Array<{ id: string; sort: number }> = [];
+  target.forEach((f, index) => {
+    const sort = (index + 1) * STEP;
+    if (f.sort !== sort) changes.push({ id: f.id, sort });
+  });
+  if (changes.length === 0) return 0;
+  for (const change of changes) {
+    await tx.update(backlogItems).set({ sort: change.sort }).where(eq(backlogItems.id, change.id));
+  }
+  await recordEvent(
+    tx,
+    ctx,
+    board.id,
+    "backlog.aligned",
+    { count: changes.length },
+    {
+      undo: {
+        kind: "items.order",
+        boardId: board.id,
+        level: "feature",
+        order: lane.map((f) => f.id),
+      },
+    },
+  );
+  return changes.length;
 }

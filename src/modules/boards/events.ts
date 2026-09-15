@@ -33,6 +33,7 @@ export type EventType =
   | "item.cascaded"
   | "item.mapped"
   | "item.unmapped"
+  | "backlog.aligned"
   | "item.deleted"
   | "card.created"
   | "card.moved"

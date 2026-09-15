@@ -1236,6 +1236,9 @@
     },
     "undo": {
       "applied": "An action was undone"
+    },
+    "backlog": {
+      "aligned": "The backlog's order followed the story map ({count} features moved)"
     }
   },
   "help": {
@@ -1476,7 +1479,9 @@
     "emptyTray": "The map is empty. Click a feature in the tray to put it up.",
     "empty": "No features yet. Create a feature, and it can go up on the map.",
     "hiddenCards": "{count, plural, one {# card off the map} other {# cards off the map}}",
-    "hiddenHint": "Pick a card — its feature goes up on the map"
+    "hiddenHint": "Pick a card — its feature goes up on the map",
+    "orderDrift": "The order here differs from the backlog's ranking — maybe on purpose, maybe worth a look.",
+    "alignBacklog": "Let the backlog follow the map"
   },
   "decompose": {
     "title": "Breakdown",

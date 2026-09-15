@@ -14,9 +14,10 @@ import {
   updateItem,
 } from "@/modules/boards/structure/write-items";
 import { createArea, createTheme, updateTheme } from "@/modules/boards/structure/write-lists";
-import { placeOnMap } from "@/modules/boards/structure/write-map";
+import { alignBacklogToMap, placeOnMap } from "@/modules/boards/structure/write-map";
 import { createBoard, updateStructureView } from "@/modules/boards/write-boards";
 import { createCard, moveCard } from "@/modules/boards/write-cards";
+import type { ItemView } from "@/modules/boards/types";
 import { adminPool } from "../helpers/db";
 import { seedWorkspace } from "../helpers/workspace";
 
@@ -521,6 +522,30 @@ describe("the story map's backbone", () => {
     expect(await violation(run((tx) => placeOnMap(tx, ctx, epic.id, undefined)))).toBe(
       "parentLevel",
     );
+  });
+
+  it("lets the backlog follow the map on request, unmapped features keeping their slots", async () => {
+    const full = (await getBoardFull(ctx, boardId))!;
+    const features = full.items
+      .filter((i) => i.level === "feature" && i.state === "open")
+      .sort((x, y) => x.sort - y.sort || x.number - y.number);
+    // Two features up in the opposite of their rank; the rest stay down.
+    const [first, second] = features.slice(0, 2) as [ItemView, ItemView];
+    await run((tx) => placeOnMap(tx, ctx, second.id, 0));
+    await run((tx) => placeOnMap(tx, ctx, first.id, 1));
+
+    const moved = await run((tx) => alignBacklogToMap(tx, ctx, boardId));
+    expect(moved).toBeGreaterThan(0);
+
+    const after = (await getBoardFull(ctx, boardId))!.items
+      .filter((i) => i.level === "feature" && i.state === "open")
+      .sort((x, y) => x.sort - y.sort || x.number - y.number);
+    // The mapped pair swapped into the two front slots in map order; the
+    // unmapped tail is untouched in its old relative order.
+    expect(after.slice(0, 2).map((i) => i.id)).toEqual([second.id, first.id]);
+    expect(after.slice(2).map((i) => i.id)).toEqual(features.slice(2).map((i) => i.id));
+    // Nothing left to do: running it again moves nothing.
+    expect(await run((tx) => alignBacklogToMap(tx, ctx, boardId))).toBe(0);
   });
 });
 
