@@ -88,14 +88,14 @@ export function BacklogRow({
   if (crumb?.epic)
     parts.push(
       <span key="epic" className="inline-flex min-w-0 items-center gap-1">
-        <TypeGlyph type="epic" className="text-label shrink-0" />
+        <TypeGlyph type="epic" className="text-label size-2.5 shrink-0" />
         <span className="truncate">{crumb.epic.title}</span>
       </span>,
     );
   if (crumb?.feature)
     parts.push(
       <span key="feature" className="inline-flex min-w-0 items-center gap-1">
-        <TypeGlyph type="feature" className="text-label shrink-0" />
+        <TypeGlyph type="feature" className="text-label size-2.5 shrink-0" />
         <span className="truncate">{crumb.feature.title}</span>
       </span>,
     );

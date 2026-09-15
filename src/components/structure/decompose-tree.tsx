@@ -61,6 +61,30 @@ export function useDrop(active: boolean, place: () => void) {
 /** The line from a parent node down to its children's rail. */
 const Stem = () => <div aria-hidden className="bg-border h-5 w-px" />;
 
+/**
+ * The WBS ladder: children stacked under their parent, each hung on the
+ * one rail with an elbow — the classic chart, and the shape that keeps
+ * a breakdown narrow no matter how many cards a feature holds.
+ */
+function Ladder({ children }: { children: React.ReactNode }) {
+  return <ul className="ml-5 flex w-fit flex-col">{children}</ul>;
+}
+
+function Rung({ children }: { children: React.ReactNode }) {
+  return (
+    <li
+      className={cn(
+        "relative py-1 pl-4",
+        "before:bg-border before:absolute before:top-0 before:bottom-0 before:left-0 before:w-px",
+        "last:before:bottom-auto last:before:h-5",
+        "after:bg-border after:absolute after:top-5 after:left-0 after:h-px after:w-4",
+      )}
+    >
+      {children}
+    </li>
+  );
+}
+
 /** The children of one node, side by side, each connected up to the shared rail. */
 function Branches({ children }: { children: React.ReactNode }) {
   return <div className="flex items-start justify-center">{children}</div>;
@@ -70,10 +94,11 @@ function Branch({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        "relative flex flex-col items-center px-1.5 pt-5",
-        "before:bg-border before:absolute before:top-0 before:left-1/2 before:h-5 before:w-px",
+        "relative flex flex-col items-start px-1.5 pt-5",
+        // The drop from the rail lands on the node's own centre (w-40/2 + px-1.5).
+        "before:bg-border before:absolute before:top-0 before:left-[5.375rem] before:h-5 before:w-px",
         "after:bg-border after:absolute after:top-0 after:right-0 after:left-0 after:h-px",
-        "first:after:left-1/2 last:after:right-1/2 only:after:hidden",
+        "first:after:left-[5.375rem] last:after:right-[calc(100%-5.375rem)] only:after:hidden",
       )}
     >
       {children}
@@ -113,7 +138,7 @@ export function ChartNode({
       {...dragProps}
       {...(drop?.props ?? {})}
       className={cn(
-        "border-border group/box hover:border-primary/40 focus-within:border-primary/40 flex w-[11.5rem] items-center gap-1.5 rounded-xl border px-2 py-1.5 shadow-[var(--surface-shadow)] transition-colors",
+        "border-border group/box hover:border-primary/40 focus-within:border-primary/40 flex w-40 items-center gap-1.5 rounded-xl border px-2 py-1.5 shadow-[var(--surface-shadow)] transition-colors",
         emphasis ? "bg-accent/70 border-primary/30" : "bg-card",
         stripe && "border-l-4",
         dragProps?.draggable && "cursor-grab active:cursor-grabbing",
@@ -190,7 +215,7 @@ export function EpicTree({
           </Branch>
         ))}
         <Branch>
-          <div className="border-input w-[11.5rem] rounded-lg border border-dashed p-1.5">
+          <div className="border-input w-40 rounded-lg border border-dashed p-1.5">
             <NewFeature onAdd={(title) => h.onAddFeature(epic.id, title)} />
           </div>
         </Branch>
@@ -223,7 +248,7 @@ export function FeatureTree({
   });
   const epics = structure.items.filter((i) => i.level === "epic" && i.state === "open");
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-start">
       <ChartNode
         icon={<TypeIcon type="feature" />}
         keyLabel={`${boardKey}-${feature.number}`}
@@ -256,10 +281,9 @@ export function FeatureTree({
           />
         }
       />
-      <Stem />
-      <Branches>
+      <Ladder>
         {cards.map((card) => (
-          <Branch key={card.id}>
+          <Rung key={card.id}>
             <CardNode
               card={card}
               boardKey={boardKey}
@@ -268,10 +292,10 @@ export function FeatureTree({
               structure={structure}
               h={h}
             />
-          </Branch>
+          </Rung>
         ))}
-        <Branch>
-          <div className="border-input w-[11.5rem] rounded-lg border border-dashed p-1">
+        <Rung>
+          <div className="border-input w-40 rounded-lg border border-dashed p-1">
             <QuickAdd
               compact
               structure={structure}
@@ -279,8 +303,8 @@ export function FeatureTree({
               onAdd={(title) => h.onAddCard(feature.id, title)}
             />
           </div>
-        </Branch>
-      </Branches>
+        </Rung>
+      </Ladder>
     </div>
   );
 }
