@@ -16,6 +16,7 @@ import {
   createCardAction,
   placeCardAction,
   placeCardsAction,
+  updateCardAction,
 } from "@/modules/boards/actions-cards";
 import { reorderItemAction } from "@/modules/boards/actions-structure";
 import { reorderBacklogAction, setCardsSprintAction } from "@/modules/boards/actions-sprints";
@@ -156,6 +157,28 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
     setDragId(null);
     if (!id || id === targetId) return;
     nudge(id, targetId, after);
+  }
+
+  /** A card dropped into another group: the group's field first, then the spot it was dropped on. */
+  async function moveCardToGroup(
+    cardId: string,
+    groupKey: string,
+    siblingId: string | null,
+    after: boolean,
+  ) {
+    const card = full.cards.find((c) => c.id === cardId);
+    if (!card || grouping === "list") return;
+    const ok = await run(() =>
+      grouping === "theme"
+        ? placeCardAction({
+            cardId,
+            themeIds: [groupKey, ...card.themeIds.filter((themeId) => themeId !== groupKey)],
+          })
+        : grouping === "area"
+          ? placeCardAction({ cardId, areaId: groupKey })
+          : updateCardAction({ cardId, kind: groupKey as "business" | "enabler" }),
+    );
+    if (ok && siblingId && siblingId !== cardId) nudge(cardId, siblingId, after);
   }
 
   /** A card dragged to another feature's fold-out: placement first, then the spot it was dropped on. */

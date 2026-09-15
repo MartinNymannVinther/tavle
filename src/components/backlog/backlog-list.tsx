@@ -35,10 +35,13 @@ export function StoryRows({
   stories,
   rows,
   context,
+  groupDrop,
 }: {
   stories: CardView[];
   rows: StoryRowProps;
   context?: ChipContext;
+  /** In a grouped view: what a card from another group lands as when dropped here. */
+  groupDrop?: { onDrop: (cardId: string, siblingId: string | null, after: boolean) => void };
 }) {
   // Where the dragged card will land, drawn as a line above or below the
   // row under the pointer — the drop should never be a guess.
@@ -65,6 +68,10 @@ export function StoryRows({
             dragging={rows.dragId === card.id}
             onDragStart={() => rows.setDragId(card.id)}
             onDragOver={(event) => {
+              // A card from another group may land here only when the drop
+              // can honestly put it here (the group assigns its field).
+              const foreign = rows.dragId ? !stories.some((c) => c.id === rows.dragId) : false;
+              if (foreign && !groupDrop) return;
               event.preventDefault();
               const rect = event.currentTarget.getBoundingClientRect();
               const below = event.clientY > rect.top + rect.height / 2;
@@ -73,7 +80,14 @@ export function StoryRows({
               }
             }}
             onDrop={() => {
-              rows.onDropOn(card.id, hover?.id === card.id ? hover.after : false);
+              const after = hover?.id === card.id ? hover.after : false;
+              const foreign = rows.dragId ? !stories.some((c) => c.id === rows.dragId) : false;
+              if (foreign && groupDrop && rows.dragId) {
+                groupDrop.onDrop(rows.dragId, card.id, after);
+                rows.setDragId(null);
+              } else {
+                rows.onDropOn(card.id, after);
+              }
               setHover(null);
             }}
             onDragEnd={() => {
