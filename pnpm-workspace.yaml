@@ -5,11 +5,14 @@
 # broken, but the next regenerated lockfile would have dropped them
 # without anybody deciding to.
 #
-# sharp reaches production through next and esbuild through drizzle-kit;
-# both had advisories their own maintainers had not yet released past.
+# sharp reaches production through next, esbuild through drizzle-kit and
+# image-size through pptxgenjs (which never calls it — the only reference
+# sits in a commented-out function); all had advisories their own
+# maintainers had not yet released past.
 overrides:
   sharp: ">=0.35.4"
   esbuild: ">=0.25.0"
+  image-size: ">=2.0.3"
 
 ignoredBuiltDependencies:
   - sharp

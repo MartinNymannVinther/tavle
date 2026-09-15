@@ -12,7 +12,6 @@ import { roadmap } from "@/modules/boards/structure/roadmap";
  */
 
 const PAPER = "F7F5F1";
-const CARD = "FFFDFA";
 const INK = "24221E";
 const LABEL = "6E6B67";
 const HAIRLINE = "DDD8CF";
