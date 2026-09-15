@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { Points } from "@/components/board/bits";
+import { FoldButton } from "@/components/backlog/backlog-bits";
+import { useFolded } from "@/components/backlog/use-folded";
 import { themeSwatch } from "@/components/board/tokens";
 import { TypeIcon } from "@/components/board/type-icon";
 import { quarterPosition } from "@/modules/boards/structure/roadmap";
@@ -13,8 +15,8 @@ import { cn } from "@/lib/utils";
  * What an unfolded epic holds on the roadmap: its features on the same
  * quarter axis as the epic's own bar, each drawn roughly where its
  * planned sprints lie (docs/adr/0023) — an unplanned feature says so
- * instead of pretending — and the cards under each, one link from
- * anything. The read is "what is this epic made of, and when".
+ * instead of pretending — and the cards under each behind a fold,
+ * closed until asked, so the epic's shape stays one calm read.
  */
 export function RoadmapChildren({
   epicId,
@@ -28,6 +30,7 @@ export function RoadmapChildren({
   const t = useTranslations("roadmap");
   const nav = useTranslations("backlog.nav");
   const boardId = full.board.id;
+  const folded = useFolded(`${boardId}:roadmapcards`);
   const key = full.board.key;
   const category = new Map(full.columns.map((c) => [c.id, c.category]));
   const sprintOf = new Map(full.sprints.map((s) => [s.id, s]));
@@ -74,7 +77,15 @@ export function RoadmapChildren({
               className="grid items-center"
               style={{ gridTemplateColumns: "16rem minmax(0, 1fr)" }}
             >
-              <p className="flex items-center gap-2 py-1 pr-4 pl-12 text-2sm">
+              <p className="flex items-center gap-2 py-1 pr-4 pl-9 text-2sm">
+                {cards.length > 0 ? (
+                  <FoldButton
+                    open={folded.isOpen(feature.id)}
+                    onToggle={() => folded.toggle(feature.id)}
+                  />
+                ) : (
+                  <span className="size-6 shrink-0" aria-hidden />
+                )}
                 <TypeIcon type="feature" />
                 <span className="text-meta font-mono shrink-0 text-xs tabular-nums">
                   {key}-{feature.number}
@@ -122,27 +133,28 @@ export function RoadmapChildren({
                 )}
               </div>
             </div>
-            {cards.map((card) => {
-              const cardDone = category.get(card.columnId) === "done";
-              return (
-                <p key={card.id} className="flex items-center gap-2 py-0.5 pr-4 pl-20 text-2sm">
-                  <TypeIcon type={card.bug ? "bug" : "card"} />
-                  <span className="text-meta font-mono shrink-0 text-2xs tabular-nums">
-                    {key}-{card.number}
-                  </span>
-                  <Link
-                    href={`/boards/${boardId}/cards/${card.number}`}
-                    className={cn(
-                      "min-w-0 flex-1 truncate hover:underline",
-                      cardDone && "text-meta line-through",
-                    )}
-                  >
-                    {card.title}
-                  </Link>
-                  <Points estimate={card.estimate} />
-                </p>
-              );
-            })}
+            {folded.isOpen(feature.id) &&
+              cards.map((card) => {
+                const cardDone = category.get(card.columnId) === "done";
+                return (
+                  <p key={card.id} className="flex items-center gap-2 py-0.5 pr-4 pl-20 text-2sm">
+                    <TypeIcon type={card.bug ? "bug" : "card"} />
+                    <span className="text-meta font-mono shrink-0 text-2xs tabular-nums">
+                      {key}-{card.number}
+                    </span>
+                    <Link
+                      href={`/boards/${boardId}/cards/${card.number}`}
+                      className={cn(
+                        "min-w-0 flex-1 truncate hover:underline",
+                        cardDone && "text-meta line-through",
+                      )}
+                    >
+                      {card.title}
+                    </Link>
+                    <Points estimate={card.estimate} />
+                  </p>
+                );
+              })}
           </div>
         );
       })}

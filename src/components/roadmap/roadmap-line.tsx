@@ -125,14 +125,6 @@ export function RoadmapLine({
             {row.theme && <span>{row.theme.name}</span>}
             <span>{t("counts", { features: row.features, done: row.doneStories, total })}</span>
           </p>
-          {planned && (
-            <SpanSelects
-              epic={row.epic}
-              startQuarter={quarters[span.start]!}
-              targetQuarter={quarters[span.end]!}
-              onPlan={onPlan}
-            />
-          )}
         </div>
       </div>
       <div
@@ -222,56 +214,6 @@ function EdgeHandle({
     >
       <span className="bg-foreground/35 h-5 w-1 rounded-full opacity-0 transition-opacity group-hover/handle:opacity-100" />
     </div>
-  );
-}
-
-/** The span as two selects: the path that needs no pointer. */
-function SpanSelects({
-  epic,
-  startQuarter,
-  targetQuarter,
-  onPlan,
-}: {
-  epic: RoadmapRow["epic"];
-  startQuarter: string;
-  targetQuarter: string;
-  onPlan: PlanSpan;
-}) {
-  const t = useTranslations("roadmap");
-  const options = (extra: string) => [
-    ...(quarterOptions().includes(extra) ? [] : [extra]),
-    ...quarterOptions(),
-  ];
-  return (
-    <p className="flex flex-wrap items-center gap-1">
-      <NativeSelect
-        variant="sm"
-        value={startQuarter}
-        onChange={(event) => onPlan(epic.id, event.target.value, targetQuarter)}
-        aria-label={t("planStart", { title: epic.title })}
-        className="h-6 w-fit text-2xs"
-      >
-        {options(startQuarter).map((quarter) => (
-          <option key={quarter} value={quarter}>
-            {quarter}
-          </option>
-        ))}
-      </NativeSelect>
-      <span className="text-meta text-2xs">–</span>
-      <NativeSelect
-        variant="sm"
-        value={targetQuarter}
-        onChange={(event) => onPlan(epic.id, startQuarter, event.target.value)}
-        aria-label={t("planQuarter", { title: epic.title })}
-        className="h-6 w-fit text-2xs"
-      >
-        {options(targetQuarter).map((quarter) => (
-          <option key={quarter} value={quarter}>
-            {quarter}
-          </option>
-        ))}
-      </NativeSelect>
-    </p>
   );
 }
 

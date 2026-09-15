@@ -12,8 +12,9 @@ import { cn } from "@/lib/utils";
 /**
  * The overview: where the open work sits, by theme, by area and by kind,
  * the enabler share as one number, and the five health measures that
- * say whether the structure is being kept. Bars are rows with a length,
- * because a row can carry a name and a number and a bar chart cannot.
+ * say whether the structure is being kept. A distribution is one bar
+ * split into shares — never a row of half-filled lines, which the eye
+ * reads as progress that does not exist.
  */
 export function OverviewView({ full }: { full: BoardFull }) {
   const t = useTranslations("overview");
@@ -139,7 +140,7 @@ export function OverviewView({ full }: { full: BoardFull }) {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Bars buckets={buckets} name={name} total={data.openPoints || data.openCards} />
+              <Distribution buckets={buckets} name={name} />
             </CardContent>
           </Card>
         ))}
@@ -148,45 +149,71 @@ export function OverviewView({ full }: { full: BoardFull }) {
   );
 }
 
-function Bars({
-  buckets,
-  name,
-  total,
-}: {
-  buckets: Bucket[];
-  name: (bucket: Bucket) => string;
-  total: number;
-}) {
+/** Distinct inks for the buckets that have no colour of their own (areas, kinds). */
+const BUCKET_PALETTE = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-4)",
+  "var(--chart-3)",
+  "var(--label)",
+];
+
+function Distribution({ buckets, name }: { buckets: Bucket[]; name: (bucket: Bucket) => string }) {
   const t = useTranslations("overview");
   const byPoints = buckets.some((b) => b.points > 0);
-  const max = Math.max(1, ...buckets.map((b) => (byPoints ? b.points : b.cards)));
+  const value = (bucket: Bucket) => (byPoints ? bucket.points : bucket.cards);
+  const total = buckets.reduce((sum, bucket) => sum + value(bucket), 0);
+  const inkOf = (bucket: Bucket, index: number) =>
+    bucket.key === "none"
+      ? "var(--chart-5)"
+      : bucket.color
+        ? themeSwatch(bucket.color)
+        : BUCKET_PALETTE[index % BUCKET_PALETTE.length]!;
+  const shareOf = (bucket: Bucket) => (total > 0 ? Math.round((value(bucket) / total) * 100) : 0);
   return (
-    <ol className="flex flex-col gap-2.5">
-      {buckets.map((bucket) => {
-        const value = byPoints ? bucket.points : bucket.cards;
-        return (
-          <li key={bucket.key} className="flex flex-col gap-1">
-            <div className="flex items-baseline justify-between gap-3 text-sm">
-              <span className={cn("truncate", bucket.key === "none" && "text-meta")}>
-                {name(bucket)}
-              </span>
-              <span className="text-meta shrink-0 text-2sm tabular-nums">
-                {t("bucketValue", { cards: bucket.cards, points: bucket.points })}
-                {total > 0 && ` · ${Math.round((value / total) * 100)} %`}
-              </span>
-            </div>
-            <div className="bg-hairline h-2 overflow-hidden rounded-full">
-              <div
-                className="h-full rounded-full"
-                style={{
-                  width: `${(value / max) * 100}%`,
-                  background: bucket.color ? themeSwatch(bucket.color) : "var(--primary)",
-                }}
-              />
-            </div>
+    <div className="flex flex-col gap-3">
+      {total > 0 && (
+        <div
+          role="img"
+          aria-label={buckets
+            .filter((bucket) => value(bucket) > 0)
+            .map((bucket) => `${name(bucket)} ${shareOf(bucket)} %`)
+            .join(", ")}
+          className="flex h-2.5 w-full gap-px overflow-hidden rounded-full"
+        >
+          {buckets.map(
+            (bucket, index) =>
+              value(bucket) > 0 && (
+                <span
+                  key={bucket.key}
+                  title={`${name(bucket)} · ${shareOf(bucket)} %`}
+                  style={{
+                    width: `${(value(bucket) / total) * 100}%`,
+                    background: inkOf(bucket, index),
+                  }}
+                />
+              ),
+          )}
+        </div>
+      )}
+      <ol className="flex flex-col gap-1.5">
+        {buckets.map((bucket, index) => (
+          <li key={bucket.key} className="flex items-baseline gap-2 text-sm">
+            <span
+              aria-hidden
+              className="size-2.5 shrink-0 self-center rounded-full"
+              style={{ background: inkOf(bucket, index) }}
+            />
+            <span className={cn("min-w-0 flex-1 truncate", bucket.key === "none" && "text-meta")}>
+              {name(bucket)}
+            </span>
+            <span className="text-meta shrink-0 text-2sm tabular-nums">
+              {t("bucketValue", { cards: bucket.cards, points: bucket.points })}
+              {total > 0 && ` · ${shareOf(bucket)} %`}
+            </span>
           </li>
-        );
-      })}
-    </ol>
+        ))}
+      </ol>
+    </div>
   );
 }

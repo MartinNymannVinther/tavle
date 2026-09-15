@@ -434,6 +434,8 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
               <BacklogList
                 stories={stories}
                 rows={rows}
+                allocated={allocatedShown}
+                sprintNameOf={sprintNameOf}
                 emptyText={all.length === 0 ? t("empty") : undefined}
               />
             ) : (
@@ -441,6 +443,16 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
                 groups={grouped(full, stories, grouping, groupNames)}
                 rows={rows}
                 contextOf={contextOf}
+                groupDropOf={(group) =>
+                  // "none" cannot be assigned by a drop — a drop cannot say
+                  // which theme or area to take away, only which to give.
+                  group.key === "none"
+                    ? undefined
+                    : {
+                        onDrop: (cardId, siblingId, after) =>
+                          void moveCardToGroup(cardId, group.key, siblingId, after),
+                      }
+                }
               />
             )}
           </div>
