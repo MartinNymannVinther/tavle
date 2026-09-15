@@ -43,6 +43,7 @@ export function ItemBacklog({
   run,
   onRankItem,
   onNudgeCard,
+  onMoveCard,
   allocated = [],
   sprintNameOf,
   newFeature,
@@ -54,6 +55,8 @@ export function ItemBacklog({
   run: Run;
   onRankItem: (itemId: string, siblingId: string, after: boolean) => void;
   onNudgeCard: (cardId: string, siblingId: string, after: boolean) => void;
+  /** A card dropped on another feature — placement across the tree, then the spot it landed on. */
+  onMoveCard: (cardId: string, featureId: string, siblingId: string | null, after: boolean) => void;
   /** Cards already committed to an open sprint: shown marked under their feature, not ranked. */
   allocated?: CardView[];
   sprintNameOf?: Map<string, string>;
@@ -64,6 +67,15 @@ export function ItemBacklog({
   const { board } = full;
   const folded = useFolded(`${board.id}:levels`);
   const [drag, setDrag] = useState<Drag | null>(null);
+  // Where the dragged thing will land: a line above or below a row, or
+  // a whole feature lit up as the drop's new home.
+  const [hover, setHover] = useState<
+    { kind: "slot"; id: string; after: boolean } | { kind: "feature"; id: string } | null
+  >(null);
+  const settle = () => {
+    setDrag(null);
+    setHover(null);
+  };
 
   const allocatedOf = (featureId: string | null) =>
     allocated.filter((card) => card.featureId === featureId);
@@ -110,24 +122,52 @@ export function ItemBacklog({
         <div
           draggable
           onDragStart={() => setDrag({ kind: "item", id: item.id, scope: options.scope })}
-          onDragEnd={() => setDrag(null)}
           onDragOver={(event) => {
             if (drag?.kind === "item" && drag.scope === options.scope && drag.id !== item.id) {
               event.preventDefault();
+              const rect = event.currentTarget.getBoundingClientRect();
+              const below = event.clientY > rect.top + rect.height / 2;
+              if (hover?.kind !== "slot" || hover.id !== item.id || hover.after !== below) {
+                setHover({ kind: "slot", id: item.id, after: below });
+              }
+            }
+            if (drag?.kind === "card" && item.level === "feature") {
+              event.preventDefault();
+              if (hover?.kind !== "feature" || hover.id !== item.id) {
+                setHover({ kind: "feature", id: item.id });
+              }
             }
           }}
           onDrop={() => {
             if (drag?.kind === "item" && drag.scope === options.scope && drag.id !== item.id) {
-              onRankItem(drag.id, item.id, false);
+              onRankItem(
+                drag.id,
+                item.id,
+                hover?.kind === "slot" && hover.id === item.id ? hover.after : false,
+              );
             }
-            setDrag(null);
+            if (drag?.kind === "card" && item.level === "feature") {
+              onMoveCard(drag.id, item.id, null, false);
+            }
+            settle();
           }}
+          onDragEnd={settle}
           className={cn(
-            "group/row hover:bg-secondary/40 flex cursor-grab items-start gap-2 py-2 pr-3 transition-colors duration-[120ms] active:cursor-grabbing",
+            "group/row hover:bg-secondary/40 relative flex cursor-grab items-start gap-2 py-2 pr-3 transition-colors duration-[120ms] active:cursor-grabbing",
             drag?.kind === "item" && drag.id === item.id && "opacity-40",
+            hover?.kind === "feature" && hover.id === item.id && "bg-accent/60",
           )}
           style={{ paddingLeft: `${0.75 + (options.depth ?? 0) * 1.25}rem` }}
         >
+          {hover?.kind === "slot" && hover.id === item.id && drag?.id !== item.id && (
+            <span
+              aria-hidden
+              className={cn(
+                "bg-primary absolute inset-x-1 z-10 h-0.5 rounded-full",
+                hover.after ? "-bottom-px" : "-top-px",
+              )}
+            />
+          )}
           <FoldButton open={open} onToggle={() => folded.toggle(item.id)} />
           <TypeIcon type={item.level as "epic" | "feature"} className="mt-0.5" />
           <span className="mt-0.5 shrink-0">
@@ -175,7 +215,28 @@ export function ItemBacklog({
   const cardRows = (node: FeatureNode, depth: number) => (
     <div className="border-hairline ml-4 border-l" style={{ marginLeft: `${depth * 1.25}rem` }}>
       {node.stories.length === 0 ? (
-        <p className="text-meta px-4 py-1.5 text-xs">{t("levels.noStories")}</p>
+        <p
+          onDragOver={(event) => {
+            if (drag?.kind === "card" && drag.featureId !== node.feature.id) {
+              event.preventDefault();
+              if (hover?.kind !== "feature" || hover.id !== node.feature.id) {
+                setHover({ kind: "feature", id: node.feature.id });
+              }
+            }
+          }}
+          onDrop={() => {
+            if (drag?.kind === "card" && drag.featureId !== node.feature.id) {
+              onMoveCard(drag.id, node.feature.id, null, false);
+            }
+            settle();
+          }}
+          className={cn(
+            "text-meta px-4 py-1.5 text-xs",
+            hover?.kind === "feature" && hover.id === node.feature.id && "bg-accent/60",
+          )}
+        >
+          {t("levels.noStories")}
+        </p>
       ) : (
         <ol>
           {node.stories.map((card, index) => (

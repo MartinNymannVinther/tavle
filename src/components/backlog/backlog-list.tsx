@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { ChipContext, StructureLookup } from "@/components/board/card-chips";
 import type { CardView } from "@/modules/boards/types";
@@ -23,7 +24,7 @@ export type StoryRowProps = {
   onNudge: (cardId: string, siblingId: string, after: boolean) => void;
   dragId: string | null;
   setDragId: (id: string | null) => void;
-  onDropOn: (targetId: string) => void;
+  onDropOn: (targetId: string, after: boolean) => void;
   /** The line under a title: where the story sits, as far as the heading has not said it. */
   crumbOf: (card: CardView) => Crumb;
   /** The place the heading already states, left out of the chips. */
@@ -39,6 +40,9 @@ export function StoryRows({
   rows: StoryRowProps;
   context?: ChipContext;
 }) {
+  // Where the dragged card will land, drawn as a line above or below the
+  // row under the pointer — the drop should never be a guess.
+  const [hover, setHover] = useState<{ id: string; after: boolean } | null>(null);
   return (
     <ol className="divide-hairline divide-y">
       {stories.map((card, index) => {
@@ -60,8 +64,29 @@ export function StoryRows({
             draggable
             dragging={rows.dragId === card.id}
             onDragStart={() => rows.setDragId(card.id)}
-            onDragOver={(event) => event.preventDefault()}
-            onDrop={() => rows.onDropOn(card.id)}
+            onDragOver={(event) => {
+              event.preventDefault();
+              const rect = event.currentTarget.getBoundingClientRect();
+              const below = event.clientY > rect.top + rect.height / 2;
+              if (hover?.id !== card.id || hover.after !== below) {
+                setHover({ id: card.id, after: below });
+              }
+            }}
+            onDrop={() => {
+              rows.onDropOn(card.id, hover?.id === card.id ? hover.after : false);
+              setHover(null);
+            }}
+            onDragEnd={() => {
+              setHover(null);
+              rows.setDragId(null);
+            }}
+            indicator={
+              hover?.id === card.id && rows.dragId && rows.dragId !== card.id
+                ? hover.after
+                  ? "below"
+                  : "above"
+                : null
+            }
           />
         );
       })}

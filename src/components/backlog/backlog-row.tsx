@@ -39,6 +39,8 @@ export function BacklogRow({
   onDragStart,
   onDragOver,
   onDrop,
+  onDragEnd,
+  indicator,
   dragging,
   columnName,
   sprintName,
@@ -61,6 +63,9 @@ export function BacklogRow({
   onDragStart?: () => void;
   onDragOver?: (event: React.DragEvent) => void;
   onDrop?: () => void;
+  onDragEnd?: () => void;
+  /** Where the dragged thing will land: a line above or below this row. */
+  indicator?: "above" | "below" | null;
   dragging?: boolean;
   columnName?: string;
   /** The open sprint the card is already committed to: the row stands in the backlog, marked, not ranked. */
@@ -107,11 +112,21 @@ export function BacklogRow({
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDrop={onDrop}
+      onDragEnd={onDragEnd}
       className={cn(
-        "group/row hover:bg-secondary/40 flex items-center gap-2 py-2 pr-3 pl-3 transition-colors duration-[120ms]",
+        "group/row hover:bg-secondary/40 relative flex items-center gap-2 py-2 pr-3 pl-3 transition-colors duration-[120ms]",
         dragging && "opacity-40",
       )}
     >
+      {indicator && (
+        <span
+          aria-hidden
+          className={cn(
+            "bg-primary absolute inset-x-1 z-10 h-0.5 rounded-full",
+            indicator === "above" ? "-top-px" : "-bottom-px",
+          )}
+        />
+      )}
       {onSelect && (
         <input
           type="checkbox"

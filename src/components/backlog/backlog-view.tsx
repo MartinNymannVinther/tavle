@@ -148,11 +148,27 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
     void run(() => reorderBacklogAction({ cardId, index: after ? at + 1 : at }));
   }
 
-  function dropOn(targetId: string) {
+  function dropOn(targetId: string, after: boolean) {
     const id = dragId;
     setDragId(null);
     if (!id || id === targetId) return;
-    nudge(id, targetId, false);
+    nudge(id, targetId, after);
+  }
+
+  /** A card dragged to another feature's fold-out: placement first, then the spot it was dropped on. */
+  async function moveCardToFeature(
+    cardId: string,
+    featureId: string,
+    siblingId: string | null,
+    after: boolean,
+  ) {
+    const card = full.cards.find((c) => c.id === cardId);
+    if (!card) return;
+    if (card.featureId !== featureId) {
+      const ok = await run(() => placeCardAction({ cardId, featureId }));
+      if (!ok) return;
+    }
+    if (siblingId && siblingId !== cardId) nudge(cardId, siblingId, after);
   }
 
   const rank = (itemId: string, siblingId: string, after: boolean) =>
@@ -286,6 +302,9 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
           run={run}
           onRankItem={rank}
           onNudgeCard={nudge}
+          onMoveCard={(cardId, featureId, siblingId, after) =>
+            void moveCardToFeature(cardId, featureId, siblingId, after)
+          }
           allocated={allocated}
           sprintNameOf={sprintNameOf}
           newFeature={newFeature}
