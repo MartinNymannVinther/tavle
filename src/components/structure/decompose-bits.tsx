@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -49,32 +50,37 @@ export function MoveTo({
         <MoreHorizontal />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-44">
-        <DropdownMenuLabel>{label}</DropdownMenuLabel>
-        {options.map((option) => (
-          <DropdownMenuItem key={option.id} onClick={() => onMove(option.id)}>
-            <span className="text-meta mr-1 font-mono text-xs">{keyOf(option)}</span>
-            {option.title}
-          </DropdownMenuItem>
-        ))}
-        {withNone && (
-          <DropdownMenuItem onClick={() => onMove(null)}>{t("noParent")}</DropdownMenuItem>
-        )}
+        {/* A GroupLabel must stand inside a Group, or Base UI refuses the popup. */}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>{label}</DropdownMenuLabel>
+          {options.map((option) => (
+            <DropdownMenuItem key={option.id} onClick={() => onMove(option.id)}>
+              <span className="text-meta mr-1 font-mono text-xs">{keyOf(option)}</span>
+              {option.title}
+            </DropdownMenuItem>
+          ))}
+          {withNone && (
+            <DropdownMenuItem onClick={() => onMove(null)}>{t("noParent")}</DropdownMenuItem>
+          )}
+        </DropdownMenuGroup>
         {plan && plan.sprints.length > 0 && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuLabel>{t("planSprint")}</DropdownMenuLabel>
-            {plan.sprints.map((sprint) => (
-              <DropdownMenuItem
-                key={sprint.id}
-                onClick={() => plan.onPlan(sprint.id)}
-                className={sprint.id === plan.current ? "font-semibold" : undefined}
-              >
-                {sprint.name}
-              </DropdownMenuItem>
-            ))}
-            {plan.current && (
-              <DropdownMenuItem onClick={() => plan.onPlan(null)}>{t("noPlan")}</DropdownMenuItem>
-            )}
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>{t("planSprint")}</DropdownMenuLabel>
+              {plan.sprints.map((sprint) => (
+                <DropdownMenuItem
+                  key={sprint.id}
+                  onClick={() => plan.onPlan(sprint.id)}
+                  className={sprint.id === plan.current ? "font-semibold" : undefined}
+                >
+                  {sprint.name}
+                </DropdownMenuItem>
+              ))}
+              {plan.current && (
+                <DropdownMenuItem onClick={() => plan.onPlan(null)}>{t("noPlan")}</DropdownMenuItem>
+              )}
+            </DropdownMenuGroup>
           </>
         )}
       </DropdownMenuContent>

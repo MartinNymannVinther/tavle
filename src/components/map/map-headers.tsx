@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
@@ -245,22 +246,25 @@ export function RowLabel({
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
-              <Button type="button" variant="ghost" size="xs" className="text-meta -ml-2 w-fit">
-                <Plus data-slot="icon" />
-                {t("hiddenCards", { count: hidden.length })}
-              </Button>
+              <Button type="button" variant="ghost" size="xs" className="text-meta -ml-2 w-fit" />
             }
-          />
+          >
+            <Plus data-slot="icon" />
+            {t("hiddenCards", { count: hidden.length })}
+          </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="max-w-72 min-w-56">
-            <DropdownMenuLabel>{t("hiddenHint")}</DropdownMenuLabel>
-            {hidden.map(({ card, featureId, featureTitle }) => (
-              <DropdownMenuItem key={card.id} onClick={() => onReveal(featureId)}>
-                <span className="flex min-w-0 flex-col">
-                  <span className="truncate">{card.title}</span>
-                  <span className="text-meta text-2xs">{featureTitle}</span>
-                </span>
-              </DropdownMenuItem>
-            ))}
+            {/* A GroupLabel must stand inside a Group, or Base UI refuses the popup. */}
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>{t("hiddenHint")}</DropdownMenuLabel>
+              {hidden.map(({ card, featureId, featureTitle }) => (
+                <DropdownMenuItem key={card.id} onClick={() => onReveal(featureId)}>
+                  <span className="flex min-w-0 flex-col">
+                    <span className="truncate">{card.title}</span>
+                    <span className="text-meta text-2xs">{featureTitle}</span>
+                  </span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       )}
