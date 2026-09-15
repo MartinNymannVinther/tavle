@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Points } from "@/components/board/bits";
 import { FoldButton } from "@/components/backlog/backlog-bits";
 import { useFolded } from "@/components/backlog/use-folded";
 import { themeSwatch } from "@/components/board/tokens";
@@ -151,7 +150,6 @@ export function RoadmapChildren({
                     >
                       {card.title}
                     </Link>
-                    <Points estimate={card.estimate} />
                   </p>
                 );
               })}
