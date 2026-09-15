@@ -887,7 +887,8 @@
     "showSprints": "Show sprints",
     "levels": {
       "noStories": "No cards in the backlog here",
-      "elsewhere": "{open} under way · {done} done outside the backlog"
+      "elsewhere": "{open} under way · {done} done outside the backlog",
+      "doneElsewhere": "{done, plural, one {# card done} other {# cards done}} outside the backlog"
     }
   },
   "sprints": {

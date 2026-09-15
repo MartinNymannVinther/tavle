@@ -72,15 +72,20 @@ export function StoryRows({
 export function BacklogList({
   stories,
   rows,
+  allocated = [],
+  sprintNameOf,
   emptyText,
 }: {
   stories: CardView[];
   rows: StoryRowProps;
+  /** Cards already committed to an open sprint: shown after the ranked rows, marked, not ranked. */
+  allocated?: CardView[];
+  sprintNameOf?: Map<string, string>;
   /** What an empty list says; the whole-backlog wording differs from a narrowed one's. */
   emptyText?: string;
 }) {
   const t = useTranslations("backlog");
-  if (stories.length === 0) {
+  if (stories.length === 0 && allocated.length === 0) {
     return (
       <p className="text-meta border-hairline border-t px-4 py-3 text-sm">
         {emptyText ?? t("nothingHere")}
@@ -90,6 +95,22 @@ export function BacklogList({
   return (
     <div className="border-hairline border-t">
       <StoryRows stories={stories} rows={rows} />
+      {allocated.length > 0 && (
+        <ol className="divide-hairline border-hairline divide-y border-t">
+          {allocated.map((card) => (
+            <BacklogRow
+              key={card.id}
+              card={card}
+              boardKey={rows.boardKey}
+              boardId={rows.boardId}
+              structure={rows.structure}
+              context={rows.context}
+              crumb={rows.crumbOf(card)}
+              sprintName={(card.sprintId && sprintNameOf?.get(card.sprintId)) || undefined}
+            />
+          ))}
+        </ol>
+      )}
     </div>
   );
 }

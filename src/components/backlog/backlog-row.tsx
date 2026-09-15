@@ -41,6 +41,7 @@ export function BacklogRow({
   onDrop,
   dragging,
   columnName,
+  sprintName,
   quiet,
 }: {
   card: CardView;
@@ -62,6 +63,8 @@ export function BacklogRow({
   onDrop?: () => void;
   dragging?: boolean;
   columnName?: string;
+  /** The open sprint the card is already committed to: the row stands in the backlog, marked, not ranked. */
+  sprintName?: string;
   /** In a sprint's narrow panel: the chips wait for room, the column always shows. */
   quiet?: boolean;
 }) {
@@ -128,6 +131,7 @@ export function BacklogRow({
             href={`/boards/${boardId}/cards/${card.number}`}
             className={cn(
               "line-clamp-2 min-w-0 text-sm leading-snug hover:underline",
+              sprintName && "text-meta italic",
               card.doneAt && "text-meta line-through",
             )}
           >
@@ -164,6 +168,9 @@ export function BacklogRow({
         )}
       </div>
       <span className="flex shrink-0 items-center gap-2">
+        {sprintName && (
+          <span className="text-meta text-2xs whitespace-nowrap italic">{sprintName}</span>
+        )}
         {columnName && (
           <span
             className={cn("text-meta text-xs whitespace-nowrap", !quiet && "hidden @md:inline")}

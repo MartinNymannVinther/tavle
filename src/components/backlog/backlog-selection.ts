@@ -33,6 +33,32 @@ export function parseSelection(key: string): Selection {
 }
 
 /** The stories the selection shows, in the order they were given. */
+/** The navigator's narrowing for cards that are not in the tree (allocated to a sprint). */
+export function selectExtra(
+  stories: CardView[],
+  tree: Hierarchy,
+  selection: Selection,
+): CardView[] {
+  switch (selection.kind) {
+    case "all":
+      return stories;
+    case "feature":
+      return stories.filter((s) => s.featureId === selection.id);
+    case "epic": {
+      const node = tree.epics.find((n) => n.epic.id === selection.id);
+      const ids = new Set(node?.features.map((f) => f.feature.id) ?? []);
+      return stories.filter((s) => s.featureId && ids.has(s.featureId));
+    }
+    case "loose": {
+      const featureIds = new Set([
+        ...tree.epics.flatMap((n) => n.features.map((f) => f.feature.id)),
+        ...tree.looseFeatures.map((f) => f.feature.id),
+      ]);
+      return stories.filter((s) => !s.featureId || !featureIds.has(s.featureId));
+    }
+  }
+}
+
 export function selectStories(
   stories: CardView[],
   tree: Hierarchy,

@@ -72,6 +72,24 @@ export function backlogStories(full: BoardFull): CardView[] {
   return cards.filter(inBacklog).sort((a, b) => a.sort - b.sort || a.number - b.number);
 }
 
+/**
+ * Scrum: the cards already committed to an open sprint and not yet done.
+ * They left the backlog's order, but not the backlog's sight — the list
+ * shows them marked with their sprint, so the whole of a feature is one
+ * look (docs/adr/0027).
+ */
+export function allocatedStories(full: BoardFull): CardView[] {
+  if (full.board.mode !== "scrum") return [];
+  const open = new Map(full.sprints.filter((s) => s.state !== "closed").map((s) => [s.id, s]));
+  return full.cards
+    .filter((c) => c.sprintId && open.has(c.sprintId) && !c.doneAt)
+    .sort((a, b) => {
+      const sprintA = open.get(a.sprintId!)!;
+      const sprintB = open.get(b.sprintId!)!;
+      return sprintA.number - sprintB.number || a.sort - b.sort || a.number - b.number;
+    });
+}
+
 const byRank = (a: ItemView, b: ItemView) => a.sort - b.sort || a.number - b.number;
 
 export function hierarchy(

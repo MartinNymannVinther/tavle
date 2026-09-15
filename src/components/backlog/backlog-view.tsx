@@ -22,10 +22,24 @@ import { BacklogHeader } from "./backlog-header";
 import { BacklogHeading } from "./backlog-heading";
 import { BacklogList, type StoryRowProps } from "./backlog-list";
 import { BacklogNav, BacklogNavSelect } from "./backlog-nav";
-import { crumbFor, crumbOf, navCounts, selectStories, stillThere } from "./backlog-selection";
+import {
+  crumbFor,
+  crumbOf,
+  navCounts,
+  selectExtra,
+  selectStories,
+  stillThere,
+} from "./backlog-selection";
 import { useChosen } from "./use-chosen";
 import { BacklogToolbar } from "./backlog-toolbar";
-import { backlogStories, grouped, hierarchy, type Group, type Grouping } from "./group-backlog";
+import {
+  allocatedStories,
+  backlogStories,
+  grouped,
+  hierarchy,
+  type Group,
+  type Grouping,
+} from "./group-backlog";
 import { GroupedList } from "./grouped-list";
 import { ItemForm } from "./item-form";
 import { ItemBacklog } from "./item-backlog";
@@ -78,6 +92,10 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
   const selection = stillThere(chosen, tree);
   const stories = selectStories(filtered, tree, selection);
   const counts = navCounts(tree);
+  // Committed cards stay in the backlog's sight, marked with their sprint.
+  const allocated = allocatedStories(full);
+  const allocatedShown = selectExtra(applyFilters(allocated, filters), tree, selection);
+  const sprintNameOf = new Map(sprints.map((sp) => [sp.id, sp.name]));
   const open = sprints.filter((sp) => sp.state !== "closed").sort((a, b) => a.number - b.number);
   const active = sprints.find((sp) => sp.state === "active") ?? null;
   // The chosen sprint holds as long as it exists; otherwise the first
@@ -268,6 +286,8 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
           run={run}
           onRankItem={rank}
           onNudgeCard={nudge}
+          allocated={allocated}
+          sprintNameOf={sprintNameOf}
           newFeature={newFeature}
         />
       ) : (

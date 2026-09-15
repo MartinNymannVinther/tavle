@@ -10,7 +10,7 @@ import type { Run } from "@/components/board/use-board-actions";
 import type { Theme } from "@/core/db/schema";
 import { createCardAction } from "@/modules/boards/actions-cards";
 import { reviewDue } from "@/modules/boards/structure/rules";
-import type { BoardFull, ItemView } from "@/modules/boards/types";
+import type { BoardFull, CardView, ItemView } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { BacklogRow } from "./backlog-row";
@@ -43,6 +43,8 @@ export function ItemBacklog({
   run,
   onRankItem,
   onNudgeCard,
+  allocated = [],
+  sprintNameOf,
   newFeature,
 }: {
   full: BoardFull;
@@ -52,6 +54,9 @@ export function ItemBacklog({
   run: Run;
   onRankItem: (itemId: string, siblingId: string, after: boolean) => void;
   onNudgeCard: (cardId: string, siblingId: string, after: boolean) => void;
+  /** Cards already committed to an open sprint: shown marked under their feature, not ranked. */
+  allocated?: CardView[];
+  sprintNameOf?: Map<string, string>;
   newFeature: (epicId: string) => React.ReactNode;
 }) {
   const t = useTranslations("backlog");
@@ -60,6 +65,19 @@ export function ItemBacklog({
   const folded = useFolded(`${board.id}:levels`);
   const [drag, setDrag] = useState<Drag | null>(null);
 
+  const allocatedOf = (featureId: string | null) =>
+    allocated.filter((card) => card.featureId === featureId);
+  const markedRow = (card: CardView, context?: { areaId: string | null; themeIds: string[] }) => (
+    <BacklogRow
+      key={card.id}
+      card={card}
+      boardKey={board.key}
+      boardId={board.id}
+      structure={structure}
+      context={context}
+      sprintName={(card.sprintId && sprintNameOf?.get(card.sprintId)) || undefined}
+    />
+  );
   const epicOf = (feature: ItemView) =>
     feature.parentId ? full.items.find((i) => i.id === feature.parentId) : undefined;
   const allFeatures = [...tree.epics.flatMap((e) => e.features), ...tree.looseFeatures].sort(
@@ -207,11 +225,24 @@ export function ItemBacklog({
           ))}
         </ol>
       )}
-      {(node.elsewhere.open > 0 || node.elsewhere.done > 0) && (
-        <p className="text-meta px-4 pb-1.5 text-2xs">
-          {t("levels.elsewhere", { open: node.elsewhere.open, done: node.elsewhere.done })}
-        </p>
+      {allocatedOf(node.feature.id).length > 0 && (
+        <ol className="divide-hairline border-hairline divide-y border-t">
+          {allocatedOf(node.feature.id).map((card) =>
+            markedRow(card, { areaId: node.feature.areaId, themeIds: node.feature.themeIds }),
+          )}
+        </ol>
       )}
+      {board.mode === "scrum"
+        ? node.elsewhere.done > 0 && (
+            <p className="text-meta px-4 pb-1.5 text-2xs">
+              {t("levels.doneElsewhere", { done: node.elsewhere.done })}
+            </p>
+          )
+        : (node.elsewhere.open > 0 || node.elsewhere.done > 0) && (
+            <p className="text-meta px-4 pb-1.5 text-2xs">
+              {t("levels.elsewhere", { open: node.elsewhere.open, done: node.elsewhere.done })}
+            </p>
+          )}
       <div className="px-3 pb-2">
         <QuickAdd
           onAdd={(title) =>
@@ -299,7 +330,7 @@ export function ItemBacklog({
           </ol>
         </>
       )}
-      {tree.looseStories.length > 0 && (
+      {(tree.looseStories.length > 0 || allocatedOf(null).length > 0) && (
         <>
           {looseHeading(t("nav.noParent"))}
           <ol>
@@ -312,6 +343,7 @@ export function ItemBacklog({
                 structure={structure}
               />
             ))}
+            {allocatedOf(null).map((card) => markedRow(card))}
           </ol>
         </>
       )}

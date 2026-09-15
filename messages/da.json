@@ -887,7 +887,8 @@
     "showSprints": "Vis sprints",
     "levels": {
       "noStories": "Ingen kort i backloggen her",
-      "elsewhere": "{open} i gang · {done} færdige uden for backloggen"
+      "elsewhere": "{open} i gang · {done} færdige uden for backloggen",
+      "doneElsewhere": "{done, plural, one {# kort færdigt} other {# kort færdige}} uden for backloggen"
     }
   },
   "sprints": {
