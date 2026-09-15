@@ -77,7 +77,7 @@ export function SprintPlan({
         <div className="flex flex-wrap items-baseline gap-x-2">
           <h2 className="text-base font-semibold">{sprint.name}</h2>
           <p className="text-meta text-2sm tabular-nums">
-            {t("holds", { cards: cards.length, points })}
+            {t("holds", { unit: structure.estimateUnit, cards: cards.length, points })}
             {velocityAverage !== null && points > 0 && (
               <span> · {t("againstAverage", { average: velocityAverage })}</span>
             )}

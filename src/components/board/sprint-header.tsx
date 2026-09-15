@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { NativeSelect } from "@/components/ui/native-select";
 import { diffDays, formatDateDa } from "@/core/dates";
-import type { Sprint } from "@/core/db/schema";
+import type { EstimateUnit, Sprint } from "@/core/db/schema";
 import { closeSprintAction } from "@/modules/boards/actions-sprints";
 import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -34,6 +34,7 @@ export function SprintHeader({
   totalPoints,
   doneCards,
   totalCards,
+  unit,
   run,
 }: {
   sprint: Sprint;
@@ -44,6 +45,8 @@ export function SprintHeader({
   totalPoints: number;
   doneCards: number;
   totalCards: number;
+  /** What the board counts in, so the progress line names its sum (docs/adr/0030). */
+  unit: EstimateUnit;
   run: Run;
 }) {
   const t = useTranslations("boards.sprint");
@@ -96,7 +99,7 @@ export function SprintHeader({
           <p className="text-label text-2xs">{t("progress")}</p>
           <p className="font-semibold tabular-nums">
             {totalPoints > 0
-              ? `${donePoints}/${totalPoints} ${t("points")}`
+              ? `${donePoints}/${totalPoints} ${t("points", { unit })}`
               : `${doneCards}/${totalCards}`}
             <span className="text-meta ml-1.5 font-normal">{share}%</span>
           </p>

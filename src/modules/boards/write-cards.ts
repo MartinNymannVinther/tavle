@@ -329,7 +329,7 @@ export async function updateCard(
       ctx,
       card.boardId,
       "card.estimated",
-      { key, title: card.title, points: input.estimate ?? 0 },
+      { key, title: card.title, points: input.estimate ?? 0, unit: board?.estimateUnit },
       {
         cardId: card.id,
         actor,

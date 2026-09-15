@@ -15,7 +15,7 @@ import { ThemeDots } from "@/components/board/bits";
 import type { StructureLookup } from "@/components/board/card-chips";
 import { TypeIcon } from "@/components/board/type-icon";
 import { formatDateDa } from "@/core/dates";
-import type { Theme } from "@/core/db/schema";
+import type { EstimateUnit, Theme } from "@/core/db/schema";
 import type { CardView, ItemView } from "@/modules/boards/types";
 import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -213,12 +213,15 @@ export function RowLabel({
   row,
   cards,
   points,
+  unit,
   hidden = [],
   onReveal,
 }: {
   row: MapRow;
   cards: number;
   points: number;
+  /** What the board counts in, so the row's sum is named right (docs/adr/0030). */
+  unit: EstimateUnit;
   /** The row's cards the map cannot draw: their feature is not up on the backbone. */
   hidden?: Array<{ card: CardView; featureId: string; featureTitle: string }>;
   /** Puts the card's feature up, so the card lands in its own cell. */
@@ -241,7 +244,7 @@ export function RowLabel({
       )}
       {row.kind === "backlog" && <span className="text-2sm font-semibold">{t("backlog")}</span>}
       {row.kind === "column" && <span className="text-2sm font-semibold">{row.column.name}</span>}
-      <span className="text-meta mt-1 tabular-nums">{t("rowCounts", { cards, points })}</span>
+      <span className="text-meta mt-1 tabular-nums">{t("rowCounts", { unit, cards, points })}</span>
       {hidden.length > 0 && onReveal && (
         <DropdownMenu>
           <DropdownMenuTrigger

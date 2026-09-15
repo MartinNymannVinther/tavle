@@ -53,7 +53,12 @@ export function BacklogHeading({
         structure={structure}
         reviewDue={reviewDue(node.epic, reviewDays)}
         progress={epicProgress(node)}
-        counts={h("epicCounts", { features: node.features.length, cards, points })}
+        counts={h("epicCounts", {
+          unit: structure.estimateUnit,
+          features: node.features.length,
+          cards,
+          points,
+        })}
         action={node.epic.state === "open" ? newFeature?.(node.epic.id) : undefined}
       />
     );
@@ -72,7 +77,12 @@ export function BacklogHeading({
         structure={structure}
         reviewDue={false}
         progress={progress}
-        counts={h("featureCounts", { cards, points, open: progress.open })}
+        counts={h("featureCounts", {
+          unit: structure.estimateUnit,
+          cards,
+          points,
+          open: progress.open,
+        })}
         action={node.feature.state === "open" ? featurePlan?.(node.feature) : undefined}
       />
     );
@@ -82,7 +92,7 @@ export function BacklogHeading({
     <div className="flex flex-col gap-0.5 px-4 py-3">
       <h2 className="text-reading leading-snug font-semibold">{nav("noParent")}</h2>
       <p className="text-meta text-2sm tabular-nums">
-        {h("looseHint")} · {t("holds", { cards, points })}
+        {h("looseHint")} · {t("holds", { unit: structure.estimateUnit, cards, points })}
       </p>
     </div>
   );

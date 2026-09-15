@@ -39,6 +39,7 @@ export function BacklogHeader({
         <h2 className="text-base font-semibold">{t("title")}</h2>
         <p className="text-meta text-sm tabular-nums">
           {t("holds", {
+            unit: full.board.estimateUnit,
             cards: all.length,
             points: all.reduce((total, c) => total + (c.estimate ?? 0), 0),
           })}

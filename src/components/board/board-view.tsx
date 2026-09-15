@@ -281,6 +281,7 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
           totalPoints={totalPoints}
           doneCards={doneCards}
           totalCards={onBoard.length}
+          unit={structure.estimateUnit}
           run={run}
         />
       )}

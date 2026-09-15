@@ -37,7 +37,9 @@ export default async function SprintsPage({ params }: Params) {
         <Card>
           <CardHeader>
             <CardTitle>{t("velocityTitle")}</CardTitle>
-            <CardDescription>{t("velocityBody", { average: v.average ?? 0 })}</CardDescription>
+            <CardDescription>
+              {t("velocityBody", { unit: header.board.estimateUnit, average: v.average ?? 0 })}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <VelocityChart data={v} ariaLabel={t("velocityTitle")} />
@@ -82,11 +84,15 @@ export default async function SprintsPage({ params }: Params) {
                 <p className="text-meta w-32 text-right text-sm tabular-nums">
                   {sprint.state === "closed"
                     ? t("closedPoints", {
+                        unit: header.board.estimateUnit,
                         completed: sprint.completedPoints ?? 0,
                         committed: sprint.committedPoints ?? 0,
                       })
                     : sprint.state === "active"
-                      ? t("committedPoints", { committed: sprint.committedPoints ?? 0 })
+                      ? t("committedPoints", {
+                          unit: header.board.estimateUnit,
+                          committed: sprint.committedPoints ?? 0,
+                        })
                       : ""}
                 </p>
               </Link>

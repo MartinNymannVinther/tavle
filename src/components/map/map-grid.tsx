@@ -110,6 +110,7 @@ export function MapGrid({
                 row={row}
                 cards={rowCards.length}
                 points={rowCards.reduce((sum, card) => sum + (card.estimate ?? 0), 0)}
+                unit={structure.estimateUnit}
                 hidden={handlers.hiddenOf(row.key)}
                 onReveal={handlers.onReveal}
               />

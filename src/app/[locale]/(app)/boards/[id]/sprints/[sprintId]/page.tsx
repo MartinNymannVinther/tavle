@@ -80,7 +80,13 @@ export default async function SprintPage({ params }: Params) {
           <CardHeader>
             <CardTitle>{t("burndownTitle")}</CardTitle>
             <CardDescription>
-              {t("numbers", { done: done.length, total: rows.length, donePoints, totalPoints })}
+              {t("numbers", {
+                unit: header.board.estimateUnit,
+                done: done.length,
+                total: rows.length,
+                donePoints,
+                totalPoints,
+              })}
             </CardDescription>
           </CardHeader>
           <CardContent>

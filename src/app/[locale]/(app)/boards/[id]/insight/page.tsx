@@ -52,6 +52,7 @@ export default async function InsightPage({ params }: Params) {
           <CardDescription>
             {insight.activeBurndown
               ? t("burndownBody", {
+                  unit: header.board.estimateUnit,
                   name: insight.activeBurndown.sprint.name,
                   remaining: insight.activeBurndown.remainingNow,
                   committed: insight.activeBurndown.committed,
@@ -72,7 +73,10 @@ export default async function InsightPage({ params }: Params) {
           <CardDescription>
             {insight.velocity.average === null
               ? t("velocityNone")
-              : t("velocityBody", { average: insight.velocity.average })}
+              : t("velocityBody", {
+                  unit: header.board.estimateUnit,
+                  average: insight.velocity.average,
+                })}
           </CardDescription>
         </CardHeader>
         {insight.velocity.bars.length > 0 && (

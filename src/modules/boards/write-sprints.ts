@@ -112,10 +112,12 @@ export async function startSprint(
     .update(sprints)
     .set({ state: "active", committedPoints, startedAt: new Date() })
     .where(eq(sprints.id, sprint.id));
+  const startedOn = await boardInWorkspace(tx, sprint.boardId);
   await recordEvent(tx, ctx, sprint.boardId, "sprint.started", {
     name: sprint.name,
     cards: rows.length,
     points: committedPoints,
+    unit: startedOn?.estimateUnit,
   });
   return sprint;
 }
@@ -180,6 +182,7 @@ export async function closeSprint(
     committed: sprint.committedPoints ?? 0,
     carried: unfinished.length,
     into: target?.name ?? "",
+    unit: board?.estimateUnit,
   });
   return sprint;
 }

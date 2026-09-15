@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import type { EstimateUnit } from "@/core/db/schema";
 import { themeSwatch } from "@/components/board/tokens";
 import { overview, type Bucket } from "@/modules/boards/structure/overview";
 import { structureView } from "@/modules/boards/structure/view";
@@ -21,6 +22,7 @@ export function OverviewView({ full }: { full: BoardFull }) {
   const s = useTranslations("boards.structure");
   const data = overview(full);
   const view = structureView(full.board);
+  const unit = (full.board.estimateUnit as EstimateUnit) ?? "points";
   const percent = (value: number) => `${Math.round(value * 100)} %`;
   const share = (part: number, total: number) => (total > 0 ? percent(part / total) : "–");
   const tile = (label: string, value: string, hint: string, warn = false) => (
@@ -66,7 +68,7 @@ export function OverviewView({ full }: { full: BoardFull }) {
       tile(
         t("enablerShare"),
         data.openCards > 0 ? percent(data.enablerShare) : "–",
-        data.openPoints > 0 ? t("byPoints") : t("byCards"),
+        data.openPoints > 0 ? t("byPoints", { unit }) : t("byCards"),
       ),
     (view.themes || view.areas) &&
       tile(
@@ -136,11 +138,11 @@ export function OverviewView({ full }: { full: BoardFull }) {
             <CardHeader>
               <CardTitle>{t(`${key}Title`)}</CardTitle>
               <CardDescription>
-                {t("distributionBody", { cards: data.openCards, points: data.openPoints })}
+                {t("distributionBody", { unit, cards: data.openCards, points: data.openPoints })}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Distribution buckets={buckets} name={name} />
+              <Distribution buckets={buckets} name={name} unit={unit} />
             </CardContent>
           </Card>
         ))}
@@ -158,7 +160,16 @@ const BUCKET_PALETTE = [
   "var(--label)",
 ];
 
-function Distribution({ buckets, name }: { buckets: Bucket[]; name: (bucket: Bucket) => string }) {
+function Distribution({
+  buckets,
+  name,
+  unit,
+}: {
+  buckets: Bucket[];
+  name: (bucket: Bucket) => string;
+  /** What the board counts in, so each weight is named right (docs/adr/0030). */
+  unit: EstimateUnit;
+}) {
   const t = useTranslations("overview");
   const byPoints = buckets.some((b) => b.points > 0);
   const value = (bucket: Bucket) => (byPoints ? bucket.points : bucket.cards);
@@ -208,7 +219,11 @@ function Distribution({ buckets, name }: { buckets: Bucket[]; name: (bucket: Buc
               {name(bucket)}
             </span>
             <span className="text-meta shrink-0 text-2sm tabular-nums">
-              {t("bucketValue", { cards: bucket.cards, points: bucket.points })}
+              {t("bucketValue", {
+                unit,
+                cards: bucket.cards,
+                points: bucket.points,
+              })}
               {total > 0 && ` · ${shareOf(bucket)} %`}
             </span>
           </li>
