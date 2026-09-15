@@ -99,12 +99,9 @@ export function BacklogRow({
         <span className="truncate">{crumb.feature.title}</span>
       </span>,
     );
-  if (area)
-    parts.push(
-      <span key="area" className="truncate">
-        {area.name}
-      </span>,
-    );
+  // The area stands apart from the "›" chain: epic › feature is the
+  // decomposition, the area is where the card belongs — a field, not a
+  // level, so it never reads as a child of the feature.
 
   return (
     <li
@@ -167,7 +164,7 @@ export function BacklogRow({
             {card.descriptionPreview}
           </p>
         )}
-        {parts.length > 0 && (
+        {(parts.length > 0 || area) && (
           <p className="text-meta mt-0.5 flex items-center gap-1 text-2xs">
             {parts.map((part, index) => (
               <span key={index} className="inline-flex min-w-0 items-center gap-1">
@@ -179,6 +176,16 @@ export function BacklogRow({
                 {part}
               </span>
             ))}
+            {area && (
+              <span className="inline-flex min-w-0 items-center gap-1">
+                {parts.length > 0 && (
+                  <span aria-hidden className="text-label">
+                    ·
+                  </span>
+                )}
+                <span className="truncate">{area.name}</span>
+              </span>
+            )}
           </p>
         )}
       </div>
