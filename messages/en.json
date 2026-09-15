@@ -585,7 +585,8 @@
       "business": "Business",
       "enabler": "Enabler",
       "bugs": "Bugs only",
-      "all": "All cards"
+      "all": "All cards",
+      "more": "Filters"
     },
     "sprint": {
       "kicker": "{start} – {end}",
@@ -889,7 +890,9 @@
       "noStories": "No cards in the backlog here",
       "elsewhere": "{open} under way · {done} done outside the backlog",
       "doneElsewhere": "{done, plural, one {# card done} other {# cards done}} outside the backlog"
-    }
+    },
+    "hideNav": "Hide the breakdown",
+    "showNav": "Show the breakdown"
   },
   "sprints": {
     "title": "Sprints",

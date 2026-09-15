@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { ListFilter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
@@ -56,26 +58,35 @@ export function BoardFilters({
   onChange,
   members,
   structure,
+  collapsible = false,
 }: {
   filters: Filters;
   onChange: (filters: Filters) => void;
   members: Member[];
   structure: StructureLookup;
+  /** In a narrow column: only the search stands out; the selects wait behind a counted "Filtre" button. */
+  collapsible?: boolean;
 }) {
   const t = useTranslations("boards.filters");
   const { view } = structure;
+  const [open, setOpen] = useState(false);
   const themes = view.themes ? structure.themes.filter((theme) => theme.active) : [];
   const areas = view.areas ? structure.areas.filter((area) => area.active) : [];
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <Input
-        type="search"
-        value={filters.text}
-        onChange={(event) => onChange({ ...filters, text: event.target.value })}
-        placeholder={t("search")}
-        aria-label={t("search")}
-        className="h-9 w-56 text-2sm"
-      />
+  const chosen = [filters.assignee, filters.themeId, filters.areaId, filters.kind].filter(
+    Boolean,
+  ).length;
+  const search = (
+    <Input
+      type="search"
+      value={filters.text}
+      onChange={(event) => onChange({ ...filters, text: event.target.value })}
+      placeholder={t("search")}
+      aria-label={t("search")}
+      className={collapsible ? "h-8 w-40 min-w-0 flex-1 text-2sm" : "h-9 w-56 text-2sm"}
+    />
+  );
+  const selects = (
+    <>
       <NativeSelect
         variant="sm"
         value={filters.assignee}
@@ -142,6 +153,35 @@ export function BoardFilters({
           {t("clear")}
         </Button>
       )}
+    </>
+  );
+  if (!collapsible) {
+    return (
+      <div className="flex flex-wrap items-center gap-2">
+        {search}
+        {selects}
+      </div>
+    );
+  }
+  return (
+    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+      {search}
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <ListFilter data-slot="icon" />
+        {t("more")}
+        {chosen > 0 && (
+          <span className="bg-accent text-accent-foreground rounded-full px-1.5 text-2xs font-medium tabular-nums">
+            {chosen}
+          </span>
+        )}
+      </Button>
+      {open && <div className="flex w-full flex-wrap items-center gap-2">{selects}</div>}
     </div>
   );
 }

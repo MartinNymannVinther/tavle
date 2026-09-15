@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { SegmentedChoice } from "@/components/ui/segmented";
 import { useTranslations } from "next-intl";
 import { applyFilters, NO_FILTERS, type Filters } from "@/components/board/board-filters";
@@ -84,6 +86,7 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
     `tavle.backlog.${board.id}.sprints`,
     "on",
   );
+  const [navPref, setNavPref] = usePref<"on" | "off">(`tavle.backlog.${board.id}.nav`, "on");
 
   const all = backlogStories(full);
   const filtered = applyFilters(all, filters);
@@ -255,6 +258,20 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
       />
       {(view.features || scrum) && (
         <div className="border-hairline flex flex-wrap items-center gap-x-4 gap-y-2 border-b px-4 py-2">
+          {view.features && levelChoice === "cards" && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              aria-pressed={navPref === "on"}
+              aria-label={navPref === "on" ? t("hideNav") : t("showNav")}
+              title={navPref === "on" ? t("hideNav") : t("showNav")}
+              className="text-meta @max-2xl:hidden"
+              onClick={() => setNavPref(navPref === "on" ? "off" : "on")}
+            >
+              {navPref === "on" ? <PanelLeftClose /> : <PanelLeftOpen />}
+            </Button>
+          )}
           {view.features && (
             <SegmentedChoice
               value={levelChoice}

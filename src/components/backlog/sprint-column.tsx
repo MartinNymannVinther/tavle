@@ -10,6 +10,7 @@ import { velocity } from "@/modules/boards/metrics/velocity";
 import type { BoardFull } from "@/modules/boards/types";
 import { SprintForm } from "./sprint-form";
 import { SprintPlan } from "./sprint-plan";
+import { useFolded } from "./use-folded";
 
 /**
  * The open sprints beside the backlog on a Scrum board, newest last,
@@ -38,6 +39,8 @@ export function SprintColumn({
 }) {
   const t = useTranslations("backlog");
   const { board, cards } = full;
+  // What is stored is the minimized ones, so every panel opens open.
+  const minimized = useFolded(`${board.id}:sprintpanel`);
   const columnNames = new Map(full.columns.map((c) => [c.id, c.name]));
   // The record speaks at the moment of planning: the recent closed
   // sprints' written-down points, next to what this plan holds.
@@ -61,6 +64,10 @@ export function SprintColumn({
           lengthDays={board.sprintLengthDays}
           velocityAverage={average}
           aiAvailable={aiAvailable}
+          fold={{
+            open: !minimized.isOpen(sprint.id),
+            onToggle: () => minimized.toggle(sprint.id),
+          }}
           run={run}
         />
       ))}

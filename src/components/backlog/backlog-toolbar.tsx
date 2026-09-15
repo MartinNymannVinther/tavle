@@ -41,6 +41,7 @@ export function BacklogToolbar({
         onChange={onFilters}
         members={members}
         structure={structure}
+        collapsible
       />
     </div>
   );

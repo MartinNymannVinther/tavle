@@ -585,7 +585,8 @@
       "business": "Business",
       "enabler": "Enabler",
       "bugs": "Kun fejl",
-      "all": "Alle kort"
+      "all": "Alle kort",
+      "more": "Filtre"
     },
     "sprint": {
       "kicker": "{start} – {end}",
@@ -889,7 +890,9 @@
       "noStories": "Ingen kort i backloggen her",
       "elsewhere": "{open} i gang · {done} færdige uden for backloggen",
       "doneElsewhere": "{done, plural, one {# kort færdigt} other {# kort færdige}} uden for backloggen"
-    }
+    },
+    "hideNav": "Skjul nedbrydningen",
+    "showNav": "Vis nedbrydningen"
   },
   "sprints": {
     "title": "Sprints",
