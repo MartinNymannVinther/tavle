@@ -87,10 +87,12 @@ codebase to:
 - The AI writes four kinds of proposal — finish a card, split a card, the
   sprint's story, and a starting point for backlog and roadmap from the
   team's own prose (ADR 0021) — and a person edits and says yes. Beside
-  them stand the quiet assists (ADR 0025): a done-when drafted on
-  request, and a placement suggestion with a duplicate glance while a
-  card title is typed — proposals still, writing nothing on their own.
-  Without a model the buttons say so and everything else works.
+  them stand the quiet assists (ADR 0025) and the counsel (ADR 0026):
+  a done-when and a sprint goal drafted on request, a placement
+  suggestion with a duplicate glance while a card title is typed, the
+  close conversation pre-set to a reasoned plan, and a review brief —
+  proposals still, writing nothing on their own. Without a model the
+  buttons say so and everything else works.
 - Deliberately not built: time tracking, custom fields, labels or tags,
   dependencies, automation rules, integrations, attachments,
   notifications by mail, a level above epic. The omissions are the

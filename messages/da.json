@@ -834,7 +834,9 @@
       "end": "Slut",
       "create": "Planlæg",
       "save": "Gem",
-      "cancel": "Annuller"
+      "cancel": "Annuller",
+      "suggestGoal": "Foreslå mål",
+      "aiDraft": "AI'ens udkast — ret det til, og gem det som jeres."
     },
     "newEpic": "Ny epic",
     "newFeature": "Ny feature",
@@ -1327,7 +1329,8 @@
       "deleteTitle": "Slet for altid?",
       "deleteBody": "{key} slettes. Det der ligger under, bliver stående uden forælder.",
       "deleteConfirm": "Slet",
-      "delete": "Slet"
+      "delete": "Slet",
+      "reviewBrief": "Lav et rids"
     },
     "children": {
       "features": "{count, plural, =0 {Ingen features endnu} one {# feature} other {# features}}",

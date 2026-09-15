@@ -23,6 +23,7 @@ export function SprintColumn({
   structure,
   selected,
   onSelect,
+  aiAvailable = false,
   run,
 }: {
   full: BoardFull;
@@ -32,6 +33,7 @@ export function SprintColumn({
   structure: StructureLookup;
   selected: Set<string>;
   onSelect: (cardId: string, checked: boolean) => void;
+  aiAvailable?: boolean;
   run: Run;
 }) {
   const t = useTranslations("backlog");
@@ -58,6 +60,7 @@ export function SprintColumn({
           onSelect={onSelect}
           lengthDays={board.sprintLengthDays}
           velocityAverage={average}
+          aiAvailable={aiAvailable}
           run={run}
         />
       ))}

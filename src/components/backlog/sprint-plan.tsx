@@ -30,6 +30,7 @@ export function SprintPlan({
   onSelect,
   lengthDays,
   velocityAverage = null,
+  aiAvailable = false,
   run,
 }: {
   sprint: Sprint;
@@ -44,6 +45,7 @@ export function SprintPlan({
   lengthDays: number;
   /** The recent closed sprints' average completed points; null before any close. */
   velocityAverage?: number | null;
+  aiAvailable?: boolean;
   run: Run;
 }) {
   const t = useTranslations("backlog.sprint");
@@ -74,6 +76,7 @@ export function SprintPlan({
             nextNumber={sprint.number}
             suggestedStart={sprint.startDate}
             lengthDays={lengthDays}
+            aiAssist={aiAvailable}
             run={run}
             trigger={
               <Button type="button" variant="ghost" size="xs">

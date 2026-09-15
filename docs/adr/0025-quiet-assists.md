@@ -9,8 +9,9 @@ The owner's standing direction is AI support wherever it makes sense,
 split, sprint story, bootstrap — ADR 0021) are destinations a person
 walks to; the assists live where the person already stands. The
 candidates were weighed by user value against build effort; three ship
-now, three stay on the list (sprint-goal draft, a prefilled close
-conversation, an epic review brief).
+now, three stayed on the list (sprint-goal draft, a prefilled close
+conversation, an epic review brief) — the owner said yes to those the
+day after, and ADR 0026 carries them.
 
 ## Decision
 

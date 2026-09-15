@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useFormatter, useTranslations } from "next-intl";
+import { Sparkles } from "lucide-react";
 import { StatusChip } from "@/components/board/bits";
 import { Button } from "@/components/ui/button";
 import { ConfirmButton } from "@/components/ui/confirm-button";
@@ -14,6 +16,8 @@ import { TypeIcon } from "@/components/board/type-icon";
 import { legendTypes, TypeLegend } from "@/components/board/type-legend";
 import { structureView } from "@/modules/boards/structure/view";
 import { useBoardActions } from "@/components/board/use-board-actions";
+import { proposeReviewBriefAction } from "@/modules/ai/actions-advice";
+import type { ReviewBrief } from "@/modules/ai/advice";
 import { undoEventAction } from "@/modules/boards/actions-undo";
 import {
   confirmReviewAction,
@@ -48,6 +52,7 @@ export function ItemPage({
 }) {
   const t = useTranslations("items.page");
   const s = useTranslations("boards.structure");
+  const ai = useTranslations("cards.ai");
   const format = useFormatter();
   const router = useRouter();
   const { run } = useBoardActions();
@@ -56,6 +61,23 @@ export function ItemPage({
   const categoryNames = [...themes.map((x) => x.name), ...areas.map((a) => a.name)];
   const backlog = `/boards/${board.id}/backlog`;
   const view = structureView(board);
+  // The review brief (docs/adr/0026): a read the model writes and no one
+  // applies — the banner's decision stays a human button.
+  const [brief, setBrief] = useState<(ReviewBrief & { engine: string }) | null>(null);
+  const [briefBusy, setBriefBusy] = useState(false);
+  const [briefFailure, setBriefFailure] = useState<string | null>(null);
+
+  async function fetchBrief() {
+    setBriefBusy(true);
+    setBriefFailure(null);
+    const result = await proposeReviewBriefAction({ itemId: item.id });
+    setBriefBusy(false);
+    if (!result.ok) {
+      setBriefFailure(result.error);
+      return;
+    }
+    setBrief({ ...result.proposal, engine: result.engine });
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
@@ -89,6 +111,18 @@ export function ItemPage({
         {reviewDue && (
           <div className="border-warning bg-warning-tint/40 mt-1 flex flex-wrap items-center gap-3 rounded-lg border p-3 text-sm">
             <p className="min-w-0 flex-1">{t("reviewBody", { days: board.epicReviewDays })}</p>
+            {aiAvailable && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={briefBusy}
+                onClick={() => void fetchBrief()}
+              >
+                <Sparkles data-slot="icon" />
+                {t("reviewBrief")}
+              </Button>
+            )}
             <Button
               type="button"
               size="sm"
@@ -96,6 +130,20 @@ export function ItemPage({
             >
               {t("reviewConfirm")}
             </Button>
+          </div>
+        )}
+        {briefFailure && <p className="text-destructive text-xs">{ai(`errors.${briefFailure}`)}</p>}
+        {brief && (
+          <div className="border-hairline bg-card mt-1 flex flex-col gap-2 rounded-lg border p-3 text-sm shadow-[var(--surface-shadow)]">
+            <p className="leading-relaxed whitespace-pre-wrap">{brief.summary}</p>
+            {brief.observations.length > 0 && (
+              <ul className="text-2sm flex list-disc flex-col gap-0.5 pl-5">
+                {brief.observations.map((observation) => (
+                  <li key={observation}>{observation}</li>
+                ))}
+              </ul>
+            )}
+            <p className="text-meta text-2xs">{ai("engine", { engine: brief.engine })}</p>
           </div>
         )}
       </div>
@@ -206,6 +254,7 @@ export function ItemPage({
                 targets={epic ? epics : openFeatures}
                 areas={areas}
                 run={run}
+                aiAvailable={aiAvailable}
               />
             )}
             {canManage && (

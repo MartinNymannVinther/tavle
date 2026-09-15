@@ -834,7 +834,9 @@
       "end": "End",
       "create": "Plan",
       "save": "Save",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "suggestGoal": "Suggest a goal",
+      "aiDraft": "The AI's draft — rework it and save it as yours."
     },
     "newEpic": "New epic",
     "newFeature": "New feature",
@@ -1327,7 +1329,8 @@
       "deleteTitle": "Delete for good?",
       "deleteBody": "{key} will be deleted. What is under it stays, without a parent.",
       "deleteConfirm": "Delete",
-      "delete": "Delete"
+      "delete": "Delete",
+      "reviewBrief": "Draft a brief"
     },
     "children": {
       "features": "{count, plural, =0 {No features yet} one {# feature} other {# features}}",

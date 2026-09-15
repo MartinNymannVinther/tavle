@@ -6,8 +6,14 @@ import { requireOrgContext } from "@/core/auth/guard";
 import type { Result } from "@/core/result";
 import { action, found } from "@/modules/boards/action-helpers";
 import { updateItem } from "@/modules/boards/structure/write-items";
-import { id, shortText } from "@/modules/boards/validation";
-import { proposeDoneWhen, proposeQuickAssist, type QuickAssist } from "./assists";
+import { id, isoDate, shortText } from "@/modules/boards/validation";
+import { updateSprint } from "@/modules/boards/write-sprints";
+import {
+  proposeDoneWhen,
+  proposeQuickAssist,
+  proposeSprintGoal,
+  type QuickAssist,
+} from "./assists";
 import type { ProposalResult } from "./actions";
 import { classifyAiError, modelConfigured } from "./service";
 
@@ -45,6 +51,39 @@ export async function applyDoneWhenAction(raw: unknown): Promise<Result<string>>
     );
     touch(item.boardId);
     return item.boardId;
+  });
+}
+
+const SprintGoalRef = z.object({ sprintId: id });
+
+export async function proposeSprintGoalAction(raw: unknown): Promise<ProposalResult<string>> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const parsed = SprintGoalRef.safeParse(raw);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  try {
+    const result = await proposeSprintGoal(ctx, parsed.data.sprintId, await getLocale());
+    if (!result) return { ok: false, error: "notFound" };
+    return { ok: true, ...result };
+  } catch (error) {
+    return { ok: false, error: classifyAiError(error) };
+  }
+}
+
+const ApplySprintGoalSchema = z.object({
+  sprintId: id,
+  name: shortText(80).min(1),
+  goal: shortText(500).min(1),
+  startDate: isoDate,
+  endDate: isoDate,
+});
+
+/** Saves the sprint with the goal the person kept, marked as the AI's work. */
+export async function applySprintGoalAction(raw: unknown): Promise<Result<string>> {
+  return action(ApplySprintGoalSchema, raw, async (tx, ctx, input, touch) => {
+    const sprint = found(await updateSprint(tx, ctx, input, "ai"));
+    touch(sprint.boardId);
+    return sprint.boardId;
   });
 }
 

@@ -76,6 +76,7 @@ export async function updateSprint(
   tx: AppTransaction,
   ctx: OrgContext,
   input: { sprintId: string; name: string; goal: string; startDate: string; endDate: string },
+  actor: ActorKind = "user",
 ): Promise<Sprint | null> {
   const sprint = await sprintInWorkspace(tx, input.sprintId);
   if (!sprint || sprint.state === "closed") return null;
@@ -84,7 +85,7 @@ export async function updateSprint(
     .update(sprints)
     .set({ name: input.name, goal: input.goal, startDate, endDate })
     .where(eq(sprints.id, sprint.id));
-  await recordEvent(tx, ctx, sprint.boardId, "sprint.updated", { name: input.name });
+  await recordEvent(tx, ctx, sprint.boardId, "sprint.updated", { name: input.name }, { actor });
   return sprint;
 }
 

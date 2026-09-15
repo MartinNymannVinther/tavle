@@ -298,6 +298,7 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
         structure={structure}
         selected={selected}
         onSelect={select}
+        aiAvailable={aiAvailable}
         run={run}
       />
     </div>

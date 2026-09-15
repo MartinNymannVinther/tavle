@@ -1,7 +1,8 @@
 import { and, asc, desc, eq, isNull } from "drizzle-orm";
 import type { LlmMessage } from "@/core/llm";
-import { areas, backlogItems, cards } from "@/core/db/schema";
+import { areas, backlogItems, cards, sprints } from "@/core/db/schema";
 import { withOrgContext, type OrgContext } from "@/core/db/tenant";
+import { velocity } from "@/modules/boards/metrics/velocity";
 import { boardInWorkspace } from "@/modules/boards/read";
 import { itemInWorkspace } from "@/modules/boards/structure/items";
 import { capText } from "./limits";
@@ -94,6 +95,61 @@ export async function proposeDoneWhen(
 export function sanitizeDoneWhen(raw: unknown): string | null {
   const record = raw as Record<string, unknown> | null;
   const text = capText(record?.doneWhen, 500);
+  return text.length > 0 ? text : null;
+}
+
+export async function proposeSprintGoal(
+  ctx: OrgContext,
+  sprintId: string,
+  locale: string,
+): Promise<Proposal<string> | null> {
+  const gathered = await withOrgContext(ctx, async (tx) => {
+    const [sprint] = await tx.select().from(sprints).where(eq(sprints.id, sprintId)).limit(1);
+    if (!sprint || sprint.state === "closed") return null;
+    const rows = await tx
+      .select({ title: cards.title, estimate: cards.estimate, feature: backlogItems.title })
+      .from(cards)
+      .leftJoin(backlogItems, eq(backlogItems.id, cards.featureId))
+      .where(and(eq(cards.sprintId, sprint.id), isNull(cards.archivedAt)))
+      .orderBy(asc(cards.sort));
+    if (rows.length === 0) return null;
+    const all = await tx.select().from(sprints).where(eq(sprints.boardId, sprint.boardId));
+    return { sprint, rows, average: velocity(all).average };
+  });
+  if (!gathered) return null;
+  const { sprint, rows, average } = gathered;
+  const points = rows.reduce((total, r) => total + (r.estimate ?? 0), 0);
+  const line = (r: (typeof rows)[number]) =>
+    `- ${r.title}${r.feature ? ` (${r.feature})` : ""}${r.estimate ? ` [${r.estimate}]` : ""}`;
+  const messages: LlmMessage[] = [
+    {
+      role: "system",
+      content: [
+        "You write a sprint goal for a small team: one sentence naming the outcome this sprint exists for — what is true at the end that was not at the start. Not a list of the cards.",
+        DATA_RULE,
+        languageRule(locale),
+        JSON_ONLY,
+        'Shape: {"goal": string}',
+      ].join("\n"),
+    },
+    {
+      role: "user",
+      content: [
+        `Sprint: ${fenceUntrusted(sprint.name, 80)} (${sprint.startDate} to ${sprint.endDate})`,
+        `Planned points: ${points}${average !== null ? `; the team's recent average is ${average}` : ""}`,
+        `Cards:\n${fenceUntrusted(rows.map(line).join("\n"), 4000)}`,
+      ].join("\n"),
+    },
+  ];
+  const answer = await askForJson(ctx, "goal", messages);
+  const proposal = sanitizeSprintGoal(answer.data);
+  return proposal ? { proposal, engine: answer.engine } : null;
+}
+
+/** One sentence, cut to the goal field's own cap. */
+export function sanitizeSprintGoal(raw: unknown): string | null {
+  const record = raw as Record<string, unknown> | null;
+  const text = capText(record?.goal, 500);
   return text.length > 0 ? text : null;
 }
 

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,6 +15,7 @@ import {
 import { NativeSelect } from "@/components/ui/native-select";
 import type { Run } from "@/components/board/use-board-actions";
 import type { Area } from "@/core/db/schema";
+import { proposeCloseAdviceAction } from "@/modules/ai/actions-advice";
 import { closeItemAction } from "@/modules/boards/actions-structure";
 import type { OpenChild } from "@/modules/boards/structure/close";
 import type { ChildDecision } from "@/modules/boards/structure/validation";
@@ -25,6 +27,9 @@ import type { ItemView } from "@/modules/boards/types";
  * dialog asks what to do with each — close a feature that has nothing
  * open under it, archive a story, move it to another parent, or keep it
  * without one — and sends the plan back. Nothing closes on its own.
+ * With a model set up the selects arrive pre-set to a reasoned plan
+ * (docs/adr/0026), each with its one-line why; every choice remains the
+ * person's, and confirm still re-validates everything on the server.
  */
 export function CloseItemButton({
   item,
@@ -32,6 +37,7 @@ export function CloseItemButton({
   targets,
   areas,
   run,
+  aiAvailable = false,
 }: {
   item: ItemView;
   boardKey: string;
@@ -39,11 +45,34 @@ export function CloseItemButton({
   targets: ItemView[];
   areas: Area[];
   run: Run;
+  /** A model is set up: ask it for a starting plan when the dialog opens. */
+  aiAvailable?: boolean;
 }) {
   const t = useTranslations("items.close");
   const [children, setChildren] = useState<OpenChild[] | null>(null);
   const [plan, setPlan] = useState<Record<string, ChildDecision>>({});
+  const [reasons, setReasons] = useState<Record<string, string>>({});
   const [pending, setPending] = useState(false);
+  // One ticket per dialog opening, so a slow answer for a closed dialog
+  // is dropped; a child the person already touched is never overridden.
+  const ticket = useRef(0);
+  const touched = useRef(new Set<string>());
+
+  async function advise() {
+    const mine = ++ticket.current;
+    const result = await proposeCloseAdviceAction({ itemId: item.id });
+    if (mine !== ticket.current || !result.ok) return;
+    setPlan((prev) => {
+      const next = { ...prev };
+      for (const advice of result.proposal) {
+        if (next[advice.id] && !touched.current.has(advice.id)) {
+          next[advice.id] = { id: advice.id, action: advice.action, targetId: advice.targetId };
+        }
+      }
+      return next;
+    });
+    setReasons(Object.fromEntries(result.proposal.map((a) => [a.id, a.reason])));
+  }
 
   async function attempt(withPlan?: ChildDecision[]) {
     setPending(true);
@@ -53,6 +82,8 @@ export function CloseItemButton({
         if (outcome.closed) setChildren(null);
         else {
           setChildren(outcome.openChildren);
+          touched.current = new Set();
+          setReasons({});
           setPlan(
             Object.fromEntries(
               outcome.openChildren.map((child) => [
@@ -64,6 +95,7 @@ export function CloseItemButton({
               ]),
             ),
           );
+          if (aiAvailable) void advise();
         }
       },
     );
@@ -92,7 +124,15 @@ export function CloseItemButton({
       >
         {t("button")}
       </Button>
-      <Dialog open={children !== null} onOpenChange={(open) => !open && setChildren(null)}>
+      <Dialog
+        open={children !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            ticket.current += 1;
+            setChildren(null);
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle>{t("title", { key: `${boardKey}-${item.number}` })}</DialogTitle>
@@ -101,8 +141,10 @@ export function CloseItemButton({
           <ol className="divide-hairline flex flex-col divide-y">
             {children?.map((child) => {
               const decision = plan[child.id]!;
-              const set = (patch: Partial<ChildDecision>) =>
+              const set = (patch: Partial<ChildDecision>) => {
+                touched.current.add(child.id);
                 setPlan({ ...plan, [child.id]: { ...decision, ...patch } });
+              };
               return (
                 <li key={child.id} className="flex flex-col gap-2 py-3">
                   <p className="text-sm">
@@ -176,6 +218,12 @@ export function CloseItemButton({
                       </NativeSelect>
                     )}
                   </div>
+                  {reasons[child.id] && (
+                    <p className="text-meta flex items-center gap-1 text-2xs">
+                      <Sparkles className="size-3 shrink-0" aria-hidden />
+                      {reasons[child.id]}
+                    </p>
+                  )}
                 </li>
               );
             })}
