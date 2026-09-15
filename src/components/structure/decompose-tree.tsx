@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { FoldButton } from "@/components/backlog/backlog-bits";
+import { useFolded } from "@/components/backlog/use-folded";
 import { QuickAdd } from "@/components/board/quick-add";
 import { TypeIcon } from "@/components/board/type-icon";
 import type { StructureLookup } from "@/components/board/card-chips";
@@ -116,6 +118,7 @@ export function ChartNode({
   emphasis,
   stripe,
   menu,
+  fold,
   drop,
   dragProps,
   dragging,
@@ -129,6 +132,8 @@ export function ChartNode({
   /** The first theme's colour on the left edge — the same word the dots and bars speak. */
   stripe?: string | null;
   menu?: React.ReactNode;
+  /** Folds what hangs under this node in and out. */
+  fold?: { open: boolean; toggle: () => void };
   drop?: { over: boolean; props: object };
   dragProps?: React.HTMLAttributes<HTMLDivElement> & { draggable?: boolean };
   dragging?: boolean;
@@ -148,16 +153,20 @@ export function ChartNode({
       style={stripe ? { borderLeftColor: stripe } : undefined}
     >
       {/* The title carries the box; symbol, key and menu step up into one quiet line. */}
-      <div className="text-meta flex min-h-5 items-center gap-1.5">
+      <div className="text-meta relative flex min-h-5 items-center justify-center gap-1.5">
+        {fold && (
+          <span className="absolute top-1/2 left-0 -translate-y-1/2">
+            <FoldButton open={fold.open} onToggle={fold.toggle} />
+          </span>
+        )}
         {icon}
         <span className="font-mono text-2xs tabular-nums">{keyLabel}</span>
-        <span className="flex-1" />
-        {menu}
+        {menu && <span className="absolute top-1/2 right-0 -translate-y-1/2">{menu}</span>}
       </div>
       <Link
         href={href}
         className={cn(
-          "focus-ring line-clamp-3 text-2sm leading-snug hover:underline",
+          "focus-ring line-clamp-3 text-center text-2sm leading-snug hover:underline",
           emphasis && "font-semibold",
           strike && "text-meta line-through",
         )}
@@ -192,8 +201,11 @@ export function EpicTree({
   const drop = useDrop(h.drag?.kind === "feature", () => {
     if (h.drag) h.onPlaceFeature(h.drag.id, epic.id);
   });
+  // Presence in the store means folded shut; a fresh chart stands open.
+  const folded = useFolded(`${boardId}:decompose`);
+  const shut = folded.isOpen(epic.id);
   return (
-    <section aria-label={epic.title} className="flex w-fit min-w-full flex-col items-center">
+    <section aria-label={epic.title} className="flex w-fit flex-col items-center">
       <ChartNode
         icon={<TypeIcon type="epic" />}
         keyLabel={`${boardKey}-${epic.number}`}
@@ -202,28 +214,33 @@ export function EpicTree({
         emphasis
         stripe={stripeFor(epic.themeIds, structure)}
         drop={drop}
+        fold={{ open: !shut, toggle: () => folded.toggle(epic.id) }}
       />
-      <Stem />
-      <Branches>
-        {features.map((feature) => (
-          <Branch key={feature.id}>
-            <FeatureTree
-              feature={feature}
-              boardKey={boardKey}
-              boardId={boardId}
-              structure={structure}
-              cards={cardsOf(feature.id)}
-              doneOf={doneOf}
-              h={h}
-            />
-          </Branch>
-        ))}
-        <Branch>
-          <div className="border-input w-40 rounded-lg border border-dashed p-1.5">
-            <NewFeature onAdd={(title) => h.onAddFeature(epic.id, title)} />
-          </div>
-        </Branch>
-      </Branches>
+      {!shut && (
+        <>
+          <Stem />
+          <Branches>
+            {features.map((feature) => (
+              <Branch key={feature.id}>
+                <FeatureTree
+                  feature={feature}
+                  boardKey={boardKey}
+                  boardId={boardId}
+                  structure={structure}
+                  cards={cardsOf(feature.id)}
+                  doneOf={doneOf}
+                  h={h}
+                />
+              </Branch>
+            ))}
+            <Branch>
+              <div className="border-input w-40 rounded-lg border border-dashed p-1.5">
+                <NewFeature onAdd={(title) => h.onAddFeature(epic.id, title)} />
+              </div>
+            </Branch>
+          </Branches>
+        </>
+      )}
     </section>
   );
 }
@@ -251,6 +268,8 @@ export function FeatureTree({
     if (h.drag) h.onPlaceCard(h.drag.id, feature.id);
   });
   const epics = structure.items.filter((i) => i.level === "epic" && i.state === "open");
+  const folded = useFolded(`${boardId}:decompose`);
+  const shut = folded.isOpen(feature.id);
   return (
     <div className="flex flex-col items-start">
       <ChartNode
@@ -259,6 +278,7 @@ export function FeatureTree({
         title={feature.title}
         href={`/boards/${boardId}/items/${feature.number}`}
         stripe={stripeFor(feature.themeIds, structure)}
+        fold={{ open: !shut, toggle: () => folded.toggle(feature.id) }}
         drop={drop}
         dragging={h.drag?.kind === "feature" && h.drag.id === feature.id}
         dragProps={{
@@ -285,30 +305,32 @@ export function FeatureTree({
           />
         }
       />
-      <Ladder>
-        {cards.map((card) => (
-          <Rung key={card.id}>
-            <CardNode
-              card={card}
-              boardKey={boardKey}
-              boardId={boardId}
-              done={doneOf(card)}
-              structure={structure}
-              h={h}
-            />
+      {!shut && (
+        <Ladder>
+          {cards.map((card) => (
+            <Rung key={card.id}>
+              <CardNode
+                card={card}
+                boardKey={boardKey}
+                boardId={boardId}
+                done={doneOf(card)}
+                structure={structure}
+                h={h}
+              />
+            </Rung>
+          ))}
+          <Rung>
+            <div className="border-input w-40 rounded-lg border border-dashed p-1">
+              <QuickAdd
+                compact
+                structure={structure}
+                fixed={{ featureId: feature.id }}
+                onAdd={(title) => h.onAddCard(feature.id, title)}
+              />
+            </div>
           </Rung>
-        ))}
-        <Rung>
-          <div className="border-input w-40 rounded-lg border border-dashed p-1">
-            <QuickAdd
-              compact
-              structure={structure}
-              fixed={{ featureId: feature.id }}
-              onAdd={(title) => h.onAddCard(feature.id, title)}
-            />
-          </div>
-        </Rung>
-      </Ladder>
+        </Ladder>
+      )}
     </div>
   );
 }

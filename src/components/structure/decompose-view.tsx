@@ -161,9 +161,11 @@ export function DecomposeView({ full, aiAvailable }: { full: BoardFull; aiAvaila
       <div className="flex flex-col gap-4" style={{ zoom }}>
         <div className="-mx-5 min-w-0 flex-1 overflow-x-auto px-5 pb-2 sm:-mx-7 sm:px-7 lg:mx-0 lg:px-0">
           {view.epics ? (
-            <div className="flex flex-col gap-10">
+            // The epics side by side, one shared scroll; each tree folds
+            // from its own nodes rather than fighting for the height.
+            <div className="flex items-start gap-10">
               {epics.map((epic) => (
-                <div key={epic.id} className="overflow-x-auto pb-1">
+                <div key={epic.id} className="shrink-0 pb-1">
                   <EpicTree
                     epic={epic}
                     features={featuresOf(epic.id)}
@@ -176,7 +178,7 @@ export function DecomposeView({ full, aiAvailable }: { full: BoardFull; aiAvaila
                   />
                 </div>
               ))}
-              <div>
+              <div className="shrink-0 pt-1">
                 <ItemForm
                   full={full}
                   level="epic"
