@@ -20,7 +20,15 @@ import { placeOnMapAction } from "@/modules/boards/actions-structure";
 import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
 import { MapGrid, type Drag } from "./map-grid";
 import { MapTray } from "./map-tray";
-import { backbone, featureTotals, LOOSE_COLUMN, storyMap, tray, type MapRow } from "./story-map";
+import {
+  backbone,
+  featureTotals,
+  LOOSE_COLUMN,
+  rowOf,
+  storyMap,
+  tray,
+  type MapRow,
+} from "./story-map";
 
 /**
  * The story map: the backbone of features across, in the story's
@@ -51,6 +59,23 @@ export function StoryMapView({ full }: { full: BoardFull }) {
   const wholeLane = backbone(structure.items, { showClosed: true });
   const waiting = tray(structure.items);
   const doneColumns = new Set(full.columns.filter((c) => c.category === "done").map((c) => c.id));
+  // A sprint's card whose feature is not up on the backbone is invisible
+  // in the cells; the row label offers it, and one pick puts its feature
+  // up so the card lands where it belongs. Nothing is reassigned.
+  const onMapIds = new Set(onMap.map((f) => f.id));
+  const openFeatureOf = (featureId: string | null) =>
+    featureId
+      ? structure.items.find(
+          (i) => i.id === featureId && i.level === "feature" && i.state === "open",
+        )
+      : undefined;
+  const hiddenOf = (rowKey: string) =>
+    cards.flatMap((card) => {
+      if (rowOf(card, map.rows, scrum) !== rowKey) return [];
+      const feature = openFeatureOf(card.featureId);
+      if (!feature || onMapIds.has(feature.id)) return [];
+      return [{ card, featureId: feature.id, featureTitle: feature.title }];
+    });
   const doneIds = new Set(full.cards.filter((c) => doneColumns.has(c.columnId)).map((c) => c.id));
   const countOf = (featureId: string) => full.cards.filter((c) => c.featureId === featureId).length;
 
@@ -175,6 +200,8 @@ export function StoryMapView({ full }: { full: BoardFull }) {
               full.items.find((item) => item.id === featureId)!,
               full,
             ),
+          hiddenOf,
+          onReveal: (featureId) => void run(() => placeOnMapAction({ itemId: featureId })),
         }}
       />
       <div className="border-hairline flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t px-4 py-2">

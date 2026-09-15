@@ -28,6 +28,9 @@ export type GridHandlers = {
   onTakeDown: (featureId: string) => void;
   onAdd: (row: MapRow, place: Place, title: string) => Promise<boolean>;
   featureTotals: (featureId: string) => { total: number; done: number; open: number };
+  /** The row's cards whose feature is off the backbone, offered from the label. */
+  hiddenOf: (rowKey: string) => Array<{ card: CardView; featureId: string; featureTitle: string }>;
+  onReveal: (featureId: string) => void;
 };
 
 export function MapGrid({
@@ -107,6 +110,8 @@ export function MapGrid({
                 row={row}
                 cards={rowCards.length}
                 points={rowCards.reduce((sum, card) => sum + (card.estimate ?? 0), 0)}
+                hidden={handlers.hiddenOf(row.key)}
+                onReveal={handlers.onReveal}
               />
               {map.columns.map((column, index) => (
                 <MapCell

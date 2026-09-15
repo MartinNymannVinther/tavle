@@ -1,12 +1,13 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, CircleDashed, MoreHorizontal } from "lucide-react";
+import { ArrowLeft, ArrowRight, CircleDashed, MoreHorizontal, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeDots } from "@/components/board/bits";
@@ -14,7 +15,7 @@ import type { StructureLookup } from "@/components/board/card-chips";
 import { TypeIcon } from "@/components/board/type-icon";
 import { formatDateDa } from "@/core/dates";
 import type { Theme } from "@/core/db/schema";
-import type { ItemView } from "@/modules/boards/types";
+import type { CardView, ItemView } from "@/modules/boards/types";
 import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import type { MapRow } from "./story-map";
@@ -207,7 +208,21 @@ export function LooseHead({
   );
 }
 
-export function RowLabel({ row, cards, points }: { row: MapRow; cards: number; points: number }) {
+export function RowLabel({
+  row,
+  cards,
+  points,
+  hidden = [],
+  onReveal,
+}: {
+  row: MapRow;
+  cards: number;
+  points: number;
+  /** The row's cards the map cannot draw: their feature is not up on the backbone. */
+  hidden?: Array<{ card: CardView; featureId: string; featureTitle: string }>;
+  /** Puts the card's feature up, so the card lands in its own cell. */
+  onReveal?: (featureId: string) => void;
+}) {
   const t = useTranslations("map");
   const sprint = useTranslations("backlog.sprint");
   return (
@@ -226,6 +241,29 @@ export function RowLabel({ row, cards, points }: { row: MapRow; cards: number; p
       {row.kind === "backlog" && <span className="text-2sm font-semibold">{t("backlog")}</span>}
       {row.kind === "column" && <span className="text-2sm font-semibold">{row.column.name}</span>}
       <span className="text-meta mt-1 tabular-nums">{t("rowCounts", { cards, points })}</span>
+      {hidden.length > 0 && onReveal && (
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button type="button" variant="ghost" size="xs" className="text-meta -ml-2 w-fit">
+                <Plus data-slot="icon" />
+                {t("hiddenCards", { count: hidden.length })}
+              </Button>
+            }
+          />
+          <DropdownMenuContent align="start" className="max-w-72 min-w-56">
+            <DropdownMenuLabel>{t("hiddenHint")}</DropdownMenuLabel>
+            {hidden.map(({ card, featureId, featureTitle }) => (
+              <DropdownMenuItem key={card.id} onClick={() => onReveal(featureId)}>
+                <span className="flex min-w-0 flex-col">
+                  <span className="truncate">{card.title}</span>
+                  <span className="text-meta text-2xs">{featureTitle}</span>
+                </span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   );
 }

@@ -1448,7 +1448,9 @@
     "rowCounts": "{cards, plural, one {# card} other {# cards}} · {points} points",
     "underway": "{open} underway",
     "emptyTray": "The map is empty. Click a feature in the tray to put it up.",
-    "empty": "No features yet. Create a feature, and it can go up on the map."
+    "empty": "No features yet. Create a feature, and it can go up on the map.",
+    "hiddenCards": "{count, plural, one {# card off the map} other {# cards off the map}}",
+    "hiddenHint": "Pick a card — its feature goes up on the map"
   },
   "decompose": {
     "title": "Breakdown",

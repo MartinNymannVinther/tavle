@@ -1448,7 +1448,9 @@
     "rowCounts": "{cards, plural, one {# kort} other {# kort}} · {points} point",
     "underway": "{open} i gang",
     "emptyTray": "Mappet er tomt. Klik på en feature i bakken for at sætte den op.",
-    "empty": "Ingen features endnu. Opret en feature, så kan den sættes op på mappet."
+    "empty": "Ingen features endnu. Opret en feature, så kan den sættes op på mappet.",
+    "hiddenCards": "{count, plural, one {# kort uden for mappet} other {# kort uden for mappet}}",
+    "hiddenHint": "Vælg et kort — dets feature sættes op på mappet"
   },
   "decompose": {
     "title": "Nedbrydning",
