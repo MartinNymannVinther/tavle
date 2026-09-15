@@ -99,6 +99,22 @@ export const UndoStepSchema = z.discriminatedUnion("kind", [
   }),
   z.object({ kind: z.literal("item.close"), itemId: id }),
   z.object({
+    kind: z.literal("board.estimates"),
+    boardId: id,
+    unit: z.enum(["points", "hours", "tshirt"]),
+    /** Every estimated card as it stood, so one Fortryd puts the whole board back. */
+    cards: z.array(z.object({ cardId: id, estimate: z.number().nullable() })).max(5000),
+    sprints: z
+      .array(
+        z.object({
+          sprintId: id,
+          committedPoints: z.number().nullable(),
+          completedPoints: z.number().nullable(),
+        }),
+      )
+      .max(500),
+  }),
+  z.object({
     kind: z.literal("board.view"),
     boardId: id,
     structureLevels: z.enum(["epic", "feature", "card"]),

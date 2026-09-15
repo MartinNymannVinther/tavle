@@ -763,7 +763,13 @@
       "blocked": "Blokeret",
       "blockedReason": "Hvad venter kortet på?",
       "blockedYes": "Ja, venter",
-      "blockedNo": "Nej"
+      "blockedNo": "Nej",
+      "estimateLabel": {
+        "points": "Estimat",
+        "hours": "Timer",
+        "tshirt": "Størrelse"
+      },
+      "noEstimate": "Intet estimat"
     },
     "ai": {
       "title": "AI-hjælp",
@@ -1015,6 +1021,29 @@
       "reviewDays": "Epics til revision efter (dage)",
       "reviewDaysHint": "En epic, der har været åben længere, markeres Til revision, indtil ejeren bekræfter at den stadig er et resultat."
     },
+    "estimates": {
+      "title": "Estimering",
+      "body": "Hvad I tæller i. Point og T-shirt-størrelser er de samme tal — en størrelse er et navn på en vægt — så skiftet mellem dem ændrer ingen summer. Timer er en anden skala, og der foreslår værktøjet en omregning, du kan rette, før du siger ja.",
+      "unit": {
+        "points": "Story points",
+        "hours": "Timer",
+        "tshirt": "T-shirt"
+      },
+      "hint": {
+        "points": "Kortene estimeres i point på skalaen 1, 2, 3, 5, 8, 13.",
+        "hours": "Kortene estimeres i timer. Velocity og burndown regner i timer.",
+        "tshirt": "Kortene får en størrelse fra XS til XXL. Bag størrelsen står den vægt, tallene regner på: XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13."
+      },
+      "factor": "En time-omregning på",
+      "factorHint": "timer pr. point",
+      "willChange": "{cards, plural, one {# kort får et nyt estimat} other {# kort får nye estimater}}.",
+      "nothingChanges": "Ingen tal ændrer sig — kun ordene på dem.",
+      "noEstimates": "Ingen kort på tavlen er estimeret endnu, så der er intet at regne om.",
+      "cards": "{count, plural, one {# kort} other {# kort}}",
+      "apply": "Skift til {unit}",
+      "cancel": "Fortryd valget",
+      "undoable": "Skiftet står i aktiviteten og kan fortrydes."
+    },
     "columns": {
       "title": "Kolonner",
       "body": "Navn, hvad kolonnen betyder for tallene, og en eventuel grænse for hvor mange kort der må være i den. Grænsen advarer, den forbyder ikke.",
@@ -1158,7 +1187,8 @@
     "board": {
       "created": "Tavlen {name} blev oprettet",
       "updated": "Tavlen blev omdøbt til {name}",
-      "view": "Tavlens visning af strukturen blev ændret"
+      "view": "Tavlens visning af strukturen blev ændret",
+      "estimateUnit": "Tavlen tæller nu i {unit, select, points {story points} hours {timer} tshirt {T-shirt-størrelser} other {{unit}}} ({cards} kort regnet om)"
     },
     "column": {
       "created": "Kolonnen {name} blev tilføjet",
@@ -1261,6 +1291,10 @@
       "cards": {
         "title": "Kort",
         "body": "Et kort skal bare have en titel for at findes. Klik på titlen for at åbne kortet: her sætter I ansvarlig, estimat, prioritet, deadline, acceptkriterier og tjekliste, og vælger hvilken feature kortet er del af, eller hvilket område det hører til, og skriver til hinanden i kommentarerne. Alt gemmes med det samme. Et blokeret kort får en rød kant, så det ikke bliver overset."
+      },
+      "estimates": {
+        "title": "Estimering",
+        "body": "Tavlen kan tælle i story points, i timer eller i T-shirt-størrelser — vælg under Indstillinger → Estimering. Størrelser og point er de samme tal, for en størrelse er blot et navn på en vægt (XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13), så skiftet mellem dem ændrer ingen summer. Timer er en anden skala, og der viser værktøjet en tabel over hvert estimat på tavlen og hvad det bliver til, med en omregningsfaktor du selv kan rette. Intet skrives, før du siger ja, og skiftet står i aktiviteten med en Fortryd-knap."
       },
       "undo": {
         "title": "Fortryd",

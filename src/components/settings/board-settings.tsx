@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { EstimateSettings } from "./estimate-settings";
 import { StructureSettings } from "./structure-settings";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -134,6 +135,8 @@ export function BoardSettings({ full, canManage }: { full: BoardFull; canManage:
       </Card>
 
       <StructureSettings board={board} canManage={canManage} run={run} />
+
+      <EstimateSettings board={board} canManage={canManage} run={run} />
 
       {board.mode === "kanban" && board.swimlaneBy === "manual" && (
         <Card>

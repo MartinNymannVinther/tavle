@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { Area, Theme } from "@/core/db/schema";
+import type { Area, EstimateUnit, Theme } from "@/core/db/schema";
 import type { CardView, ItemView } from "@/modules/boards/types";
 import {
   structureView,
@@ -18,10 +18,12 @@ export type StructureLookup = {
   items: ItemView[];
   /** How much of the structure the board shows; what is hidden is left out everywhere. */
   view: StructureView;
+  /** What the board counts in, so every card reads its estimate the same way (docs/adr/0030). */
+  estimateUnit: EstimateUnit;
 };
 
 export function structureOf(full: {
-  board: StructureSettings;
+  board: StructureSettings & { estimateUnit?: string };
   themes: Theme[];
   areas: Area[];
   items: ItemView[];
@@ -35,6 +37,7 @@ export function structureOf(full: {
         (item.level === "epic" && view.epics) || (item.level === "feature" && view.features),
     ),
     view,
+    estimateUnit: (full.board.estimateUnit as EstimateUnit) ?? "points",
   };
 }
 

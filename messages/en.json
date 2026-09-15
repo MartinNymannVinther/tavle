@@ -763,7 +763,13 @@
       "blocked": "Blocked",
       "blockedReason": "What is the card waiting for?",
       "blockedYes": "Yes, waiting",
-      "blockedNo": "No"
+      "blockedNo": "No",
+      "estimateLabel": {
+        "points": "Estimate",
+        "hours": "Hours",
+        "tshirt": "Size"
+      },
+      "noEstimate": "No estimate"
     },
     "ai": {
       "title": "AI help",
@@ -1015,6 +1021,29 @@
       "reviewDays": "Epics for review after (days)",
       "reviewDaysHint": "An epic open longer than this is marked For review until its owner confirms it is still a result."
     },
+    "estimates": {
+      "title": "Estimation",
+      "body": "What you count in. Points and T-shirt sizes are the same numbers — a size is a name for a weight — so moving between them changes no sums. Hours are another scale, and there the tool proposes a conversion you can adjust before saying yes.",
+      "unit": {
+        "points": "Story points",
+        "hours": "Hours",
+        "tshirt": "T-shirt"
+      },
+      "hint": {
+        "points": "Cards are estimated in points on the scale 1, 2, 3, 5, 8, 13.",
+        "hours": "Cards are estimated in hours. Velocity and burndown count in hours.",
+        "tshirt": "Cards get a size from XS to XXL. Behind the size stands the weight the numbers use: XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13."
+      },
+      "factor": "An hour conversion of",
+      "factorHint": "hours per point",
+      "willChange": "{cards, plural, one {# card gets a new estimate} other {# cards get new estimates}}.",
+      "nothingChanges": "No numbers change — only the words on them.",
+      "noEstimates": "No card on the board is estimated yet, so there is nothing to convert.",
+      "cards": "{count, plural, one {# card} other {# cards}}",
+      "apply": "Switch to {unit}",
+      "cancel": "Undo the choice",
+      "undoable": "The switch is in the activity and can be undone."
+    },
     "columns": {
       "title": "Columns",
       "body": "A name, what the column means to the numbers, and an optional limit on how many cards may sit in it. The limit warns; it does not forbid.",
@@ -1158,7 +1187,8 @@
     "board": {
       "created": "The board {name} was created",
       "updated": "The board was renamed to {name}",
-      "view": "The board's view of the structure was changed"
+      "view": "The board's view of the structure was changed",
+      "estimateUnit": "The board now counts in {unit, select, points {story points} hours {hours} tshirt {T-shirt sizes} other {{unit}}} ({cards} cards converted)"
     },
     "column": {
       "created": "The column {name} was added",
@@ -1261,6 +1291,10 @@
       "cards": {
         "title": "Cards",
         "body": "A card only needs a title to exist. Click the title to open it: here you set the assignee, estimate, priority, due date, acceptance criteria and checklist, and choose which feature the card is part of, or which area it belongs to, and write to each other in the comments. Everything saves immediately. A blocked card gets a red edge so it is not overlooked."
+      },
+      "estimates": {
+        "title": "Estimation",
+        "body": "A board can count in story points, in hours or in T-shirt sizes — choose under Settings → Estimation. Sizes and points are the same numbers, because a size is only a name for a weight (XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13), so moving between them changes no sums. Hours are another scale, and there the tool shows a table of every estimate on the board and what it would become, with a conversion factor you can adjust. Nothing is written until you say yes, and the switch stands in the activity with an Undo button."
       },
       "undo": {
         "title": "Undo",

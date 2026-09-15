@@ -24,6 +24,7 @@ export function ItemChildren({ full, run }: { full: ItemFull; run: Run }) {
   const { item, board, features, stories, doneStories, themes, areas, epics, openFeatures } = full;
   const epic = item.level === "epic";
   const source: ItemFormSource = { board, themes, areas, items: [...epics, ...openFeatures] };
+  const estimateUnit = structureOf(source).estimateUnit;
 
   return (
     <section className="flex flex-col gap-2">
@@ -94,7 +95,7 @@ export function ItemChildren({ full, run }: { full: ItemFull; run: Run }) {
                 {story.title}
               </Link>
               <span className="text-meta hidden text-xs sm:inline">{story.columnName}</span>
-              <Points estimate={story.estimate} />
+              <Points estimate={story.estimate} unit={estimateUnit} />
               {story.assigneeName ? (
                 <Initials name={story.assigneeName} />
               ) : (

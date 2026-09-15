@@ -2,6 +2,8 @@
 
 import type { Result } from "@/core/result";
 import { action, found } from "./action-helpers";
+import type { EstimateChange } from "./estimates";
+import { previewEstimateUnit, setEstimateUnit } from "./write-estimates";
 import {
   BoardIdSchema,
   BoardMetaSchema,
@@ -9,6 +11,7 @@ import {
   ColumnDeleteSchema,
   ColumnOrderSchema,
   ColumnUpdateSchema,
+  EstimateUnitSchema,
   NewBoardSchema,
   NewColumnSchema,
 } from "./validation";
@@ -125,6 +128,35 @@ export async function deleteColumnAction(raw: unknown): Promise<Result<string>> 
       const column = found(await deleteColumn(tx, ctx, input.columnId, input.moveCardsTo));
       touch(column.boardId);
       return column.id;
+    },
+    { manage: true },
+  );
+}
+
+/**
+ * What the switch would do, so the person sees the table before saying
+ * yes (docs/adr/0030). Reads only; the board is untouched until
+ * setEstimateUnitAction is called with the same factor.
+ */
+export async function previewEstimateUnitAction(
+  raw: unknown,
+): Promise<Result<{ table: EstimateChange[]; rewrites: boolean }>> {
+  return action(EstimateUnitSchema, raw, async (tx, _ctx, input) => {
+    const preview = found(
+      await previewEstimateUnit(tx, input.boardId, input.unit, input.hoursPerPoint),
+    );
+    return { table: preview.table, rewrites: preview.rewrites };
+  });
+}
+
+export async function setEstimateUnitAction(raw: unknown): Promise<Result<string>> {
+  return action(
+    EstimateUnitSchema,
+    raw,
+    async (tx, ctx, input, touch) => {
+      const board = found(await setEstimateUnit(tx, ctx, input));
+      touch(board.id);
+      return board.id;
     },
     { manage: true },
   );

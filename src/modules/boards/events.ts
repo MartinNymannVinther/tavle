@@ -34,6 +34,7 @@ export type EventType =
   | "item.mapped"
   | "item.unmapped"
   | "backlog.aligned"
+  | "board.estimateUnit"
   | "item.deleted"
   | "card.created"
   | "card.moved"

@@ -115,6 +115,7 @@ export const board: BoardFull = {
     nextSprintNumber: 3,
     epicReviewDays: 180,
     swimlaneBy: "none",
+    estimateUnit: "points",
     structureLevels: "epic",
     showKind: true,
     showThemes: true,

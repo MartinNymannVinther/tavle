@@ -1,5 +1,7 @@
 import type { Priority, Theme } from "@/core/db/schema";
 import { cn } from "@/lib/utils";
+import type { EstimateUnit } from "@/core/db/schema";
+import { labelOf } from "@/modules/boards/estimates";
 import { PRIORITY_MARK, themeSwatch } from "./tokens";
 import { TypeGlyph } from "./type-icon";
 
@@ -160,17 +162,28 @@ export function Initials({
   );
 }
 
-/** Story points, when there are any. */
-export function Points({ estimate, className }: { estimate: number | null; className?: string }) {
-  if (estimate === null || estimate === undefined) return null;
+/** The card's size, in whatever the board counts in (docs/adr/0030). */
+export function Points({
+  estimate,
+  unit = "points",
+  className,
+}: {
+  estimate: number | null;
+  unit?: EstimateUnit;
+  className?: string;
+}) {
+  const label = labelOf(estimate, unit);
+  if (label === null) return null;
   return (
     <span
       className={cn(
-        "bg-muted text-secondary-foreground inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-2xs font-semibold tabular-nums",
+        "bg-muted text-secondary-foreground inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-2xs font-semibold",
+        // A size is a word, not a number; only digits want tabular figures.
+        unit === "tshirt" ? "tracking-tight" : "tabular-nums",
         className,
       )}
     >
-      {estimate}
+      {label}
     </span>
   );
 }

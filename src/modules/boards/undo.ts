@@ -25,6 +25,7 @@ import { updateArea, updateTheme } from "./structure/write-lists";
 import { enterColumn } from "./transitions";
 import { UndoStepSchema, type UndoStep } from "./undo-steps";
 import { updateStructureView } from "./write-boards";
+import { restoreEstimates } from "./write-estimates";
 import { setCardsSprint } from "./write-sprints";
 import { recordEvent } from "./events";
 import type { StructureViewInput } from "./validation";
@@ -176,6 +177,9 @@ async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): P
       if (!outcome.closed) throw new NotUndoable();
       return;
     }
+    case "board.estimates":
+      if (!(await restoreEstimates(tx, ctx, step))) throw new NotUndoable();
+      return;
     case "board.view": {
       const view: StructureViewInput = {
         structureLevels: step.structureLevels,

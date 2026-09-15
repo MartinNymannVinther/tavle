@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { PropertyGroup, PropertyRow } from "@/components/ui/property-row";
 import { Textarea } from "@/components/ui/textarea";
-import type { Area, Column, Priority, Sprint, Theme } from "@/core/db/schema";
+import type { Area, Column, EstimateUnit, Priority, Sprint, Theme } from "@/core/db/schema";
 import { PRIORITIES } from "@/core/db/schema";
 import type { CardDetail, ItemView, PersonRef } from "@/modules/boards/types";
 import { moveCardAction, updateCardAction } from "@/modules/boards/actions-cards";
@@ -14,6 +14,7 @@ import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
 import type { Run } from "@/components/board/use-board-actions";
 import type { StructureView } from "@/modules/boards/structure/view";
 import { cn } from "@/lib/utils";
+import { TSHIRT } from "@/modules/boards/estimates";
 import { PlacementFields } from "./placement-fields";
 
 /**
@@ -34,6 +35,7 @@ export function CardSidePanel({
   people,
   scrum,
   view,
+  unit,
   run,
 }: {
   card: CardDetail;
@@ -46,6 +48,8 @@ export function CardSidePanel({
   people: PersonRef[];
   scrum: boolean;
   view: StructureView;
+  /** What the board counts in, so the field asks for the right thing (docs/adr/0030). */
+  unit: EstimateUnit;
   run: Run;
 }) {
   const t = useTranslations("cards.fields");
@@ -134,22 +138,42 @@ export function CardSidePanel({
       </PropertyGroup>
 
       <PropertyGroup>
-        <PropertyRow label={t("estimate")} htmlFor="card-estimate">
-          <Input
-            id="card-estimate"
-            type="number"
-            inputMode="numeric"
-            min={0}
-            max={1000}
-            defaultValue={card.estimate ?? ""}
-            onBlur={(event) => {
-              const value = event.target.value.trim();
-              const next =
-                value === "" ? null : Math.max(0, Math.min(1000, Math.round(Number(value))));
-              if (next !== card.estimate) void update({ estimate: next });
-            }}
-            className={cn(control, "w-24 rounded-sm")}
-          />
+        <PropertyRow label={t(`estimateLabel.${unit}`)} htmlFor="card-estimate">
+          {unit === "tshirt" ? (
+            // Sizes are a closed list, so the size is picked, never typed.
+            <NativeSelect
+              id="card-estimate"
+              variant="xs"
+              value={card.estimate === null ? "" : String(card.estimate)}
+              onChange={(event) => {
+                const next = event.target.value === "" ? null : Number(event.target.value);
+                if (next !== card.estimate) void update({ estimate: next });
+              }}
+            >
+              <option value="">{t("noEstimate")}</option>
+              {TSHIRT.map((size) => (
+                <option key={size.size} value={size.weight}>
+                  {size.size}
+                </option>
+              ))}
+            </NativeSelect>
+          ) : (
+            <Input
+              id="card-estimate"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={1000}
+              defaultValue={card.estimate ?? ""}
+              onBlur={(event) => {
+                const value = event.target.value.trim();
+                const next =
+                  value === "" ? null : Math.max(0, Math.min(1000, Math.round(Number(value))));
+                if (next !== card.estimate) void update({ estimate: next });
+              }}
+              className={cn(control, "w-24 rounded-sm")}
+            />
+          )}
         </PropertyRow>
         <PropertyRow label={t("priority")} htmlFor="card-priority">
           <NativeSelect

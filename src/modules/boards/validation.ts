@@ -3,6 +3,7 @@ import { ISO_DATE } from "@/core/dates";
 import {
   BOARD_MODES,
   COLUMN_CATEGORIES,
+  ESTIMATE_UNITS,
   ENABLER_TYPES,
   KINDS,
   PRIORITIES,
@@ -65,6 +66,13 @@ export const BoardMetaSchema = z.object({
 });
 
 export const BoardViewSchema = StructureViewSchema.extend({ boardId: id });
+
+/** What the board counts in, and the factor that crosses between scales (docs/adr/0030). */
+export const EstimateUnitSchema = z.object({
+  boardId: id,
+  unit: z.enum(ESTIMATE_UNITS),
+  hoursPerPoint: z.number().min(0.5).max(40).default(4),
+});
 
 export const BoardIdSchema = z.object({ boardId: id });
 

@@ -79,7 +79,7 @@ export function MapCard({
               </FlagChip>
             )}
             <ThemeDots themes={themes} />
-            <Points estimate={card.estimate} />
+            <Points estimate={card.estimate} unit={structure.estimateUnit} />
             {card.assigneeName && <Initials name={card.assigneeName} className="size-5" />}
           </div>
         )}

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { TypeIcon } from "@/components/board/type-icon";
 import { legendTypes, TypeLegend } from "@/components/board/type-legend";
 import { structureView } from "@/modules/boards/structure/view";
+import type { EstimateUnit } from "@/core/db/schema";
 import { useBoardActions } from "@/components/board/use-board-actions";
 import { undoEventAction } from "@/modules/boards/actions-undo";
 import type { CardFull } from "@/modules/boards/types";
@@ -104,6 +105,7 @@ export function CardPage({
             people={people}
             scrum={board.mode === "scrum"}
             view={view}
+            unit={(board.estimateUnit as EstimateUnit) ?? "points"}
             run={run}
           />
           <div className="border-hairline text-meta flex flex-col gap-0.5 border-t px-4 py-3 text-xs">

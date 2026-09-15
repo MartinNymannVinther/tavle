@@ -14,6 +14,7 @@ const HOW_TO = [
   "kanban",
   "scrum",
   "cards",
+  "estimates",
   "undo",
   "backlog",
   "structure",

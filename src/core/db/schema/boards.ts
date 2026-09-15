@@ -44,6 +44,14 @@ export const SWIMLANE_MODES = ["none", "kind", "theme", "area", "manual"] as con
 export type SwimlaneMode = (typeof SWIMLANE_MODES)[number];
 
 /**
+ * What the team counts in (docs/adr/0030). Points and T-shirt sizes are
+ * the same numbers — a size is a label on a weight — so switching
+ * between them never rewrites a sum; hours are their own scale.
+ */
+export const ESTIMATE_UNITS = ["points", "hours", "tshirt"] as const;
+export type EstimateUnit = (typeof ESTIMATE_UNITS)[number];
+
+/**
  * What a column means, whatever it is called. The metrics read the
  * category, not the name: a card enters `doing` and its clock starts, it
  * enters `done` and the clock stops.
@@ -117,6 +125,8 @@ export const boards = pgTable(
     showAreas: boolean("show_areas").notNull().default(true),
     /** Kanban only: how the board splits into swimlanes, if at all. */
     swimlaneBy: text("swimlane_by").notNull().default("none"),
+    /** Points, hours or T-shirt sizes; a way of counting, stored as one number (docs/adr/0030). */
+    estimateUnit: text("estimate_unit").notNull().default("points"),
     createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
     archivedAt: timestamp("archived_at", { withTimezone: true }),
     ...timestamps,
@@ -125,6 +135,7 @@ export const boards = pgTable(
     uniqueIndex("boards_org_key_uq").on(t.orgId, t.key),
     index("boards_org_created_idx").on(t.orgId, t.createdAt),
     check("boards_structure_levels_ck", sql`${t.structureLevels} in ('epic', 'feature', 'card')`),
+    check("boards_estimate_unit_ck", sql`${t.estimateUnit} in ('points', 'hours', 'tshirt')`),
     check(
       "boards_swimlane_by_ck",
       sql`${t.swimlaneBy} in ('none', 'kind', 'theme', 'area', 'manual')`,

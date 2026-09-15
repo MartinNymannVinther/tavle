@@ -137,7 +137,7 @@ export function BoardCard({
             title={t("unassigned")}
           />
         )}
-        <Points estimate={card.estimate} />
+        <Points estimate={card.estimate} unit={structure.estimateUnit} />
         {card.checklistTotal > 0 && (
           <span className="inline-flex items-center gap-1 tabular-nums">
             <ListChecks className="size-3.5" aria-hidden />
