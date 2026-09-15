@@ -116,14 +116,16 @@ async function seedScrum(
   const done = columns.find((c) => c.category === "done")!;
   const doing = columns.find((c) => c.category === "doing")!;
 
-  // Two sprints already behind the team, with their velocity written down.
+  // The sprints already behind the team, fortnight by fortnight back from
+  // the one running, so the history is as long as the words make it.
+  const behind = words.scrum.pastSprints.length;
   for (const [i, past] of words.scrum.pastSprints.entries()) {
     const sprint = (await createSprint(tx, ctx, {
       boardId: board.id,
       name: past.name,
       goal: past.goal,
-      startDate: day(-28 + i * 14),
-      endDate: day(-15 + i * 14),
+      startDate: day(-4 - (behind - i) * 14),
+      endDate: day(-4 - (behind - i) * 14 + 13),
     }))!;
     const ids: string[] = [];
     for (const spec of past.cards) {
@@ -243,9 +245,9 @@ async function shiftHistory(
       done_at = case when c.done_at is null then null else p.start_date::timestamptz + interval '1 day' + (p.n * interval '9 hours') end
     from placed p where p.id = c.id
   `);
-  // The Kanban board: finished cards spread over the last three weeks,
-  // the rest created over the last three as well, everything in the past,
-  // so throughput and cycle time have a past to count.
+  // The Kanban board: finished cards spread over the last twelve weeks,
+  // the rest created over the last five, everything in the past, so
+  // throughput and cycle time have a past to count.
   await tx.execute(sql`
     with placed as (
       select c.id,
@@ -258,16 +260,16 @@ async function shiftHistory(
     )
     update cards c set
       done_at = case when c.done_at is null then null else
-        now() - interval '24 days' + ((p.dn - 1) * interval '22 days' / greatest(p.dtotal, 1)) + interval '6 hours' end,
+        now() - interval '84 days' + ((p.dn - 1) * interval '80 days' / greatest(p.dtotal, 1)) + interval '6 hours' end,
       started_at = case
         when c.started_at is null then null
         when c.done_at is not null then
-          now() - interval '24 days' + ((p.dn - 1) * interval '22 days' / greatest(p.dtotal, 1)) - ((2 + p.dn % 4) * interval '1 day')
+          now() - interval '84 days' + ((p.dn - 1) * interval '80 days' / greatest(p.dtotal, 1)) - ((2 + p.dn % 4) * interval '1 day')
         else now() - interval '9 days' + ((p.n % 5) * interval '1 day') end,
       created_at = case
         when c.done_at is not null then
-          now() - interval '24 days' + ((p.dn - 1) * interval '22 days' / greatest(p.dtotal, 1)) - ((3 + p.dn % 4) * interval '1 day')
-        else now() - interval '20 days' + ((p.n - 1) * interval '10 days' / greatest(p.total, 1)) end
+          now() - interval '84 days' + ((p.dn - 1) * interval '80 days' / greatest(p.dtotal, 1)) - ((3 + p.dn % 4) * interval '1 day')
+        else now() - interval '35 days' + ((p.n - 1) * interval '25 days' / greatest(p.total, 1)) end
     from placed p where p.id = c.id
   `);
   // The transition log follows the clocks: creation, start and finish.
@@ -294,10 +296,10 @@ async function shiftHistory(
     where s.org_id = ${ctx.orgId} and s.state <> 'planned'
   `);
   // The structure: items were created before their cards, and one epic is
-  // made old enough to show the review mark; closed items closed with the
-  // second sprint.
+  // made old enough to show the review mark; a closed feature closed when
+  // its last card did, a closed epic when its last feature did.
   await tx.execute(sql`
-    update backlog_items i set created_at = now() - interval '40 days' - (i.number * interval '1 hour')
+    update backlog_items i set created_at = now() - interval '100 days' - (i.number * interval '1 hour')
     where i.org_id = ${ctx.orgId}
   `);
   for (const epic of aged) {
@@ -307,7 +309,15 @@ async function shiftHistory(
     `);
   }
   await tx.execute(sql`
-    update backlog_items set closed_at = now() - interval '15 days'
-    where org_id = ${ctx.orgId} and state = 'closed'
+    update backlog_items i set closed_at = coalesce(
+      (select max(c.done_at) from cards c where c.feature_id = i.id),
+      now() - interval '15 days')
+    where i.org_id = ${ctx.orgId} and i.state = 'closed' and i.level = 'feature'
+  `);
+  await tx.execute(sql`
+    update backlog_items i set closed_at = coalesce(
+      (select max(f.closed_at) from backlog_items f where f.parent_id = i.id),
+      now() - interval '15 days')
+    where i.org_id = ${ctx.orgId} and i.state = 'closed' and i.level = 'epic'
   `);
 }

@@ -54,22 +54,28 @@ describe("a demo workspace", () => {
     ]);
     const kanban = boards.find((b) => b.key === "WEB")!;
     expect(kanban.inProgressCount).toBe(4);
-    expect(kanban.doneCount).toBe(5);
+    expect(kanban.doneCount).toBe(32);
     const scrum = boards.find((b) => b.key === "APP")!;
-    expect(scrum.activeSprint?.name).toBe("Sprint 3");
+    expect(scrum.activeSprint?.name).toBe("Sprint 7");
   });
 
   it("has a Scrum board with history to draw", async () => {
     const boards = await listBoards({ orgId, userId });
     const scrum = boards.find((b) => b.key === "APP")!;
     const full = (await getBoardFull({ orgId, userId }, scrum.id))!;
-    expect(full.sprints.map((s) => s.state)).toEqual(["planned", "active", "closed", "closed"]);
+    // Six sprints behind the team: about three months of fortnights.
+    expect(full.sprints.map((s) => s.state)).toEqual([
+      "planned",
+      "active",
+      ...Array<string>(6).fill("closed"),
+    ]);
     const closed = full.sprints.filter((s) => s.state === "closed");
-    expect(closed.map((s) => s.completedPoints)).toEqual([19, 15]);
-    // Six backlog cards plus the two carried over unfinished from the closed sprints.
-    expect(full.cards.filter((c) => !c.sprintId)).toHaveLength(6 + 2);
+    expect(closed).toHaveLength(6);
+    // Six backlog cards plus what each closed sprint left unfinished.
+    expect(full.cards.filter((c) => !c.sprintId)).toHaveLength(12);
     const insight = (await boardInsight({ orgId, userId }, scrum.id))!;
-    expect(insight.velocity.bars.map((b) => b.completed)).toEqual([15, 19]);
+    // One bar per closed sprint, oldest first, so the chart has a shape.
+    expect(insight.velocity.bars.map((b) => b.completed)).toEqual([15, 19, 15, 21, 19, 23]);
     expect(insight.activeBurndown?.committed).toBe(26);
     expect(insight.activeBurndown?.remainingNow).toBe(21);
   });
@@ -82,10 +88,11 @@ describe("a demo workspace", () => {
     expect(full.themes).toHaveLength(3);
     const epics = full.items.filter((i) => i.level === "epic");
     const features = full.items.filter((i) => i.level === "feature");
-    expect(epics).toHaveLength(4);
-    expect(features).toHaveLength(5);
-    expect(epics.filter((e) => e.state === "closed")).toHaveLength(1);
-    expect(features.filter((f) => f.state === "closed")).toHaveLength(1);
+    expect(epics).toHaveLength(5);
+    expect(features).toHaveLength(8);
+    // What the six sprints finished is closed behind them.
+    expect(epics.filter((e) => e.state === "closed")).toHaveLength(2);
+    expect(features.filter((f) => f.state === "closed")).toHaveLength(4);
     expect(features.every((f) => f.parentId)).toBe(true);
     expect(full.cards.filter((c) => c.featureId).length).toBeGreaterThan(10);
     expect(full.cards.every((c) => c.featureId || c.areaId)).toBe(true);
@@ -102,10 +109,15 @@ describe("a demo workspace", () => {
   it("has a Kanban board whose numbers come from a past", async () => {
     const insight = (await boardInsight({ orgId, userId }, boardId))!;
     expect(insight.wip).toBe(4);
-    expect(insight.throughput.reduce((t, w) => t + w.count, 0)).toBe(5);
+    // Eight weeks of throughput, filled from twelve weeks of finished work.
+    expect(insight.throughput.reduce((t, w) => t + w.count, 0)).toBe(18);
+    // Spread across the weeks rather than a single spike; the newest week may
+    // still be empty, because the last card finished a few days ago.
+    expect(insight.throughput.filter((week) => week.count > 0).length).toBeGreaterThanOrEqual(6);
     expect(insight.cycle.sample).toBeGreaterThan(0);
     expect(insight.flow.at(-1)?.counts.doing).toBe(4);
-    expect(insight.flow[0]?.counts.done).toBe(0);
+    // The board had a past before the flow window opened, so it starts full.
+    expect(insight.flow[0]?.counts.done).toBeGreaterThan(0);
   });
 
   it("is deleted whole when its time is up, guest account included", async () => {
