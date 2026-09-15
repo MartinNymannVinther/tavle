@@ -142,7 +142,10 @@ export function BacklogRow({
           <Link
             href={`/boards/${boardId}/cards/${card.number}`}
             className={cn(
-              "line-clamp-2 min-w-0 text-sm leading-snug hover:underline",
+              // The title carries the row: reading size and weight, so the
+              // epic/feature crumb underneath can never be mistaken for it.
+              "line-clamp-2 min-w-0 leading-snug font-medium hover:underline",
+              quiet ? "text-sm" : "text-reading",
               sprintName && "text-meta italic",
               card.doneAt && "text-meta line-through",
             )}
