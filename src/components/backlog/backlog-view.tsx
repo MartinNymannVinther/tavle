@@ -327,8 +327,13 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
           newFeature={newFeature}
         />
       ) : (
-        <div className={cn("grid", view.features && "@2xl:grid-cols-[17rem_minmax(0,1fr)]")}>
-          {view.features && (
+        <div
+          className={cn(
+            "grid",
+            view.features && navPref === "on" && "@2xl:grid-cols-[17rem_minmax(0,1fr)]",
+          )}
+        >
+          {view.features && navPref === "on" && (
             <aside className="bg-secondary/60 border-hairline hidden border-r p-2 @2xl:block">
               <BacklogNav
                 {...navProps}
@@ -343,7 +348,12 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
             </aside>
           )}
           {view.features && (
-            <div className="border-hairline border-b px-4 pt-3 @2xl:hidden">
+            <div
+              className={cn(
+                "border-hairline border-b px-4 pt-3 pb-2",
+                navPref === "on" && "@2xl:hidden",
+              )}
+            >
               <BacklogNavSelect {...navProps} />
             </div>
           )}
