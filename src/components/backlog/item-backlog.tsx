@@ -32,7 +32,8 @@ import { useFolded } from "./use-folded";
  * past its sibling, exactly the write the flat list makes.
  */
 
-type Drag = { kind: "item"; id: string; scope: string } | { kind: "card"; id: string };
+type Drag =
+  { kind: "item"; id: string; scope: string } | { kind: "card"; id: string; featureId: string };
 
 export function ItemBacklog({
   full,
@@ -168,12 +169,25 @@ export function ItemBacklog({
               structure={structure}
               context={{ areaId: node.feature.areaId, themeIds: node.feature.themeIds }}
               draggable
-              onDragStart={() => setDrag({ kind: "card", id: card.id })}
+              onDragStart={() => setDrag({ kind: "card", id: card.id, featureId: node.feature.id })}
               onDragOver={(event) => {
-                if (drag?.kind === "card" && drag.id !== card.id) event.preventDefault();
+                // The drop stays inside the feature's own fold-out: a
+                // cross-feature drag would reorder invisibly, and moving a
+                // card to another feature is placement, not rank.
+                if (
+                  drag?.kind === "card" &&
+                  drag.featureId === node.feature.id &&
+                  drag.id !== card.id
+                ) {
+                  event.preventDefault();
+                }
               }}
               onDrop={() => {
-                if (drag?.kind === "card" && drag.id !== card.id) {
+                if (
+                  drag?.kind === "card" &&
+                  drag.featureId === node.feature.id &&
+                  drag.id !== card.id
+                ) {
                   onNudgeCard(drag.id, card.id, false);
                 }
                 setDrag(null);
