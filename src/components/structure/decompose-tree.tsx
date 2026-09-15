@@ -138,7 +138,7 @@ export function ChartNode({
       {...dragProps}
       {...(drop?.props ?? {})}
       className={cn(
-        "border-border group/box hover:border-primary/40 focus-within:border-primary/40 flex w-40 items-center gap-1.5 rounded-xl border px-2 py-1.5 shadow-[var(--surface-shadow)] transition-colors",
+        "border-border group/box hover:border-primary/40 focus-within:border-primary/40 flex w-40 flex-col rounded-xl border px-2 py-1.5 shadow-[var(--surface-shadow)] transition-colors",
         emphasis ? "bg-accent/70 border-primary/30" : "bg-card",
         stripe && "border-l-4",
         dragProps?.draggable && "cursor-grab active:cursor-grabbing",
@@ -147,12 +147,17 @@ export function ChartNode({
       )}
       style={stripe ? { borderLeftColor: stripe } : undefined}
     >
-      {icon}
-      <span className="text-meta font-mono shrink-0 text-2xs tabular-nums">{keyLabel}</span>
+      {/* The title carries the box; symbol, key and menu step up into one quiet line. */}
+      <div className="text-meta flex min-h-5 items-center gap-1.5">
+        {icon}
+        <span className="font-mono text-2xs tabular-nums">{keyLabel}</span>
+        <span className="flex-1" />
+        {menu}
+      </div>
       <Link
         href={href}
         className={cn(
-          "focus-ring line-clamp-2 min-w-0 flex-1 text-2sm leading-snug hover:underline",
+          "focus-ring line-clamp-3 text-2sm leading-snug hover:underline",
           emphasis && "font-semibold",
           strike && "text-meta line-through",
         )}
@@ -160,7 +165,6 @@ export function ChartNode({
       >
         {title}
       </Link>
-      {menu}
     </div>
   );
 }
