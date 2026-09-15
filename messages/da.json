@@ -1404,7 +1404,8 @@
     "unplannedFeatures": "Uplanlagte features ({count})",
     "unplannedWord": "Vælg sprint …",
     "featureUnplanned": "uplanlagt",
-    "axisLabel": "Visning"
+    "axisLabel": "Visning",
+    "downloadPpt": "Hent som PowerPoint"
   },
   "overview": {
     "title": "Overblik",

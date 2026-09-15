@@ -1404,7 +1404,8 @@
     "unplannedFeatures": "Unplanned features ({count})",
     "unplannedWord": "Pick a sprint …",
     "featureUnplanned": "unplanned",
-    "axisLabel": "View"
+    "axisLabel": "View",
+    "downloadPpt": "Download as PowerPoint"
   },
   "overview": {
     "title": "Overview",

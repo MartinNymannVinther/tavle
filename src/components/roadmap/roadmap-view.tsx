@@ -1,9 +1,9 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { NativeSelect } from "@/components/ui/native-select";
 import { SegmentedChoice } from "@/components/ui/segmented";
 import { StatusChip, ThemeChip } from "@/components/board/bits";
@@ -142,6 +142,14 @@ export function RoadmapView({ full }: { full: BoardFull }) {
           ))}
         </div>
         <span className="flex-1" />
+        <a
+          href={`/api/boards/${full.board.id}/roadmap-pptx`}
+          download
+          className={buttonVariants({ variant: "outline", size: "sm" })}
+        >
+          <Download data-slot="icon" />
+          {t("downloadPpt")}
+        </a>
         <ItemForm
           full={full}
           level="epic"
