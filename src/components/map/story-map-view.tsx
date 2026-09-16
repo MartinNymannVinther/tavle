@@ -55,6 +55,10 @@ export function StoryMapView({ full }: { full: BoardFull }) {
   const [showClosed, setShowClosed] = useState(false);
   const [showDone, setShowDone] = useState(true);
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
+  // A card added into a cell under a filter that hides it would vanish
+  // the moment it was written; it is held on the wall until the filter
+  // is touched again.
+  const [justAdded, setJustAdded] = useState<string[]>([]);
   const [drag, setDrag] = useState<Drag>(null);
   const screen = useFullscreen();
   // One dialog serves every band: null means a new one.
@@ -65,7 +69,12 @@ export function StoryMapView({ full }: { full: BoardFull }) {
 
   const doneColumns = new Set(full.columns.filter((c) => c.category === "done").map((c) => c.id));
   const isDone = (card: { columnId: string }) => doneColumns.has(card.columnId);
-  const filtered = applyFilters(full.cards, filters, board.key);
+  const kept = applyFilters(full.cards, filters, board.key);
+  const keptIds = new Set(kept.map((card) => card.id));
+  const filtered =
+    justAdded.length === 0
+      ? kept
+      : full.cards.filter((card) => keptIds.has(card.id) || justAdded.includes(card.id));
   // Finished work can be taken off the wall: after a few months the cells
   // are mostly strikethrough, and what is left is the interesting part.
   // Everything downstream — the cells, the row counts, the off-map
@@ -157,13 +166,15 @@ export function StoryMapView({ full }: { full: BoardFull }) {
   }
 
   const add = (row: MapRow, place: Place, title: string) =>
-    run(() =>
-      createCardAction({
-        boardId: board.id,
-        title,
-        ...place,
-        releaseId: row.kind === "release" ? row.release.id : undefined,
-      }),
+    run(
+      () =>
+        createCardAction({
+          boardId: board.id,
+          title,
+          ...place,
+          releaseId: row.kind === "release" ? row.release.id : undefined,
+        }),
+      (created) => setJustAdded((ids) => [...ids, created.id]),
     );
 
   return (
@@ -207,7 +218,10 @@ export function StoryMapView({ full }: { full: BoardFull }) {
       <div className="border-hairline flex flex-wrap items-center gap-x-4 gap-y-2 border-b px-4 py-2">
         <BoardFilters
           filters={filters}
-          onChange={setFilters}
+          onChange={(next) => {
+            setFilters(next);
+            setJustAdded([]);
+          }}
           people={full.people}
           structure={structure}
         />

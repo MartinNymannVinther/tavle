@@ -11,7 +11,7 @@ import { QuickAdd } from "@/components/board/quick-add";
 import { legendTypes, TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
 import { cn } from "@/lib/utils";
-import type { BoardFull } from "@/modules/boards/types";
+import type { BoardFull, CardView } from "@/modules/boards/types";
 import {
   createCardAction,
   placeCardAction,
@@ -76,6 +76,11 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
   const [showClosed, setShowClosed] = useState(false);
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  // Cards made here since the filter was last touched. A card written
+  // under a filter it does not pass would otherwise be indistinguishable
+  // from a card that was never written at all — the form clears, nothing
+  // appears, and the person types the sentence again.
+  const [justAdded, setJustAdded] = useState<string[]>([]);
   const [dragId, setDragId] = useState<string | null>(null);
   // The backlog's altitude (docs/adr/0027) and whether the sprints stand
   // beside it — both remembered per board, like the folds.
@@ -90,7 +95,14 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
   const [navPref, setNavPref] = usePref<"on" | "off">(`tavle.backlog.${board.id}.nav`, "on");
 
   const all = backlogStories(full);
-  const filtered = applyFilters(all, filters, board.key);
+  /** The filter's answer, plus whatever was just made here. */
+  const shown = (list: CardView[]): CardView[] => {
+    const kept = applyFilters(list, filters, board.key);
+    if (justAdded.length === 0) return kept;
+    const ids = new Set(kept.map((card) => card.id));
+    return list.filter((card) => ids.has(card.id) || justAdded.includes(card.id));
+  };
+  const filtered = shown(all);
   const { view } = structure;
   const tree = hierarchy(full, all, { showClosed, items: structure.items });
   const selection = stillThere(chosen, tree);
@@ -98,7 +110,7 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
   const counts = navCounts(tree);
   // Committed cards stay in the backlog's sight, marked with their sprint.
   const allocated = allocatedStories(full);
-  const allocatedShown = selectExtra(applyFilters(allocated, filters, board.key), tree, selection);
+  const allocatedShown = selectExtra(shown(allocated), tree, selection);
   const sprintNameOf = new Map(sprints.map((sp) => [sp.id, sp.name]));
   const open = sprints.filter((sp) => sp.state !== "closed").sort((a, b) => a.number - b.number);
   const active = sprints.find((sp) => sp.state === "active") ?? null;
@@ -443,7 +455,12 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
               grouping={grouping}
               onGrouping={setGrouping}
               filters={filters}
-              onFilters={setFilters}
+              onFilters={(next) => {
+                setFilters(next);
+                // Looking again: the cards held out of the filter go back
+                // to obeying it.
+                setJustAdded([]);
+              }}
               people={full.people}
               structure={structure}
             />
@@ -461,7 +478,10 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
             <div className="border-hairline border-b px-2 py-2">
               <QuickAdd
                 onAdd={(title, place) =>
-                  run(() => createCardAction({ boardId: board.id, title, ...place }))
+                  run(
+                    () => createCardAction({ boardId: board.id, title, ...place }),
+                    (created) => setJustAdded((ids) => [...ids, created.id]),
+                  )
                 }
                 structure={structure}
                 placeholder={t("addPlaceholder")}
