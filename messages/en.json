@@ -1545,7 +1545,9 @@
     "hiddenCards": "{count, plural, one {# card off the map} other {# cards off the map}}",
     "hiddenHint": "Pick a card — its feature goes up on the map",
     "orderDrift": "The order here differs from the backlog's ranking — maybe on purpose, maybe worth a look.",
-    "alignBacklog": "Let the backlog follow the map"
+    "alignBacklog": "Let the backlog follow the map",
+    "showClosedFeatures": "{count, plural, =0 {Show closed features} other {Show # closed}}",
+    "noClosed": "No closed features are up on the map."
   },
   "decompose": {
     "title": "Breakdown",

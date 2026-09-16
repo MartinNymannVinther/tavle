@@ -1545,7 +1545,9 @@
     "hiddenCards": "{count, plural, one {# kort uden for mappet} other {# kort uden for mappet}}",
     "hiddenHint": "Vælg et kort — dets feature sættes op på mappet",
     "orderDrift": "Rækkefølgen her afviger fra backloggens prioritering — måske med vilje, måske værd at overveje.",
-    "alignBacklog": "Lad backloggen følge mappet"
+    "alignBacklog": "Lad backloggen følge mappet",
+    "showClosedFeatures": "{count, plural, =0 {Vis lukkede features} other {Vis # lukkede}}",
+    "noClosed": "Ingen lukkede features står på mappet."
   },
   "decompose": {
     "title": "Nedbrydning",

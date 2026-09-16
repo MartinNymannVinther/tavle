@@ -86,8 +86,11 @@ export async function seedStructure(
       });
       featureIdByTitle.set(featureSpec.title, feature.id);
       if (featureSpec.closed) features.push(feature.id);
-      // The open features stand on the story map in the words' order, so the demo has a wall.
-      else await placeOnMap(tx, ctx, feature.id, undefined);
+      // Every feature stands on the wall in the words' order, the finished
+      // ones included: a team leaves what it delivered up there, and a
+      // closed note is exactly what the map's "show closed" is for. They
+      // are all still open here — closeSeeded runs once the cards are in.
+      await placeOnMap(tx, ctx, feature.id, undefined);
     }
   }
   return { featureIdByTitle, areaIdByName, aged, toClose: [...features, ...epics] };

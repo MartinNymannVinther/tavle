@@ -61,6 +61,8 @@ export function StoryMapView({ full }: { full: BoardFull }) {
   // The server orders the whole lane, hidden closed features included, so
   // every index sent up is a position in that lane, not in the view.
   const wholeLane = backbone(structure.items, { showClosed: true });
+  // Closed features still standing on the wall: what the tick reveals.
+  const closedOnMap = wholeLane.filter((f) => f.state === "closed").length;
   const waiting = tray(structure.items);
   const doneColumns = new Set(full.columns.filter((c) => c.category === "done").map((c) => c.id));
   // A sprint's card whose feature is not up on the backbone is invisible
@@ -183,14 +185,20 @@ export function StoryMapView({ full }: { full: BoardFull }) {
           people={full.people}
           structure={structure}
         />
-        <label className="text-meta flex items-center gap-1.5 text-2sm">
+        {/* A board with nothing closed on the wall says so, rather than
+            offering a tick that cannot change anything. */}
+        <label
+          className="text-meta flex items-center gap-1.5 text-2sm has-disabled:opacity-50"
+          title={closedOnMap === 0 ? t("noClosed") : undefined}
+        >
           <input
             type="checkbox"
             checked={showClosed}
+            disabled={closedOnMap === 0}
             onChange={(event) => setShowClosed(event.target.checked)}
             className="accent-[var(--primary)]"
           />
-          {b("nav.showClosed")}
+          {t("showClosedFeatures", { count: closedOnMap })}
         </label>
       </div>
       {onMap.length === 0 && (
