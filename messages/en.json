@@ -1318,13 +1318,17 @@
         "title": "The backlog",
         "body": "The backlog is the ordered list of what the team does next, most important at the top. Drag the cards, or use the arrows. Select cards with the checkbox and put them in a sprint with one button. At the top of the list the level can switch: the epic backlog folds out to features and on to cards, the feature backlog to cards — and on a Scrum board the sprint panels can be shown or hidden, giving the list the whole width."
       },
+      "care": {
+        "title": "Backlog care",
+        "body": "The page answers one question: what is the backlog waiting for? It shows only what actually needs a decision — features and cards with no place, epics and features with no “done when”, features with no work under them, epics nobody has confirmed in a long time, unweighed work at the top, and a backlog ranked deeper than you will reach. Each line folds out to the real rows, so you can go straight there and fix it. If there is nothing, the page says so. At the bottom it shows where the weight of the open work sits, by theme, area or kind."
+      },
       "insight": {
         "title": "Insight",
         "body": "Every number is computed from what actually happened to the cards, never from an estimate. Kanban teams look at cards done per week, cycle time and cumulative flow. Scrum teams look at the burndown of the running sprint and the velocity of the closed ones."
       },
       "team": {
         "title": "The team",
-        "body": "Invite colleagues under Settings → Workspace. You get a link you send yourself. If the person has no account, it is created through the link. Owners and admins can change the boards' columns, swimlanes, themes and areas, invite and remove members; everyone else can do everything else."
+        "body": "Invite colleagues under Settings → Workspace. You get a link you send yourself. If the person has no account, it is created through the link. Owners and admins can change the boards' columns, swimlanes, themes and areas, invite and remove members; everyone else can do everything else. Work is assigned to people, not accounts: under Settings → Workspace you can write a colleague in as a person long before they have a login, and when their login arrives it attaches itself by the e-mail address."
       },
       "ai": {
         "title": "The AI help",
@@ -1344,7 +1348,11 @@
       },
       "map": {
         "title": "The story map",
-        "body": "The story map is the team's wall: features as yellow notes across the top in the story's order (what the user does first stands at the left), the sprints (or the columns on a Kanban board) down the side, and every card in the cell where its feature and its sprint meet. The map's order is its own and leaves the backlog's priority alone. Features go up from the tray under the heading, are dragged into place or moved with the arrows, and come down again from the note's menu. Cards without a feature stand in a dashed column at the far right, so they cannot hide. Drag a card sideways to move it to another feature, up or down to put it in another sprint, and write a new card straight into a cell."
+        "body": "The story map is the team's wall: features as yellow notes across the top in the story's order (what the user does first is on the left), your own releases down the side, and every card in the cell where its feature and its release meet. At the bottom there is always a band for what no release has promised yet. The map's order is its own and never touches the backlog's ranking — they answer two different questions. Put a feature up from the tray, drag the notes into place, and drag a card sideways to another feature or up and down to another release. If the map's order drifts from the backlog's, the map says so and offers to let the backlog follow."
+      },
+      "releases": {
+        "title": "Releases",
+        "body": "A release is what you deliver together — it cuts across sprints, because the sprint is the team's rhythm and the release is what the customer gets. Create them on the story map with “New release”: a name you would say out loud, and a target delivery date that may be left blank. Each release is a horizontal band on the map with its own count of cards and estimates, and you move work into it by dragging a card up or down. Deleting a band removes only the band — the cards fall back into “Not in a release”. On the roadmap the releases stand as a strip above the epic bars, each on the quarter its date falls in."
       }
     },
     "abcTitle": "The board's ABC",

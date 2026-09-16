@@ -1318,13 +1318,17 @@
         "title": "Backloggen",
         "body": "Backloggen er den prioriterede liste over det næste, teamet skal lave, øverst er vigtigst. Træk kortene, eller brug pilene. Vælg kort med afkrydsningen og læg dem i en sprint med én knap. Øverst i listen kan niveauet skiftes: epic-backloggen folder ud til features og videre til kort, feature-backloggen til kort — og på en Scrum-tavle kan sprint-panelerne vises eller skjules, så listen får hele bredden."
       },
+      "care": {
+        "title": "Backlog-styring",
+        "body": "Siden svarer på ét spørgsmål: hvad venter backloggen på? Den viser kun det, der faktisk kræver en beslutning — features og kort uden en plads, epics og features uden et “Færdig når”, features uden arbejde under sig, epics ingen har bekræftet længe, uvejet arbejde i toppen, og en backlog rangeret dybere end I når. Hvert punkt folder ud til de faktiske rækker, så I kan gå direkte hen og rette det. Er der ingenting, siger siden det. Nederst står, hvor vægten af det åbne arbejde ligger, fordelt på tema, område eller art."
+      },
       "insight": {
         "title": "Indsigt",
         "body": "Alle tal regnes ud fra det der faktisk skete med kortene, aldrig fra et skøn. Kanban-teams kigger på færdige kort pr. uge, cycle time og cumulative flow. Scrum-teams kigger på burndown for den sprint der kører og velocity for de afsluttede."
       },
       "team": {
         "title": "Teamet",
-        "body": "Inviter kollegerne under Indstillinger → Arbejdsrum. Du får et link, som du selv sender. Har personen ingen konto, bliver den oprettet gennem linket. Ejere og administratorer kan ændre tavlernes kolonner, svømmebaner, temaer og områder, invitere og fjerne medlemmer; alle andre kan alt det andet."
+        "body": "Inviter kollegerne under Indstillinger → Arbejdsrum. Du får et link, som du selv sender. Har personen ingen konto, bliver den oprettet gennem linket. Ejere og administratorer kan ændre tavlernes kolonner, svømmebaner, temaer og områder, invitere og fjerne medlemmer; alle andre kan alt det andet. Arbejdet lægges hos personer, ikke hos konti: under Indstillinger → Arbejdsrum kan I skrive en kollega ind som person, længe før de har et login, og når deres login kommer, knyttes det til af sig selv via e-mailadressen."
       },
       "ai": {
         "title": "AI-hjælpen",
@@ -1344,7 +1348,11 @@
       },
       "map": {
         "title": "Story mappet",
-        "body": "Story mappet er teamets væg: features som gule noter hen over toppen i fortællingens rækkefølge (det brugeren gør først står til venstre), sprintene (eller kolonnerne på en Kanban-tavle) nedad, og hvert kort i den celle hvor dets feature og dets sprint mødes. Rækkefølgen på mappet er mappets egen og rører ikke backloggens prioritering. Features sættes op fra bakken under overskriften, trækkes på plads eller flyttes med pilene, og tages ned igen fra notens menu. Kort uden feature står i en stiplet kolonne yderst til højre, så de ikke gemmer sig. Træk et kort sidelæns for at flytte det til en anden feature, op eller ned for at lægge det i en anden sprint, og skriv et nyt kort direkte i en celle."
+        "body": "Story mappet er teamets væg: features som gule noter hen over toppen i fortællingens rækkefølge (det brugeren gør først står til venstre), jeres egne releases nedad, og hvert kort i den celle hvor dets feature og dets release mødes. Nederst står altid et bånd til det, ingen release har lovet endnu. Rækkefølgen på mappet er mappets egen og rører aldrig backloggens prioritering — de svarer på to forskellige spørgsmål. Sæt en feature op fra bakken, træk noterne på plads, og træk et kort sidelæns til en anden feature eller op og ned til en anden release. Afviger mappets rækkefølge fra backloggens, siger mappet det og tilbyder at lade backloggen følge med."
+      },
+      "releases": {
+        "title": "Releases",
+        "body": "En release er det, I leverer sammen — den skærer på tværs af sprints, for sprintet er holdets rytme og releasen er det, kunden får. Opret dem på story mappet med “Ny release”: et navn, I ville sige højt, og en ønsket leveringsdato, der gerne må stå tom. Hver release er et vandret bånd på mappet med sin egen optælling af kort og estimater, og I flytter arbejde ind i den ved at trække et kort op eller ned. Sletter I et bånd, forsvinder kun båndet — kortene falder tilbage i “Ikke i en release”. På roadmappet står releaserne som en stribe over epic-søjlerne, hver på det kvartal dens dato falder i."
       }
     },
     "abcTitle": "Tavlens ABC",
