@@ -105,7 +105,7 @@ describe("the story map", () => {
     expect([...map.cells.values()].flat().map((c) => c.id)).not.toContain("c3");
   });
 
-  it("offers only open features in the tray, and shows a closed one on the map only on request", () => {
+  it("keeps a closed feature out of the tray until the wall is showing closed ones", () => {
     const closed = item({
       id: "f3",
       level: "feature",
@@ -115,10 +115,13 @@ describe("the story map", () => {
       mapSort: 500,
     });
     const items = [...scrum.items, closed];
-    expect(tray([...board.items, { ...closed, mapSort: null }]).map((f) => f.id)).toEqual([
-      "f1",
-      "f2",
-    ]);
+    const down = [...board.items, { ...closed, mapSort: null }];
+    expect(tray(down).map((f) => f.id)).toEqual(["f1", "f2"]);
+    // Taken down, a closed feature waits in the tray while the wall is
+    // showing closed ones — a note taken down has to be able to go back.
+    // In the tray's own order, which is the backlog's rank, not the order
+    // the features happen to be listed in.
+    expect(tray(down, { showClosed: true }).map((f) => f.id)).toEqual(["f1", "f3", "f2"]);
     expect(backbone(items, { showClosed: false }).map((f) => f.id)).toEqual(["f2", "f1"]);
     expect(backbone(items, { showClosed: true }).map((f) => f.id)).toEqual(["f3", "f2", "f1"]);
   });

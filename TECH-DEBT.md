@@ -265,3 +265,26 @@ put in a sprint, place under a feature — are out of reach; the flat list
 has them. Ranking works everywhere since docs/adr/0033. Wiring it needs
 a prop through `backlog-view.tsx` and `item-backlog.tsx`, and a decision
 about whether a selection survives a change of altitude.
+
+### A redirect from a board page arrives as a meta refresh
+
+The story map, the decomposition and the roadmap send you back to the
+board when the board's levels leave them nothing to draw. Because
+`src/app/[locale]/(app)/loading.tsx` gives the group a streaming
+boundary, Next has already flushed the shell by the time the redirect is
+thrown, so the response is a 200 carrying `<meta http-equiv="refresh">`
+rather than a 307, and a bare shell shows for about a second. What the
+person sees is right — the page never again claims the board has no
+features — so this is a blemish on a URL nobody types, not a defect.
+Fixing it means deciding the redirect before the boundary: a cheap
+header read in the layout, or dropping the loading file for these
+routes. Neither is worth doing on its own.
+
+### A card's rank can tie with another's
+
+Ranks written before docs/adr/0033 came from two independent
+numberings, so a free row and a sprint-committed one can hold the same
+`sort`. `mergeByRank` breaks such a tie on the card number, which is
+creation order and means nothing to a reader. Nothing new ties — a
+placement always lands strictly between its neighbours — and moving
+either row settles it, so this drains as boards are used.

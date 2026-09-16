@@ -528,6 +528,24 @@ describe("the story map's backbone", () => {
     );
   });
 
+  it("takes a closed feature back onto the wall, because taking it down is not one-way", async () => {
+    // The wall draws closed features struck through when the tick asks
+    // for them, so hanging one back up is an arrangement, not giving a
+    // closed thing more to do. Refusing it stranded the feature's cards:
+    // counted in their band, drawn nowhere, offered by a dead menu.
+    const full = (await getBoardFull(ctx, boardId))!;
+    const closed = full.items.find((i) => i.level === "feature" && i.state === "closed");
+    if (!closed) return;
+    await run((tx) => placeOnMap(tx, ctx, closed.id, null));
+    expect(
+      (await getBoardFull(ctx, boardId))!.items.find((i) => i.id === closed.id)!.mapSort,
+    ).toBeNull();
+    await run((tx) => placeOnMap(tx, ctx, closed.id, 0));
+    expect(
+      (await getBoardFull(ctx, boardId))!.items.find((i) => i.id === closed.id)!.mapSort,
+    ).not.toBeNull();
+  });
+
   it("lets the backlog follow the map on request, unmapped features keeping their slots", async () => {
     const full = (await getBoardFull(ctx, boardId))!;
     const features = full.items

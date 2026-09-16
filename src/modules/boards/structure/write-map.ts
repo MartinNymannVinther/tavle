@@ -64,7 +64,11 @@ export async function placeOnMap(
     return item;
   }
 
-  if (item.state === "closed") throw new RuleViolation("itemClosed");
+  // Where a note hangs on the wall is an arrangement, not content: the
+  // map already draws closed features, struck through, whenever the tick
+  // above asks for them. Refusing to put one back up made "take down"
+  // the one move on the wall that could not be undone — and left its
+  // cards counted in a band with no way to reach them.
   const wasOn = item.mapSort !== null;
   const changes = placeInLane(await mapLane(tx, board.id), item.id, index);
   for (const change of changes) {

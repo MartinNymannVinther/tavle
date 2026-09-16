@@ -51,9 +51,18 @@ export function backbone(items: ItemView[], options: { showClosed: boolean }): I
 }
 
 /** The open features not on the map, in the backlog's rank: what the tray offers. */
-export function tray(items: ItemView[]): ItemView[] {
+export function tray(items: ItemView[], options: { showClosed?: boolean } = {}): ItemView[] {
   return items
-    .filter((item) => item.level === "feature" && item.mapSort === null && item.state === "open")
+    .filter(
+      (item) =>
+        item.level === "feature" &&
+        item.mapSort === null &&
+        // A closed feature waits in the tray only while the wall is
+        // showing closed ones — otherwise putting it up would answer a
+        // pick with nothing appearing. It has to be offered somewhere,
+        // or a note taken down could never go back.
+        (item.state === "open" || options.showClosed === true),
+    )
     .sort(byRank);
 }
 
