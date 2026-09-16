@@ -64,6 +64,13 @@ export type SprintCard = {
   bug?: boolean;
 };
 
+/** A release the demo ships: a name, and how many days from today it is aimed at. */
+export type DemoRelease = {
+  name: string;
+  /** Negative is behind the team, positive ahead; null is a release with no date. */
+  dayOffset: number | null;
+};
+
 export type DemoWords = {
   kanban: {
     name: string;
@@ -72,6 +79,8 @@ export type DemoWords = {
     structure: DemoStructure;
     cards: DemoCard[];
     comment: string;
+    /** The bands the story map is divided into, oldest shipped first. */
+    releases: DemoRelease[];
   };
   scrum: {
     name: string;
@@ -92,6 +101,8 @@ export type DemoWords = {
     };
     backlog: Array<Omit<SprintCard, "estimate"> & { estimate: number | null }>;
     plannedSprint: { name: string; goal: string };
+    /** The versions the app has shipped, oldest first, then the one being built. */
+    releases: DemoRelease[];
   };
 };
 

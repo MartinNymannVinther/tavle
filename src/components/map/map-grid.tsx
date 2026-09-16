@@ -32,6 +32,8 @@ export type GridHandlers = {
   /** The row's cards whose feature is off the backbone, offered from the label. */
   hiddenOf: (rowKey: string) => Array<{ card: CardView; featureId: string; featureTitle: string }>;
   onReveal: (featureId: string) => void;
+  /** Every card in a band, drawn or not, so its count is the release's own. */
+  bandOf: (rowKey: string) => CardView[];
   /** Opens a band for renaming and dating. */
   onEditRelease: (release: Release) => void;
 };
@@ -99,7 +101,10 @@ export function MapGrid({
           ),
         )}
         {map.rows.map((row, rowIndex) => {
-          const rowCards = map.columns.flatMap((column) => cellsOf(row, column.key));
+          // A band's weight is the whole release, not only what the
+          // backbone happens to draw: the row label names the release, so
+          // the number beside it has to be the release's own.
+          const rowCards = handlers.bandOf(row.key);
           // The nearest release is the one the team is working toward.
           const active = row.kind === "release" && rowIndex === 0;
           return (

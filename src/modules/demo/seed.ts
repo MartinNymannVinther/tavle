@@ -5,6 +5,7 @@ import { ownPerson } from "@/modules/boards/people";
 import { createBoard } from "@/modules/boards/write-boards";
 import { updateChecklist } from "@/modules/boards/write-card-details";
 import { createCard, moveCard, updateCard } from "@/modules/boards/write-cards";
+import { setCardsRelease } from "@/modules/boards/write-releases";
 import {
   closeSprint,
   createSprint,
@@ -17,6 +18,7 @@ import {
   closeSeeded,
   placement,
   planSeededFeatures,
+  seedReleases,
   seedStructure,
   type SeededStructure,
 } from "./seed-structure";
@@ -45,7 +47,7 @@ export async function seedDemoWorkspace(
   const today = todayInCopenhagen();
   const day = (offset: number) => addDaysIso(today, offset);
 
-  const kanban = await seedKanban(tx, ctx, words, me);
+  const kanban = await seedKanban(tx, ctx, words, me, day);
   const scrum = await seedScrum(tx, ctx, words, day, me);
   await shiftHistory(tx, ctx, [...kanban.seeded.aged, ...scrum.aged]);
   return kanban.boardId;
@@ -56,6 +58,7 @@ async function seedKanban(
   ctx: OrgContext,
   words: DemoWords,
   me: string | null,
+  day: (offset: number) => string,
 ): Promise<{ boardId: string; seeded: SeededStructure }> {
   const board = await createBoard(tx, ctx, {
     name: words.kanban.name,
@@ -65,9 +68,16 @@ async function seedKanban(
     firstArea: words.kanban.structure.areas[0]!,
   });
   const seeded = await seedStructure(tx, ctx, board.id, words.kanban.structure);
+  const bands = await seedReleases(tx, ctx, board.id, words.kanban.releases, day);
   const columns = await columnsOf(tx, board.id);
   const col = (category: string) => columns.find((c) => c.category === category)!;
   const created: string[] = [];
+  // A flow team still ships in batches. What is finished went out in one
+  // of the releases behind them, oldest work in the oldest; what is in
+  // hand is aimed at the one ahead; the backlog is promised to nothing,
+  // which is the honest state and what the bottom band is for.
+  const finished: string[] = [];
+  const building: string[] = [];
   for (const [i, spec] of words.kanban.cards.entries()) {
     const card = await createCard(tx, ctx, {
       boardId: board.id,
@@ -85,6 +95,11 @@ async function seedKanban(
     });
     created.push(card.id);
     if (spec.column !== "backlog") await moveCard(tx, ctx, card.id, col(spec.column).id, undefined);
+    if (spec.column === "done") {
+      finished.push(card.id);
+    } else if (spec.column === "doing" || spec.column === "todo") {
+      building.push(card.id);
+    }
     if (spec.checklist) {
       await updateChecklist(
         tx,
@@ -99,6 +114,17 @@ async function seedKanban(
   }
   const first = created[0];
   if (first) await addComment(tx, ctx, first, words.kanban.comment);
+  // The finished work is dealt evenly across the releases behind them,
+  // oldest cards into the oldest release: the card list runs oldest
+  // first, and shiftHistory spreads the clocks the same way.
+  const past = bands.slice(0, -1);
+  const perBand = Math.ceil(finished.length / Math.max(past.length, 1));
+  for (const [n, band] of past.entries()) {
+    const slice = finished.slice(n * perBand, (n + 1) * perBand);
+    if (slice.length > 0) await setCardsRelease(tx, ctx, slice, band.id);
+  }
+  const ahead = bands.at(-1);
+  if (ahead) await setCardsRelease(tx, ctx, building, ahead.id);
   await closeSeeded(tx, ctx, seeded);
   return { boardId: board.id, seeded };
 }
@@ -121,6 +147,11 @@ async function seedScrum(
   const columns = await columnsOf(tx, board.id);
   const done = columns.find((c) => c.category === "done")!;
   const doing = columns.find((c) => c.category === "doing")!;
+
+  // The releases the app has shipped, and the one being built. Two
+  // sprints make a version, which is how a team that demos every other
+  // Friday actually ships; the running sprint fills the next one.
+  const bands = await seedReleases(tx, ctx, board.id, words.scrum.releases, day);
 
   // The sprints already behind the team, fortnight by fortnight back from
   // the one running, so the history is as long as the words make it.
@@ -154,6 +185,8 @@ async function seedScrum(
       if (past.cards[n]!.done) await moveCard(tx, ctx, id, done.id, undefined);
     }
     await closeSprint(tx, ctx, sprint.id, null);
+    const shipped = bands[Math.floor(i / 2)];
+    if (shipped) await setCardsRelease(tx, ctx, ids, shipped.id);
   }
 
   // The sprint the team is in now, four days in.
@@ -187,6 +220,9 @@ async function seedScrum(
     if (spec.state === "done") await moveCard(tx, ctx, id, done.id, undefined);
     if (spec.state === "doing") await moveCard(tx, ctx, id, doing.id, undefined);
   }
+  // What the team is building now goes in the version it is building.
+  const next = bands.at(-1);
+  if (next) await setCardsRelease(tx, ctx, activeIds, next.id);
 
   // The backlog, in priority order, and a sprint already planned.
   for (const spec of words.scrum.backlog) {

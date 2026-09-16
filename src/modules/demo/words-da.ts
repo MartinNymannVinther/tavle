@@ -449,6 +449,11 @@ export const DEMO_DA: DemoWords = {
       },
     ],
     comment: "Jeg kan genskabe fejlen på min egen telefon. Kigger på det i dag.",
+    releases: [
+      { name: "Forår: betaling og katalog", dayOffset: -70 },
+      { name: "Sommer: anmeldelser og drift", dayOffset: -28 },
+      { name: "Black Friday-klar", dayOffset: 21 },
+    ],
   },
   scrum: {
     name: "Medlemsapp",
@@ -960,5 +965,11 @@ export const DEMO_DA: DemoWords = {
       },
     ],
     plannedSprint: { name: "Sprint 8", goal: "Beskeder til medlemmerne" },
+    releases: [
+      { name: "1.0 Login og kontingent", dayOffset: -84 },
+      { name: "1.1 Min side", dayOffset: -56 },
+      { name: "1.2 Arrangementer", dayOffset: -28 },
+      { name: "1.3 Betaling i appen", dayOffset: 14 },
+    ],
   },
 };

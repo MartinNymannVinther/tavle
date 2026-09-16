@@ -9,7 +9,9 @@ import { createItem } from "@/modules/boards/structure/write-items";
 import { planFeature } from "@/modules/boards/structure/plan-feature";
 import { createArea, createTheme } from "@/modules/boards/structure/write-lists";
 import { placeOnMap } from "@/modules/boards/structure/write-map";
-import type { DemoStructure } from "./words";
+import type { Release } from "@/core/db/schema";
+import { createRelease } from "@/modules/boards/write-releases";
+import type { DemoRelease, DemoStructure } from "./words";
 
 /**
  * The structure above a demo board's cards: its areas and themes, its
@@ -178,4 +180,28 @@ export async function planSeededFeatures(
       targetSprintId: at.last,
     });
   }
+}
+
+/**
+ * The bands a demo board's story map is divided into (docs/adr/0032),
+ * with their dates counted from today so a seeded workspace always has
+ * two or three behind it and one ahead.
+ */
+export async function seedReleases(
+  tx: AppTransaction,
+  ctx: OrgContext,
+  boardId: string,
+  specs: DemoRelease[],
+  day: (offset: number) => string,
+): Promise<Release[]> {
+  const made: Release[] = [];
+  for (const spec of specs) {
+    const release = await createRelease(tx, ctx, {
+      boardId,
+      name: spec.name,
+      targetDate: spec.dayOffset === null ? null : day(spec.dayOffset),
+    });
+    if (release) made.push(release);
+  }
+  return made;
 }

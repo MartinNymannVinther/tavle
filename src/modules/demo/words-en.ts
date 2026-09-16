@@ -450,6 +450,11 @@ export const DEMO_EN: DemoWords = {
       },
     ],
     comment: "I can reproduce this on my own phone. Looking at it today.",
+    releases: [
+      { name: "Spring: payment and catalogue", dayOffset: -70 },
+      { name: "Summer: reviews and operations", dayOffset: -28 },
+      { name: "Black Friday ready", dayOffset: 21 },
+    ],
   },
   scrum: {
     name: "Member app",
@@ -964,5 +969,11 @@ export const DEMO_EN: DemoWords = {
       },
     ],
     plannedSprint: { name: "Sprint 8", goal: "Messages to members" },
+    releases: [
+      { name: "1.0 Login and fees", dayOffset: -84 },
+      { name: "1.1 My page", dayOffset: -56 },
+      { name: "1.2 Events", dayOffset: -28 },
+      { name: "1.3 Paying in the app", dayOffset: 14 },
+    ],
   },
 };

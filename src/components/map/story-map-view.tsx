@@ -272,6 +272,7 @@ export function StoryMapView({ full }: { full: BoardFull }) {
               full,
             ),
           hiddenOf,
+          bandOf: (rowKey) => cards.filter((card) => rowOf(card, map.rows) === rowKey),
           onEditRelease: (release) => setEditing({ open: true, release }),
           onReveal: (featureId) => void run(() => placeOnMapAction({ itemId: featureId })),
         }}
