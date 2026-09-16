@@ -6,11 +6,20 @@ import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { PropertyGroup, PropertyRow } from "@/components/ui/property-row";
 import { Textarea } from "@/components/ui/textarea";
-import type { Area, Column, EstimateUnit, Priority, Sprint, Theme } from "@/core/db/schema";
+import type {
+  Area,
+  Column,
+  EstimateUnit,
+  Priority,
+  Release,
+  Sprint,
+  Theme,
+} from "@/core/db/schema";
 import { PRIORITIES } from "@/core/db/schema";
 import type { CardDetail, ItemView, PersonRef } from "@/modules/boards/types";
 import { moveCardAction, updateCardAction } from "@/modules/boards/actions-cards";
 import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
+import { setCardsReleaseAction } from "@/modules/boards/actions-releases";
 import type { Run } from "@/components/board/use-board-actions";
 import type { StructureView } from "@/modules/boards/structure/view";
 import { cn } from "@/lib/utils";
@@ -32,6 +41,7 @@ export function CardSidePanel({
   areas,
   features,
   sprints,
+  releases,
   people,
   scrum,
   view,
@@ -45,6 +55,8 @@ export function CardSidePanel({
   areas: Area[];
   features: ItemView[];
   sprints: Sprint[];
+  /** The board's release bands, for the field the map's vertical drag writes. */
+  releases: Release[];
   people: PersonRef[];
   scrum: boolean;
   view: StructureView;
@@ -83,6 +95,32 @@ export function CardSidePanel({
             ))}
           </NativeSelect>
         </PropertyRow>
+        {releases.length > 0 && (
+          // Every drag has a select beside it: the story map's vertical
+          // drag writes this field, so the field has to exist here too.
+          <PropertyRow label={t("release")} htmlFor="card-release">
+            <NativeSelect
+              id="card-release"
+              variant="xs"
+              value={card.releaseId ?? ""}
+              onChange={(event) =>
+                void run(() =>
+                  setCardsReleaseAction({
+                    cardIds: [card.id],
+                    releaseId: event.target.value || null,
+                  }),
+                )
+              }
+            >
+              <option value="">{t("noRelease")}</option>
+              {releases.map((release) => (
+                <option key={release.id} value={release.id}>
+                  {release.name}
+                </option>
+              ))}
+            </NativeSelect>
+          </PropertyRow>
+        )}
         {scrum && (
           <PropertyRow label={t("sprint")} htmlFor="card-sprint">
             <NativeSelect

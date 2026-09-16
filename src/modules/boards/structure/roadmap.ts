@@ -108,10 +108,18 @@ export function roadmap(full: BoardFull, now: Date = new Date()): Roadmap {
     (min, r) => (compareQuarters(r.startQuarter, min) < 0 ? r.startQuarter : min),
     oldestShown,
   );
-  const last = rows.reduce(
+  // The axis has to reach whatever is drawn on it, releases included:
+  // a date beyond the last column would otherwise be clamped onto it and
+  // read as a promise for a quarter nobody made.
+  const lastPlanned = rows.reduce(
     (max, r) => (compareQuarters(r.endQuarter, max) > 0 ? r.endQuarter : max),
     shift(current, QUARTERS_AHEAD),
   );
+  const last = full.releases.reduce((max, release) => {
+    if (!release.targetDate) return max;
+    const q = quarterOf(release.targetDate);
+    return compareQuarters(q, max) > 0 ? q : max;
+  }, lastPlanned);
   const quarters = quartersBetween(first, last);
   // A release is drawn where its date falls; one without a date has
   // nowhere honest to sit on a time axis, so it is left off.

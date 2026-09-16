@@ -68,6 +68,15 @@ export function labelOf(value: number | null | undefined, unit: EstimateUnit): s
   return String(value);
 }
 
+/**
+ * What a *sum* shows. A T-shirt size names one card, so a band or a
+ * release holding eleven weights is eleven points, not "XL" — the size
+ * vocabulary simply has no word for a total.
+ */
+export function totalLabel(value: number, unit: EstimateUnit): string {
+  return unit === "hours" ? `${value} t` : String(value);
+}
+
 /** The values a card may be given, for the picker the board's unit asks for. */
 export function choicesFor(unit: EstimateUnit): number[] {
   if (unit === "tshirt") return TSHIRT.map((t) => t.weight);

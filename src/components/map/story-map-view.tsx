@@ -18,7 +18,7 @@ import { FullscreenButton, useFullscreen } from "@/components/board/use-fullscre
 import { Button } from "@/components/ui/button";
 import type { BoardFull } from "@/modules/boards/types";
 import { createCardAction, placeCardAction } from "@/modules/boards/actions-cards";
-import { setCardsReleaseAction } from "@/modules/boards/actions-releases";
+import { reorderReleaseAction, setCardsReleaseAction } from "@/modules/boards/actions-releases";
 import { alignBacklogToMapAction, placeOnMapAction } from "@/modules/boards/actions-structure";
 import { cn } from "@/lib/utils";
 import type { Release } from "@/core/db/schema";
@@ -274,6 +274,15 @@ export function StoryMapView({ full }: { full: BoardFull }) {
           hiddenOf,
           bandOf: (rowKey) => cards.filter((card) => rowOf(card, map.rows) === rowKey),
           onEditRelease: (release) => setEditing({ open: true, release }),
+          onNudgeRelease: (release, delta) => {
+            const order = [...full.releases].sort(
+              (a, b) => a.sort - b.sort || a.createdAt.getTime() - b.createdAt.getTime(),
+            );
+            const at = order.findIndex((r) => r.id === release.id);
+            const index = at + delta;
+            if (at < 0 || index < 0 || index >= order.length) return;
+            void run(() => reorderReleaseAction({ releaseId: release.id, index }));
+          },
           onReveal: (featureId) => void run(() => placeOnMapAction({ itemId: featureId })),
         }}
       />

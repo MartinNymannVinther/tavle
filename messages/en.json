@@ -773,7 +773,9 @@
         "hours": "Hours",
         "tshirt": "Size"
       },
-      "noEstimate": "No estimate"
+      "noEstimate": "No estimate",
+      "release": "Release",
+      "noRelease": "Not in a release"
     },
     "ai": {
       "title": "AI help",
@@ -1548,8 +1550,8 @@
   },
   "map": {
     "title": "Story map",
-    "leadScrum": "Features across the top in the story's order, the sprints down. Put features up from the tray, drag them into place, and drag a card sideways to another feature or up and down to another sprint.",
-    "leadKanban": "Features across the top in the story's order, the board's columns down. Put features up from the tray, drag them into place, and drag a card sideways to another feature or up and down to another column.",
+    "leadScrum": "Features across the top in the story's order, your releases down the side. Put features up from the tray, drag them into place, and drag a card sideways to another feature or up and down to another release.",
+    "leadKanban": "Features across the top in the story's order, your releases down the side. Put features up from the tray, drag them into place, and drag a card sideways to another feature or up and down to another release.",
     "tray": "Not on the map",
     "trayEmpty": "Every open feature is up.",
     "putUp": "Put on the map",
@@ -1591,7 +1593,9 @@
     },
     "unreleased": "Not in a release",
     "noDate": "No date",
-    "editRelease": "Edit release"
+    "editRelease": "Edit release",
+    "moveReleaseUp": "Move the release up",
+    "moveReleaseDown": "Move the release down"
   },
   "decompose": {
     "title": "Breakdown",

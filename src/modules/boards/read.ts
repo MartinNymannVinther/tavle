@@ -203,6 +203,7 @@ export async function getCardFull(
       areaRows,
       featureRows,
       sprintRows,
+      releaseRows,
       roster,
       commentRows,
       eventRows,
@@ -220,6 +221,7 @@ export async function getCardFull(
         .from(sprints)
         .where(and(eq(sprints.boardId, boardId), inArray(sprints.state, ["planned", "active"])))
         .orderBy(asc(sprints.number)),
+      releasesOf(tx, boardId),
       rosterOf(tx, ctx.orgId),
       tx
         .select({
@@ -255,6 +257,7 @@ export async function getCardFull(
         featureRows.filter((f) => f.state === "open" || f.id === row.featureId),
       ),
       sprints: sprintRows,
+      releases: releaseRows,
       people: roster,
       comments: commentRows,
       events: eventRows,

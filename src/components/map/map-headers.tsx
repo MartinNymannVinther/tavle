@@ -1,6 +1,15 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, CircleDashed, MoreHorizontal, Pencil, Plus } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  CircleDashed,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -217,6 +226,7 @@ export function RowLabel({
   hidden = [],
   onReveal,
   onEdit,
+  onNudge,
 }: {
   row: MapRow;
   cards: number;
@@ -229,6 +239,8 @@ export function RowLabel({
   onReveal?: (featureId: string) => void;
   /** Opens the band for renaming and dating; absent for the unreleased band. */
   onEdit?: (release: Release) => void;
+  /** Moves the band a step nearer or further; absent ends of the list are disabled. */
+  onNudge?: { up?: () => void; down?: () => void };
 }) {
   const t = useTranslations("map");
   return (
@@ -237,18 +249,47 @@ export function RowLabel({
         <>
           <span className="flex items-start gap-1">
             <span className="min-w-0 flex-1 text-2sm font-semibold">{row.release.name}</span>
-            {onEdit && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-xs"
-                aria-label={t("editRelease")}
-                onClick={() => onEdit(row.release)}
-                className="text-meta -mt-0.5 -mr-1.5 shrink-0 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/row:opacity-100 [@media(hover:hover)]:focus-visible:opacity-100"
-              >
-                <Pencil />
-              </Button>
-            )}
+            <span className="flex shrink-0 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/row:opacity-100 [@media(hover:hover)]:group-focus-within/row:opacity-100">
+              {/* Every drag has a button beside it; the bands are no exception. */}
+              {onNudge && (
+                <>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-xs"
+                    aria-label={t("moveReleaseUp")}
+                    disabled={!onNudge.up}
+                    onClick={onNudge.up}
+                    className="text-meta size-5"
+                  >
+                    <ArrowUp />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-xs"
+                    aria-label={t("moveReleaseDown")}
+                    disabled={!onNudge.down}
+                    onClick={onNudge.down}
+                    className="text-meta size-5"
+                  >
+                    <ArrowDown />
+                  </Button>
+                </>
+              )}
+              {onEdit && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  aria-label={t("editRelease")}
+                  onClick={() => onEdit(row.release)}
+                  className="text-meta size-5"
+                >
+                  <Pencil />
+                </Button>
+              )}
+            </span>
           </span>
           <span className="text-chart-2 font-medium">
             {row.release.targetDate ? formatDateDa(row.release.targetDate) : t("noDate")}

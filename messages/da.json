@@ -773,7 +773,9 @@
         "hours": "Timer",
         "tshirt": "Størrelse"
       },
-      "noEstimate": "Intet estimat"
+      "noEstimate": "Intet estimat",
+      "release": "Release",
+      "noRelease": "Ikke i en release"
     },
     "ai": {
       "title": "AI-hjælp",
@@ -1548,8 +1550,8 @@
   },
   "map": {
     "title": "Story map",
-    "leadScrum": "Features hen over toppen i fortællingens rækkefølge, sprintene nedad. Sæt features op fra bakken, træk dem på plads, og træk et kort sidelæns til en anden feature eller op og ned til en anden sprint.",
-    "leadKanban": "Features hen over toppen i fortællingens rækkefølge, tavlens kolonner nedad. Sæt features op fra bakken, træk dem på plads, og træk et kort sidelæns til en anden feature eller op og ned til en anden kolonne.",
+    "leadScrum": "Features hen over toppen i fortællingens rækkefølge, jeres releases nedad. Sæt features op fra bakken, træk dem på plads, og træk et kort sidelæns til en anden feature eller op og ned til en anden release.",
+    "leadKanban": "Features hen over toppen i fortællingens rækkefølge, jeres releases nedad. Sæt features op fra bakken, træk dem på plads, og træk et kort sidelæns til en anden feature eller op og ned til en anden release.",
     "tray": "Ikke på mappet",
     "trayEmpty": "Alle åbne features er sat op.",
     "putUp": "Sæt op på mappet",
@@ -1591,7 +1593,9 @@
     },
     "unreleased": "Ikke i en release",
     "noDate": "Ingen dato",
-    "editRelease": "Rediger release"
+    "editRelease": "Rediger release",
+    "moveReleaseUp": "Flyt releasen op",
+    "moveReleaseDown": "Flyt releasen ned"
   },
   "decompose": {
     "title": "Nedbrydning",

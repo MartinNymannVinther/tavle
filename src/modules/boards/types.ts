@@ -83,6 +83,8 @@ export type CardFull = {
   features: ItemView[];
   /** Planned and active sprints a card can be moved to. */
   sprints: Sprint[];
+  /** The board's release bands, so the card can name the one it ships in. */
+  releases: Release[];
   people: PersonRef[];
   comments: CommentView[];
   events: BoardEvent[];

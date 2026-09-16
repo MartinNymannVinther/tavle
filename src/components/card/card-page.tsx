@@ -48,7 +48,19 @@ export function CardPage({
   const format = useFormatter();
   const router = useRouter();
   const { run } = useBoardActions();
-  const { card, board, columns, themes, areas, features, sprints, people, comments, events } = full;
+  const {
+    card,
+    board,
+    columns,
+    themes,
+    areas,
+    features,
+    sprints,
+    releases,
+    people,
+    comments,
+    events,
+  } = full;
   const column = columns.find((c) => c.id === card.columnId);
   const view = structureView(board);
 
@@ -108,6 +120,7 @@ export function CardPage({
             areas={areas}
             features={features}
             sprints={sprints}
+            releases={releases}
             people={people}
             scrum={board.mode === "scrum"}
             view={view}

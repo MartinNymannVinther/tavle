@@ -34,6 +34,7 @@ export const EXPORT_TABLES: ExportTable[] = [
   { table: "areas", sheet: "Områder", orderBy: "board_id, sort" },
   { table: "backlog_item_themes", sheet: "Item-temaer", orderBy: "item_id" },
   { table: "card_themes", sheet: "Kort-temaer", orderBy: "card_id" },
+  { table: "releases", sheet: "Releases", orderBy: "board_id, sort" },
   { table: "sprints", sheet: "Sprints", orderBy: "board_id, number" },
   { table: "comments", sheet: "Kommentarer", orderBy: "created_at" },
   { table: "card_transitions", sheet: "Flytninger", orderBy: "at" },

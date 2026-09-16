@@ -36,6 +36,8 @@ export type GridHandlers = {
   bandOf: (rowKey: string) => CardView[];
   /** Opens a band for renaming and dating. */
   onEditRelease: (release: Release) => void;
+  /** Moves a band one step nearer or further. */
+  onNudgeRelease: (release: Release, delta: -1 | 1) => void;
 };
 
 export function MapGrid({
@@ -122,6 +124,20 @@ export function MapGrid({
                 unit={structure.estimateUnit}
                 hidden={handlers.hiddenOf(row.key)}
                 onEdit={handlers.onEditRelease}
+                onNudge={
+                  row.kind === "release"
+                    ? {
+                        up:
+                          rowIndex > 0 ? () => handlers.onNudgeRelease(row.release, -1) : undefined,
+                        // The unreleased band is always last, so a release
+                        // can go down only while another release is below it.
+                        down:
+                          rowIndex < map.rows.length - 2
+                            ? () => handlers.onNudgeRelease(row.release, 1)
+                            : undefined,
+                      }
+                    : undefined
+                }
                 onReveal={handlers.onReveal}
               />
               {map.columns.map((column, index) => (

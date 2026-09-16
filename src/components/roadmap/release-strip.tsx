@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import type { EstimateUnit } from "@/core/db/schema";
 import type { RoadmapRelease } from "@/modules/boards/structure/roadmap";
-import { labelOf } from "@/modules/boards/estimates";
+import { totalLabel } from "@/modules/boards/estimates";
 import { cn } from "@/lib/utils";
 
 /**
@@ -27,6 +27,21 @@ export function ReleaseStrip({
   const t = useTranslations("roadmap.releases");
   const dated = releases.filter((r) => r.at !== null);
   const undated = releases.length - dated.length;
+
+  // Two markers closer than this share of the axis would overlap, so the
+  // later one steps down a lane. Measured against the widest label the
+  // strip allows, not guessed.
+  const MIN_GAP = 0.9;
+  const taken: number[][] = [];
+  const laneOf = dated.map((row) => {
+    const at = row.at!;
+    let lane = 0;
+    while ((taken[lane] ?? []).some((other) => Math.abs(other - at) < MIN_GAP)) lane += 1;
+    taken[lane] = [...(taken[lane] ?? []), at];
+    return lane;
+  });
+  const lanes = Math.max(1, taken.length);
+
   if (releases.length === 0) return null;
 
   return (
@@ -40,20 +55,31 @@ export function ReleaseStrip({
           <span className="text-meta text-2xs">{t("undated", { count: undated })}</span>
         )}
       </div>
-      <div className="relative col-span-full col-start-2 min-h-11 py-2">
-        {dated.map((row) => {
+      <div
+        className="relative col-span-full col-start-2 py-2"
+        style={{ minHeight: `${2.75 + (lanes - 1) * 1.6}rem` }}
+      >
+        {dated.map((row, index) => {
           // The marker sits where the date falls, as a share of the axis.
           const left = (row.at! / columns) * 100;
+          // Releases land close together often — a quarter is three months
+          // and a team ships more than once in it. Rather than painting
+          // over each other, a marker steps down a lane until it clears
+          // the ones already placed.
+          const lane = laneOf[index]!;
           const share = row.points > 0 ? Math.round((row.donePoints / row.points) * 100) : 0;
-          const weight = labelOf(row.points, unit);
+          const weight = row.points > 0 ? totalLabel(row.points, unit) : null;
           return (
             <span
               key={row.release.id}
               className={cn(
-                "bg-card border-border absolute top-1.5 flex max-w-52 -translate-x-1/2 items-center gap-1.5",
+                "bg-card border-border absolute flex max-w-52 -translate-x-1/2 items-center gap-1.5",
                 "rounded-full border px-2 py-0.5 text-2xs shadow-[var(--surface-shadow)]",
               )}
-              style={{ left: `${Math.min(99, Math.max(1, left))}%` }}
+              style={{
+                left: `${Math.min(99, Math.max(1, left))}%`,
+                top: `${0.375 + lane * 1.6}rem`,
+              }}
               title={t("tip", { cards: row.cards, done: share })}
             >
               <span
