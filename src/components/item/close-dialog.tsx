@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +15,8 @@ import {
 import { NativeSelect } from "@/components/ui/native-select";
 import type { Run } from "@/components/board/use-board-actions";
 import type { Area } from "@/core/db/schema";
-import { proposeCloseAdviceAction } from "@/modules/ai/actions-advice";
+import type { CloseAdviceItem } from "@/modules/ai/advice";
+import { askAi } from "@/modules/ai/read-client";
 import { closeItemAction } from "@/modules/boards/actions-structure";
 import type { OpenChild } from "@/modules/boards/structure/close";
 import type { ChildDecision } from "@/modules/boards/structure/validation";
@@ -30,6 +31,11 @@ import type { ItemView } from "@/modules/boards/types";
  * With a model set up the selects arrive pre-set to a reasoned plan
  * (docs/adr/0026), each with its one-line why; every choice remains the
  * person's, and confirm still re-validates everything on the server.
+ *
+ * The advice is fetched, not dispatched as an action (docs/adr/0034):
+ * the person's own confirm must leave the moment it is clicked, whatever
+ * the model is doing, and cancelling must abandon the thinking rather
+ * than let a close land half a minute later.
  */
 export function CloseItemButton({
   item,
@@ -49,19 +55,39 @@ export function CloseItemButton({
   aiAvailable?: boolean;
 }) {
   const t = useTranslations("items.close");
+  const locale = useLocale();
   const [children, setChildren] = useState<OpenChild[] | null>(null);
   const [plan, setPlan] = useState<Record<string, ChildDecision>>({});
   const [reasons, setReasons] = useState<Record<string, string>>({});
+  const [thinking, setThinking] = useState(false);
   const [pending, setPending] = useState(false);
   // One ticket per dialog opening, so a slow answer for a closed dialog
   // is dropped; a child the person already touched is never overridden.
   const ticket = useRef(0);
+  const flight = useRef<AbortController | null>(null);
   const touched = useRef(new Set<string>());
+
+  /** Lets go of the advice: the answer is dropped and the call left behind. */
+  function abandonAdvice() {
+    ticket.current += 1;
+    flight.current?.abort();
+    flight.current = null;
+    setThinking(false);
+  }
 
   async function advise() {
     const mine = ++ticket.current;
-    const result = await proposeCloseAdviceAction({ itemId: item.id });
-    if (mine !== ticket.current || !result.ok) return;
+    const controller = new AbortController();
+    flight.current = controller;
+    setThinking(true);
+    const result = await askAi<CloseAdviceItem[]>(
+      "close-advice",
+      { itemId: item.id },
+      { locale, signal: controller.signal },
+    );
+    if (mine !== ticket.current) return;
+    setThinking(false);
+    if (!result.ok) return;
     setPlan((prev) => {
       const next = { ...prev };
       for (const advice of result.proposal) {
@@ -75,6 +101,9 @@ export function CloseItemButton({
   }
 
   async function attempt(withPlan?: ChildDecision[]) {
+    // The person has decided: the advice has nothing left to say, and the
+    // close goes out now rather than behind it.
+    if (withPlan) abandonAdvice();
     setPending(true);
     const ok = await run(
       () => closeItemAction({ itemId: item.id, plan: withPlan }),
@@ -128,7 +157,7 @@ export function CloseItemButton({
         open={children !== null}
         onOpenChange={(open) => {
           if (!open) {
-            ticket.current += 1;
+            abandonAdvice();
             setChildren(null);
           }
         }}
@@ -228,15 +257,28 @@ export function CloseItemButton({
               );
             })}
           </ol>
+          {thinking && (
+            <p className="text-meta flex items-center gap-1.5 text-2xs" aria-live="polite">
+              <Sparkles className="size-3 shrink-0 animate-pulse" aria-hidden />
+              {t("thinking")}
+            </p>
+          )}
           <DialogFooter>
             <Button
               type="button"
               disabled={pending || !complete}
               onClick={() => void attempt(Object.values(plan))}
             >
-              {t("confirm")}
+              {pending ? t("closing") : t("confirm")}
             </Button>
-            <Button type="button" variant="ghost" onClick={() => setChildren(null)}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                abandonAdvice();
+                setChildren(null);
+              }}
+            >
               {t("cancel")}
             </Button>
           </DialogFooter>

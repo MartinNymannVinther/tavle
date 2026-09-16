@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   addDaysIso,
   diffDays,
-  formatDateDa,
+  formatDay,
+  formatPlanDate,
+  formatStamp,
   maxIso,
   minIso,
   mondayOf,
@@ -75,8 +77,28 @@ describe("today", () => {
 });
 
 describe("readable dates", () => {
-  it("writes a Danish date without leading zeroes", () => {
-    expect(formatDateDa("2026-09-01")).toContain("1.");
-    expect(formatDateDa("2026-09-01")).toContain("2026");
+  it("writes a plan date in the reader's language, day first in both", () => {
+    expect(formatPlanDate("2026-09-01", "da")).toBe("01.09.2026");
+    expect(formatPlanDate("2026-09-01", "en")).toBe("01/09/2026");
+  });
+
+  it("never lets a timezone move a plan date to another day", () => {
+    // A plan date carries no clock; the first of a month must not become
+    // the last of the one before it because the server sits west of us.
+    expect(formatPlanDate("2026-01-01", "da")).toBe("01.01.2026");
+    expect(formatPlanDate("2026-12-31", "en")).toBe("31/12/2026");
+  });
+
+  it("leaves anything that is not a plan date alone", () => {
+    expect(formatPlanDate("", "da")).toBe("");
+    expect(formatPlanDate("nonsense", "en")).toBe("nonsense");
+  });
+
+  it("writes a moment as a day and as a stamp, in Copenhagen", () => {
+    const at = new Date("2026-08-26T22:30:00Z");
+    // Half past midnight in Copenhagen: the day is already the 27th.
+    expect(formatDay(at, "da")).toContain("27");
+    expect(formatDay(at, "en")).toBe("27 Aug 2026");
+    expect(formatStamp(at, "en")).toBe("27/08/2026, 00:30");
   });
 });

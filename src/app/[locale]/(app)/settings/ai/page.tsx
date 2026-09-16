@@ -98,8 +98,18 @@ export default async function AiSettingsPage() {
                 {t("noModel")}
               </Badge>
               <p className="text-muted-foreground">{t("setupIntro")}</p>
+              {/* The settings themselves are the same in every language;
+                  the comments and the placeholder are not. */}
               <pre className="bg-muted overflow-x-auto rounded-lg p-3 font-mono text-xs leading-relaxed">
-                {`# .env — EU-hostet (Mistral)\nLLM_PROVIDER=mistral\nMISTRAL_API_KEY=din-nøgle-her\n\n# eller lokalt (Ollama)\nLLM_PROVIDER=ollama\nOLLAMA_BASE_URL=http://localhost:11434`}
+                {[
+                  `# .env — ${t("setupEuComment")}`,
+                  "LLM_PROVIDER=mistral",
+                  `MISTRAL_API_KEY=${t("setupKeyPlaceholder")}`,
+                  "",
+                  `# ${t("setupLocalComment")}`,
+                  "LLM_PROVIDER=ollama",
+                  "OLLAMA_BASE_URL=http://localhost:11434",
+                ].join("\n")}
               </pre>
               <p className="text-muted-foreground">{t("setupOutro")}</p>
             </div>

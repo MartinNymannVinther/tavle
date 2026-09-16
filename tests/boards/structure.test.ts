@@ -280,10 +280,14 @@ describe("ranking", () => {
         enablerType: "infrastructure",
       }),
     );
+    const before = (await getBoardFull(ctx, boardId))!.items.find((i) => i.id === epicOne)!;
     await run((tx) => reorderItem(tx, second.id, epicOne, false));
     const epics = (await getBoardFull(ctx, boardId))!.items.filter((i) => i.level === "epic");
     expect(epics.map((e) => e.number)).toEqual([second.number, 1]);
-    expect(epics.map((e) => e.sort)).toEqual([1000, 2000]);
+    // One rank, one number (docs/adr/0033): the move writes the moved
+    // item's number and leaves the one it passed exactly where it was.
+    expect(epics.map((e) => e.sort)).toEqual([...epics.map((e) => e.sort)].sort((a, b) => a - b));
+    expect(epics.find((e) => e.id === epicOne)!.sort).toBe(before.sort);
   });
 });
 

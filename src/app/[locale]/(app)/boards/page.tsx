@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireOrgContext } from "@/core/auth/guard";
 import { modelConfigured } from "@/modules/ai/service";
-import { formatDateDa } from "@/core/dates";
+import { formatPlanDate } from "@/core/dates";
 import { listBoards } from "@/modules/boards/read-lists";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export default async function BoardsPage() {
   const t = await getTranslations("boards.list");
+  const locale = await getLocale();
   const modes = await getTranslations("boards.mode");
   const context = await requireOrgContext();
   const boards = context ? await listBoards(context) : [];
@@ -84,7 +85,7 @@ export default async function BoardsPage() {
                       <span className="text-foreground">
                         {t("activeSprint", {
                           name: board.activeSprint.name,
-                          date: formatDateDa(board.activeSprint.endDate),
+                          date: formatPlanDate(board.activeSprint.endDate, locale),
                         })}
                       </span>
                     ) : (

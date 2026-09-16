@@ -82,9 +82,49 @@ export function weekNumberFromKey(key: string): number {
   return Number(key.split("-W")[1] ?? 0);
 }
 
-/** "2026-08-26" → "26.08.2026" (Danish short date). */
-export function formatDateDa(dateIso: string): string {
-  const [year, month, day] = dateIso.split("-");
-  if (!year || !month || !day) return dateIso;
-  return `${day}.${month}.${year}`;
+/**
+ * Dates in the reader's language, in one place.
+ *
+ * English here is British English, not American: the product is Danish
+ * and day-first everywhere, and "9/16/26" beside "16.09.2026" on the
+ * same page is worse than an unfamiliar separator. Every surface goes
+ * through these three, so a page cannot mix three styles by accident.
+ */
+function intlLocale(locale: string): string {
+  return locale === "en" ? "en-GB" : "da-DK";
+}
+
+/** A plan date: "26.08.2026" in Danish, "26/08/2026" in English. */
+export function formatPlanDate(dateIso: string, locale: string): string {
+  if (!ISO_DATE.test(dateIso)) return dateIso;
+  const [y, m, d] = parts(dateIso);
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    // A plan date carries no clock, so it must not be moved by one.
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(y, m, d)));
+}
+
+/** A moment as the day it happened: "26. aug. 2026" / "26 Aug 2026". */
+export function formatDay(value: Date, locale: string): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Europe/Copenhagen",
+  }).format(value);
+}
+
+/** A moment with its clock, for a feed: "26.08.2026, 14.05" / "26/08/2026, 14:05". */
+export function formatStamp(value: Date, locale: string): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Europe/Copenhagen",
+  }).format(value);
 }

@@ -11,6 +11,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useBoardActions } from "@/components/board/use-board-actions";
+import type { BoardEvent } from "@/core/db/schema";
 import type { BoardFull } from "@/modules/boards/types";
 import {
   archiveBoardAction,
@@ -20,6 +21,7 @@ import {
 } from "@/modules/boards/actions-boards";
 import { useRouter } from "@/i18n/navigation";
 import { AreasEditor } from "./areas-editor";
+import { BoardActivity } from "./board-activity";
 import { ColumnsEditor } from "./columns-editor";
 import { SwimlanesEditor } from "./swimlanes-editor";
 import { ThemesEditor } from "./themes-editor";
@@ -34,11 +36,14 @@ export function BoardSettings({
   full,
   canManage,
   lastUnitChange = null,
+  activity = [],
 }: {
   full: BoardFull;
   canManage: boolean;
   /** The last estimate-unit switch that can still be taken back. */
   lastUnitChange?: { id: string; payload: Record<string, unknown> } | null;
+  /** Changes to the board itself, which no card's feed would show. */
+  activity?: BoardEvent[];
 }) {
   const t = useTranslations("boardSettings");
   const router = useRouter();
@@ -210,6 +215,8 @@ export function BoardSettings({
           />
         </CardContent>
       </Card>
+
+      <BoardActivity events={activity} />
 
       {canManage && (
         <Card>

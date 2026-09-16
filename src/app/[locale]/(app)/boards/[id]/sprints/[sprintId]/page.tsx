@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { BurndownChart } from "@/components/charts/burndown-chart";
 import { SprintNotes } from "@/components/sprint/sprint-notes";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireOrgContext } from "@/core/auth/guard";
-import { formatDateDa } from "@/core/dates";
+import { formatPlanDate } from "@/core/dates";
 import { cards, columns } from "@/core/db/schema";
 import { withOrgContext } from "@/core/db/tenant";
 import { modelConfigured } from "@/modules/ai/service";
@@ -38,6 +38,7 @@ export default async function SprintPage({ params }: Params) {
   const sprint = (await listSprints(context, id)).find((s) => s.id === sprintId);
   if (!header || !sprint) notFound();
   const t = await getTranslations("sprints.detail");
+  const locale = await getLocale();
   const states = await getTranslations("sprints.state");
   const [burndown, rows, aiAvailable] = await Promise.all([
     sprintBurndown(context, sprint.id),
@@ -80,7 +81,8 @@ export default async function SprintPage({ params }: Params) {
         </Link>
         <h2 className="text-xl font-semibold">{sprint.name}</h2>
         <span className="text-meta text-sm">
-          {formatDateDa(sprint.startDate)} – {formatDateDa(sprint.endDate)} · {states(sprint.state)}
+          {formatPlanDate(sprint.startDate, locale)} – {formatPlanDate(sprint.endDate, locale)} ·{" "}
+          {states(sprint.state)}
         </span>
       </div>
       {sprint.goal && <p className="text-reading">{sprint.goal}</p>}

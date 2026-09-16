@@ -11,7 +11,7 @@ import { applySwimlaneAssignment, updateSwimlane } from "./write-swimlanes";
 import { archiveCard, deleteCard, restoreCard } from "./write-card-lifecycle";
 import { moveCard, updateCard, type CardUpdate } from "./write-cards";
 import { deleteComment } from "./comments";
-import { cardInWorkspace, columnInBoard, joiningSort, laneFor } from "./lanes";
+import { cardInWorkspace, columnInBoard } from "./lanes";
 import { canManage, roleOf } from "./members";
 import { people } from "@/core/db/schema";
 import { closeItem, type CloseOutcome } from "./structure/close";
@@ -118,18 +118,16 @@ async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): P
       }
       // The move between backlog and a planned sprint reset the column
       // too; the reverse re-enters the one the card stood in, when it
-      // still exists — the done clock restarts with the transition.
+      // still exists — the done clock restarts with the transition. The
+      // rank is left where it was: an undo restores what a move changed,
+      // and the move no longer changes the number (docs/adr/0033).
       if (step.columnId) {
         const card = await cardInWorkspace(tx, step.cardId);
         if (card && card.columnId !== step.columnId) {
           const to = await columnInBoard(tx, card.boardId, step.columnId);
           if (to) {
             const from = await columnInBoard(tx, card.boardId, card.columnId);
-            const sort = await joiningSort(
-              tx,
-              laneFor("scrum", { boardId: card.boardId, columnId: to.id, sprintId: card.sprintId }),
-            );
-            await enterColumn(tx, ctx, card, from, to, { sort });
+            await enterColumn(tx, ctx, card, from, to);
           }
         }
       }

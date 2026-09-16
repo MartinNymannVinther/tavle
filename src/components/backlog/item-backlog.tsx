@@ -9,6 +9,7 @@ import { TypeIcon } from "@/components/board/type-icon";
 import type { Run } from "@/components/board/use-board-actions";
 import type { Theme } from "@/core/db/schema";
 import { createCardAction } from "@/modules/boards/actions-cards";
+import { mergeByRank } from "@/modules/boards/ordering";
 import { reviewDue } from "@/modules/boards/structure/rules";
 import type { BoardFull, CardView, ItemView } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
@@ -33,7 +34,9 @@ import { useFolded } from "./use-folded";
  */
 
 type Drag =
-  { kind: "item"; id: string; scope: string } | { kind: "card"; id: string; featureId: string };
+  | { kind: "item"; id: string; scope: string }
+  /** A card ranks among the siblings it is shown with: a feature's fold-out, or what has no parent. */
+  | { kind: "card"; id: string; featureId: string | null };
 
 export function ItemBacklog({
   full,
@@ -90,6 +93,52 @@ export function ItemBacklog({
       sprintName={(card.sprintId && sprintNameOf?.get(card.sprintId)) || undefined}
     />
   );
+  /**
+   * One backlog card as a ranked row. Its siblings are the free rows it
+   * is shown beside — a feature's fold-out, or the cards with no parent
+   * under their own heading — so every card on the page can be moved by
+   * a drag and by the arrows, at every altitude (docs/adr/0027).
+   */
+  const storyRow = (
+    card: CardView,
+    siblings: CardView[],
+    featureId: string | null,
+    context?: { areaId: string | null; themeIds: string[] },
+  ) => {
+    const index = siblings.findIndex((sibling) => sibling.id === card.id);
+    // The drop stays among those siblings: a drag across features would
+    // reorder invisibly, and moving a card to another feature is
+    // placement, not rank.
+    const among = drag?.kind === "card" && drag.featureId === featureId && drag.id !== card.id;
+    return (
+      <BacklogRow
+        key={card.id}
+        card={card}
+        boardKey={board.key}
+        boardId={board.id}
+        structure={structure}
+        context={context}
+        draggable
+        onDragStart={() => setDrag({ kind: "card", id: card.id, featureId })}
+        onDragOver={(event) => {
+          if (among) event.preventDefault();
+        }}
+        onDrop={() => {
+          if (among && drag?.kind === "card") onNudgeCard(drag.id, card.id, false);
+          setDrag(null);
+        }}
+        dragging={drag?.kind === "card" && drag.id === card.id}
+        onMoveUp={
+          index > 0 ? () => onNudgeCard(card.id, siblings[index - 1]!.id, false) : undefined
+        }
+        onMoveDown={
+          index < siblings.length - 1
+            ? () => onNudgeCard(card.id, siblings[index + 1]!.id, true)
+            : undefined
+        }
+      />
+    );
+  };
   const epicOf = (feature: ItemView) =>
     feature.parentId ? full.items.find((i) => i.id === feature.parentId) : undefined;
   const allFeatures = [...tree.epics.flatMap((e) => e.features), ...tree.looseFeatures].sort(
@@ -214,13 +263,9 @@ export function ItemBacklog({
 
   const cardRows = (node: FeatureNode, depth: number) => {
     // The feature's committed cards stand at their rank among the free
-    // ones — one priority, the sprint's name saying why these rows
-    // neither drag nor tick.
-    const merged = [
-      ...node.stories.map((card) => ({ card, committed: false })),
-      ...allocatedOf(node.feature.id).map((card) => ({ card, committed: true })),
-    ].sort((a, b) => a.card.sort - b.card.sort || a.card.number - b.card.number);
-    const rankIndex = new Map(node.stories.map((card, index) => [card.id, index]));
+    // ones — one priority (docs/adr/0033), the sprint's name saying why
+    // these rows neither drag nor tick.
+    const merged = mergeByRank(node.stories, allocatedOf(node.feature.id));
     return (
       <div className="border-hairline ml-4 border-l" style={{ marginLeft: `${depth * 1.25}rem` }}>
         {merged.length === 0 ? (
@@ -249,60 +294,10 @@ export function ItemBacklog({
         ) : (
           <ol>
             {merged.map(({ card, committed }) => {
-              if (committed) {
-                return markedRow(card, {
-                  areaId: node.feature.areaId,
-                  themeIds: node.feature.themeIds,
-                });
-              }
-              const index = rankIndex.get(card.id)!;
-              return (
-                <BacklogRow
-                  key={card.id}
-                  card={card}
-                  boardKey={board.key}
-                  boardId={board.id}
-                  structure={structure}
-                  context={{ areaId: node.feature.areaId, themeIds: node.feature.themeIds }}
-                  draggable
-                  onDragStart={() =>
-                    setDrag({ kind: "card", id: card.id, featureId: node.feature.id })
-                  }
-                  onDragOver={(event) => {
-                    // The drop stays inside the feature's own fold-out: a
-                    // cross-feature drag would reorder invisibly, and moving a
-                    // card to another feature is placement, not rank.
-                    if (
-                      drag?.kind === "card" &&
-                      drag.featureId === node.feature.id &&
-                      drag.id !== card.id
-                    ) {
-                      event.preventDefault();
-                    }
-                  }}
-                  onDrop={() => {
-                    if (
-                      drag?.kind === "card" &&
-                      drag.featureId === node.feature.id &&
-                      drag.id !== card.id
-                    ) {
-                      onNudgeCard(drag.id, card.id, false);
-                    }
-                    setDrag(null);
-                  }}
-                  dragging={drag?.kind === "card" && drag.id === card.id}
-                  onMoveUp={
-                    index > 0
-                      ? () => onNudgeCard(card.id, node.stories[index - 1]!.id, false)
-                      : undefined
-                  }
-                  onMoveDown={
-                    index < node.stories.length - 1
-                      ? () => onNudgeCard(card.id, node.stories[index + 1]!.id, true)
-                      : undefined
-                  }
-                />
-              );
+              const place = { areaId: node.feature.areaId, themeIds: node.feature.themeIds };
+              return committed
+                ? markedRow(card, place)
+                : storyRow(card, node.stories, node.feature.id, place);
             })}
           </ol>
         )}
@@ -408,25 +403,12 @@ export function ItemBacklog({
       {(tree.looseStories.length > 0 || allocatedOf(null).length > 0) && (
         <>
           {looseHeading(t("nav.noParent"))}
+          {/* The cards with no feature are each other's siblings under their
+              own heading, so they rank like every other row on the page. */}
           <ol>
-            {[
-              ...tree.looseStories.map((card) => ({ card, committed: false })),
-              ...allocatedOf(null).map((card) => ({ card, committed: true })),
-            ]
-              .sort((a, b) => a.card.sort - b.card.sort || a.card.number - b.card.number)
-              .map(({ card, committed }) =>
-                committed ? (
-                  markedRow(card)
-                ) : (
-                  <BacklogRow
-                    key={card.id}
-                    card={card}
-                    boardKey={board.key}
-                    boardId={board.id}
-                    structure={structure}
-                  />
-                ),
-              )}
+            {mergeByRank(tree.looseStories, allocatedOf(null)).map(({ card, committed }) =>
+              committed ? markedRow(card) : storyRow(card, tree.looseStories, null),
+            )}
           </ol>
         </>
       )}

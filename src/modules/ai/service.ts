@@ -3,6 +3,10 @@ import { LlmError, type LlmMessage } from "@/core/llm";
 import { reserveAiCall, type AiKind } from "./limits";
 import { workspaceLlmProvider } from "./model-settings";
 import { parseModelJson } from "./parse-json";
+import type { AiFailure } from "./wire";
+
+/** The word the interface shows for why the model did not answer. */
+export type { AiFailure };
 
 /**
  * One door to the model for every feature: the workspace's provider,
@@ -48,9 +52,6 @@ export async function askForJson(
   if (data === null) throw new LlmError("bad_response", "the model did not answer with JSON");
   return { data, engine };
 }
-
-/** The word the interface shows for why the model did not answer. */
-export type AiFailure = "noModel" | "rateLimited" | "unreachable" | "badAnswer" | "generic";
 
 export function classifyAiError(error: unknown): AiFailure {
   if (error instanceof NoModel) return "noModel";

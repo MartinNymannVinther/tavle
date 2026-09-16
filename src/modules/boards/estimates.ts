@@ -26,11 +26,49 @@ export const TSHIRT = [
 
 export type TshirtSize = (typeof TSHIRT)[number]["size"];
 
-/** The ladder a point estimate is snapped to; the sizes' weights and one step beyond. */
-const POINT_SCALE = [1, 2, 3, 5, 8, 13, 21] as const;
+/**
+ * The ladder a point estimate is snapped to; the sizes' weights and one
+ * step beyond. Exported because the settings page writes the scale out
+ * for the team, and a sentence that repeats the ladder by hand drifts
+ * from it: the copy names this list rather than copying it.
+ */
+export const POINT_SCALE = [1, 2, 3, 5, 8, 13, 21] as const;
 
 /** Hours one point stands for, when nothing else is said. Half a working day. */
 export const DEFAULT_HOURS_PER_POINT = 4;
+
+/**
+ * What a team may set the hour factor to. Half an hour to a point is the
+ * smallest that means anything; forty is a working week, beyond which
+ * "a point" has stopped being an estimate. The field, the preview and
+ * `EstimateUnitSchema` all read these, so the form cannot offer what the
+ * server will refuse.
+ */
+export const HOURS_PER_POINT_MIN = 0.5;
+export const HOURS_PER_POINT_MAX = 40;
+
+/** Whether a factor is one the board may be converted by. */
+export function isHoursPerPoint(value: number): boolean {
+  return Number.isFinite(value) && value >= HOURS_PER_POINT_MIN && value <= HOURS_PER_POINT_MAX;
+}
+
+/**
+ * How an amount of hours is written out, handed in by the UI.
+ *
+ * The word is copy — "t" in Danish, "h" in English — and CLAUDE.md keeps
+ * every word a person reads in `messages/*.json`. This module is pure
+ * domain: it has no locale and no next-intl to ask, and a hardcoded "t"
+ * here is precisely how the English UI came to say "8 t". So the caller
+ * hands the sentence in; `useEstimateLabel()` in
+ * `src/components/board/estimate-label.ts` builds it once from the
+ * catalogue. Called without one, the number is returned bare rather than
+ * wearing a word in the wrong language.
+ */
+export type HourFormat = (value: number) => string;
+
+function hours(value: number, format: HourFormat | undefined): string {
+  return format ? format(value) : String(value);
+}
 
 /** Which scale a unit counts on: sizes are points wearing a name. */
 export function scaleOf(unit: EstimateUnit): "points" | "hours" {
@@ -61,10 +99,14 @@ export function sizeOf(value: number): TshirtSize {
 }
 
 /** What a card shows: "5", "5 t" or "L". Null stays null — unestimated is a state. */
-export function labelOf(value: number | null | undefined, unit: EstimateUnit): string | null {
+export function labelOf(
+  value: number | null | undefined,
+  unit: EstimateUnit,
+  hourFormat?: HourFormat,
+): string | null {
   if (value === null || value === undefined) return null;
   if (unit === "tshirt") return sizeOf(value);
-  if (unit === "hours") return `${value} t`;
+  if (unit === "hours") return hours(value, hourFormat);
   return String(value);
 }
 
@@ -73,8 +115,8 @@ export function labelOf(value: number | null | undefined, unit: EstimateUnit): s
  * release holding eleven weights is eleven points, not "XL" — the size
  * vocabulary simply has no word for a total.
  */
-export function totalLabel(value: number, unit: EstimateUnit): string {
-  return unit === "hours" ? `${value} t` : String(value);
+export function totalLabel(value: number, unit: EstimateUnit, hourFormat?: HourFormat): string {
+  return unit === "hours" ? hours(value, hourFormat) : String(value);
 }
 
 /** The values a card may be given, for the picker the board's unit asks for. */

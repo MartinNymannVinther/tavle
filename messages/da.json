@@ -14,7 +14,8 @@
     "thinking": {
       "seconds": "{seconds} s",
       "slow": "En lokal model kan tage op mod et minut. Svarer den ikke, tager regelmotoren over, og siden siger det."
-    }
+    },
+    "hours": "{value} t"
   },
   "landing": {
     "nav": {
@@ -244,13 +245,13 @@
       "xlsxBody": "Én fil med en fane per type data. Til dig selv, til styregruppen eller til enhver der skal kigge med uden at kende Tavle.",
       "xlsxAction": "Hent regneark",
       "jsonTitle": "Maskinlæsbar kopi",
-      "jsonBody": "De samme data som JSON, med alle id'er bevaret. Det er den fil der gør, at du kan flytte til noget andet end Tavle uden at miste sammenhængen mellem projekter, opgaver og statusser.",
+      "jsonBody": "De samme data som JSON, med alle id'er bevaret. Det er den fil der gør, at du kan flytte til noget andet end Tavle uden at miste sammenhængen mellem tavler, kort, sprints og backloggens struktur.",
       "jsonAction": "Hent JSON",
       "sheetsLabel": "Faner i filen:",
       "membersSheet": "Brugere",
       "notBackupTitle": "Det her er ikke en backup.",
       "notBackupBody": "En eksport kan læses, men den kan ikke lægges tilbage, og den er kun så ny som den dag du hentede den. Den dag databasen er væk, er det det natlige krypterede dump der redder dig.",
-      "privacy": "Eksporten indeholder navne på de personer, projekterne nævner, og hele arbejdsrummets historik. Adgangskoder og passkeys kommer aldrig med, og delelinks eksporteres uden deres nøgle. At du henter filen bliver skrevet i revisionssporet."
+      "privacy": "Eksporten indeholder navnene på arbejdsrummets personer og hele dets historik. Adgangskoder, passkeys og nøglen til arbejdsrummets sprogmodel kommer aldrig med. At du henter filen bliver skrevet i revisionssporet."
     },
     "boards": {
       "passkeyPromptTitle": "Gør din konto mere sikker",
@@ -315,7 +316,7 @@
       },
       "delete": {
         "title": "Slet arbejdsrummet",
-        "body": "Alt i arbejdsrummet forsvinder: projekter, planer, statusser, beslutninger, delelinks og revisionssporet om dem. Det kan ikke fortrydes.",
+        "body": "Alt i arbejdsrummet forsvinder: tavler, kort, epics og features, sprints, kommentarer, temaer og områder, personer og hele historikken og revisionssporet om dem. Det kan ikke fortrydes.",
         "exportFirst": "Hent en eksport først, hvis du vil beholde noget. Den findes under Data.",
         "typeName": "Skriv {name} for at bekræfte",
         "action": "Slet arbejdsrummet permanent",
@@ -368,7 +369,7 @@
       },
       "noModel": "Ingen model konfigureret",
       "setupIntro": "Tavle virker uden en model. Vil du have rigtige forslag og fritekstsvar, så sæt en op:",
-      "setupOutro": "Kør derefter Tavle igen. Uden en model svarer reservemotoren, og de tre flows virker stadig.",
+      "setupOutro": "Kør derefter Tavle igen. Uden en model siger AI-knapperne det, og alt andet i Tavle virker som før.",
       "limitsTitle": "Loft over AI-kald",
       "limitsHint": "Et modelkald koster penge på en hostet installation og minutter på en lokal. Tallene er rundhåndede for et menneske og nærige for et script.",
       "perUser": "Kald pr. bruger i timen",
@@ -393,7 +394,10 @@
       "failWhereToLook": "Detaljerne står i serverloggen.",
       "testNotAllowed": "Kun ejeren eller en administrator kan teste forbindelsen.",
       "withoutTitle": "Uden model",
-      "withoutBody": "Tavlen, sprintene og tallene har ikke brug for en model. Det AI'en tilbyder er tre forslag, som en person retter i og siger ja til: et udkast til et kort, en opdeling af et kort, og sprintens historie. Uden model siger knapperne det, og alt andet virker som før."
+      "withoutBody": "Tavlen, sprintene og tallene har ikke brug for en model. Det AI'en tilbyder er forslag, som en person retter i og siger ja til: et udkast til et kort, en opdeling af et kort, sprintens historie, og et startpunkt for backlog og roadmap — plus de stille hjælp undervejs og et oplæg til lukkesamtalen. Uden model siger knapperne det, og alt andet virker som før.",
+      "setupEuComment": "EU-hostet (Mistral)",
+      "setupLocalComment": "eller lokalt (Ollama)",
+      "setupKeyPlaceholder": "din-nøgle-her"
     },
     "members": {
       "title": "Medlemmer",
@@ -449,7 +453,10 @@
       "add": "Tilføj person",
       "errors": {
         "generic": "Det lykkedes ikke. Prøv igen."
-      }
+      },
+      "removeTitle": "Fjern {name}?",
+      "removeBody": "{count, plural, =0 {Personen har ingen kort. Det kan ikke fortrydes.} one {# kort mister sin ansvarlige. Det kan ikke fortrydes.} other {# kort mister deres ansvarlige. Det kan ikke fortrydes.}}",
+      "removeConfirm": "Fjern personen"
     }
   },
   "demo": {
@@ -587,7 +594,9 @@
       "inArea": "I område",
       "looseFeatures": "Features uden epic",
       "aiSuggested": "AI foreslår placeringen — vælg selv for at ændre den",
-      "similar": "Ligner:"
+      "similar": "Ligner:",
+      "closedGroup": "Lukket — kan ikke få flere kort",
+      "closedNote": "“{title}” er lukket og kan ikke få flere kort. Vælg et andet sted, eller genåbn den først."
     },
     "filters": {
       "search": "Søg i kort",
@@ -612,13 +621,13 @@
     "sprint": {
       "kicker": "{start} – {end}",
       "daysLeft": "Dage tilbage",
-      "overdue": "{days} dage over",
+      "overdue": "{days, plural, one {# dag over} other {# dage over}}",
       "progress": "Fremdrift",
       "points": "{unit, select, hours {timer} other {point}}",
       "toBacklog": "Backlog",
       "close": "Afslut sprint",
       "closeTitle": "Afslut {name}",
-      "closeBody": "{done} kort er færdige ({points} {unit, select, hours {timer} other {point}}). {open} er ikke. Sprintens tal skrives ned som de står nu.",
+      "closeBody": "{done, plural, one {# kort er færdigt} other {# kort er færdige}} ({points} {unit, select, hours {timer} other {point}}). {open, plural, one {# er ikke} other {# er ikke}}. Sprintens tal skrives ned som de står nu.",
       "unfinishedGo": "De ufærdige kort flyttes til",
       "toBacklogOption": "Backloggen, øverst",
       "closeConfirm": "Afslut sprinten",
@@ -636,7 +645,9 @@
       "invalid": "Noget i det du skrev kunne ikke bruges. Se felterne igennem.",
       "unauthorized": "Du er ikke logget ind længere.",
       "forbidden": "Det kræver at du er ejer eller administrator af arbejdsrummet.",
-      "generic": "Det gik galt. Prøv igen."
+      "generic": "Det gik galt. Prøv igen.",
+      "keyTaken": "Nøglen er allerede i brug på en anden tavle. Vælg en anden.",
+      "nameTaken": "Navnet er allerede i brug. Vælg et andet."
     },
     "structure": {
       "bug": "Fejl",
@@ -791,7 +802,6 @@
       "descriptionField": "Beskrivelse",
       "acceptanceField": "Sådan ved vi, det er færdigt",
       "checklistField": "Tjekliste",
-      "acceptanceHeading": "Færdigt når:",
       "drop": "Fjern",
       "keep": "Behold",
       "points": "{unit, select, hours {Timer} other {Point}}",
@@ -855,7 +865,7 @@
       "toBoard": "Se tavlen",
       "empty": "Ingen kort endnu. Vælg kort i backloggen og læg dem her.",
       "toBacklog": "Flyt {count, plural, one {# kort} other {# kort}} til backloggen",
-      "againstAverage": "snittet er {average}",
+      "againstAverage": "snittet er {average, number}",
       "startAskTitle": "Start {name}",
       "startAskBody": "Sprinten var planlagt til at starte {planned}. Skal datoerne flyttes, så den starter i dag ({today}) og beholder sin længde?",
       "startKeep": "Behold de planlagte datoer",
@@ -934,7 +944,7 @@
   "sprints": {
     "title": "Sprints",
     "velocityTitle": "Velocity",
-    "velocityBody": "{unit, select, hours {Timer} other {Point}} færdiggjort pr. afsluttet sprint. Gennemsnit af de sidste tre: {average}.",
+    "velocityBody": "{unit, select, hours {Timer} other {Point}} færdiggjort pr. afsluttet sprint. Gennemsnit af de sidste tre: {average, number}.",
     "emptyTitle": "Ingen sprints endnu",
     "emptyBody": "Sprints planlægges i backloggen. Her ligger de, når de er kørt.",
     "emptyCta": "Gå til backloggen",
@@ -991,17 +1001,17 @@
     "wipHint": "Kort i kolonner af typen I gang",
     "cycle": "Cycle time",
     "cycleNone": "Ingen færdige kort de sidste 30 dage",
-    "cycleHint": "Median. Gennemsnit {average} dage over {sample} kort",
+    "cycleHint": "Median. Gennemsnit {average, number} dage over {sample} kort",
     "lead": "Lead time",
     "leadHint": "Fra kortet blev oprettet til det var færdigt",
     "weekly": "Færdige denne uge",
-    "weeklyHint": "Gennemsnit {average} pr. uge over otte uger",
-    "days": "{days} dage",
+    "weeklyHint": "Gennemsnit {average, number} pr. uge over otte uger",
+    "days": "{days, number} dage",
     "burndownTitle": "Burndown",
-    "burndownBody": "{name}: {remaining} af {committed} {unit, select, hours {timer} other {point}} tilbage. Slutter {end}.",
+    "burndownBody": "{name}: {remaining} {unit, select, hours {timer} other {point}} tilbage, {committed} lovet ved start. Slutter {end}.",
     "burndownNone": "Der kører ingen sprint lige nu.",
     "velocityTitle": "Velocity",
-    "velocityBody": "{unit, select, hours {Timer} other {Point}} færdiggjort pr. afsluttet sprint. Gennemsnit af de sidste tre: {average}.",
+    "velocityBody": "{unit, select, hours {Timer} other {Point}} færdiggjort pr. afsluttet sprint. Gennemsnit af de sidste tre: {average, number}.",
     "velocityNone": "Ingen afsluttede sprints endnu.",
     "throughputTitle": "Færdige kort pr. uge",
     "throughputBody": "De sidste otte uger. Jævnt er godt; svingende er et tegn på flaskehalse.",
@@ -1036,9 +1046,9 @@
         "tshirt": "T-shirt"
       },
       "hint": {
-        "points": "Kortene estimeres i point på skalaen 1, 2, 3, 5, 8, 13.",
+        "points": "Kortene estimeres i point på skalaen {scale}.",
         "hours": "Kortene estimeres i timer. Velocity og burndown regner i timer.",
-        "tshirt": "Kortene får en størrelse fra XS til XXL. Bag størrelsen står den vægt, tallene regner på: XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13."
+        "tshirt": "Kortene får en størrelse fra XS til XXL. Bag størrelsen står den vægt, tallene regner på: {sizes}."
       },
       "factor": "En time-omregning på",
       "factorHint": "timer pr. point",
@@ -1050,7 +1060,9 @@
       "cancel": "Fortryd valget",
       "undoable": "Skiftet står i aktiviteten og kan fortrydes.",
       "lastChange": "Sidst skiftet til {unit} · {cards, plural, =0 {ingen kort ændret} one {# kort ændret} other {# kort ændret}}.",
-      "undo": "Fortryd skiftet"
+      "undo": "Fortryd skiftet",
+      "factorRange": "Faktoren skal være mellem {min, number} og {max, number} timer pr. point.",
+      "previewFailed": "Forhåndsvisningen kunne ikke beregnes. Prøv igen, eller genindlæs siden."
     },
     "columns": {
       "title": "Kolonner",
@@ -1158,6 +1170,10 @@
       "deactivate": "Deaktivér",
       "activate": "Aktivér igen",
       "inactive": "deaktiveret"
+    },
+    "activity": {
+      "title": "Seneste ændringer på tavlen",
+      "body": "Ændringer af selve tavlen — temaer, områder, baner, niveauer og releases. Står de her, kan de fortrydes."
     }
   },
   "my": {
@@ -1209,8 +1225,8 @@
       "updated": "{key} blev redigeret ({fields})",
       "assigned": "{key} fik {name} som ansvarlig",
       "unassigned": "{key} står uden ansvarlig",
-      "estimated": "{key} blev estimeret til {points} {unit, select, hours {timer} other {point}}",
-      "blocked": "{key} blev blokeret: {reason}",
+      "estimated": "{key} blev estimeret til {unit, select, tshirt {{size}} hours {{points, plural, one {# time} other {# timer}}} other {{points} point}}",
+      "blocked": "{key} blev blokeret{why, select, reason {: {reason}} other {}}",
       "unblocked": "{key} er ikke længere blokeret",
       "checklist": "Tjeklisten på {key} står på {done} af {total}",
       "sprint": "{key} blev lagt i {sprint}",
@@ -1220,13 +1236,15 @@
       "deleted": "{key} blev slettet",
       "split": "{key} blev delt op i {into}",
       "parent": "{key} blev lagt under {parent}",
-      "placed": "{key} fik område {area} og temaer {themes}",
+      "placed": "{placed, select, both {{key} fik område {area} og temaer {themes}} area {{key} fik område {area}} themes {{key} fik temaer {themes}} other {{key} står uden område og temaer}}",
       "kind": "{key} blev sat til {kind} {enablerType}",
       "bug": "{key} blev markeret som fejl",
       "notBug": "{key} er ikke længere markeret som fejl",
       "swimlane": "{lane, select, none {{key} blev lagt uden bane} other {{key} blev lagt i banen {lane}}}",
       "released": "{key} blev lagt i releasen {name}",
-      "unreleased": "{key} blev taget ud af sin release"
+      "unreleased": "{key} blev taget ud af sin release",
+      "unestimated": "Estimatet på {key} blev fjernet",
+      "waiting": "{key} venter på: {reason}"
     },
     "comment": {
       "added": "Kommentar på {key}",
@@ -1259,7 +1277,7 @@
       "created": "{key} blev oprettet som {level}: {title}",
       "updated": "{key} blev redigeret ({fields})",
       "moved": "{key} blev flyttet til {parent}",
-      "placed": "{key} fik område {area} og temaer {themes}",
+      "placed": "{placed, select, both {{key} fik område {area} og temaer {themes}} area {{key} fik område {area}} themes {{key} fik temaer {themes}} other {{key} står uden område og temaer}}",
       "cascaded": "{key}: område og temaer gik ned til {features} features og {cards} kort",
       "closed": "{key} blev lukket",
       "reopened": "{key} blev genåbnet",
@@ -1285,6 +1303,17 @@
       "updated": "Releasen {name} blev opdateret",
       "reordered": "Releasen {name} blev flyttet",
       "deleted": "Releasen {name} blev slettet ({cards} kort blev frigivet)"
+    },
+    "field": {
+      "title": "titel",
+      "description": "beskrivelse",
+      "acceptance": "acceptkriterier",
+      "priority": "prioritet",
+      "dueDate": "deadline",
+      "doneWhen": "færdig når",
+      "kind": "art",
+      "targetQuarter": "målkvartal",
+      "startQuarter": "startkvartal"
     }
   },
   "help": {
@@ -1310,11 +1339,11 @@
       },
       "estimates": {
         "title": "Estimering",
-        "body": "Tavlen kan tælle i story points, i timer eller i T-shirt-størrelser — vælg under Indstillinger → Estimering. Størrelser og point er de samme tal, for en størrelse er blot et navn på en vægt (XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13), så skiftet mellem dem ændrer ingen summer. Timer er en anden skala, og der viser værktøjet en tabel over hvert estimat på tavlen og hvad det bliver til, med en omregningsfaktor du selv kan rette. Intet skrives, før du siger ja, og skiftet står i aktiviteten med en Fortryd-knap."
+        "body": "Tavlen kan tælle i story points, i timer eller i T-shirt-størrelser — vælg under Indstillinger → Estimering. Størrelser og point er de samme tal, for en størrelse er blot et navn på en vægt (XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13), så skiftet mellem dem ændrer ingen summer. Timer er en anden skala, og der viser værktøjet en tabel over hvert estimat på tavlen og hvad det bliver til, med en omregningsfaktor du selv kan rette. Intet skrives, før du siger ja, og skiftet kan fortrydes med knappen på indstillingssiden."
       },
       "undo": {
         "title": "Fortryd",
-        "body": "Hver ændring står i aktiviteten på kortet eller emnet med en Fortryd-knap. Fortryd kører den modsatte handling gennem de samme regler som alt andet — er verden gået videre, fordi kortet er slettet eller featuren lukket, siger værktøjet nej i stedet for at gætte. Det fortrudte streges over i aktiviteten, og fortrydelsen selv skrives ned."
+        "body": "Hver ændring står i aktiviteten på kortet eller emnet med en Fortryd-knap, og ændringer af selve tavlen — temaer, områder, baner, niveauer, releases — står under Indstillinger → Seneste ændringer på tavlen. Fortryd kører den modsatte handling gennem de samme regler som alt andet — er verden gået videre, fordi kortet er slettet eller featuren lukket, siger værktøjet nej i stedet for at gætte. Det fortrudte streges over i aktiviteten, og fortrydelsen selv skrives ned."
       },
       "backlog": {
         "title": "Backloggen",
@@ -1322,7 +1351,7 @@
       },
       "care": {
         "title": "Backlog-styring",
-        "body": "Siden svarer på ét spørgsmål: hvad venter backloggen på? Den viser kun det, der faktisk kræver en beslutning — features og kort uden en plads, epics og features uden et “Færdig når”, features uden arbejde under sig, epics ingen har bekræftet længe, uvejet arbejde i toppen, og en backlog rangeret dybere end I når. Hvert punkt folder ud til de faktiske rækker, så I kan gå direkte hen og rette det. Er der ingenting, siger siden det. Nederst står, hvor vægten af det åbne arbejde ligger, fordelt på tema, område eller art."
+        "body": "Siden svarer på ét spørgsmål: hvad venter backloggen på? Den viser kun det, der faktisk kræver en beslutning — features og kort uden en plads, epics og features uden et “Færdig når”, features uden arbejde under sig, epics ingen har bekræftet længe, uvejet arbejde i toppen, og en backlog rangeret dybere end I når. Hvert punkt folder ud til de faktiske rækker, så I kan gå direkte hen og rette det. Er der ingenting, siger siden det. Nederst står, hvor vægten af det åbne arbejde ligger, fordelt på tema, område eller art. Et kort med flere temaer tælles ét sted, under “Flere temaer”, så rækkerne lægger sammen til det tal, der står over dem."
       },
       "insight": {
         "title": "Indsigt",
@@ -1345,8 +1374,8 @@
         "body": "Backloggen har ét hierarki med tre niveauer: en epic er et resultat teamet kan nå på et til to kvartaler, en feature er en frigivelig skive af den, et kort er den mindste leverance og passer i ét sprint. Alle tre har en art, Business eller Enabler. Overblik og gruppering løses med to felter på det enkelte item: Tema svarer på hvorfor, Område på hvor. To tests afgør hvor noget hører hjemme, og værktøjet håndhæver dem: kan det blive færdigt, er det i hierarkiet; kan det aldrig blive færdigt, er det et tema eller et område. Har det præcis én forælder, er det hierarki; kan det høre til flere på én gang, er det en kategori. Under fanen Nedbrydning tegnes hierarkiet som et diagram: epics øverst, features og kort nedenunder, og alt uden forælder venter i bakken. Træk tingene på plads, eller brug menuen på hvert kort — og zoom ud, når hele billedet skal med."
       },
       "roadmap": {
-        "title": "Roadmap og overblik",
-        "body": "Roadmappet tegner epics på en linje af kvartaler, farvet efter deres første tema. Træk i baren: midten flytter epicen, kanterne ændrer varigheden. En epic uden målkvartal tegnes ikke, den listes nedenunder. På en Scrum-tavle kan visningen skiftes til features på sprints: læg sprints forud, og læg hver feature der hvor I regner med at bygge den — foldes en epic ud, ses dens features tegnet der hvor deres sprints ligger. Overblikket viser hvor det åbne arbejde ligger pr. tema, område og art, enabler-andelen som ét tal, og fem mål på om strukturen holder: andelen uden forælder, epics til revision, items uden område, enabler-andelen, og temaer og områder ingen bruger."
+        "title": "Roadmap og backlog-styring",
+        "body": "Roadmappet tegner epics på en linje af kvartaler, farvet efter deres første tema. Træk i baren: midten flytter epicen, kanterne ændrer varigheden — og de to små kvartalsvælgere under titlen gør det samme uden mus. En epic uden målkvartal tegnes ikke, den listes nedenunder. Har tavlen releases, står de som en stribe øverst, hver på det kvartal dens dato falder i. På en Scrum-tavle kan visningen skiftes til features på sprints: læg sprints forud, og læg hver feature der hvor I regner med at bygge den — foldes en epic ud, ses dens features tegnet der hvor deres sprints ligger. Backlog-styring er siden ved siden af: den svarer på hvad backloggen venter på — kun de fund der faktisk gælder — og hvor vægten ligger, pr. tema, område eller art, med totalen sagt én gang."
       },
       "map": {
         "title": "Story mappet",
@@ -1459,7 +1488,9 @@
       "area": "Område",
       "chooseArea": "Vælg område…",
       "confirm": "Luk og gør sådan",
-      "cancel": "Annuller"
+      "cancel": "Annuller",
+      "thinking": "AI'en skriver et forslag. Du kan vælge og lukke uden at vente på den.",
+      "closing": "Lukker…"
     }
   },
   "roadmap": {
@@ -1495,14 +1526,19 @@
     "releases": {
       "title": "Releases",
       "undated": "{count, plural, one {# uden dato} other {# uden dato}}",
-      "tip": "{cards} kort · {done} % færdigt"
-    }
+      "tip": "{cards} kort · {done} % færdigt",
+      "weight": "{unit, select, hours {{points, plural, one {# time} other {# timer}}} tshirt {vægt {points}} other {{points} point}}"
+    },
+    "startQuarterFor": "Startkvartal for {title}",
+    "noStartQuarter": "Intet startkvartal",
+    "emptyArea": "Ingen epics i dette område. Vælg et andet område, eller “Alle områder”.",
+    "pptUnplanned": "Uplanlagt"
   },
   "care": {
     "title": "Hvad venter backloggen på?",
     "body": "Det, en product owner bør tage stilling til, før der planlægges. Står her ingenting, er der ingenting at tage stilling til.",
     "summary": "{cards, plural, one {# kort} other {# kort}} venter · {points} {unit, select, hours {timer} other {point}}",
-    "depth": "cirka {sprints} sprints arbejde",
+    "depth": "cirka {sprints, number} sprints arbejde",
     "unweighed": "{count, plural, one {# uden estimat} other {# uden estimat}}",
     "count": "{count}",
     "clear": {
@@ -1535,7 +1571,7 @@
     },
     "tooDeep": {
       "title": "Dybere end I når",
-      "body": "Der ligger {value} point rangeret, og I færdiggør omkring {of} pr. sprint. Den nederste del af listen bliver næppe til noget — overvej at lade den være uordnet."
+      "body": "Der ligger {value} {unit, select, hours {timer} other {point}} rangeret, og I færdiggør omkring {of} pr. sprint. Den nederste del af listen bliver næppe til noget — overvej at lade den være uordnet."
     }
   },
   "overview": {
@@ -1546,7 +1582,9 @@
     "distributionBody": "{cards, plural, one {# åbent kort} other {# åbne kort}} · {points} {unit, select, hours {timer} other {point}}",
     "none": "Uden",
     "bucketValue": "{cards} kort · {points} {unit, select, hours {timer} other {point}}",
-    "weightTitle": "Hvor ligger vægten?"
+    "weightTitle": "Hvor ligger vægten?",
+    "multi": "Flere temaer",
+    "retired": "{name} (udgået)"
   },
   "map": {
     "title": "Story map",
@@ -1563,12 +1601,12 @@
     "noParent": "Uden feature",
     "noParentHint": "{count, plural, =0 {Ingen kort uden feature} one {# kort uden feature} other {# kort uden feature}}",
     "backlog": "Backlog",
-    "rowCounts": "{cards, plural, one {# kort} other {# kort}} · {points} {unit, select, hours {timer} other {point}}",
+    "rowCounts": "{cards, plural, one {# kort} other {# kort}} · {unit, select, hours {{points, plural, one {# time} other {# timer}}} tshirt {vægt {points}} other {{points} point}}",
     "underway": "{open} i gang",
     "emptyTray": "Mappet er tomt. Klik på en feature i bakken for at sætte den op.",
     "empty": "Ingen features endnu. Opret en feature, så kan den sættes op på mappet.",
     "hiddenCards": "{count, plural, one {# kort uden for mappet} other {# kort uden for mappet}}",
-    "hiddenHint": "Vælg et kort — dets feature sættes op på mappet",
+    "hiddenHint": "Vælg et kort, så kommer det frem på mappet",
     "orderDrift": "Rækkefølgen her afviger fra backloggens prioritering — måske med vilje, måske værd at overveje.",
     "alignBacklog": "Lad backloggen følge mappet",
     "showClosedFeatures": "{count, plural, =0 {Vis lukkede features} one {Vis # lukket} other {Vis # lukkede}}",
@@ -1595,7 +1633,8 @@
     "noDate": "Ingen dato",
     "editRelease": "Rediger release",
     "moveReleaseUp": "Flyt releasen op",
-    "moveReleaseDown": "Flyt releasen ned"
+    "moveReleaseDown": "Flyt releasen ned",
+    "closedFeature": "lukket feature"
   },
   "decompose": {
     "title": "Nedbrydning",

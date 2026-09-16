@@ -1,8 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { CircleAlert, ListChecks, MessageSquare } from "lucide-react";
-import { formatDateDa } from "@/core/dates";
+import { formatPlanDate } from "@/core/dates";
 import type { Column, Priority } from "@/core/db/schema";
 import type { CardView } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
@@ -59,6 +59,7 @@ export function BoardCard({
   canDown?: boolean;
 }) {
   const t = useTranslations("boards.card");
+  const locale = useLocale();
   const priorities = useTranslations("boards.priority");
   const overdue = Boolean(card.dueDate && card.dueDate < today && !card.doneAt);
   const href = `/boards/${boardId}/cards/${card.number}`;
@@ -152,7 +153,7 @@ export function BoardCard({
         )}
         {card.dueDate && (
           <span className={cn("ml-auto tabular-nums", overdue && "text-destructive font-medium")}>
-            {formatDateDa(card.dueDate)}
+            {formatPlanDate(card.dueDate, locale)}
           </span>
         )}
       </div>

@@ -1,15 +1,15 @@
 "use client";
 
 import { Plus, Sparkles } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { NativeSelect } from "@/components/ui/native-select";
-import { proposeQuickAssistAction } from "@/modules/ai/actions-assists";
+import { askAi } from "@/modules/ai/read-client";
 import type { QuickAssist } from "@/modules/ai/assists";
 import { Link } from "@/i18n/navigation";
 import type { StructureLookup } from "./card-chips";
+import { placesOf, WhereSelect } from "./quick-add-where";
 import { cn } from "@/lib/utils";
 
 /** Where a new card goes in the structure: part of a feature, or on its own in an area. */
@@ -25,8 +25,10 @@ export type Place = { featureId?: string; areaId?: string };
  * With a model set up, a pause in the typing quietly asks it where the
  * card belongs and whether it already exists (docs/adr/0025): the select
  * moves — never over the person's own choice — and probable duplicates
- * stand as one meta line of links. Nothing is written; without a model
- * nothing happens at all.
+ * stand as one meta line of links. It is a read over its own route
+ * (docs/adr/0034), so the card the person adds in the meantime never
+ * waits for the model, and a new keystroke abandons the old question.
+ * Nothing is written; without a model nothing happens at all.
  */
 export function QuickAdd({
   onAdd,
@@ -52,11 +54,8 @@ export function QuickAdd({
   boardKey?: string;
 }) {
   const t = useTranslations("boards.quickAdd");
-  const { view } = structure;
-  const features = view.features
-    ? structure.items.filter((i) => i.level === "feature" && i.state === "open")
-    : [];
-  const areas = view.areas ? structure.areas.filter((a) => a.active) : [];
+  const locale = useLocale();
+  const { features, areas, values } = placesOf(structure);
   const choice = !fixed && (features.length > 0 || areas.length > 0);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -71,23 +70,52 @@ export function QuickAdd({
     if (defaultWhere) setWhere(defaultWhere);
   }
 
+  // The navigator can point at a closed feature, and a closed feature
+  // takes nothing more. The select names it anyway and the add is
+  // refused here, in plain sight, rather than by a toast about something
+  // the control never mentioned. A place that has gone altogether falls
+  // back to the first one the select does offer, so what is named and
+  // what is written are never two different things.
+  const chosenFeatureId = where.startsWith("f:") ? where.slice(2) : "";
+  const closedTarget =
+    chosenFeatureId && !features.some((feature) => feature.id === chosenFeatureId)
+      ? structure.items.find(
+          (item) =>
+            item.level === "feature" && item.id === chosenFeatureId && item.state === "closed",
+        )
+      : undefined;
+  const place = values.includes(where) || closedTarget ? where : (values[0] ?? "");
+
   // The quiet assist's bookkeeping: one timer, one ticket so a stale
-  // answer is dropped, one latch so a modelless installation is asked once.
+  // answer is dropped, one call in flight that a new keystroke abandons,
+  // and one latch so a modelless installation is asked once.
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ticket = useRef(0);
+  const flight = useRef<AbortController | null>(null);
   const noModel = useRef(false);
   const touchedRef = useRef(false);
   const [assist, setAssist] = useState<QuickAssist | null>(null);
   const [suggested, setSuggested] = useState(false);
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (timer.current) clearTimeout(timer.current);
-    };
-  }, []);
+      flight.current?.abort();
+    },
+    [],
+  );
+
+  /** Lets go of the question asked: no timer, no answer, no call in the air. */
+  function abandon() {
+    ticket.current += 1;
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+    flight.current?.abort();
+    flight.current = null;
+  }
 
   function scheduleAssist(value: string) {
     if (!boardId || !choice || noModel.current) return;
-    if (timer.current) clearTimeout(timer.current);
+    abandon();
     const trimmed = value.trim();
     if (trimmed.length < 8) return;
     timer.current = setTimeout(() => void ask(trimmed), 800);
@@ -95,7 +123,13 @@ export function QuickAdd({
 
   async function ask(value: string) {
     const mine = ++ticket.current;
-    const result = await proposeQuickAssistAction({ boardId, title: value });
+    const controller = new AbortController();
+    flight.current = controller;
+    const result = await askAi<QuickAssist>(
+      "quick-assist",
+      { boardId, title: value },
+      { locale, signal: controller.signal },
+    );
     if (mine !== ticket.current) return;
     if (!result.ok) {
       if (result.error === "noModel") noModel.current = true;
@@ -112,28 +146,14 @@ export function QuickAdd({
     }
   }
 
-  // The features stand under their epics, as in the navigator, so the
-  // select reads as the decomposition rather than as an unsorted pile.
-  const epics = view.epics ? structure.items.filter((i) => i.level === "epic") : [];
-  const featureGroups = epics
-    .map((epic) => ({
-      key: epic.id,
-      label: epic.title,
-      features: features.filter((f) => f.parentId === epic.id),
-    }))
-    .filter((group) => group.features.length > 0);
-  const grouped = new Set(featureGroups.flatMap((g) => g.features.map((f) => f.id)));
-  const loose = features.filter((f) => !grouped.has(f.id));
-
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmed = title.trim();
-    if (!trimmed || (choice && !where)) return;
+    if (!trimmed || (choice && !place) || closedTarget) return;
     // A late answer must not move anything after the card exists.
-    ticket.current += 1;
-    if (timer.current) clearTimeout(timer.current);
+    abandon();
     setPending(true);
-    const [kind, id] = where.split(":");
+    const [kind, id] = place.split(":");
     const ok = await onAdd(
       trimmed,
       fixed ?? (!choice || !id ? {} : kind === "f" ? { featureId: id } : { areaId: id }),
@@ -144,6 +164,13 @@ export function QuickAdd({
       setAssist(null);
       setSuggested(false);
     }
+  }
+
+  /** Closing the form lets go of the assist too; only Escape throws the sentence away. */
+  function close(clearTitle: boolean) {
+    abandon();
+    setOpen(false);
+    if (clearTitle) setTitle("");
   }
 
   if (!open) {
@@ -171,10 +198,7 @@ export function QuickAdd({
           scheduleAssist(event.target.value);
         }}
         onKeyDown={(event) => {
-          if (event.key === "Escape") {
-            setOpen(false);
-            setTitle("");
-          }
+          if (event.key === "Escape") close(true);
         }}
         placeholder={placeholder ?? t("placeholder")}
         maxLength={160}
@@ -182,44 +206,19 @@ export function QuickAdd({
         className="h-9 text-2sm"
       />
       {choice && (
-        <NativeSelect
-          variant="sm"
-          value={where}
-          onChange={(event) => {
+        <WhereSelect
+          structure={structure}
+          value={place}
+          closedTarget={closedTarget}
+          onChange={(value) => {
             touchedRef.current = true;
             setSuggested(false);
-            setWhere(event.target.value);
+            setWhere(value);
           }}
-          aria-label={t("where")}
-        >
-          {featureGroups.map((group) => (
-            <optgroup key={group.key} label={group.label}>
-              {group.features.map((feature) => (
-                <option key={feature.id} value={`f:${feature.id}`}>
-                  {feature.title}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-          {loose.length > 0 && (
-            <optgroup label={featureGroups.length > 0 ? t("looseFeatures") : t("partOfFeature")}>
-              {loose.map((feature) => (
-                <option key={feature.id} value={`f:${feature.id}`}>
-                  {feature.title}
-                </option>
-              ))}
-            </optgroup>
-          )}
-          {areas.length > 0 && (
-            <optgroup label={view.features ? t("noParentInArea") : t("inArea")}>
-              {areas.map((area) => (
-                <option key={area.id} value={`a:${area.id}`}>
-                  {area.name}
-                </option>
-              ))}
-            </optgroup>
-          )}
-        </NativeSelect>
+        />
+      )}
+      {closedTarget && (
+        <p className="text-meta text-2xs">{t("closedNote", { title: closedTarget.title })}</p>
       )}
       {suggested && (
         <p className="text-meta flex items-center gap-1 text-2xs">
@@ -243,10 +242,14 @@ export function QuickAdd({
         </p>
       )}
       <div className="flex gap-1.5">
-        <Button type="submit" size="sm" disabled={pending || !title.trim() || (choice && !where)}>
+        <Button
+          type="submit"
+          size="sm"
+          disabled={pending || !title.trim() || (choice && !place) || Boolean(closedTarget)}
+        >
           {t("add")}
         </Button>
-        <Button type="button" size="sm" variant="ghost" onClick={() => setOpen(false)}>
+        <Button type="button" size="sm" variant="ghost" onClick={() => close(false)}>
           {t("cancel")}
         </Button>
       </div>

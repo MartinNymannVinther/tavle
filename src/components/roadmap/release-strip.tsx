@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import type { EstimateUnit } from "@/core/db/schema";
 import type { RoadmapRelease } from "@/modules/boards/structure/roadmap";
-import { totalLabel } from "@/modules/boards/estimates";
+import { useEstimateLabel } from "@/components/board/estimate-label";
 import { cn } from "@/lib/utils";
 
 /**
@@ -25,6 +25,7 @@ export function ReleaseStrip({
   unit: EstimateUnit;
 }) {
   const t = useTranslations("roadmap.releases");
+  const { total } = useEstimateLabel();
   const dated = releases.filter((r) => r.at !== null);
   const undated = releases.length - dated.length;
 
@@ -68,7 +69,7 @@ export function ReleaseStrip({
           // the ones already placed.
           const lane = laneOf[index]!;
           const share = row.points > 0 ? Math.round((row.donePoints / row.points) * 100) : 0;
-          const weight = row.points > 0 ? totalLabel(row.points, unit) : null;
+          const weight = row.points > 0 ? total(row.points, unit) : null;
           return (
             <span
               key={row.release.id}
@@ -80,7 +81,11 @@ export function ReleaseStrip({
                 left: `${Math.min(99, Math.max(1, left))}%`,
                 top: `${0.375 + lane * 1.6}rem`,
               }}
-              title={t("tip", { cards: row.cards, done: share })}
+              // The pill has room for a number; the tip has room for the
+              // word, so the strip and the map's band say the same thing.
+              title={`${t("tip", { cards: row.cards, done: share })}${
+                row.points > 0 ? ` · ${t("weight", { unit, points: row.points })}` : ""
+              }`}
             >
               <span
                 aria-hidden

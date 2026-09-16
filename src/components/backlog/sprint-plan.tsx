@@ -1,8 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { formatDateDa } from "@/core/dates";
+import { formatPlanDate } from "@/core/dates";
 import type { Sprint } from "@/core/db/schema";
 import type { StructureLookup } from "@/components/board/card-chips";
 import type { CardView } from "@/modules/boards/types";
@@ -54,6 +54,7 @@ export function SprintPlan({
   run: Run;
 }) {
   const t = useTranslations("backlog.sprint");
+  const locale = useLocale();
   const points = cards.reduce((total, c) => total + (c.estimate ?? 0), 0);
   const active = sprint.state === "active";
 
@@ -69,7 +70,7 @@ export function SprintPlan({
           )}
           <div className="min-w-0 flex-1">
             <p className="text-chart-2 text-xs font-medium">
-              {formatDateDa(sprint.startDate)} – {formatDateDa(sprint.endDate)}
+              {formatPlanDate(sprint.startDate, locale)} – {formatPlanDate(sprint.endDate, locale)}
               {active ? ` · ${t("activeLabel")}` : ` · ${t("plannedLabel")}`}
             </p>
           </div>

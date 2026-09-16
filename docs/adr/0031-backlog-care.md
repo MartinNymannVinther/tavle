@@ -73,3 +73,24 @@ Findings are computed on every page load from the board already in
 memory. That is the same promise the insight page makes — nothing
 cached, nothing estimated — and it costs one pass over cards and
 items.
+
+## Amendment (2026-09-16): one card, one bucket
+
+The first build of the distribution counted a card once per theme it
+carried, so a card with two themes stood in two rows and the shares
+were computed against a total larger than the one stated above them.
+A distribution printed as percentages has to account for the total it
+sits under, so every open story now lands in exactly one bucket on
+every axis: a card with more than one theme goes in a bucket of its
+own ("Flere temaer"), beside the one for a card with none.
+
+Two alternatives were rejected. Splitting a card by fraction prints
+half cards and re-breaks the sums through rounding. Picking one of the
+card's themes on the team's behalf would have the tool decide
+something it has not been told, which is the same rule that makes an
+item without a parent show as exactly that.
+
+A theme or an area that has been deactivated keeps its bucket for as
+long as open work still carries it, marked as retired. The alternative
+was the cards quietly leaving the page, which is how the mismatch was
+found in the first place.

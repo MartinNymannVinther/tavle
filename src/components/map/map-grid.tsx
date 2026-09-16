@@ -6,7 +6,7 @@ import type { CardView } from "@/modules/boards/types";
 import { cn } from "@/lib/utils";
 import { MapCell } from "./map-cell";
 import type { Release } from "@/core/db/schema";
-import { FeatureNote, LooseHead, RowLabel } from "./map-headers";
+import { FeatureNote, LooseHead, RowLabel, type HiddenCard } from "./map-headers";
 import { cellKey, LOOSE_COLUMN, type MapRow, type StoryMap } from "./story-map";
 
 /**
@@ -29,10 +29,11 @@ export type GridHandlers = {
   onTakeDown: (featureId: string) => void;
   onAdd: (row: MapRow, place: Place, title: string) => Promise<boolean>;
   featureTotals: (featureId: string) => { total: number; done: number; open: number };
-  /** The row's cards whose feature is off the backbone, offered from the label. */
-  hiddenOf: (rowKey: string) => Array<{ card: CardView; featureId: string; featureTitle: string }>;
-  onReveal: (featureId: string) => void;
-  /** Every card in a band, drawn or not, so its count is the release's own. */
+  /** The row's cards the wall is not drawing, offered from the label. */
+  hiddenOf: (rowKey: string) => HiddenCard[];
+  /** Brings one out: the feature goes up, or the closed ones are shown. */
+  onReveal: (featureId: string, reason: HiddenCard["reason"]) => void;
+  /** Every card in a band the view is showing, so the label's count and the row agree. */
   bandOf: (rowKey: string) => CardView[];
   /** Opens a band for renaming and dating. */
   onEditRelease: (release: Release) => void;
@@ -103,9 +104,11 @@ export function MapGrid({
           ),
         )}
         {map.rows.map((row, rowIndex) => {
-          // A band's weight is the whole release, not only what the
-          // backbone happens to draw: the row label names the release, so
-          // the number beside it has to be the release's own.
+          // A band's count is every card the view is showing in it, which
+          // is more than the backbone draws: a card under a feature that
+          // is in the tray or closed belongs to the release all the same.
+          // The label offers each of those from the "off the map" menu, so
+          // nothing is counted that cannot be reached.
           const rowCards = handlers.bandOf(row.key);
           // The nearest release is the one the team is working toward.
           const active = row.kind === "release" && rowIndex === 0;

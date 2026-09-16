@@ -90,7 +90,7 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
   const [navPref, setNavPref] = usePref<"on" | "off">(`tavle.backlog.${board.id}.nav`, "on");
 
   const all = backlogStories(full);
-  const filtered = applyFilters(all, filters);
+  const filtered = applyFilters(all, filters, board.key);
   const { view } = structure;
   const tree = hierarchy(full, all, { showClosed, items: structure.items });
   const selection = stillThere(chosen, tree);
@@ -98,7 +98,7 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
   const counts = navCounts(tree);
   // Committed cards stay in the backlog's sight, marked with their sprint.
   const allocated = allocatedStories(full);
-  const allocatedShown = selectExtra(applyFilters(allocated, filters), tree, selection);
+  const allocatedShown = selectExtra(applyFilters(allocated, filters, board.key), tree, selection);
   const sprintNameOf = new Map(sprints.map((sp) => [sp.id, sp.name]));
   const open = sprints.filter((sp) => sp.state !== "closed").sort((a, b) => a.number - b.number);
   const active = sprints.find((sp) => sp.state === "active") ?? null;

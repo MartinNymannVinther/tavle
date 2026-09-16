@@ -1,5 +1,5 @@
-import { and, asc, eq, isNull } from "drizzle-orm";
-import { memberships, people, users, type Person } from "@/core/db/schema";
+import { and, asc, count, eq, isNotNull, isNull } from "drizzle-orm";
+import { cards, memberships, people, users, type Person } from "@/core/db/schema";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 import { Conflict } from "./lanes";
 
@@ -15,6 +15,23 @@ import { Conflict } from "./lanes";
 /** The roster in name order; the list every assignee picker shows. */
 export async function peopleOf(tx: AppTransaction, orgId: string): Promise<Person[]> {
   return tx.select().from(people).where(eq(people.orgId, orgId)).orderBy(asc(people.name));
+}
+
+/**
+ * How many open cards each person carries. Removing a person lets their
+ * cards fall back to unassigned, so the question before it can say how
+ * much falls — a count is the difference between a warning and a guess.
+ */
+export async function assignmentCounts(
+  tx: AppTransaction,
+  orgId: string,
+): Promise<Map<string, number>> {
+  const rows = await tx
+    .select({ personId: cards.assigneePersonId, count: count() })
+    .from(cards)
+    .where(and(eq(cards.orgId, orgId), isNull(cards.archivedAt), isNotNull(cards.assigneePersonId)))
+    .groupBy(cards.assigneePersonId);
+  return new Map(rows.filter((row) => row.personId).map((row) => [row.personId!, row.count]));
 }
 
 /** A person by id, or null; RLS makes anyone else's roster invisible. */

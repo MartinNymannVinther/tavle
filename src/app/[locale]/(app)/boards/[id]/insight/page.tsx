@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ThroughputChart, VelocityChart } from "@/components/charts/bar-charts";
 import { BurndownChart } from "@/components/charts/burndown-chart";
 import { FlowChart } from "@/components/charts/flow-chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireOrgContext } from "@/core/auth/guard";
-import { formatDateDa } from "@/core/dates";
+import { formatPlanDate } from "@/core/dates";
 import { boardInsight } from "@/modules/boards/metrics/read";
 import { getBoardHeader } from "@/modules/boards/read";
 
@@ -34,6 +34,7 @@ export default async function InsightPage({ params }: Params) {
   ]);
   if (!header || !insight) notFound();
   const t = await getTranslations("insight");
+  const locale = await getLocale();
   const scrum = header.board.mode === "scrum";
 
   const stat = (label: string, value: string, hint?: string) => (
@@ -56,7 +57,7 @@ export default async function InsightPage({ params }: Params) {
                   name: insight.activeBurndown.sprint.name,
                   remaining: insight.activeBurndown.remainingNow,
                   committed: insight.activeBurndown.committed,
-                  end: formatDateDa(insight.activeBurndown.sprint.endDate),
+                  end: formatPlanDate(insight.activeBurndown.sprint.endDate, locale),
                 })
               : t("burndownNone")}
           </CardDescription>

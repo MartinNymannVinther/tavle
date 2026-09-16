@@ -37,7 +37,14 @@ function PageHeader({
           <p className="text-muted-foreground text-reading leading-normal">{subtitle}</p>
         ) : null}
       </div>
-      {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
+      {/* `max-w-full` is load-bearing: `shrink-0` alone lets this box grow to
+          its content, and then a `max-w-full` inside it (a tab strip that
+          means to scroll sideways) has nothing definite to measure against
+          and stretches the page instead. Capped here, the actions wrap or
+          scroll inside the header and the document stays viewport wide. */}
+      {actions ? (
+        <div className="flex max-w-full shrink-0 flex-wrap items-center gap-2">{actions}</div>
+      ) : null}
     </div>
   );
 }

@@ -14,7 +14,8 @@
     "thinking": {
       "seconds": "{seconds} s",
       "slow": "A local model can take up to a minute. If it does not answer, the rules engine takes over and the page says so."
-    }
+    },
+    "hours": "{value} h"
   },
   "landing": {
     "nav": {
@@ -244,13 +245,13 @@
       "xlsxBody": "One file with a tab per kind of data. For you, for the steering group, or for anyone who needs to look without knowing Tavle.",
       "xlsxAction": "Download spreadsheet",
       "jsonTitle": "Machine-readable copy",
-      "jsonBody": "The same data as JSON with every id kept, so you can move to something other than Tavle without losing the links between projects, tasks and statuses.",
+      "jsonBody": "The same data as JSON with every id kept, so you can move to something other than Tavle without losing the links between boards, cards, sprints and the backlog's structure.",
       "jsonAction": "Download JSON",
-      "sheetsLabel": "Tabs in the file:",
-      "membersSheet": "Users",
+      "sheetsLabel": "Tabs in the file (named in Danish, as the file writes them):",
+      "membersSheet": "Brugere",
       "notBackupTitle": "This is not a backup.",
       "notBackupBody": "An export can be read but not restored, and it is only as fresh as the day you downloaded it. The night's encrypted dump is what saves you when the database is gone.",
-      "privacy": "The export contains the names of the people the projects mention and the workspace's whole history. Passwords and passkeys are never included, and share links are exported without their key. Downloading it is recorded in the audit log."
+      "privacy": "The export contains the names of the workspace's people and its whole history. Passwords, passkeys and the key to the workspace's language model are never included. Downloading it is recorded in the audit log."
     },
     "boards": {
       "passkeyPromptTitle": "Make your account more secure",
@@ -315,7 +316,7 @@
       },
       "delete": {
         "title": "Delete the workspace",
-        "body": "Everything in the workspace goes: projects, plans, statuses, decisions, share links and the audit trail about them. It cannot be undone.",
+        "body": "Everything in the workspace goes: boards, cards, epics and features, sprints, comments, themes and areas, people, and the whole history and audit trail about them. It cannot be undone.",
         "exportFirst": "Take an export first if you want to keep anything. It is under Data.",
         "typeName": "Type {name} to confirm",
         "action": "Delete the workspace permanently",
@@ -368,7 +369,7 @@
       },
       "noModel": "No model configured",
       "setupIntro": "Tavle works without a model. For real proposals and free-text answers, set one up:",
-      "setupOutro": "Then start Tavle again. Without a model the rules engine answers and the three flows still work.",
+      "setupOutro": "Then start Tavle again. Without a model the AI buttons say so, and everything else in Tavle works as before.",
       "limitsTitle": "Ceiling on AI calls",
       "limitsHint": "A model call costs money on a hosted installation and minutes on a local one. The numbers are generous for a person and mean for a script.",
       "perUser": "Calls per user per hour",
@@ -393,7 +394,10 @@
       "failWhereToLook": "The details are in the server log.",
       "testNotAllowed": "Only the owner or an administrator can test the connection.",
       "withoutTitle": "Without a model",
-      "withoutBody": "The board, the sprints and the numbers need no model. What the AI offers is three proposals a person edits and says yes to: a draft for a card, a split of a card, and the sprint's story. Without a model the buttons say so, and everything else works as before."
+      "withoutBody": "The board, the sprints and the numbers need no model. What the AI offers is proposals a person edits and says yes to: a draft for a card, a split of a card, the sprint's story, and a starting point for the backlog and the roadmap — plus the quiet assists along the way and a draft for the close conversation. Without a model the buttons say so, and everything else works as before.",
+      "setupEuComment": "hosted in the EU (Mistral)",
+      "setupLocalComment": "or locally (Ollama)",
+      "setupKeyPlaceholder": "your-key-here"
     },
     "members": {
       "title": "Members",
@@ -449,7 +453,10 @@
       "add": "Add person",
       "errors": {
         "generic": "That did not work. Try again."
-      }
+      },
+      "removeTitle": "Remove {name}?",
+      "removeBody": "{count, plural, =0 {This person holds no cards. This cannot be undone.} one {# card loses its assignee. This cannot be undone.} other {# cards lose their assignee. This cannot be undone.}}",
+      "removeConfirm": "Remove the person"
     }
   },
   "demo": {
@@ -587,7 +594,9 @@
       "inArea": "In area",
       "looseFeatures": "Features without an epic",
       "aiSuggested": "AI suggests this place — pick one yourself to change it",
-      "similar": "Looks like:"
+      "similar": "Looks like:",
+      "closedGroup": "Closed — takes nothing more",
+      "closedNote": "“{title}” is closed and takes nothing more. Choose somewhere else, or reopen it first."
     },
     "filters": {
       "search": "Search cards",
@@ -612,13 +621,13 @@
     "sprint": {
       "kicker": "{start} – {end}",
       "daysLeft": "Days left",
-      "overdue": "{days} days over",
+      "overdue": "{days, plural, one {# day over} other {# days over}}",
       "progress": "Progress",
       "points": "{unit, select, hours {hours} other {points}}",
       "toBacklog": "Backlog",
       "close": "Close sprint",
       "closeTitle": "Close {name}",
-      "closeBody": "{done} cards are done ({points} {unit, select, hours {hours} other {points}}). {open} are not. The sprint's numbers are written down as they stand now.",
+      "closeBody": "{done, plural, one {# card is done} other {# cards are done}} ({points} {unit, select, hours {hours} other {points}}). {open, plural, one {# is not} other {# are not}}. The sprint's numbers are written down as they stand now.",
       "unfinishedGo": "The unfinished cards go to",
       "toBacklogOption": "The backlog, at the top",
       "closeConfirm": "Close the sprint",
@@ -636,7 +645,9 @@
       "invalid": "Something you wrote could not be used. Check the fields.",
       "unauthorized": "You are no longer signed in.",
       "forbidden": "That takes an owner or an admin of the workspace.",
-      "generic": "That went wrong. Try again."
+      "generic": "That went wrong. Try again.",
+      "keyTaken": "That key is already in use on another board. Pick another one.",
+      "nameTaken": "That name is already in use. Pick another one."
     },
     "structure": {
       "bug": "Bug",
@@ -791,7 +802,6 @@
       "descriptionField": "Description",
       "acceptanceField": "How we know it is done",
       "checklistField": "Checklist",
-      "acceptanceHeading": "Done when:",
       "drop": "Drop",
       "keep": "Keep",
       "points": "{unit, select, hours {Hours} other {Points}}",
@@ -855,7 +865,7 @@
       "toBoard": "See the board",
       "empty": "No cards yet. Select cards in the backlog and put them here.",
       "toBacklog": "Move {count, plural, one {# card} other {# cards}} to the backlog",
-      "againstAverage": "the average is {average}",
+      "againstAverage": "the average is {average, number}",
       "startAskTitle": "Start {name}",
       "startAskBody": "The sprint was planned to start {planned}. Move the dates so it starts today ({today}) and keeps its length?",
       "startKeep": "Keep the planned dates",
@@ -934,7 +944,7 @@
   "sprints": {
     "title": "Sprints",
     "velocityTitle": "Velocity",
-    "velocityBody": "{unit, select, hours {Hours} other {Points}} completed per closed sprint. Average of the last three: {average}.",
+    "velocityBody": "{unit, select, hours {Hours} other {Points}} completed per closed sprint. Average of the last three: {average, number}.",
     "emptyTitle": "No sprints yet",
     "emptyBody": "Sprints are planned in the backlog. They are listed here once they have run.",
     "emptyCta": "Go to the backlog",
@@ -991,17 +1001,17 @@
     "wipHint": "Cards in columns of the In progress kind",
     "cycle": "Cycle time",
     "cycleNone": "No cards finished in the last 30 days",
-    "cycleHint": "Median. Average {average} days over {sample} cards",
+    "cycleHint": "Median. Average {average, number} days over {sample} cards",
     "lead": "Lead time",
     "leadHint": "From the card was created until it was done",
     "weekly": "Done this week",
-    "weeklyHint": "Average {average} per week over eight weeks",
-    "days": "{days} days",
+    "weeklyHint": "Average {average, number} per week over eight weeks",
+    "days": "{days, number} days",
     "burndownTitle": "Burndown",
-    "burndownBody": "{name}: {remaining} of {committed} {unit, select, hours {hours} other {points}} left. Ends {end}.",
+    "burndownBody": "{name}: {remaining} {unit, select, hours {hours} other {points}} left, {committed} committed at start. Ends {end}.",
     "burndownNone": "No sprint is running right now.",
     "velocityTitle": "Velocity",
-    "velocityBody": "{unit, select, hours {Hours} other {Points}} completed per closed sprint. Average of the last three: {average}.",
+    "velocityBody": "{unit, select, hours {Hours} other {Points}} completed per closed sprint. Average of the last three: {average, number}.",
     "velocityNone": "No closed sprints yet.",
     "throughputTitle": "Cards done per week",
     "throughputBody": "The last eight weeks. Steady is good; swinging is a sign of bottlenecks.",
@@ -1036,9 +1046,9 @@
         "tshirt": "T-shirt"
       },
       "hint": {
-        "points": "Cards are estimated in points on the scale 1, 2, 3, 5, 8, 13.",
+        "points": "Cards are estimated in points on the scale {scale}.",
         "hours": "Cards are estimated in hours. Velocity and burndown count in hours.",
-        "tshirt": "Cards get a size from XS to XXL. Behind the size stands the weight the numbers use: XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13."
+        "tshirt": "Cards get a size from XS to XXL. Behind the size stands the weight the numbers use: {sizes}."
       },
       "factor": "An hour conversion of",
       "factorHint": "hours per point",
@@ -1050,7 +1060,9 @@
       "cancel": "Undo the choice",
       "undoable": "The switch is in the activity and can be undone.",
       "lastChange": "Last switched to {unit} · {cards, plural, =0 {no cards changed} one {# card changed} other {# cards changed}}.",
-      "undo": "Undo the switch"
+      "undo": "Undo the switch",
+      "factorRange": "The factor must be between {min, number} and {max, number} hours per point.",
+      "previewFailed": "The preview could not be computed. Try again, or reload the page."
     },
     "columns": {
       "title": "Columns",
@@ -1158,6 +1170,10 @@
       "deactivate": "Deactivate",
       "activate": "Activate again",
       "inactive": "deactivated"
+    },
+    "activity": {
+      "title": "Recent changes to the board",
+      "body": "Changes to the board itself — themes, areas, lanes, levels and releases. What stands here can be undone."
     }
   },
   "my": {
@@ -1209,8 +1225,8 @@
       "updated": "{key} was edited ({fields})",
       "assigned": "{key} was assigned to {name}",
       "unassigned": "{key} has no assignee",
-      "estimated": "{key} was estimated at {points} {unit, select, hours {hours} other {points}}",
-      "blocked": "{key} was blocked: {reason}",
+      "estimated": "{key} was estimated at {unit, select, tshirt {{size}} hours {{points, plural, one {# hour} other {# hours}}} other {{points, plural, one {# point} other {# points}}}}",
+      "blocked": "{key} was blocked{why, select, reason {: {reason}} other {}}",
       "unblocked": "{key} is no longer blocked",
       "checklist": "The checklist on {key} stands at {done} of {total}",
       "sprint": "{key} was put in {sprint}",
@@ -1220,13 +1236,15 @@
       "deleted": "{key} was deleted",
       "split": "{key} was split into {into}",
       "parent": "{key} was put under {parent}",
-      "placed": "{key} got area {area} and themes {themes}",
+      "placed": "{placed, select, both {{key} got area {area} and themes {themes}} area {{key} got area {area}} themes {{key} got themes {themes}} other {{key} has no area or themes}}",
       "kind": "{key} was set to {kind} {enablerType}",
       "bug": "{key} was marked as a bug",
       "notBug": "{key} is no longer marked as a bug",
       "swimlane": "{lane, select, none {{key} was put outside the lanes} other {{key} was put in the lane {lane}}}",
       "released": "{key} was put in the release {name}",
-      "unreleased": "{key} was taken out of its release"
+      "unreleased": "{key} was taken out of its release",
+      "unestimated": "The estimate on {key} was removed",
+      "waiting": "{key} is waiting for: {reason}"
     },
     "comment": {
       "added": "Comment on {key}",
@@ -1259,7 +1277,7 @@
       "created": "{key} was created as {level}: {title}",
       "updated": "{key} was edited ({fields})",
       "moved": "{key} was moved under {parent}",
-      "placed": "{key} got area {area} and themes {themes}",
+      "placed": "{placed, select, both {{key} got area {area} and themes {themes}} area {{key} got area {area}} themes {{key} got themes {themes}} other {{key} has no area or themes}}",
       "cascaded": "{key}: area and themes went down to {features} features and {cards} cards",
       "closed": "{key} was closed",
       "reopened": "{key} was reopened",
@@ -1285,6 +1303,17 @@
       "updated": "The release {name} was updated",
       "reordered": "The release {name} was moved",
       "deleted": "The release {name} was deleted ({cards} cards freed)"
+    },
+    "field": {
+      "title": "title",
+      "description": "description",
+      "acceptance": "acceptance criteria",
+      "priority": "priority",
+      "dueDate": "due date",
+      "doneWhen": "done when",
+      "kind": "kind",
+      "targetQuarter": "target quarter",
+      "startQuarter": "start quarter"
     }
   },
   "help": {
@@ -1310,11 +1339,11 @@
       },
       "estimates": {
         "title": "Estimation",
-        "body": "A board can count in story points, in hours or in T-shirt sizes — choose under Settings → Estimation. Sizes and points are the same numbers, because a size is only a name for a weight (XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13), so moving between them changes no sums. Hours are another scale, and there the tool shows a table of every estimate on the board and what it would become, with a conversion factor you can adjust. Nothing is written until you say yes, and the switch stands in the activity with an Undo button."
+        "body": "A board can count in story points, in hours or in T-shirt sizes — choose under Settings → Estimation. Sizes and points are the same numbers, because a size is only a name for a weight (XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13), so moving between them changes no sums. Hours are another scale, and there the tool shows a table of every estimate on the board and what it would become, with a conversion factor you can adjust. Nothing is written until you say yes, and the switch can be taken back with the button on the settings page."
       },
       "undo": {
         "title": "Undo",
-        "body": "Every change stands in the activity of its card or item with an Undo button. Undo runs the opposite action through the same rules as everything else — if the world has moved on because the card was deleted or the feature closed, the tool says no instead of guessing. What was undone is struck through in the activity, and the undo itself is written down."
+        "body": "Every change stands in the activity of its card or item with an Undo button, and changes to the board itself — themes, areas, lanes, levels, releases — stand under Settings → Recent changes to the board. Undo runs the opposite action through the same rules as everything else — if the world has moved on because the card was deleted or the feature closed, the tool says no instead of guessing. What was undone is struck through in the activity, and the undo itself is written down."
       },
       "backlog": {
         "title": "The backlog",
@@ -1322,7 +1351,7 @@
       },
       "care": {
         "title": "Backlog care",
-        "body": "The page answers one question: what is the backlog waiting for? It shows only what actually needs a decision — features and cards with no place, epics and features with no “done when”, features with no work under them, epics nobody has confirmed in a long time, unweighed work at the top, and a backlog ranked deeper than you will reach. Each line folds out to the real rows, so you can go straight there and fix it. If there is nothing, the page says so. At the bottom it shows where the weight of the open work sits, by theme, area or kind."
+        "body": "The page answers one question: what is the backlog waiting for? It shows only what actually needs a decision — features and cards with no place, epics and features with no “done when”, features with no work under them, epics nobody has confirmed in a long time, unweighed work at the top, and a backlog ranked deeper than you will reach. Each line folds out to the real rows, so you can go straight there and fix it. If there is nothing, the page says so. At the bottom it shows where the weight of the open work sits, by theme, area or kind. A card with more than one theme is counted in one place, under “More than one theme”, so the rows add up to the total stated above them."
       },
       "insight": {
         "title": "Insight",
@@ -1345,8 +1374,8 @@
         "body": "The backlog has one hierarchy with three levels: an epic is a result the team can reach in one or two quarters, a feature is a releasable slice of it, a card is the smallest deliverable and fits in one sprint. All three have a kind, Business or Enabler. Overview and grouping are handled by two fields on each item: Theme answers why, Area answers where. Two tests decide where something belongs, and the tool enforces them: if it can be finished, it is in the hierarchy; if it can never be finished, it is a theme or an area. If it has exactly one parent, it is hierarchy; if it can belong to several at once, it is a category. The Breakdown tab draws the hierarchy as a chart: epics on top, features and cards below, and everything without a parent waits in the tray. Drag things into place, or use the menu on each card — and zoom out when you need the whole picture."
       },
       "roadmap": {
-        "title": "Roadmap and overview",
-        "body": "The roadmap draws epics on a line of quarters, coloured by their first theme. Drag the bar: the middle moves the epic, the edges change its duration. An epic without a target quarter is not drawn; it is listed underneath. On a Scrum board the view can switch to features on sprints: lay sprints ahead, and put each feature where you expect to build it — unfold an epic to see its features drawn where their sprints lie. The overview shows where the open work sits by theme, area and kind, the enabler share as one number, and five measures of whether the structure holds: the share without a parent, epics for review, items without an area, the enabler share, and themes and areas nobody uses."
+        "title": "Roadmap and backlog care",
+        "body": "The roadmap draws epics on a line of quarters, coloured by their first theme. Drag the bar: the middle moves the epic, the edges change its duration — and the two small quarter selects under the title do the same without a mouse. An epic without a target quarter is not drawn; it is listed underneath. If the board has releases they stand in a strip along the top, each on the quarter its date falls in. On a Scrum board the view can switch to features on sprints: lay sprints ahead, and put each feature where you expect to build it — unfold an epic to see its features drawn where their sprints lie. Backlog care is the page beside it: it answers what the backlog is waiting for — only the findings that actually apply — and where the weight sits, by theme, area or kind, with the total stated once."
       },
       "map": {
         "title": "The story map",
@@ -1459,7 +1488,9 @@
       "area": "Area",
       "chooseArea": "Choose an area…",
       "confirm": "Close and do this",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "thinking": "The AI is drafting a suggestion. You can choose and close without waiting for it.",
+      "closing": "Closing…"
     }
   },
   "roadmap": {
@@ -1495,14 +1526,19 @@
     "releases": {
       "title": "Releases",
       "undated": "{count, plural, one {# with no date} other {# with no date}}",
-      "tip": "{cards} cards · {done} % done"
-    }
+      "tip": "{cards} cards · {done} % done",
+      "weight": "{unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}}"
+    },
+    "startQuarterFor": "Start quarter for {title}",
+    "noStartQuarter": "No start quarter",
+    "emptyArea": "No epics in this area. Pick another area, or “All areas”.",
+    "pptUnplanned": "Unplanned"
   },
   "care": {
     "title": "What is the backlog waiting for?",
     "body": "What a product owner should decide before planning. Nothing here means nothing to decide.",
     "summary": "{cards, plural, one {# card} other {# cards}} waiting · {points} {unit, select, hours {hours} other {points}}",
-    "depth": "about {sprints} sprints of work",
+    "depth": "about {sprints, number} sprints of work",
     "unweighed": "{count, plural, one {# unestimated} other {# unestimated}}",
     "count": "{count}",
     "clear": {
@@ -1535,7 +1571,7 @@
     },
     "tooDeep": {
       "title": "Deeper than you reach",
-      "body": "There are {value} points ranked, and you finish about {of} per sprint. The bottom of the list is unlikely to happen — consider leaving it unordered."
+      "body": "There are {value} {unit, select, hours {hours} other {points}} ranked, and you finish about {of} per sprint. The bottom of the list is unlikely to happen — consider leaving it unordered."
     }
   },
   "overview": {
@@ -1545,8 +1581,10 @@
     "byKindTitle": "By kind",
     "distributionBody": "{cards, plural, one {# open card} other {# open cards}} · {points} {unit, select, hours {hours} other {points}}",
     "none": "None",
-    "bucketValue": "{cards} cards · {points} {unit, select, hours {hours} other {points}}",
-    "weightTitle": "Where is the weight?"
+    "bucketValue": "{cards, plural, one {# card} other {# cards}} · {points} {unit, select, hours {hours} other {points}}",
+    "weightTitle": "Where is the weight?",
+    "multi": "More than one theme",
+    "retired": "{name} (retired)"
   },
   "map": {
     "title": "Story map",
@@ -1563,12 +1601,12 @@
     "noParent": "No feature",
     "noParentHint": "{count, plural, =0 {No cards without a feature} one {# card without a feature} other {# cards without a feature}}",
     "backlog": "Backlog",
-    "rowCounts": "{cards, plural, one {# card} other {# cards}} · {points} {unit, select, hours {hours} other {points}}",
+    "rowCounts": "{cards, plural, one {# card} other {# cards}} · {unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}}",
     "underway": "{open} underway",
     "emptyTray": "The map is empty. Click a feature in the tray to put it up.",
     "empty": "No features yet. Create a feature, and it can go up on the map.",
     "hiddenCards": "{count, plural, one {# card off the map} other {# cards off the map}}",
-    "hiddenHint": "Pick a card — its feature goes up on the map",
+    "hiddenHint": "Pick a card and it comes out on the map",
     "orderDrift": "The order here differs from the backlog's ranking — maybe on purpose, maybe worth a look.",
     "alignBacklog": "Let the backlog follow the map",
     "showClosedFeatures": "{count, plural, =0 {Show closed features} one {Show # closed} other {Show # closed}}",
@@ -1595,7 +1633,8 @@
     "noDate": "No date",
     "editRelease": "Edit release",
     "moveReleaseUp": "Move the release up",
-    "moveReleaseDown": "Move the release down"
+    "moveReleaseDown": "Move the release down",
+    "closedFeature": "closed feature"
   },
   "decompose": {
     "title": "Breakdown",

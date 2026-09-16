@@ -47,6 +47,11 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
     setCards(full.cards);
   }
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
+  // Cards made here since the filter was last touched. A card written
+  // under a filter it does not pass would otherwise be indistinguishable
+  // from a card that was never written at all — the form clears, nothing
+  // appears, and the person types the sentence again.
+  const [justAdded, setJustAdded] = useState<string[]>([]);
   const [dragId, setDragId] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<DropTarget>(null);
 
@@ -57,7 +62,14 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
     () => (scrum ? cards.filter((c) => c.sprintId === activeSprint?.id) : cards),
     [scrum, cards, activeSprint?.id],
   );
-  const visible = applyFilters(onBoard, filters);
+  /** The filter's answer, plus whatever was just made here. */
+  const shown = (list: CardView[]): CardView[] => {
+    const kept = applyFilters(list, filters, board.key);
+    if (justAdded.length === 0) return kept;
+    const ids = new Set(kept.map((card) => card.id));
+    return list.filter((card) => ids.has(card.id) || justAdded.includes(card.id));
+  };
+  const visible = shown(onBoard);
   const planned = full.sprints.filter((s) => s.state === "planned");
   // Grouped and sorted once per data change, not once per column per
   // render — a dragover and a filter keystroke both redraw the board.
@@ -192,15 +204,17 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
             : laneMode === "manual" && laneKey
               ? { swimlaneId: laneKey }
               : {};
-    return run(() =>
-      createCardAction({
-        boardId: board.id,
-        title,
-        columnId,
-        sprintId: activeSprint?.id ?? null,
-        ...place,
-        ...inLane,
-      }),
+    return run(
+      () =>
+        createCardAction({
+          boardId: board.id,
+          title,
+          columnId,
+          sprintId: activeSprint?.id ?? null,
+          ...place,
+          ...inLane,
+        }),
+      (created) => setJustAdded((ids) => [...ids, created.id]),
     );
   }
 
@@ -232,7 +246,7 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
         <BoardColumn
           key={column.id}
           column={column}
-          cards={applyFilters(withLanes ? cell(column.id, laneKey) : lane(column.id), filters)}
+          cards={shown(withLanes ? cell(column.id, laneKey) : lane(column.id))}
           boardKey={board.key}
           boardId={board.id}
           structure={structure}
@@ -240,7 +254,10 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
           today={today}
           laneKey={laneKey}
           laneOptions={withLanes ? laneOptions : undefined}
-          wipCount={withLanes ? lane(column.id).length : undefined}
+          // The limit belongs to the column, not to what is on screen: a
+          // filter narrows the drawing, never the count a team is
+          // measured against.
+          wipCount={lane(column.id).length}
           dense={withLanes}
           dragId={dragId}
           dropTarget={dropTarget}
@@ -285,7 +302,17 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
           run={run}
         />
       )}
-      <BoardFilters filters={filters} onChange={setFilters} people={people} structure={structure} />
+      <BoardFilters
+        filters={filters}
+        onChange={(next) => {
+          setFilters(next);
+          // Changing the filter is the person looking again; the cards
+          // held out of it go back to obeying it.
+          setJustAdded([]);
+        }}
+        people={people}
+        structure={structure}
+      />
       <div className="-mx-5 overflow-x-auto px-5 pb-4 sm:-mx-7 sm:px-7 lg:-mx-8 lg:px-8">
         {laneMode === "none" ? (
           columnStrip(null, false)

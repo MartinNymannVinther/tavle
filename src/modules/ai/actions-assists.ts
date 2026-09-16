@@ -8,21 +8,17 @@ import { action, found } from "@/modules/boards/action-helpers";
 import { updateItem } from "@/modules/boards/structure/write-items";
 import { id, isoDate, shortText } from "@/modules/boards/validation";
 import { updateSprint } from "@/modules/boards/write-sprints";
-import {
-  proposeDoneWhen,
-  proposeQuickAssist,
-  proposeSprintGoal,
-  type QuickAssist,
-} from "./assists";
-import type { ProposalResult } from "./actions";
-import { classifyAiError, modelConfigured } from "./service";
+import { proposeDoneWhen, proposeSprintGoal } from "./assists";
+import type { ProposalResult } from "./wire";
+import { classifyAiError } from "./service";
 
 /**
- * The quiet assists' actions (docs/adr/0025). The done-when follows the
- * house pair — propose, then apply through the ordinary service marked
- * as the AI's work. The quick assist has no apply at all: it moves a
- * select and shows a line, and creating the card stays the person's own
- * act through the ordinary create action.
+ * The quiet assists' actions (docs/adr/0025). The done-when and the
+ * sprint goal follow the house pair — propose, then apply through the
+ * ordinary service marked as the AI's work; both are asked for by a
+ * button the person then waits at. The quick assist is not here: it is
+ * asked while the person is typing and must not queue behind anything,
+ * so it went to `POST /api/ai/quick-assist` (docs/adr/0034).
  */
 
 const DoneWhenRef = z.object({ itemId: id });
@@ -85,28 +81,4 @@ export async function applySprintGoalAction(raw: unknown): Promise<Result<string
     touch(sprint.boardId);
     return sprint.boardId;
   });
-}
-
-const QuickAssistRef = z.object({ boardId: id, title: shortText(200).min(8) });
-
-export async function proposeQuickAssistAction(raw: unknown): Promise<ProposalResult<QuickAssist>> {
-  const ctx = await requireOrgContext();
-  if (!ctx) return { ok: false, error: "unauthorized" };
-  const parsed = QuickAssistRef.safeParse(raw);
-  if (!parsed.success) return { ok: false, error: "invalid" };
-  // Honest and cheap: without a model the client learns it once and goes
-  // quiet, instead of paying a model timeout per typed title.
-  if (!(await modelConfigured(ctx))) return { ok: false, error: "noModel" };
-  try {
-    const result = await proposeQuickAssist(
-      ctx,
-      parsed.data.boardId,
-      parsed.data.title,
-      await getLocale(),
-    );
-    if (!result) return { ok: false, error: "notFound" };
-    return { ok: true, ...result };
-  } catch (error) {
-    return { ok: false, error: classifyAiError(error) };
-  }
 }

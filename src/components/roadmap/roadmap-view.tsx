@@ -2,7 +2,7 @@
 
 import { Download, Plus } from "lucide-react";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { NativeSelect } from "@/components/ui/native-select";
 import { SegmentedChoice } from "@/components/ui/segmented";
@@ -20,7 +20,8 @@ import type { EstimateUnit } from "@/core/db/schema";
 import { ReleaseStrip } from "./release-strip";
 import { RoadmapChildren } from "./roadmap-children";
 import { FeaturePlan } from "./feature-plan";
-import { QuarterSelect, RoadmapLine, type PlanSpan } from "./roadmap-line";
+import { QuarterSelect } from "./quarter-selects";
+import { RoadmapLine, type PlanSpan } from "./roadmap-line";
 import type { BoardFull } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,9 @@ import { cn } from "@/lib/utils";
 export function RoadmapView({ full }: { full: BoardFull }) {
   const t = useTranslations("roadmap");
   const s = useTranslations("boards.structure");
+  // The deck is built in a route with no locale in its path, so the page
+  // says which language it is asking in (docs/adr/0028).
+  const locale = useLocale();
   const { run } = useBoardActions();
   const scrum = full.board.mode === "scrum";
   const view = structureView(full.board);
@@ -145,7 +149,7 @@ export function RoadmapView({ full }: { full: BoardFull }) {
         </div>
         <span className="flex-1" />
         <a
-          href={`/api/boards/${full.board.id}/roadmap-pptx`}
+          href={`/api/boards/${full.board.id}/roadmap-pptx?locale=${locale}`}
           download
           className={buttonVariants({ variant: "outline", size: "sm" })}
         >
@@ -209,7 +213,12 @@ export function RoadmapView({ full }: { full: BoardFull }) {
             />
           )}
           {rows.length === 0 ? (
-            <p className="text-meta px-4 py-6 text-sm">{t("empty")}</p>
+            // An area with nothing in it is not an empty board: saying so
+            // would send the reader off to plan epics that are already
+            // planned, only somewhere else.
+            <p className="text-meta px-4 py-6 text-sm">
+              {areaId && data.rows.length > 0 ? t("emptyArea") : t("empty")}
+            </p>
           ) : (
             <ol>
               {rows.map((row) => (
@@ -221,6 +230,7 @@ export function RoadmapView({ full }: { full: BoardFull }) {
                     boardId={full.board.id}
                     boardKey={full.board.key}
                     onPlan={plan}
+                    run={run}
                     fold={{
                       open: folded.isOpen(row.epic.id),
                       onToggle: () => folded.toggle(row.epic.id),

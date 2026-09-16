@@ -1,3 +1,4 @@
+import type { StructureView } from "@/modules/boards/structure/view";
 import type { BoardFull, CardView, ItemView } from "@/modules/boards/types";
 
 /**
@@ -12,7 +13,21 @@ import type { BoardFull, CardView, ItemView } from "@/modules/boards/types";
  */
 
 export type Grouping = "list" | "theme" | "area" | "kind";
-export const GROUPINGS: Grouping[] = ["list", "theme", "area", "kind"];
+
+/**
+ * The ways of looking a board actually has. A field switched off in the
+ * board's settings is not a way of looking at anything (docs/adr/0014):
+ * grouping by it would sort the list under headings the rows carry no
+ * chip for. The one list is always there.
+ */
+export function groupingsFor(view: StructureView): Grouping[] {
+  return [
+    "list",
+    ...(view.themes ? (["theme"] as const) : []),
+    ...(view.areas ? (["area"] as const) : []),
+    ...(view.kind ? (["kind"] as const) : []),
+  ];
+}
 
 export type FeatureNode = {
   feature: ItemView;
@@ -58,37 +73,9 @@ export function epicProgress(node: EpicNode): Progress {
   );
 }
 
-/** The stories that are in the backlog, in the backlog's own order. */
-export function backlogStories(full: BoardFull): CardView[] {
-  const { board, columns, cards } = full;
-  let inBacklog: (card: CardView) => boolean;
-  if (board.mode === "scrum") {
-    inBacklog = (card) => !card.sprintId;
-  } else {
-    const backlogColumns = columns.filter((c) => c.category === "backlog").map((c) => c.id);
-    const ids = backlogColumns.length > 0 ? backlogColumns : columns.slice(0, 1).map((c) => c.id);
-    inBacklog = (card) => ids.includes(card.columnId);
-  }
-  return cards.filter(inBacklog).sort((a, b) => a.sort - b.sort || a.number - b.number);
-}
-
-/**
- * Scrum: the cards already committed to an open sprint and not yet done.
- * They left the backlog's order, but not the backlog's sight — the list
- * shows them marked with their sprint, so the whole of a feature is one
- * look (docs/adr/0027).
- */
-export function allocatedStories(full: BoardFull): CardView[] {
-  if (full.board.mode !== "scrum") return [];
-  const open = new Map(full.sprints.filter((s) => s.state !== "closed").map((s) => [s.id, s]));
-  return full.cards
-    .filter((c) => c.sprintId && open.has(c.sprintId) && !c.doneAt)
-    .sort((a, b) => {
-      const sprintA = open.get(a.sprintId!)!;
-      const sprintB = open.get(b.sprintId!)!;
-      return sprintA.number - sprintB.number || a.sort - b.sort || a.number - b.number;
-    });
-}
+// What the backlog *is* belongs with the rules, not with the view that
+// draws it: the care page asks the same question from the module side.
+export { allocatedStories, backlogStories } from "@/modules/boards/structure/backlog";
 
 const byRank = (a: ItemView, b: ItemView) => a.sort - b.sort || a.number - b.number;
 

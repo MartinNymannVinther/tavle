@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { formatDay } from "@/core/dates";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -67,7 +68,7 @@ export function PasskeyManager() {
 
   function formatDate(value: Passkey["createdAt"]): string | null {
     if (!value) return null;
-    return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(value));
+    return formatDay(new Date(value), locale);
   }
 
   return (

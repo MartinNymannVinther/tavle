@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { EstimateUnit } from "@/core/db/schema";
 import { themeSwatch } from "@/components/board/tokens";
-import { overview, type Bucket } from "@/modules/boards/structure/overview";
+import { MULTI, NONE, overview, type Bucket } from "@/modules/boards/structure/overview";
 import { backlogCare } from "@/modules/boards/structure/hygiene";
 import { SegmentedChoice } from "@/components/ui/segmented";
 import { CareClear, CareList, CareSummary } from "./care-list";
@@ -49,12 +49,18 @@ export function OverviewView({ full }: { full: BoardFull }) {
     ] as const
   ).filter(([, , on]) => on);
   const buckets = axes.find(([key]) => key === axis)?.[1] ?? [];
-  const name = (bucket: Bucket) =>
-    bucket.key === "none"
-      ? t("none")
-      : bucket.key === "business" || bucket.key === "enabler"
-        ? s(`kind.${bucket.key}`)
-        : bucket.name;
+  const name = (bucket: Bucket) => {
+    const own =
+      bucket.key === NONE
+        ? t("none")
+        : bucket.key === MULTI
+          ? t("multi")
+          : bucket.key === "business" || bucket.key === "enabler"
+            ? s(`kind.${bucket.key}`)
+            : bucket.name;
+    // A value nobody picks from any more still holds the work it holds.
+    return bucket.retired ? t("retired", { name: own }) : own;
+  };
 
   return (
     <div className="flex flex-col gap-5">
@@ -73,7 +79,12 @@ export function OverviewView({ full }: { full: BoardFull }) {
         </CardHeader>
         <CardContent className="px-0 pb-2">
           {shown.length > 0 ? (
-            <CareList findings={shown} boardKey={full.board.key} boardId={full.board.id} />
+            <CareList
+              findings={shown}
+              boardKey={full.board.key}
+              boardId={full.board.id}
+              unit={unit}
+            />
           ) : (
             <CareClear />
           )}
@@ -133,11 +144,13 @@ function Distribution({
   const value = (bucket: Bucket) => (byPoints ? bucket.points : bucket.cards);
   const total = buckets.reduce((sum, bucket) => sum + value(bucket), 0);
   const inkOf = (bucket: Bucket, index: number) =>
-    bucket.key === "none"
+    bucket.key === NONE
       ? "var(--chart-5)"
-      : bucket.color
-        ? themeSwatch(bucket.color)
-        : BUCKET_PALETTE[index % BUCKET_PALETTE.length]!;
+      : bucket.key === MULTI
+        ? "var(--label)"
+        : bucket.color
+          ? themeSwatch(bucket.color)
+          : BUCKET_PALETTE[index % BUCKET_PALETTE.length]!;
   const shareOf = (bucket: Bucket) => (total > 0 ? Math.round((value(bucket) / total) * 100) : 0);
   return (
     <div className="flex flex-col gap-3">
@@ -173,7 +186,12 @@ function Distribution({
               className="size-2.5 shrink-0 self-center rounded-full"
               style={{ background: inkOf(bucket, index) }}
             />
-            <span className={cn("min-w-0 flex-1 truncate", bucket.key === "none" && "text-meta")}>
+            <span
+              className={cn(
+                "min-w-0 flex-1 truncate",
+                (bucket.key === NONE || bucket.key === MULTI) && "text-meta",
+              )}
+            >
               {name(bucket)}
             </span>
             <span className="text-meta shrink-0 text-2sm tabular-nums">

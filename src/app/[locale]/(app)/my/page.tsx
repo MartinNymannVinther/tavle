@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { FlagChip, Initials, Points, PriorityMark } from "@/components/board/bits";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireOrgContext } from "@/core/auth/guard";
-import { formatDateDa, todayInCopenhagen } from "@/core/dates";
-import type { Priority } from "@/core/db/schema";
+import { formatPlanDate, todayInCopenhagen } from "@/core/dates";
+import type { EstimateUnit, Priority } from "@/core/db/schema";
 import { listMyCards } from "@/modules/boards/read-lists";
+import { listEstimateUnits } from "@/modules/boards/read-units";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -22,9 +23,15 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export default async function MyCardsPage() {
   const t = await getTranslations("my");
+  const locale = await getLocale();
   const priorities = await getTranslations("boards.priority");
   const context = await requireOrgContext();
   const cards = context ? await listMyCards(context) : [];
+  // The rows of three boards stand in one column here, so each estimate
+  // has to wear its own board's unit (docs/adr/0030): "20" under a board
+  // counting hours and "3" under one counting points are not comparable,
+  // and nothing else on the row says which scale it is on.
+  const units = context ? await listEstimateUnits(context) : new Map<string, EstimateUnit>();
   const today = todayInCopenhagen();
   const boards = [
     ...new Map(
@@ -72,7 +79,7 @@ export default async function MyCardsPage() {
                         priority={card.priority as Priority}
                         label={priorities(card.priority)}
                       />
-                      <Points estimate={card.estimate} />
+                      <Points estimate={card.estimate} unit={units.get(board.id) ?? "points"} />
                       {card.blocked && <FlagChip tone="blocked">{t("blocked")}</FlagChip>}
                       {card.dueDate && (
                         <span
@@ -81,7 +88,7 @@ export default async function MyCardsPage() {
                             overdue ? "text-destructive font-medium" : "text-meta",
                           )}
                         >
-                          {formatDateDa(card.dueDate)}
+                          {formatPlanDate(card.dueDate, locale)}
                         </span>
                       )}
                       {card.assigneeName && <Initials name={card.assigneeName} />}

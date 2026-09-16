@@ -20,11 +20,24 @@ export type Filters = {
 
 export const NO_FILTERS: Filters = { text: "", assignee: "", themeId: "", areaId: "", kind: "" };
 
-/** Which cards pass the filter bar. A blank bar passes everything. */
-export function applyFilters(cards: CardView[], filters: Filters): CardView[] {
-  const text = filters.text.trim().toLowerCase();
+/**
+ * A hyphen and a space are the same character to someone searching: a
+ * card is printed as "WEB-13" and pasted into a chat as "WEB 13", and
+ * both should find it.
+ */
+const loose = (value: string) => value.toLowerCase().replace(/[\s-]+/g, "-");
+
+/**
+ * Which cards pass the filter bar. A blank bar passes everything. The
+ * board's key is optional only because the backlog and the map call this
+ * with the same cards; where it is given, the key printed on every card
+ * is searchable, which is the form a person actually has to hand.
+ */
+export function applyFilters(cards: CardView[], filters: Filters, boardKey?: string): CardView[] {
+  const text = loose(filters.text.trim());
   return cards.filter((card) => {
-    if (text && !`${card.number} ${card.title}`.toLowerCase().includes(text)) return false;
+    const key = boardKey ? `${boardKey}-${card.number} ` : "";
+    if (text && !loose(`${key}${card.number} ${card.title}`).includes(text)) return false;
     if (filters.assignee === "unassigned" && card.assigneePersonId) return false;
     if (
       filters.assignee &&

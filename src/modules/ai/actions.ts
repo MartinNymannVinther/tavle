@@ -16,7 +16,8 @@ import { createCard, updateCard } from "@/modules/boards/write-cards";
 import { saveSummary } from "@/modules/boards/write-sprints";
 import { proposeCardDraft, proposeCardSplit, proposeSprintSummary } from "./features";
 import type { CardDraft, SplitProposal, SprintSummary } from "./sanitize";
-import { classifyAiError, modelConfigured, type AiFailure } from "./service";
+import { classifyAiError, modelConfigured } from "./service";
+import type { ProposalResult } from "./wire";
 
 /**
  * Proposals and their acceptance, as two separate actions each. The
@@ -25,10 +26,6 @@ import { classifyAiError, modelConfigured, type AiFailure } from "./service";
  * marked as the AI's work in the event log. Between the two the person
  * can edit every word.
  */
-
-export type ProposalResult<T> =
-  | { ok: true; proposal: T; engine: string }
-  | { ok: false; error: AiFailure | "unauthorized" | "invalid" | "notFound" };
 
 const CardRef = z.object({ boardId: id, number: z.number().int().min(1) });
 
@@ -93,15 +90,25 @@ async function propose<T>(
 const ApplyDraftSchema = z.object({
   cardId: id,
   description: shortText(8000),
+  acceptance: shortText(4000).default(""),
   checklist: z.array(shortText(200).min(1)).max(30),
   engine: shortText(80),
 });
 
-/** Writes the draft the person kept: the description as edited, the checklist items appended. */
+/**
+ * Writes the draft the person kept: the description as edited, the
+ * done-when in the card's own Acceptkriterier field, the checklist items
+ * appended. A card that already had acceptance criteria keeps them and
+ * takes the new lines underneath — the dialog never showed the old ones,
+ * so replacing them would throw away something nobody was asked about.
+ */
 export async function applyDraftAction(raw: unknown): Promise<Result<string>> {
   return action(ApplyDraftSchema, raw, async (tx, ctx, input, touch) => {
     const card = found(await cardInWorkspace(tx, input.cardId));
-    await updateCard(tx, ctx, card.id, { description: input.description }, "ai");
+    const acceptance = input.acceptance.trim()
+      ? [card.acceptance.trim(), input.acceptance.trim()].filter(Boolean).join("\n")
+      : card.acceptance;
+    await updateCard(tx, ctx, card.id, { description: input.description, acceptance }, "ai");
     if (input.checklist.length > 0) {
       const existing = card.checklist;
       const added = input.checklist.map((title, i) => ({

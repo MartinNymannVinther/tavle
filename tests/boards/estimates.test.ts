@@ -3,13 +3,23 @@ import type { Pool } from "pg";
 import { withOrgContext, type OrgContext } from "@/core/db/tenant";
 import {
   changedCount,
+  choicesFor,
   conversionTable,
   convert,
   convertTotal,
+  DEFAULT_HOURS_PER_POINT,
+  HOURS_PER_POINT_MAX,
+  HOURS_PER_POINT_MIN,
+  isHoursPerPoint,
   labelOf,
+  POINT_SCALE,
   scaleOf,
   sizeOf,
+  totalLabel,
+  TSHIRT,
 } from "@/modules/boards/estimates";
+import { listEstimateUnits } from "@/modules/boards/read-units";
+import { EstimateUnitSchema } from "@/modules/boards/validation";
 import { previewEstimateUnit, setEstimateUnit } from "@/modules/boards/write-estimates";
 import { getBoardFull } from "@/modules/boards/read";
 import { createBoard } from "@/modules/boards/write-boards";
@@ -37,8 +47,52 @@ describe("the estimate scales", () => {
     expect(sizeOf(5)).toBe("L");
     expect(labelOf(5, "tshirt")).toBe("L");
     expect(labelOf(5, "points")).toBe("5");
-    expect(labelOf(5, "hours")).toBe("5 t");
     expect(labelOf(null, "tshirt")).toBeNull();
+  });
+
+  it("takes the hour's word from the caller, and never invents one", () => {
+    // The word is copy and lives in messages/*.json; the domain module
+    // holds no locale, so it formats with what it is handed and with
+    // nothing at all otherwise. A "t" here is what put Danish in the
+    // English UI.
+    const da = (value: number) => `${value} t`;
+    const en = (value: number) => `${value} h`;
+    expect(labelOf(5, "hours", da)).toBe("5 t");
+    expect(labelOf(5, "hours", en)).toBe("5 h");
+    expect(labelOf(5, "hours")).toBe("5");
+    expect(totalLabel(240, "hours", en)).toBe("240 h");
+    expect(totalLabel(240, "points", en)).toBe("240");
+    // A size has no word for a sum, so a total stays a number.
+    expect(totalLabel(240, "tshirt", en)).toBe("240");
+  });
+
+  it("offers exactly the ladder the settings page writes out", () => {
+    // The sentence in Settings → Estimering is built from POINT_SCALE, so
+    // the promise and the picker cannot disagree (the page once said
+    // "1, 2, 3, 5, 8, 13" while the picker offered 21 too).
+    expect(choicesFor("points")).toEqual([...POINT_SCALE]);
+    expect(choicesFor("tshirt")).toEqual(TSHIRT.map((size) => size.weight));
+  });
+
+  it("knows which hour factors a conversion can be asked for", () => {
+    expect(isHoursPerPoint(HOURS_PER_POINT_MIN)).toBe(true);
+    expect(isHoursPerPoint(HOURS_PER_POINT_MAX)).toBe(true);
+    expect(isHoursPerPoint(DEFAULT_HOURS_PER_POINT)).toBe(true);
+    expect(isHoursPerPoint(HOURS_PER_POINT_MAX + 6)).toBe(false);
+    expect(isHoursPerPoint(0)).toBe(false);
+    expect(isHoursPerPoint(Number.NaN)).toBe(false);
+  });
+
+  it("agrees with the schema, so the field never offers what the server refuses", () => {
+    // The factor field disables the switch on a value out of range; that
+    // is only honest if the range is the server's own.
+    const factor = EstimateUnitSchema.shape.hoursPerPoint;
+    for (const value of [HOURS_PER_POINT_MIN, HOURS_PER_POINT_MAX, DEFAULT_HOURS_PER_POINT]) {
+      expect(factor.safeParse(value).success).toBe(isHoursPerPoint(value));
+    }
+    for (const value of [0, HOURS_PER_POINT_MIN / 2, HOURS_PER_POINT_MAX + 6]) {
+      expect(factor.safeParse(value).success).toBe(isHoursPerPoint(value));
+    }
   });
 
   it("snaps an estimate off the ladder onto the nearest size", () => {
@@ -165,6 +219,16 @@ describe("switching what a board counts in", () => {
     expect(back.board.estimateUnit).toBe("tshirt");
     expect(back.cards.map((c) => c.estimate).sort((a, b) => a! - b!)).toEqual([3, 5, 8]);
     expect(back.activeSprint!.committedPoints).toBe(16);
+  });
+
+  it("tells a list that crosses boards what each board counts in", async () => {
+    // "My cards" puts several boards in one column and has no board of
+    // its own to ask, so it reads the units for the whole workspace. A
+    // row there must wear the same unit the board page would give it.
+    const units = await listEstimateUnits(ctx);
+    const board = (await getBoardFull(ctx, boardId))!.board;
+    expect(units.get(boardId)).toBe(board.estimateUnit);
+    expect(units.size).toBeGreaterThan(0);
   });
 });
 

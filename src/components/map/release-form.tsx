@@ -15,6 +15,7 @@ import {
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { Release } from "@/core/db/schema";
+import { PLAN_DATE_MAX, PLAN_DATE_MIN } from "@/modules/boards/plan-dates";
 import type { Run } from "@/components/board/use-board-actions";
 import {
   createReleaseAction,
@@ -46,21 +47,34 @@ export function ReleaseForm({
   run: Run;
 }) {
   const t = useTranslations("map.release");
+  const errors = useTranslations("boards.errors");
   // The fields start from the band that was opened. The parent keys this
   // component on that band, so React builds a fresh one each time rather
   // than the fields being pushed back into shape from an effect.
   const [name, setName] = useState(release?.name ?? "");
   const [date, setDate] = useState(release?.targetDate ?? "");
   const [pending, setPending] = useState(false);
+  // A band whose name is already on the board is refused by the service.
+  // Remembering which names came back taken marks the field, so the
+  // dialog says what is wrong where the wrong thing is.
+  const [takenNames, setTakenNames] = useState<string[]>([]);
+  const taken = takenNames.includes(name.trim().toLowerCase());
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!name.trim()) return;
     setPending(true);
-    const ok = await run(() =>
-      release
-        ? updateReleaseAction({ releaseId: release.id, name, targetDate: date || null })
-        : createReleaseAction({ boardId, name, targetDate: date || null }),
+    const ok = await run(
+      () =>
+        release
+          ? updateReleaseAction({ releaseId: release.id, name, targetDate: date || null })
+          : createReleaseAction({ boardId, name, targetDate: date || null }),
+      undefined,
+      (_error, detail) => {
+        if (detail === "nameTaken") {
+          setTakenNames((names) => [...names, name.trim().toLowerCase()]);
+        }
+      },
     );
     setPending(false);
     if (ok) onOpenChange(false);
@@ -75,10 +89,11 @@ export function ReleaseForm({
         </DialogHeader>
         <form onSubmit={submit} className="flex flex-col gap-4">
           <FieldGroup>
-            <Field>
+            <Field data-invalid={taken || undefined}>
               <FieldLabel htmlFor="release-name">{t("name")}</FieldLabel>
               <Input
                 id="release-name"
+                aria-invalid={taken || undefined}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 maxLength={60}
@@ -86,13 +101,19 @@ export function ReleaseForm({
                 autoFocus
                 required
               />
+              {taken && <p className="text-destructive text-xs">{errors("nameTaken")}</p>}
             </Field>
             <Field>
               <FieldLabel htmlFor="release-date">{t("date")}</FieldLabel>
+              {/* A native date field fires a change for every digit of the
+                  year, so the bounds are what keep 0202 from reaching the
+                  service — which refuses it too (src/modules/boards/plan-dates.ts). */}
               <Input
                 id="release-date"
                 type="date"
                 value={date}
+                min={PLAN_DATE_MIN}
+                max={PLAN_DATE_MAX}
                 onChange={(event) => setDate(event.target.value)}
                 className="w-44"
               />

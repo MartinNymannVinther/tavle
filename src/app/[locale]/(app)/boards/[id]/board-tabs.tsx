@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { usePathname } from "@/i18n/navigation";
 import { SegmentedFilter } from "@/components/ui/segmented";
@@ -25,6 +26,7 @@ export function BoardTabs({
 }) {
   const t = useTranslations("boards.tabs");
   const pathname = usePathname();
+  const box = useScrollActiveIntoView(pathname);
   const base = `/boards/${boardId}`;
   const items = [
     {
@@ -95,10 +97,33 @@ export function BoardTabs({
     },
   ];
   // Up to nine tabs; on a phone the track scrolls sideways instead of
-  // stretching the whole page.
+  // stretching the whole page. The box only holds its ground because the
+  // header's actions slot is capped at the header's width
+  // (src/components/ui/page-header.tsx).
   return (
-    <div className="max-w-full min-w-0 overflow-x-auto">
+    <div ref={box} className="max-w-full min-w-0 overflow-x-auto">
       <SegmentedFilter items={items} />
     </div>
   );
+}
+
+/**
+ * On a phone the track is wider than its box, so the place you are
+ * standing has to be brought into sight; on a wide screen nothing moves.
+ */
+function useScrollActiveIntoView(at: string) {
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const track = box.current;
+    if (!track) return;
+    const hidden = track.scrollWidth - track.clientWidth;
+    if (hidden <= 0) return;
+    const active = track.querySelector<HTMLElement>("[aria-current]");
+    if (!active) return;
+    const offset =
+      active.getBoundingClientRect().left - track.getBoundingClientRect().left + track.scrollLeft;
+    const centred = offset - (track.clientWidth - active.offsetWidth) / 2;
+    track.scrollLeft = Math.max(0, Math.min(centred, hidden));
+  }, [at]);
+  return box;
 }

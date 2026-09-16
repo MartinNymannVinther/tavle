@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { ISO_DATE } from "@/core/dates";
+import { DEFAULT_HOURS_PER_POINT, HOURS_PER_POINT_MAX, HOURS_PER_POINT_MIN } from "./estimates";
+import { isPlannableDate } from "./plan-dates";
 import {
   BOARD_MODES,
   COLUMN_CATEGORIES,
@@ -17,7 +18,10 @@ import {
  * paragraph, a description is a page.
  */
 
-export const isoDate = z.string().regex(ISO_DATE);
+// Every plan date in the product goes through one gate: a real calendar
+// day inside the plannable range, so a half-typed year cannot be stored
+// by a sprint or a release any more than by a card.
+export const isoDate = z.string().refine(isPlannableDate);
 export const id = z.string().min(1).max(64);
 export const shortText = (max: number) => z.string().trim().max(max);
 
@@ -71,7 +75,14 @@ export const BoardViewSchema = StructureViewSchema.extend({ boardId: id });
 export const EstimateUnitSchema = z.object({
   boardId: id,
   unit: z.enum(ESTIMATE_UNITS),
-  hoursPerPoint: z.number().min(0.5).max(40).default(4),
+  // The same bounds the field checks against, from the one place that
+  // states them — a form and a service that disagree is a button that
+  // looks armed and is not.
+  hoursPerPoint: z
+    .number()
+    .min(HOURS_PER_POINT_MIN)
+    .max(HOURS_PER_POINT_MAX)
+    .default(DEFAULT_HOURS_PER_POINT),
 });
 
 export const BoardIdSchema = z.object({ boardId: id });

@@ -5,7 +5,7 @@ import { SegmentedChoice } from "@/components/ui/segmented";
 import { BoardFilters, type Filters } from "@/components/board/board-filters";
 import type { StructureLookup } from "@/components/board/card-chips";
 import type { PersonRef } from "@/modules/boards/types";
-import { GROUPINGS, type Grouping } from "./group-backlog";
+import { groupingsFor, type Grouping } from "./group-backlog";
 
 /**
  * How the list is looked at: as the one list, or grouped by theme, area
@@ -28,14 +28,17 @@ export function BacklogToolbar({
   structure: StructureLookup;
 }) {
   const g = useTranslations("backlog.grouping");
+  const groupings = groupingsFor(structure.view);
   return (
     <div className="flex flex-wrap items-center gap-2 px-4 pb-3">
-      <SegmentedChoice
-        value={grouping}
-        onChange={onGrouping}
-        label={g("label")}
-        options={GROUPINGS.map((option) => ({ value: option, label: g(option) }))}
-      />
+      {groupings.length > 1 && (
+        <SegmentedChoice
+          value={grouping}
+          onChange={onGrouping}
+          label={g("label")}
+          options={groupings.map((option) => ({ value: option, label: g(option) }))}
+        />
+      )}
       <BoardFilters
         filters={filters}
         onChange={onFilters}

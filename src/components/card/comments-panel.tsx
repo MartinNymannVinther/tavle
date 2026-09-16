@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { formatStamp } from "@/core/dates";
 import { Textarea } from "@/components/ui/textarea";
 import { Initials } from "@/components/board/bits";
 import type { CommentView } from "@/modules/boards/types";
@@ -28,7 +29,7 @@ export function CommentsPanel({
   run: Run;
 }) {
   const t = useTranslations("cards.comments");
-  const format = useFormatter();
+  const locale = useLocale();
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState(false);
 
@@ -58,9 +59,7 @@ export function CommentsPanel({
             <div className="min-w-0 flex-1">
               <p className="text-2sm">
                 <span className="font-semibold">{comment.authorName ?? t("unknown")}</span>
-                <span className="text-meta ml-2">
-                  {format.dateTime(comment.createdAt, { dateStyle: "medium", timeStyle: "short" })}
-                </span>
+                <span className="text-meta ml-2">{formatStamp(comment.createdAt, locale)}</span>
               </p>
               <p className="mt-0.5 text-sm leading-relaxed whitespace-pre-wrap">{comment.text}</p>
               {(comment.authorUserId === currentUserId || canManage) && (

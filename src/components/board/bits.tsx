@@ -1,12 +1,15 @@
 import type { Priority, Theme } from "@/core/db/schema";
 import { cn } from "@/lib/utils";
 import type { EstimateUnit } from "@/core/db/schema";
-import { labelOf } from "@/modules/boards/estimates";
+import { useEstimateLabel } from "./estimate-label";
 import { PRIORITY_MARK, themeSwatch } from "./tokens";
 import { TypeGlyph } from "./type-icon";
 
+// A chip is a flex box, so the ellipsis has to live on the text run
+// inside it: `truncate` on the box itself only ever hard-clips the word.
+// The box keeps `overflow-hidden` so it may still shrink in a tight row.
 const chip =
-  "inline-flex h-5 max-w-[11rem] items-center gap-1 truncate rounded-full px-2 text-2xs font-medium";
+  "inline-flex h-5 max-w-[11rem] min-w-0 items-center gap-1 overflow-hidden rounded-full px-2 text-2xs font-medium";
 
 /**
  * The one status pill: closed things wear the success tint, things that
@@ -30,7 +33,7 @@ export function StatusChip({
         className,
       )}
     >
-      {children}
+      <span className="truncate">{children}</span>
     </span>
   );
 }
@@ -118,7 +121,7 @@ export function FlagChip({
       )}
     >
       {tone !== "blocked" && <TypeGlyph type={tone} />}
-      {children}
+      <span className="truncate">{children}</span>
     </span>
   );
 }
@@ -172,7 +175,8 @@ export function Points({
   unit?: EstimateUnit;
   className?: string;
 }) {
-  const label = labelOf(estimate, unit);
+  const { label: format } = useEstimateLabel();
+  const label = format(estimate, unit);
   if (label === null) return null;
   return (
     <span

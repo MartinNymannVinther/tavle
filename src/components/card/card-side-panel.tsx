@@ -24,6 +24,7 @@ import type { Run } from "@/components/board/use-board-actions";
 import type { StructureView } from "@/modules/boards/structure/view";
 import { cn } from "@/lib/utils";
 import { choicesFor, labelOf } from "@/modules/boards/estimates";
+import { isPlannableDate, PLAN_DATE_MAX, PLAN_DATE_MIN } from "@/modules/boards/plan-dates";
 import { PlacementFields } from "./placement-fields";
 
 /**
@@ -69,6 +70,14 @@ export function CardSidePanel({
   const [reason, setReason] = useState(card.blockedReason);
   const update = (fields: Record<string, unknown>) =>
     run(() => updateCardAction({ cardId: card.id, ...fields }));
+  const commitDue = (field: HTMLInputElement) => {
+    const value = field.value || null;
+    if (value !== null && !isPlannableDate(value)) {
+      field.value = card.dueDate ?? "";
+      return;
+    }
+    if (value !== card.dueDate) void update({ dueDate: value });
+  };
   const control = "h-8 text-2sm";
 
   return (
@@ -166,9 +175,21 @@ export function CardSidePanel({
             id="card-due"
             type="date"
             defaultValue={card.dueDate ?? ""}
-            onChange={(event) => {
-              const value = event.target.value || null;
-              if (value !== card.dueDate) void update({ dueDate: value });
+            min={PLAN_DATE_MIN}
+            max={PLAN_DATE_MAX}
+            // A native date field fires a change for every digit of the
+            // year, so typing 2026 passes through 0002, 0020 and 0202:
+            // four writes, four lines in the feed, and whichever landed
+            // last left on the card. Saved on leaving the field or on
+            // Enter instead — one date entered is one write — and a date
+            // outside what a plan can point at is put back rather than
+            // saved, so the field never shows what the card does not hold.
+            onBlur={(event) => commitDue(event.target)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                event.currentTarget.blur();
+              }
             }}
             className={cn(control, "w-full rounded-sm")}
           />

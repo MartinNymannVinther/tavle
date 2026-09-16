@@ -237,9 +237,20 @@ pairs with the `public/fonts` item above: `next/font/local` with the
 files already in the repository, plus a decision about weight 500 and a
 local Geist Mono.
 
-### Medium dates are formatted in three places
+### The about page still builds its own date
 
-`access-admin.tsx`, `settings/about/page.tsx` and `passkey-manager.tsx`
-each build a medium date from scratch; the product's own pages go through
-`src/core/dates.ts`. Give `dates.ts` the one locale-aware formatter the
-three foundation pages need and call it.
+`src/core/dates.ts` now holds the product's three date formats
+(`formatPlanDate`, `formatDay`, `formatStamp`), and every page goes
+through them — except `settings/about/page.tsx`, which builds a long
+date with a clock from scratch for the build stamp. It is locale-correct
+and nobody's plan date, so it is the one place left rather than a bug;
+fold it in when `dates.ts` grows a fourth format worth naming.
+
+### Cards cannot be ticked at the Epics and Features altitudes
+
+`ItemBacklog` is never given `selected`/`onSelect`, so at those two
+altitudes no card has a tick box and the selection bar's bulk actions —
+put in a sprint, place under a feature — are out of reach; the flat list
+has them. Ranking works everywhere since docs/adr/0033. Wiring it needs
+a prop through `backlog-view.tsx` and `item-backlog.tsx`, and a decision
+about whether a selection survives a change of altitude.

@@ -40,6 +40,7 @@ function suggestKey(name: string): string {
  */
 export function NewBoardDialog({ aiAvailable }: { aiAvailable: boolean }) {
   const t = useTranslations("boards.new");
+  const errors = useTranslations("boards.errors");
   const modes = useTranslations("boards.mode");
   const structure = useTranslations("boardSettings.structure");
   const router = useRouter();
@@ -53,6 +54,11 @@ export function NewBoardDialog({ aiAvailable }: { aiAvailable: boolean }) {
   const [view, setView] = useState<StructureViewInput>(DEFAULT_VIEW);
   const [aiStart, setAiStart] = useState(false);
   const [pending, setPending] = useState(false);
+  // The key is suggested from the name, so two boards whose initials match
+  // collide on an ordinary name. Remembering which keys came back taken
+  // marks the field itself rather than leaving a toast to explain it.
+  const [takenKeys, setTakenKeys] = useState<string[]>([]);
+  const keyTaken = takenKeys.includes(key);
   // The starting point proposes features, so a cards-only board has
   // nowhere to put it — and without a model the promise would be empty.
   const aiPossible = aiAvailable && view.structureLevels !== "card";
@@ -68,6 +74,9 @@ export function NewBoardDialog({ aiAvailable }: { aiAvailable: boolean }) {
         // Straight into the AI starting point when asked: the backlog
         // opens with the bootstrap dialog already up (docs/adr/0021).
         router.push(wantsAi ? `/boards/${boardId}/backlog?ai=start` : `/boards/${boardId}`);
+      },
+      (_error, detail) => {
+        if (detail === "keyTaken") setTakenKeys((taken) => [...taken, key]);
       },
     );
     setPending(false);
@@ -104,10 +113,11 @@ export function NewBoardDialog({ aiAvailable }: { aiAvailable: boolean }) {
                 autoFocus
               />
             </Field>
-            <Field>
+            <Field data-invalid={keyTaken || undefined}>
               <FieldLabel htmlFor="board-key">{t("key")}</FieldLabel>
               <Input
                 id="board-key"
+                aria-invalid={keyTaken || undefined}
                 value={key}
                 onChange={(event) => {
                   setKeyTouched(true);
@@ -122,7 +132,9 @@ export function NewBoardDialog({ aiAvailable }: { aiAvailable: boolean }) {
                 pattern="[A-Z][A-Z0-9]{1,5}"
                 className="w-32 font-mono uppercase"
               />
-              <FieldDescription>{t("keyHint", { key: key || "WEB" })}</FieldDescription>
+              <FieldDescription className={cn(keyTaken && "text-destructive")}>
+                {keyTaken ? errors("keyTaken") : t("keyHint", { key: key || "WEB" })}
+              </FieldDescription>
             </Field>
             <Field>
               <FieldLabel htmlFor="board-first-area">{t("firstArea")}</FieldLabel>

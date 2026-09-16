@@ -90,7 +90,12 @@ export function FeaturePlan({ full }: { full: BoardFull }) {
         >
           {[2, 4, 6, 8].map((n) => (
             <option key={n} value={n}>
-              {t("seriesOption", { count: n, weeks: (n * board.sprintLengthDays) / 7 })}
+              {/* Whole weeks: the number is a sense of horizon, and a
+                  ten-day sprint would otherwise print 2.857142857142857. */}
+              {t("seriesOption", {
+                count: n,
+                weeks: Math.round((n * board.sprintLengthDays) / 7),
+              })}
             </option>
           ))}
         </NativeSelect>

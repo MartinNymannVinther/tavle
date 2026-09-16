@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { NativeSelect } from "@/components/ui/native-select";
-import { diffDays, formatDateDa } from "@/core/dates";
+import { diffDays, formatPlanDate } from "@/core/dates";
 import type { EstimateUnit, Sprint } from "@/core/db/schema";
 import { closeSprintAction } from "@/modules/boards/actions-sprints";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -50,6 +50,7 @@ export function SprintHeader({
   run: Run;
 }) {
   const t = useTranslations("boards.sprint");
+  const locale = useLocale();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [target, setTarget] = useState<string>("");
@@ -76,14 +77,18 @@ export function SprintHeader({
 
   return (
     <div className="bg-card border-border flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border px-4 py-3 shadow-[var(--surface-shadow)]">
-      <div className="min-w-0 flex-1">
-        <p className="text-chart-2 text-xs font-medium">
+      {/* A width to ask for, not `flex-1`'s nothing: with a zero basis the
+          block is invisible to the wrapping and gets crushed to the few
+          pixels the numbers leave over, instead of the row breaking and
+          the sprint's dates and name keeping a line of their own. */}
+      <div className="min-w-0 grow basis-52">
+        <p className="text-chart-2 text-xs font-medium break-words">
           {t("kicker", {
-            start: formatDateDa(sprint.startDate),
-            end: formatDateDa(sprint.endDate),
+            start: formatPlanDate(sprint.startDate, locale),
+            end: formatPlanDate(sprint.endDate, locale),
           })}
         </p>
-        <p className="truncate text-base font-semibold">
+        <p className="line-clamp-2 text-base font-semibold">
           {sprint.name}
           {sprint.goal ? <span className="text-meta font-normal"> · {sprint.goal}</span> : null}
         </p>

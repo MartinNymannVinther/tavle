@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { ChipContext, StructureLookup } from "@/components/board/card-chips";
+import { mergeByRank } from "@/modules/boards/ordering";
 import type { CardView } from "@/modules/boards/types";
 import { BacklogRow } from "./backlog-row";
 import type { Crumb } from "./backlog-selection";
@@ -50,11 +51,9 @@ export function StoryRows({
   // row under the pointer — the drop should never be a guess.
   const [hover, setHover] = useState<{ id: string; after: boolean } | null>(null);
   // Committed cards keep their place in the one priority (docs/adr/0013):
-  // the sequence merges on the rank itself, and only the free rows drag.
-  const merged = [
-    ...stories.map((card) => ({ card, committed: false })),
-    ...(extras?.cards ?? []).map((card) => ({ card, committed: true })),
-  ].sort((a, b) => a.card.sort - b.card.sort || a.card.number - b.card.number);
+  // the sequence merges on the rank both carry (docs/adr/0033), and only
+  // the free rows drag.
+  const merged = mergeByRank(stories, extras?.cards ?? []);
   const rankIndex = new Map(stories.map((card, index) => [card.id, index]));
   return (
     <ol className="divide-hairline divide-y">

@@ -1,7 +1,8 @@
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ConfirmButton } from "@/components/ui/confirm-button";
+import { formatDay } from "@/core/dates";
 import { panel, surface } from "@/components/ui/detail-surfaces";
 import { StatusChip } from "@/components/board/bits";
 import { Button } from "@/components/ui/button";
@@ -45,7 +46,7 @@ export function CardPage({
   aiAvailable: boolean;
 }) {
   const t = useTranslations("cards.page");
-  const format = useFormatter();
+  const locale = useLocale();
   const router = useRouter();
   const { run } = useBoardActions();
   const {
@@ -108,7 +109,19 @@ export function CardPage({
           />
           <ActivityList
             events={events}
-            onUndo={(eventId) => void run(() => undoEventAction({ eventId }))}
+            unit={(board.estimateUnit as EstimateUnit) ?? "points"}
+            onUndo={(eventId, type) =>
+              // Undoing a creation deletes the card (docs/adr/0022), and
+              // refreshing a page whose card is gone lands on "not found"
+              // with no way back. The board is where the reverse leaves
+              // you, as Arkivér and Slet on this same page already do.
+              void run(
+                () => undoEventAction({ eventId }),
+                (boardId) => {
+                  if (type === "card.created") router.push(`/boards/${boardId}`);
+                },
+              )
+            }
           />
         </div>
         <aside className={cn(panel, "@3xl:sticky @3xl:top-6")}>
@@ -128,17 +141,9 @@ export function CardPage({
             run={run}
           />
           <div className="border-hairline text-meta flex flex-col gap-0.5 border-t px-4 py-3 text-xs">
-            <p>
-              {t("created", { date: format.dateTime(card.createdAt, { dateStyle: "medium" }) })}
-            </p>
-            {card.startedAt && (
-              <p>
-                {t("started", { date: format.dateTime(card.startedAt, { dateStyle: "medium" }) })}
-              </p>
-            )}
-            {card.doneAt && (
-              <p>{t("done", { date: format.dateTime(card.doneAt, { dateStyle: "medium" }) })}</p>
-            )}
+            <p>{t("created", { date: formatDay(card.createdAt, locale) })}</p>
+            {card.startedAt && <p>{t("started", { date: formatDay(card.startedAt, locale) })}</p>}
+            {card.doneAt && <p>{t("done", { date: formatDay(card.doneAt, locale) })}</p>}
           </div>
           <div className="border-hairline flex flex-wrap gap-2 border-t px-4 py-3">
             {card.archivedAt ? (

@@ -43,9 +43,11 @@ afterAll(async () => {
   await admin.end();
 });
 
+const LABELS = { unplanned: "Uplanlagt" };
+
 describe("the roadmap slide", () => {
   it("returns a real pptx (a zip) for the board", async () => {
-    const buffer = await buildRoadmapPptx(ctx, boardId);
+    const buffer = await buildRoadmapPptx(ctx, boardId, LABELS);
     expect(buffer).not.toBeNull();
     expect(buffer!.length).toBeGreaterThan(2000);
     expect(buffer!.subarray(0, 2).toString("latin1")).toBe("PK");
@@ -53,6 +55,6 @@ describe("the roadmap slide", () => {
 
   it("answers null for a board that is not the workspace's", async () => {
     const stranger = await seedWorkspace(admin, "pptx_b");
-    expect(await buildRoadmapPptx(stranger, boardId)).toBeNull();
+    expect(await buildRoadmapPptx(stranger, boardId, LABELS)).toBeNull();
   });
 });

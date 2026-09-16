@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { ConfirmButton } from "@/components/ui/confirm-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
@@ -24,7 +25,14 @@ import {
 } from "@/modules/boards/actions-people";
 import { useRouter } from "@/i18n/navigation";
 
-export type PersonRow = { id: string; name: string; email: string | null; userId: string | null };
+export type PersonRow = {
+  id: string;
+  name: string;
+  email: string | null;
+  userId: string | null;
+  /** Open cards pointing at this person; they fall to unassigned if it goes. */
+  cards: number;
+};
 export type LinkableMember = { userId: string; name: string; email: string };
 
 /**
@@ -179,17 +187,19 @@ export function PeopleAdmin({
                               ))}
                             </NativeSelect>
                           )}
-                          <Button
-                            type="button"
-                            size="xs"
+                          {/* Removing lets every card the person carries
+                              fall back to unassigned, and writes no event
+                              to undo, so the question says how much. */}
+                          <ConfirmButton
                             variant="ghost"
-                            className="text-destructive"
-                            onClick={() =>
-                              void act(() => removePersonAction({ personId: person.id }))
-                            }
+                            size="xs"
+                            title={t("removeTitle", { name: person.name })}
+                            body={t("removeBody", { count: person.cards })}
+                            confirmLabel={t("removeConfirm")}
+                            onConfirm={() => act(() => removePersonAction({ personId: person.id }))}
                           >
-                            {t("remove")}
-                          </Button>
+                            <span className="text-destructive">{t("remove")}</span>
+                          </ConfirmButton>
                         </>
                       )}
                     </span>

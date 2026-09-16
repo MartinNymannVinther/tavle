@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { formatDay } from "@/core/dates";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -59,8 +60,7 @@ export function AccessAdmin({
   const [inviting, setInviting] = useState(false);
   const [fresh, setFresh] = useState<IssuedLink | null>(null);
 
-  const formatDate = (value: Date | string) =>
-    new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(value));
+  const formatDate = (value: Date | string) => formatDay(new Date(value), locale);
 
   const pending = requests.filter((r) => r.status === "pending");
   const decided = requests.filter((r) => r.status !== "pending").slice(0, 10);

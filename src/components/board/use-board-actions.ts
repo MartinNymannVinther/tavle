@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import type { Result } from "@/core/result";
+import type { ActionError, Result } from "@/core/result";
 
 /**
  * Every write a board page makes, in one place. Each call reports the
@@ -18,6 +18,8 @@ import type { Result } from "@/core/result";
 export type Run = <T>(
   action: () => Promise<Result<T>>,
   onDone?: (data: T) => void,
+  /** For a form that wants to mark the field the refusal names. */
+  onError?: (error: ActionError, detail?: string) => void,
 ) => Promise<boolean>;
 
 export function useBoardActions(): { run: Run; pending: boolean } {
@@ -26,7 +28,7 @@ export function useBoardActions(): { run: Run; pending: boolean } {
   const rules = useTranslations("boards.rules");
   const [pending, startTransition] = useTransition();
 
-  const run: Run = async (action, onDone) => {
+  const run: Run = async (action, onDone, onError) => {
     let result: Awaited<ReturnType<typeof action>>;
     try {
       result = await action();
@@ -40,15 +42,18 @@ export function useBoardActions(): { run: Run; pending: boolean } {
       startTransition(() => router.refresh());
       return true;
     }
+    onError?.(result.error, result.detail);
     if (result.error === "conflict") {
       toast.error(t("conflict"));
       startTransition(() => router.refresh());
       return false;
     }
-    // A refused rule of the backlog structure names itself, so the toast can
-    // say which field rather than "something".
+    // A refused rule of the backlog structure names itself, and so does a
+    // name or a key already in use, so the toast can say which field
+    // rather than "something".
     if (result.error === "invalid" && result.detail) {
-      toast.error(rules.has(result.detail) ? rules(result.detail) : t("invalid"));
+      const named = result.detail;
+      toast.error(t.has(named) ? t(named) : rules.has(named) ? rules(named) : t("invalid"));
       return false;
     }
     toast.error(t(result.error));

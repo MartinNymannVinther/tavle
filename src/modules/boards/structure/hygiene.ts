@@ -1,6 +1,10 @@
 import type { BoardFull, CardView, ItemView } from "../types";
 import { velocity } from "../metrics/velocity";
 import { reviewDue } from "./rules";
+// The one definition of what the backlog holds. The summary links to the
+// backlog page, so it has to count the set that page lists, and a second
+// reading of "the backlog" here is how the two came apart.
+import { backlogStories } from "./backlog";
 
 /**
  * Backlog care (docs/adr/0031): the handful of things a product owner
@@ -45,13 +49,19 @@ const row = (item: ItemView | CardView, level: "epic" | "feature" | "card") => (
   level,
 });
 
-/** The cards a plan would be drawn from: open, and not already committed. */
+/**
+ * The cards a plan would be drawn from: the backlog itself, in the
+ * board's own order. On a Scrum board that is the cards not yet in a
+ * sprint; on a Kanban board it is the cards in a backlog column — not
+ * every card that is not done, which counted work already in progress as
+ * waiting and made the summary name a number the backlog it links to did
+ * not hold. A done card is dropped: on Kanban a backlog column is never
+ * done, so this only touches a Scrum board where something finished
+ * without ever being committed, and finished work is not waiting.
+ */
 function waitingCards(full: BoardFull): CardView[] {
   const category = new Map(full.columns.map((c) => [c.id, c.category]));
-  return full.cards.filter((card) => {
-    if (category.get(card.columnId) === "done") return false;
-    return full.board.mode === "scrum" ? card.sprintId === null : true;
-  });
+  return backlogStories(full).filter((card) => category.get(card.columnId) !== "done");
 }
 
 export function backlogCare(full: BoardFull, now: Date = new Date()): BacklogCare {
@@ -61,7 +71,8 @@ export function backlogCare(full: BoardFull, now: Date = new Date()): BacklogCar
   const category = new Map(full.columns.map((c) => [c.id, c.category]));
   const openCards = full.cards.filter((c) => category.get(c.columnId) !== "done");
 
-  const waiting = waitingCards(full).sort((a, b) => a.sort - b.sort || a.number - b.number);
+  // Already in the backlog's own order, so the top of the rank is the top.
+  const waiting = waitingCards(full);
   const waitingPoints = waiting.reduce((sum, c) => sum + (c.estimate ?? 0), 0);
   const unestimated = waiting.filter((c) => c.estimate === null);
 

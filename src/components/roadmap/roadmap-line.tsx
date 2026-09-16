@@ -2,14 +2,12 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { NativeSelect } from "@/components/ui/native-select";
 import { themeInk, themeSwatch } from "@/components/board/tokens";
 import { TypeIcon } from "@/components/board/type-icon";
 import type { Run } from "@/components/board/use-board-actions";
 import { FoldButton } from "@/components/backlog/backlog-bits";
-import { quarterOptions } from "@/components/backlog/quarters";
-import { updateItemAction } from "@/modules/boards/actions-structure";
 import type { RoadmapRow } from "@/modules/boards/structure/roadmap";
+import { SpanSelects } from "./quarter-selects";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -18,11 +16,12 @@ export type PlanSpan = (epicId: string, startQuarter: string, targetQuarter: str
 
 /**
  * One epic on the roadmap. The bar is the plan and the plan is the
- * bar's to change: dragging its middle moves the whole span, dragging
- * an edge changes the duration, and the two selects under the title do
- * the same without a pointer — because every move also exists as a
- * control. The preview follows the pointer in whole quarters; the
- * write happens once, on release.
+ * bar's to change: dragging its middle moves the whole span, and
+ * dragging an edge changes the duration. The bar is a pointer's path
+ * only, so the two selects under the title say the same thing for a
+ * keyboard, a screen reader and a phone — and they are the only way to
+ * take a start quarter off again. The preview follows the pointer in
+ * whole quarters; the write happens once, on release.
  */
 type Drag = { mode: "move" | "start" | "end"; from: number; cell: number; delta: number };
 
@@ -33,6 +32,7 @@ export function RoadmapLine({
   boardId,
   boardKey,
   onPlan,
+  run,
   fold,
 }: {
   row: RoadmapRow;
@@ -41,6 +41,8 @@ export function RoadmapLine({
   boardId: string;
   boardKey: string;
   onPlan: PlanSpan;
+  /** For the selects, which write one end of the span on their own. */
+  run: Run;
   /** Folds the epic's features and cards out underneath. */
   fold?: { open: boolean; onToggle: () => void };
 }) {
@@ -104,7 +106,10 @@ export function RoadmapLine({
   }
 
   return (
-    <div className="grid items-center" style={{ gridTemplateColumns: "16rem minmax(0, 1fr)" }}>
+    <div
+      className="group/row grid items-center"
+      style={{ gridTemplateColumns: "16rem minmax(0, 1fr)" }}
+    >
       <div className="flex min-w-0 items-start gap-2 px-4 py-2">
         {fold && <FoldButton open={fold.open} onToggle={fold.onToggle} />}
         <TypeIcon type="epic" className="mt-0.5" />
@@ -125,6 +130,7 @@ export function RoadmapLine({
             {row.theme && <span>{row.theme.name}</span>}
             <span>{t("counts", { features: row.features, done: row.doneStories, total })}</span>
           </p>
+          <SpanSelects epic={row.epic} run={run} />
         </div>
       </div>
       <div
@@ -214,38 +220,5 @@ function EdgeHandle({
     >
       <span className="bg-foreground/35 h-5 w-1 rounded-full opacity-0 transition-opacity group-hover/handle:opacity-100" />
     </div>
-  );
-}
-
-/** The unplanned list's way onto the roadmap: choose a target, keep the derived start. */
-export function QuarterSelect({ epic, run }: { epic: RoadmapRow["epic"]; run: Run }) {
-  const t = useTranslations("roadmap");
-  const s = useTranslations("boards.structure");
-  if (epic.state !== "open") return null;
-  const options = [
-    ...(epic.targetQuarter && !quarterOptions().includes(epic.targetQuarter)
-      ? [epic.targetQuarter]
-      : []),
-    ...quarterOptions(),
-  ];
-  return (
-    <NativeSelect
-      variant="sm"
-      value={epic.targetQuarter ?? ""}
-      onChange={(event) =>
-        void run(() =>
-          updateItemAction({ itemId: epic.id, targetQuarter: event.target.value || null }),
-        )
-      }
-      aria-label={t("planQuarter", { title: epic.title })}
-      className="h-7 w-fit text-xs"
-    >
-      <option value="">{s("noQuarter")}</option>
-      {options.map((quarter) => (
-        <option key={quarter} value={quarter}>
-          {quarter}
-        </option>
-      ))}
-    </NativeSelect>
   );
 }

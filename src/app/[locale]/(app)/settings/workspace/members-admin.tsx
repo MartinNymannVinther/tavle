@@ -2,9 +2,10 @@
 
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { formatDay } from "@/core/dates";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 import { Input } from "@/components/ui/input";
@@ -50,7 +51,7 @@ export function MembersAdmin({
 }) {
   const t = useTranslations("settings.members");
   const roles = useTranslations("settings.workspace.roles");
-  const format = useFormatter();
+  const locale = useLocale();
   const router = useRouter();
   const canManage = role === "owner" || role === "admin";
   const [email, setEmail] = useState("");
@@ -259,7 +260,7 @@ export function MembersAdmin({
                       <TableCell>{invitation.email}</TableCell>
                       <TableCell>{roles(invitation.role)}</TableCell>
                       <TableCell className="text-meta">
-                        {format.dateTime(invitation.expiresAt, { dateStyle: "medium" })}
+                        {formatDay(invitation.expiresAt, locale)}
                       </TableCell>
                       <TableCell className="text-right whitespace-nowrap">
                         <Button

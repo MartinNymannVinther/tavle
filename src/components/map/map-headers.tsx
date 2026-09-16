@@ -10,7 +10,7 @@ import {
   Pencil,
   Plus,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,7 +23,7 @@ import {
 import { ThemeDots } from "@/components/board/bits";
 import type { StructureLookup } from "@/components/board/card-chips";
 import { TypeIcon } from "@/components/board/type-icon";
-import { formatDateDa } from "@/core/dates";
+import { formatPlanDate } from "@/core/dates";
 import type { EstimateUnit, Release, Theme } from "@/core/db/schema";
 import type { CardView, ItemView } from "@/modules/boards/types";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -218,6 +218,17 @@ export function LooseHead({
   );
 }
 
+/**
+ * A card the wall is counting but not drawing, and why: its feature is
+ * waiting in the tray, or it is closed and the tick above hides it.
+ */
+export type HiddenCard = {
+  card: CardView;
+  featureId: string;
+  featureTitle: string;
+  reason: "tray" | "closed";
+};
+
 export function RowLabel({
   row,
   cards,
@@ -233,16 +244,17 @@ export function RowLabel({
   points: number;
   /** What the board counts in, so the row's sum is named right (docs/adr/0030). */
   unit: EstimateUnit;
-  /** The row's cards the map cannot draw: their feature is not up on the backbone. */
-  hidden?: Array<{ card: CardView; featureId: string; featureTitle: string }>;
-  /** Puts the card's feature up, so the card lands in its own cell. */
-  onReveal?: (featureId: string) => void;
+  /** The row's cards the map is not drawing, whatever the reason. */
+  hidden?: HiddenCard[];
+  /** Brings the card out: its feature goes up, or the closed ones are shown. */
+  onReveal?: (featureId: string, reason: HiddenCard["reason"]) => void;
   /** Opens the band for renaming and dating; absent for the unreleased band. */
   onEdit?: (release: Release) => void;
   /** Moves the band a step nearer or further; absent ends of the list are disabled. */
   onNudge?: { up?: () => void; down?: () => void };
 }) {
   const t = useTranslations("map");
+  const locale = useLocale();
   return (
     <div className="bg-card group/row sticky left-0 z-10 flex flex-col gap-0.5 px-4 py-4 text-xs">
       {row.kind === "release" ? (
@@ -292,7 +304,7 @@ export function RowLabel({
             </span>
           </span>
           <span className="text-chart-2 font-medium">
-            {row.release.targetDate ? formatDateDa(row.release.targetDate) : t("noDate")}
+            {row.release.targetDate ? formatPlanDate(row.release.targetDate, locale) : t("noDate")}
           </span>
         </>
       ) : (
@@ -313,11 +325,14 @@ export function RowLabel({
             {/* A GroupLabel must stand inside a Group, or Base UI refuses the popup. */}
             <DropdownMenuGroup>
               <DropdownMenuLabel>{t("hiddenHint")}</DropdownMenuLabel>
-              {hidden.map(({ card, featureId, featureTitle }) => (
-                <DropdownMenuItem key={card.id} onClick={() => onReveal(featureId)}>
+              {hidden.map(({ card, featureId, featureTitle, reason }) => (
+                <DropdownMenuItem key={card.id} onClick={() => onReveal(featureId, reason)}>
                   <span className="flex min-w-0 flex-col">
                     <span className="truncate">{card.title}</span>
-                    <span className="text-meta text-2xs">{featureTitle}</span>
+                    <span className="text-meta text-2xs">
+                      {featureTitle}
+                      {reason === "closed" ? ` · ${t("closedFeature")}` : ""}
+                    </span>
                   </span>
                 </DropdownMenuItem>
               ))}

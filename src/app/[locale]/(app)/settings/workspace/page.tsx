@@ -2,12 +2,12 @@ import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getOrgContext } from "@/core/auth/session";
-import { formatDateDa } from "@/core/dates";
+import { formatPlanDate } from "@/core/dates";
 import { memberships, organizations } from "@/core/db/schema";
 import { withOrgContext } from "@/core/db/tenant";
 import { listPendingInvitations } from "@/core/team/service";
 import { redirect } from "@/i18n/navigation";
-import { peopleOf, unlinkedMembers } from "@/modules/boards/people";
+import { assignmentCounts, peopleOf, unlinkedMembers } from "@/modules/boards/people";
 import { currentRole, listMembers } from "@/modules/export/workspace";
 import { DeleteWorkspaceCard } from "./delete-workspace-card";
 import { MembersAdmin } from "./members-admin";
@@ -32,23 +32,28 @@ export default async function WorkspaceSettingsPage() {
   }
 
   const t = await getTranslations("settings.workspace");
-  const [workspace, memberRows, roster, linkable] = await withOrgContext(context, async (tx) => {
-    const [org] = await tx
-      .select({ name: organizations.name, createdAt: organizations.createdAt })
-      .from(organizations)
-      .where(eq(organizations.id, context.orgId))
-      .limit(1);
-    const rows = await tx
-      .select({ id: memberships.id, userId: memberships.userId })
-      .from(memberships)
-      .where(eq(memberships.organizationId, context.orgId));
-    return [
-      org,
-      rows,
-      await peopleOf(tx, context.orgId),
-      await unlinkedMembers(tx, context),
-    ] as const;
-  });
+  const locale = await getLocale();
+  const [workspace, memberRows, roster, linkable, carried] = await withOrgContext(
+    context,
+    async (tx) => {
+      const [org] = await tx
+        .select({ name: organizations.name, createdAt: organizations.createdAt })
+        .from(organizations)
+        .where(eq(organizations.id, context.orgId))
+        .limit(1);
+      const rows = await tx
+        .select({ id: memberships.id, userId: memberships.userId })
+        .from(memberships)
+        .where(eq(memberships.organizationId, context.orgId));
+      return [
+        org,
+        rows,
+        await peopleOf(tx, context.orgId),
+        await unlinkedMembers(tx, context),
+        await assignmentCounts(tx, context.orgId),
+      ] as const;
+    },
+  );
   const members = await listMembers(context);
   const role = (await currentRole(context)) ?? "member";
   const invitations =
@@ -60,7 +65,9 @@ export default async function WorkspaceSettingsPage() {
         <h2 className="text-base font-semibold">{workspace?.name ?? t("title")}</h2>
         <p className="text-meta text-2sm leading-relaxed">
           {workspace
-            ? t("createdOn", { date: formatDateDa(workspace.createdAt.toISOString().slice(0, 10)) })
+            ? t("createdOn", {
+                date: formatPlanDate(workspace.createdAt.toISOString().slice(0, 10), locale),
+              })
             : t("subtitle")}
         </p>
       </div>
@@ -74,7 +81,13 @@ export default async function WorkspaceSettingsPage() {
       />
 
       <PeopleAdmin
-        people={roster.map(({ id, name, email, userId }) => ({ id, name, email, userId }))}
+        people={roster.map(({ id, name, email, userId }) => ({
+          id,
+          name,
+          email,
+          userId,
+          cards: carried.get(id) ?? 0,
+        }))}
         linkable={linkable}
         canManage={role === "owner" || role === "admin"}
       />

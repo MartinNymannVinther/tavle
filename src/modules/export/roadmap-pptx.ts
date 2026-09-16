@@ -28,11 +28,18 @@ const SWATCH: Record<string, { bar: string; ink: string }> = {
   forest: { bar: "2C4A37", ink: PAPER },
 };
 
+/** The words the slide carries, resolved by the caller in the reader's language. */
+export type PptxLabels = { unplanned: string };
+
 const PAGE = { width: 13.33, height: 7.5 };
 const CHART = { left: 3.2, top: 1.55, right: 0.5, rowHeight: 0.52, rowGap: 0.1 };
 const MAX_ROWS = 9;
 
-export async function buildRoadmapPptx(ctx: OrgContext, boardId: string): Promise<Buffer | null> {
+export async function buildRoadmapPptx(
+  ctx: OrgContext,
+  boardId: string,
+  labels: PptxLabels,
+): Promise<Buffer | null> {
   const full = await getBoardFull(ctx, boardId);
   if (!full) return null;
   const data = roadmap(full);
@@ -144,7 +151,7 @@ export async function buildRoadmapPptx(ctx: OrgContext, boardId: string): Promis
   if (data.rows.length > shown.length) footnotes.push(`+ ${data.rows.length - shown.length}`);
   if (data.unplanned.length > 0) {
     footnotes.push(
-      `Uplanlagt: ${data.unplanned
+      `${labels.unplanned}: ${data.unplanned
         .slice(0, 4)
         .map((row) => row.epic.title)
         .join(" · ")}${data.unplanned.length > 4 ? ` (+${data.unplanned.length - 4})` : ""}`,

@@ -16,6 +16,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { addDaysIso } from "@/core/dates";
+import { PLAN_DATE_MAX, PLAN_DATE_MIN } from "@/modules/boards/plan-dates";
 import type { Sprint } from "@/core/db/schema";
 import { applySprintGoalAction, proposeSprintGoalAction } from "@/modules/ai/actions-assists";
 import { createSprintAction, updateSprintAction } from "@/modules/boards/actions-sprints";
@@ -141,9 +142,14 @@ export function SprintForm({
             <div className="flex flex-wrap gap-3">
               <Field className="flex-1">
                 <FieldLabel htmlFor="sprint-start">{t("start")}</FieldLabel>
+                {/* Bounded, because a native date field passes through
+                    0002, 0020 and 0202 on the way to 2026 and the service
+                    refuses those (src/modules/boards/plan-dates.ts). */}
                 <Input
                   id="sprint-start"
                   type="date"
+                  min={PLAN_DATE_MIN}
+                  max={PLAN_DATE_MAX}
                   value={startDate}
                   onChange={(e) => {
                     setStartDate(e.target.value);
@@ -158,6 +164,8 @@ export function SprintForm({
                 <Input
                   id="sprint-end"
                   type="date"
+                  min={PLAN_DATE_MIN}
+                  max={PLAN_DATE_MAX}
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                   required

@@ -1,9 +1,10 @@
 "use client";
 
 import { Undo2 } from "lucide-react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import type { BoardEvent } from "@/core/db/schema";
+import { formatStamp } from "@/core/dates";
+import type { BoardEvent, EstimateUnit } from "@/core/db/schema";
 import { renderEvent } from "@/modules/boards/events";
 import { cn } from "@/lib/utils";
 
@@ -17,14 +18,24 @@ import { cn } from "@/lib/utils";
 export function ActivityList({
   events,
   onUndo,
+  heading,
+  unit,
 }: {
   events: BoardEvent[];
-  /** Runs the event's reverse; absent, the feed is read-only. */
-  onUndo?: (eventId: string) => void;
+  /**
+   * Runs the event's reverse; absent, the feed is read-only. The event's
+   * type comes along because some reverses take the page with them — the
+   * reverse of a creation is a deletion.
+   */
+  onUndo?: (eventId: string, type: string) => void;
+  /** Its own heading; null where the surface around it already has one. */
+  heading?: string | null;
+  /** What the board counts in, so an old line is read in today's words. */
+  unit?: EstimateUnit;
 }) {
   const t = useTranslations("cards.activity");
   const lines = useTranslations("events");
-  const format = useFormatter();
+  const locale = useLocale();
   if (events.length === 0) return null;
   const undone = new Set(
     events
@@ -33,7 +44,7 @@ export function ActivityList({
   );
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="text-sm font-semibold">{t("title")}</h2>
+      {heading !== null && <h2 className="text-sm font-semibold">{heading ?? t("title")}</h2>}
       <ol className="border-hairline flex flex-col divide-y">
         {events.map((event) => {
           const wasUndone = undone.has(event.id);
@@ -50,7 +61,7 @@ export function ActivityList({
               <span
                 className={cn("text-foreground/80 min-w-0 flex-1", wasUndone && "line-through")}
               >
-                {renderEvent(lines, event)}
+                {renderEvent(lines, event, { unit })}
                 {event.actorKind === "ai" && (
                   <span className="bg-accent text-accent-foreground ml-2 rounded-full px-1.5 py-0.5 text-2xs font-medium">
                     {t("byAi")}
@@ -62,7 +73,7 @@ export function ActivityList({
                   type="button"
                   variant="ghost"
                   size="xs"
-                  onClick={() => onUndo!(event.id)}
+                  onClick={() => onUndo!(event.id, event.type)}
                   className="text-meta hover:text-foreground h-6 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/event:opacity-100 [@media(hover:hover)]:focus-visible:opacity-100"
                 >
                   <Undo2 data-slot="icon" />
@@ -70,7 +81,7 @@ export function ActivityList({
                 </Button>
               )}
               <time dateTime={event.createdAt.toISOString()} className="tabular-nums">
-                {format.dateTime(event.createdAt, { dateStyle: "short", timeStyle: "short" })}
+                {formatStamp(event.createdAt, locale)}
               </time>
             </li>
           );

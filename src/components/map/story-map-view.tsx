@@ -65,7 +65,7 @@ export function StoryMapView({ full }: { full: BoardFull }) {
 
   const doneColumns = new Set(full.columns.filter((c) => c.category === "done").map((c) => c.id));
   const isDone = (card: { columnId: string }) => doneColumns.has(card.columnId);
-  const filtered = applyFilters(full.cards, filters);
+  const filtered = applyFilters(full.cards, filters, board.key);
   // Finished work can be taken off the wall: after a few months the cells
   // are mostly strikethrough, and what is left is the interesting part.
   // Everything downstream — the cells, the row counts, the off-map
@@ -80,22 +80,24 @@ export function StoryMapView({ full }: { full: BoardFull }) {
   // Closed features still standing on the wall: what the tick reveals.
   const closedOnMap = wholeLane.filter((f) => f.state === "closed").length;
   const waiting = tray(structure.items);
-  // A sprint's card whose feature is not up on the backbone is invisible
-  // in the cells; the row label offers it, and one pick puts its feature
-  // up so the card lands where it belongs. Nothing is reassigned.
-  const onMapIds = new Set(onMap.map((f) => f.id));
-  const openFeatureOf = (featureId: string | null) =>
+  // A card whose feature the wall is not drawing is invisible in the
+  // cells while still counted in its band; the row label offers every one
+  // of them, and says which of the two reasons it is. A feature waiting
+  // in the tray goes up; a closed one is behind the tick above. Nothing
+  // is reassigned either way.
+  const drawnFeatureIds = new Set(onMap.map((f) => f.id));
+  const featureOf = (featureId: string | null) =>
     featureId
-      ? structure.items.find(
-          (i) => i.id === featureId && i.level === "feature" && i.state === "open",
-        )
+      ? structure.items.find((i) => i.id === featureId && i.level === "feature")
       : undefined;
   const hiddenOf = (rowKey: string) =>
     cards.flatMap((card) => {
       if (rowOf(card, map.rows) !== rowKey) return [];
-      const feature = openFeatureOf(card.featureId);
-      if (!feature || onMapIds.has(feature.id)) return [];
-      return [{ card, featureId: feature.id, featureTitle: feature.title }];
+      const feature = featureOf(card.featureId);
+      // No feature at all is drawn in the dashed column, so it is not hidden.
+      if (!feature || drawnFeatureIds.has(feature.id)) return [];
+      const reason = feature.state === "closed" && !showClosed ? "closed" : "tray";
+      return [{ card, featureId: feature.id, featureTitle: feature.title, reason } as const];
     });
   const doneIds = new Set(full.cards.filter(isDone).map((c) => c.id));
   const countOf = (featureId: string) => full.cards.filter((c) => c.featureId === featureId).length;
@@ -283,7 +285,10 @@ export function StoryMapView({ full }: { full: BoardFull }) {
             if (at < 0 || index < 0 || index >= order.length) return;
             void run(() => reorderReleaseAction({ releaseId: release.id, index }));
           },
-          onReveal: (featureId) => void run(() => placeOnMapAction({ itemId: featureId })),
+          onReveal: (featureId, reason) => {
+            if (reason === "closed") setShowClosed(true);
+            else void run(() => placeOnMapAction({ itemId: featureId }));
+          },
         }}
       />
       <ReleaseForm

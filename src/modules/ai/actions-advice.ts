@@ -4,28 +4,20 @@ import { getLocale } from "next-intl/server";
 import { z } from "zod";
 import { requireOrgContext } from "@/core/auth/guard";
 import { id } from "@/modules/boards/validation";
-import {
-  proposeCloseDecisions,
-  proposeReviewBrief,
-  type CloseAdviceItem,
-  type ReviewBrief,
-} from "./advice";
-import type { ProposalResult } from "./actions";
+import { proposeReviewBrief, type ReviewBrief } from "./advice";
+import type { ProposalResult } from "./wire";
 import { classifyAiError } from "./service";
 
 /**
- * The counsel's actions (docs/adr/0026): both are pure reads. The close
- * advice only pre-sets a dialog the person still confirms through the
- * ordinary close action, and the review brief is never applied at all.
+ * The counsel's actions (docs/adr/0026). The review brief is a read that
+ * is never applied at all; it stays an action because the button that
+ * asks for it waits for it and nothing else is in flight. The close
+ * advice went the other way, onto `POST /api/ai/close-advice`, because a
+ * dialog that is thinking must not hold back the close itself
+ * (docs/adr/0034).
  */
 
 const ItemRef = z.object({ itemId: id });
-
-export async function proposeCloseAdviceAction(
-  raw: unknown,
-): Promise<ProposalResult<CloseAdviceItem[]>> {
-  return advise(raw, proposeCloseDecisions);
-}
 
 export async function proposeReviewBriefAction(raw: unknown): Promise<ProposalResult<ReviewBrief>> {
   return advise(raw, proposeReviewBrief);

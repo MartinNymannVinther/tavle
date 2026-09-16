@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Sparkles } from "lucide-react";
 import { StatusChip } from "@/components/board/bits";
 import { Button } from "@/components/ui/button";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 import { NativeSelect } from "@/components/ui/native-select";
 import { PropertyGroup, PropertyRow } from "@/components/ui/property-row";
+import { formatDay } from "@/core/dates";
+import type { EstimateUnit } from "@/core/db/schema";
 import { FeaturePlanFields } from "./feature-plan-fields";
 import { ActivityList } from "@/components/card/activity-list";
 import { StructureFields } from "@/components/card/placement-fields";
@@ -53,7 +55,7 @@ export function ItemPage({
   const t = useTranslations("items.page");
   const s = useTranslations("boards.structure");
   const ai = useTranslations("cards.ai");
-  const format = useFormatter();
+  const locale = useLocale();
   const router = useRouter();
   const { run } = useBoardActions();
   const { item, board, parent, themes, areas, epics, openFeatures, events, reviewDue } = full;
@@ -155,7 +157,18 @@ export function ItemPage({
           <ItemChildren full={full} run={run} />
           <ActivityList
             events={events}
-            onUndo={(eventId) => void run(() => undoEventAction({ eventId }))}
+            unit={(board.estimateUnit as EstimateUnit) ?? "points"}
+            onUndo={(eventId, type) =>
+              // The reverse of a creation is a deletion (docs/adr/0022),
+              // and this page would refresh into "not found"; the backlog
+              // is where Slet on this same page already leaves you.
+              void run(
+                () => undoEventAction({ eventId }),
+                () => {
+                  if (type === "item.created") router.push(backlog);
+                },
+              )
+            }
           />
         </div>
         <aside className={cn(panel, "@3xl:sticky @3xl:top-6")}>
@@ -221,21 +234,15 @@ export function ItemPage({
             </PropertyGroup>
           )}
           <div className="border-hairline text-meta flex flex-col gap-0.5 border-t px-4 py-3 text-xs">
-            <p>
-              {t("created", { date: format.dateTime(item.createdAt, { dateStyle: "medium" }) })}
-            </p>
+            <p>{t("created", { date: formatDay(item.createdAt, locale) })}</p>
             {item.reviewConfirmedAt && (
               <p>
                 {t("reviewed", {
-                  date: format.dateTime(item.reviewConfirmedAt, { dateStyle: "medium" }),
+                  date: formatDay(item.reviewConfirmedAt, locale),
                 })}
               </p>
             )}
-            {item.closedAt && (
-              <p>
-                {t("closedAt", { date: format.dateTime(item.closedAt, { dateStyle: "medium" }) })}
-              </p>
-            )}
+            {item.closedAt && <p>{t("closedAt", { date: formatDay(item.closedAt, locale) })}</p>}
           </div>
           <div className="border-hairline flex flex-wrap gap-2 border-t px-4 py-3">
             {item.state === "closed" ? (

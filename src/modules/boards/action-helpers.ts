@@ -85,7 +85,8 @@ export async function action<S extends z.ZodType, T>(
     return ok(data);
   } catch (error) {
     if (error instanceof RuleViolation) return fail("invalid", error.code);
-    return fail(classify(error));
+    const { code, detail } = classify(error);
+    return fail(code, detail);
   }
 }
 
@@ -96,23 +97,31 @@ export async function withWorkspace<T>(fn: (ctx: OrgContext) => Promise<T>): Pro
   try {
     return ok(await fn(ctx));
   } catch (error) {
-    return fail(classify(error));
+    const { code, detail } = classify(error);
+    return fail(code, detail);
   }
 }
 
-function classify(error: unknown): ActionError {
-  if (error instanceof Conflict || error instanceof KeyTaken || error instanceof NameTaken) {
-    return "conflict";
-  }
-  if (error instanceof SprintStateError) return "conflict";
+/**
+ * The word the client renders, and — where the cause is something the
+ * person can act on — a name for it. A key or a name already in use is
+ * not a race with a colleague: nobody edited anything, and telling them
+ * so sends them looking for a change that never happened. Both are
+ * refusals of what was typed, and they say which field.
+ */
+function classify(error: unknown): { code: ActionError; detail?: string } {
+  if (error instanceof KeyTaken) return { code: "invalid", detail: "keyTaken" };
+  if (error instanceof NameTaken) return { code: "invalid", detail: "nameTaken" };
+  if (error instanceof Conflict) return { code: "conflict" };
+  if (error instanceof SprintStateError) return { code: "conflict" };
   // The state has moved on since the event; the reverse no longer holds.
-  if (error instanceof NotUndoable) return "conflict";
-  if (error instanceof NotFound) return "notFound";
-  if (error instanceof Forbidden) return "forbidden";
-  if (error instanceof Error && error.message === "notFound") return "notFound";
-  if (error instanceof Error && error.message === "forbidden") return "forbidden";
-  if (error instanceof Error && error.message === "invalid") return "invalid";
+  if (error instanceof NotUndoable) return { code: "conflict" };
+  if (error instanceof NotFound) return { code: "notFound" };
+  if (error instanceof Forbidden) return { code: "forbidden" };
+  if (error instanceof Error && error.message === "notFound") return { code: "notFound" };
+  if (error instanceof Error && error.message === "forbidden") return { code: "forbidden" };
+  if (error instanceof Error && error.message === "invalid") return { code: "invalid" };
   // Details stay in the server log; the client gets a word it can render.
   console.error("action failed", error);
-  return "generic";
+  return { code: "generic" };
 }

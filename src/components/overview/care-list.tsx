@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronRight } from "lucide-react";
 import { TypeIcon } from "@/components/board/type-icon";
+import type { EstimateUnit } from "@/core/db/schema";
 import type { Finding } from "@/modules/boards/structure/hygiene";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -25,10 +26,13 @@ export function CareList({
   findings,
   boardKey,
   boardId,
+  unit,
 }: {
   findings: Finding[];
   boardKey: string;
   boardId: string;
+  /** What the board counts in, so a finding that names a sum names it right (docs/adr/0030). */
+  unit: EstimateUnit;
 }) {
   const t = useTranslations("care");
   const [open, setOpen] = useState<string | null>(null);
@@ -63,8 +67,8 @@ export function CareList({
                 </span>
                 <span className="text-meta mt-0.5 block text-2sm">
                   {finding.measure
-                    ? t(`${finding.key}.body`, finding.measure)
-                    : t(`${finding.key}.body`, { count })}
+                    ? t(`${finding.key}.body`, { ...finding.measure, unit })
+                    : t(`${finding.key}.body`, { count, unit })}
                 </span>
               </span>
               {count > 0 && (
@@ -130,7 +134,7 @@ export function CareSummary({
   points: number;
   unestimated: number;
   depth: number | null;
-  unit: string;
+  unit: EstimateUnit;
   boardId: string;
 }) {
   const t = useTranslations("care");

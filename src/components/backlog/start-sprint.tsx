@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { formatDateDa, todayInCopenhagen } from "@/core/dates";
+import { formatPlanDate, todayInCopenhagen } from "@/core/dates";
 import type { Sprint } from "@/core/db/schema";
 import type { Run } from "@/components/board/use-board-actions";
 import { startSprintAction, updateSprintAction } from "@/modules/boards/actions-sprints";
@@ -32,6 +32,7 @@ export function StartSprint({
   run: Run;
 }) {
   const t = useTranslations("backlog.sprint");
+  const locale = useLocale();
   const [asking, setAsking] = useState(false);
   const today = todayInCopenhagen();
   const start = () => run(() => startSprintAction({ sprintId: sprint.id }));
@@ -68,8 +69,8 @@ export function StartSprint({
             <DialogTitle>{t("startAskTitle", { name: sprint.name })}</DialogTitle>
             <DialogDescription>
               {t("startAskBody", {
-                planned: formatDateDa(sprint.startDate),
-                today: formatDateDa(today),
+                planned: formatPlanDate(sprint.startDate, locale),
+                today: formatPlanDate(today, locale),
               })}
             </DialogDescription>
           </DialogHeader>

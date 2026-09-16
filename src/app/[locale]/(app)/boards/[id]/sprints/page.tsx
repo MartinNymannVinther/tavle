@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { VelocityChart } from "@/components/charts/bar-charts";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { requireOrgContext } from "@/core/auth/guard";
-import { formatDateDa } from "@/core/dates";
+import { formatPlanDate } from "@/core/dates";
 import { velocity } from "@/modules/boards/metrics/velocity";
 import { getBoardHeader, listSprints } from "@/modules/boards/read";
 import { Link } from "@/i18n/navigation";
@@ -27,6 +27,7 @@ export default async function SprintsPage({ params }: Params) {
   const header = await getBoardHeader(context, id);
   if (!header || header.board.mode !== "scrum") notFound();
   const t = await getTranslations("sprints");
+  const locale = await getLocale();
   const states = await getTranslations("sprints.state");
   const sprints = await listSprints(context, id);
   const v = velocity(sprints);
@@ -64,9 +65,13 @@ export default async function SprintsPage({ params }: Params) {
                 href={`/boards/${id}/sprints/${sprint.id}`}
                 className="border-border bg-card hover:border-primary/40 focus-visible:ring-ring flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border px-4 py-3 shadow-[var(--surface-shadow)] transition focus-visible:ring-2 focus-visible:outline-none"
               >
-                <div className="min-w-0 flex-1">
-                  <p className="text-chart-2 text-xs font-medium">
-                    {formatDateDa(sprint.startDate)} – {formatDateDa(sprint.endDate)}
+                {/* A zero flex-basis is invisible to wrapping, so the row
+                    never breaks and this block is crushed on a phone; a
+                    real basis lets it ask for a width. */}
+                <div className="min-w-0 grow basis-52">
+                  <p className="text-chart-2 text-xs font-medium break-words">
+                    {formatPlanDate(sprint.startDate, locale)} –{" "}
+                    {formatPlanDate(sprint.endDate, locale)}
                   </p>
                   <p className="truncate text-base font-semibold">{sprint.name}</p>
                   {sprint.goal && <p className="text-meta truncate text-sm">{sprint.goal}</p>}

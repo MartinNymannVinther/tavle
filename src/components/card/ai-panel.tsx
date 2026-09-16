@@ -90,16 +90,22 @@ export function AiPanel({
   async function applyDraft() {
     if (!draft) return;
     setBusy(true);
-    const description = [
-      draft.description,
-      draft.acceptance.length
-        ? `\n${t("acceptanceHeading")}\n${draft.acceptance.map((a) => `- ${a}`).join("\n")}`
-        : "",
-    ]
-      .join("")
-      .trim();
+    // What the dialog calls the done-when lands in the card's own
+    // Acceptkriterier field. Gluing it onto the description left the card
+    // saying in one breath that it had a done-when and that it had none,
+    // with the dashed "add" row still standing underneath.
+    const acceptance = draft.acceptance
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .join("\n");
     const ok = await run(() =>
-      applyDraftAction({ cardId: card.id, description, checklist: draft.checklist, engine }),
+      applyDraftAction({
+        cardId: card.id,
+        description: draft.description.trim(),
+        acceptance,
+        checklist: draft.checklist,
+        engine,
+      }),
     );
     setBusy(false);
     if (ok) setKind(null);

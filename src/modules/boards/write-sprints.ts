@@ -191,7 +191,8 @@ export async function closeSprint(
  * Commits cards to a sprint, or sends them back to the backlog. Into the
  * active sprint a card keeps its column; anywhere else it starts over in
  * the first column, because a card in a sprint that has not begun is not
- * in progress, whatever it was before.
+ * in progress, whatever it was before. Its rank it keeps either way
+ * (docs/adr/0033).
  */
 export async function setCardsSprint(
   tx: AppTransaction,
@@ -212,35 +213,25 @@ export async function setCardsSprint(
   const first = await firstColumn(tx, board.id);
   const columnRows = await tx.select().from(columns).where(eq(columns.boardId, board.id));
   const categoryOf = new Map(columnRows.map((c) => [c.id, c]));
-  const active = await activeSprintOf(tx, board.id);
   let moved = 0;
   for (const card of rows) {
     if (card.boardId !== board.id || card.sprintId === (target?.id ?? null)) continue;
     const keepColumn = target?.state === "active";
     const column = keepColumn ? categoryOf.get(card.columnId) : first;
     if (!column) continue;
-    // Between the backlog and a planned sprint the card keeps its rank:
-    // allocation is a promise, not a new priority, and the backlog shows
-    // the card standing where it stood. Only the active sprint's lanes
-    // are the board's own order and ask for a joining position.
-    const involvesActive = keepColumn || (active !== null && card.sprintId === active.id);
-    const sort = involvesActive
-      ? await joiningSort(
-          tx,
-          laneFor("scrum", {
-            boardId: card.boardId,
-            columnId: column.id,
-            sprintId: target?.id ?? null,
-          }),
-        )
-      : card.sort;
+    // Neither write touches `sort`: the card keeps its rank, whichever
+    // sprint it is promised to and on the way back. Allocation is a
+    // promise, not a new priority, and the backlog shows the card
+    // standing where it stood (docs/adr/0033) — the number carries
+    // across, because the backlog and the sprint's columns read the
+    // same one.
     if (column.id !== card.columnId) {
       const from = categoryOf.get(card.columnId) ?? null;
-      await enterColumn(tx, ctx, card, from, column, { sprintId: target?.id ?? null, sort });
+      await enterColumn(tx, ctx, card, from, column, { sprintId: target?.id ?? null });
     } else {
       await tx
         .update(cards)
-        .set({ sprintId: target?.id ?? null, sort })
+        .set({ sprintId: target?.id ?? null })
         .where(eq(cards.id, card.id));
     }
     await recordEvent(

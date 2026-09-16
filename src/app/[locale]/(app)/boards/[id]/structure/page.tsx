@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { DecomposeView } from "@/components/structure/decompose-view";
 import { requireOrgContext } from "@/core/auth/guard";
 import { modelConfigured } from "@/modules/ai/service";
 import { getBoardFull } from "@/modules/boards/read";
+import { redirect as localeRedirect } from "@/i18n/navigation";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -20,5 +21,10 @@ export default async function DecomposePage({ params }: Params) {
   const { id } = await params;
   const full = await getBoardFull(context, id);
   if (!full) notFound();
+  // Cards alone: there is nothing to decompose, and the nav says so by
+  // leaving the tab out (docs/adr/0014).
+  if (full.board.structureLevels === "card") {
+    localeRedirect({ href: `/boards/${id}`, locale: await getLocale() });
+  }
   return <DecomposeView full={full} aiAvailable={await modelConfigured(context)} />;
 }

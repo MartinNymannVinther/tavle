@@ -7,7 +7,7 @@ import type { Result } from "@/core/result";
 import { action, found } from "@/modules/boards/action-helpers";
 import { id, shortText } from "@/modules/boards/validation";
 import { QUARTER_PATTERN } from "@/core/db/schema";
-import type { ProposalResult } from "./actions";
+import type { ProposalResult } from "./wire";
 import { proposeBootstrap, type BootstrapProposal } from "./bootstrap";
 import { applyBootstrap } from "./bootstrap-apply";
 import { classifyAiError } from "./service";

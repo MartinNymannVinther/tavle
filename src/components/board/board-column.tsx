@@ -18,9 +18,10 @@ export type LaneOption = { key: string | null; label: string };
  * One column: its name, how many cards it holds against its limit, the
  * cards in order, and a way to add one. A column over its WIP limit is
  * tinted and says so; it never refuses a card, because a limit is a
- * conversation the team has, not a wall the tool builds. On a board with
- * swimlanes the column appears once per lane; `wipCount` then carries
- * the whole column's count, because the limit belongs to the column.
+ * conversation the team has, not a wall the tool builds. `wipCount`
+ * carries the whole column's count: a filter and a swimlane both narrow
+ * what is drawn, never what the column holds, and the limit belongs to
+ * the column.
  */
 export function BoardColumn({
   column,
