@@ -1046,7 +1046,9 @@
       "cards": "{count, plural, one {# card} other {# cards}}",
       "apply": "Switch to {unit}",
       "cancel": "Undo the choice",
-      "undoable": "The switch is in the activity and can be undone."
+      "undoable": "The switch is in the activity and can be undone.",
+      "lastChange": "Last switched to {unit} · {cards, plural, =0 {no cards changed} one {# card changed} other {# cards changed}}.",
+      "undo": "Undo the switch"
     },
     "columns": {
       "title": "Columns",

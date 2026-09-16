@@ -107,6 +107,26 @@ export function convert(
   return Math.max(1, points);
 }
 
+/**
+ * A sum converts by arithmetic alone. The ladder exists to force a
+ * conversation about one card's size; a sprint's written-down total is
+ * not a card and has no business being snapped onto it — sixty-four
+ * hours is sixteen points, not the thirteen the nearest rung would say.
+ */
+export function convertTotal(
+  value: number,
+  from: EstimateUnit,
+  to: EstimateUnit,
+  hoursPerPoint: number = DEFAULT_HOURS_PER_POINT,
+): number {
+  if (value === 0) return 0;
+  const factor = hoursPerPoint > 0 ? hoursPerPoint : DEFAULT_HOURS_PER_POINT;
+  if (scaleOf(from) === scaleOf(to)) return value;
+  return scaleOf(to) === "hours"
+    ? Math.max(1, Math.round(value * factor))
+    : Math.max(1, Math.round(value / factor));
+}
+
 export type EstimateChange = { from: number; to: number; cards: number };
 
 /**

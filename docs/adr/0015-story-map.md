@@ -2,6 +2,10 @@
 
 Status: accepted, amended by ADR 0016 · Date: 2026-09-12
 
+> Amended by ADR 0032: the bands down the map are no longer the
+> sprints or the columns but the team's own releases, on both board
+> types. Everything else below still holds.
+
 ## Context
 
 ADR 0013 made the backlog one flat list with the decomposition beside it

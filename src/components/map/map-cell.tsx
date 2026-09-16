@@ -31,7 +31,7 @@ export function MapCell({
   structure: StructureLookup;
   /** The cards that count as done, drawn faded. */
   doneIds: Set<string>;
-  /** The running sprint's row, tinted. */
+  /** The nearest release's band, tinted. */
   active: boolean;
   /** Every other column is a shade darker, so the eye can follow one down. */
   band: boolean;

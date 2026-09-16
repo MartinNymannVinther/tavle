@@ -59,8 +59,18 @@ export default async function SprintPage({ params }: Params) {
     modelConfigured(context),
   ]);
   const done = rows.filter((r) => r.category === "done");
-  const donePoints = done.reduce((s, r) => s + (r.estimate ?? 0), 0);
-  const totalPoints = rows.reduce((s, r) => s + (r.estimate ?? 0), 0);
+  // A closed sprint's numbers are the ones written down when it closed,
+  // not a fresh count of whatever still points at it: cards carried over
+  // have left, cards re-estimated since have moved, and the velocity
+  // record must not drift behind them. An open sprint has nothing
+  // written down yet, so it counts what it holds.
+  const closed = sprint.state === "closed";
+  const donePoints = closed
+    ? (sprint.completedPoints ?? 0)
+    : done.reduce((s, r) => s + (r.estimate ?? 0), 0);
+  const totalPoints = closed
+    ? (sprint.committedPoints ?? 0)
+    : rows.reduce((s, r) => s + (r.estimate ?? 0), 0);
 
   return (
     <div className="flex flex-col gap-5">

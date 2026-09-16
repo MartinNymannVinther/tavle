@@ -216,10 +216,14 @@ codebase to:
   measures; labels removed. 0.10.2: the type symbols (ADR 0012). 0.10.3:
   the backlog as a navigator and a flat list (ADR 0013). 0.10.7: the
   structure's levels and fields chosen per board, view only (ADR 0014).
-- 0.11 (this): the story map — features across, sprints (or columns)
-  down, stories in the cells — as the decomposition's own view (ADR
-  0015). 0.11.1: the backbone is the team's — chosen features in the
-  story's order, a tray for the rest, sticky notes (ADR 0016).
+- 0.11 (this): the story map — features across, stories in the cells —
+  as the decomposition's own view (ADR 0015). 0.11.1: the backbone is
+  the team's — chosen features in the story's order, a tray for the
+  rest, sticky notes (ADR 0016). 0.11.2: the bands down are the team's
+  own releases, on both board types (ADR 0032); the roster of people
+  work is assigned to (ADR 0029); estimation in points, hours or
+  T-shirt sizes (ADR 0030); the overview becomes backlog care (ADR
+  0031).
 - Before 1.0: dogma seven — a real team runs a real board on it; the
   screenshots for the README; the tool card on haij.dk; whatever the
   first team asks for that the omissions list did not foresee.

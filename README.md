@@ -78,9 +78,9 @@ list in its own order, with the decomposition beside it as a navigator:
 click an epic or a feature and the list narrows to it, every kind of
 thing carrying its own symbol. The list also groups by theme, area or
 kind; the story map is the team's wall — the features they put up,
-across in the story's order, the sprints down, every card in the cell
-where the two meet — and a card dragged on it is moved for real; the roadmap draws epics on quarters; the overview says
-how the open work is spread and whether the structure is being kept.
+across in the story's order, the team's own releases down, every card
+in the cell where the two meet — and a card dragged on it is moved for real; the roadmap draws epics on quarters; backlog care says what the
+backlog is waiting for and where the weight of the open work sits.
 
 **The numbers come from the record.** Every move a card makes is written
 down, so the insight page can say how many cards were finished per week,

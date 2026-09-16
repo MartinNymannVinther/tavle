@@ -30,7 +30,16 @@ import { ThemesEditor } from "./themes-editor";
  * Members can read it all; owners and admins can change it, because the
  * shape of the board is the team's agreement, not one person's.
  */
-export function BoardSettings({ full, canManage }: { full: BoardFull; canManage: boolean }) {
+export function BoardSettings({
+  full,
+  canManage,
+  lastUnitChange = null,
+}: {
+  full: BoardFull;
+  canManage: boolean;
+  /** The last estimate-unit switch that can still be taken back. */
+  lastUnitChange?: { id: string; payload: Record<string, unknown> } | null;
+}) {
   const t = useTranslations("boardSettings");
   const router = useRouter();
   const { run } = useBoardActions();
@@ -136,7 +145,7 @@ export function BoardSettings({ full, canManage }: { full: BoardFull; canManage:
 
       <StructureSettings board={board} canManage={canManage} run={run} />
 
-      <EstimateSettings board={board} canManage={canManage} run={run} />
+      <EstimateSettings board={board} canManage={canManage} lastChange={lastUnitChange} run={run} />
 
       {board.mode === "kanban" && board.swimlaneBy === "manual" && (
         <Card>

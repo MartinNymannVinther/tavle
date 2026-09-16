@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { events } from "@/core/db/schema";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 
@@ -105,6 +105,37 @@ export async function recordEvent(
     actorKind: options.actor ?? "user",
     actorUserId: ctx.userId,
   });
+}
+
+/**
+ * The most recent event of one kind on a board, when it still carries a
+ * reverse nobody has used. Board-level changes have no activity feed of
+ * their own, so the surface that made the change is the honest place to
+ * offer the undo — and the promise that it can be undone is only true
+ * if some surface does.
+ */
+export async function lastUndoableBoardEvent(
+  tx: AppTransaction,
+  boardId: string,
+  type: EventType,
+): Promise<{ id: string; payload: Record<string, unknown> } | null> {
+  const rows = await tx
+    .select()
+    .from(events)
+    .where(and(eq(events.boardId, boardId), eq(events.type, type)))
+    .orderBy(desc(events.createdAt))
+    .limit(1);
+  const row = rows[0];
+  if (!row) return null;
+  const payload = row.payload as Record<string, unknown>;
+  if (!payload.undo) return null;
+  // An event already taken back is not offered again.
+  const applied = await tx
+    .select({ payload: events.payload })
+    .from(events)
+    .where(and(eq(events.boardId, boardId), eq(events.type, "undo.applied")));
+  if (applied.some((a) => (a.payload as { of?: string }).of === row.id)) return null;
+  return { id: row.id, payload };
 }
 
 export async function recentBoardEvents(tx: AppTransaction, boardId: string, limit = 20) {

@@ -17,6 +17,7 @@ import {
   type EstimateChange,
 } from "@/modules/boards/estimates";
 import { previewEstimateUnitAction, setEstimateUnitAction } from "@/modules/boards/actions-boards";
+import { undoEventAction } from "@/modules/boards/actions-undo";
 import type { Run } from "@/components/board/use-board-actions";
 
 /**
@@ -30,10 +31,13 @@ import type { Run } from "@/components/board/use-board-actions";
 export function EstimateSettings({
   board,
   canManage,
+  lastChange = null,
   run,
 }: {
   board: Board;
   canManage: boolean;
+  /** The last switch still open to being taken back; board events have no feed of their own. */
+  lastChange?: { id: string; payload: Record<string, unknown> } | null;
   run: Run;
 }) {
   const t = useTranslations("boardSettings.estimates");
@@ -129,6 +133,27 @@ export function EstimateSettings({
           <p className="text-meta text-2sm">{t("noEstimates")}</p>
         )}
 
+        {!pending && lastChange && canManage && (
+          // A board change has no activity feed to carry its Fortryd, so
+          // the surface that made it offers it. Without this the promise
+          // that the switch can be undone would not be true anywhere.
+          <p className="text-meta flex flex-wrap items-center gap-2 text-2sm">
+            <span>
+              {t("lastChange", {
+                unit: t(`unit.${String(lastChange.payload.unit ?? "points")}`),
+                cards: Number(lastChange.payload.cards ?? 0),
+              })}
+            </span>
+            <Button
+              type="button"
+              variant="outline"
+              size="xs"
+              onClick={() => void run(() => undoEventAction({ eventId: lastChange.id }))}
+            >
+              {t("undo")}
+            </Button>
+          </p>
+        )}
         {canManage && pending && (
           <div className="flex flex-wrap items-center gap-2">
             <Button

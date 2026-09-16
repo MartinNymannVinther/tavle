@@ -2,6 +2,10 @@
 
 Status: accepted · Date: 2026-09-12 · Amends ADR 0015
 
+> Amended by ADR 0032: the bands down the map are no longer the
+> sprints or the columns but the team's own releases, on both board
+> types. Everything else below still holds.
+
 ## Context
 
 ADR 0015 drew the map from the board alone: every feature, grouped

@@ -106,7 +106,7 @@ export function StoryMapView({ full }: { full: BoardFull }) {
   const drifted =
     onMap.length > 1 && onMap.some((feature, index) => feature.id !== rankOrder[index]!.id);
 
-  /** A card's drop is at most two moves: a new feature, and a new sprint or column. */
+  /** A card's drop is at most two moves: a new feature, and a new release. */
   async function dropCard(row: MapRow, columnKey: string) {
     const id = drag?.kind === "card" ? drag.id : null;
     setDrag(null);

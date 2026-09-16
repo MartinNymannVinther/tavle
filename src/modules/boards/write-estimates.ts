@@ -3,7 +3,7 @@ import { boards, cards, sprints, type Board, type EstimateUnit } from "@/core/db
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 import { recordEvent } from "./events";
 import { boardInWorkspace } from "./read";
-import { conversionTable, convert, scaleOf, type EstimateChange } from "./estimates";
+import { conversionTable, convert, convertTotal, scaleOf, type EstimateChange } from "./estimates";
 
 /**
  * Changing what a board counts in (docs/adr/0030). The unit is written
@@ -101,14 +101,15 @@ export async function setEstimateUnit(
     completedPoints: row.completedPoints,
   }));
   for (const row of sprintRows) {
+    // A total scales; it is never snapped onto the card ladder.
     const committedPoints =
       row.committedPoints === null
         ? null
-        : convert(row.committedPoints, from, plan.unit, plan.hoursPerPoint);
+        : convertTotal(row.committedPoints, from, plan.unit, plan.hoursPerPoint);
     const completedPoints =
       row.completedPoints === null
         ? null
-        : convert(row.completedPoints, from, plan.unit, plan.hoursPerPoint);
+        : convertTotal(row.completedPoints, from, plan.unit, plan.hoursPerPoint);
     if (committedPoints === row.committedPoints && completedPoints === row.completedPoints)
       continue;
     await tx

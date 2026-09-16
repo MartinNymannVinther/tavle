@@ -5,6 +5,7 @@ import { BoardSettings } from "@/components/settings/board-settings";
 import { requireOrgContext } from "@/core/auth/guard";
 import { withOrgContext } from "@/core/db/tenant";
 import { canManage, roleOf } from "@/modules/boards/members";
+import { lastUndoableBoardEvent } from "@/modules/boards/events";
 import { getBoardFull } from "@/modules/boards/read";
 
 type Params = { params: Promise<{ id: string }> };
@@ -20,6 +21,13 @@ export default async function BoardSettingsPage({ params }: Params) {
   const { id } = await params;
   const full = await getBoardFull(context, id);
   if (!full) notFound();
-  const role = await withOrgContext(context, (tx) => roleOf(tx, context));
-  return <BoardSettings full={full} canManage={canManage(role)} />;
+  const [role, lastUnitChange] = await withOrgContext(
+    context,
+    async (tx) =>
+      [
+        await roleOf(tx, context),
+        await lastUndoableBoardEvent(tx, id, "board.estimateUnit"),
+      ] as const,
+  );
+  return <BoardSettings full={full} canManage={canManage(role)} lastUnitChange={lastUnitChange} />;
 }

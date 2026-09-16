@@ -1046,7 +1046,9 @@
       "cards": "{count, plural, one {# kort} other {# kort}}",
       "apply": "Skift til {unit}",
       "cancel": "Fortryd valget",
-      "undoable": "Skiftet står i aktiviteten og kan fortrydes."
+      "undoable": "Skiftet står i aktiviteten og kan fortrydes.",
+      "lastChange": "Sidst skiftet til {unit} · {cards, plural, =0 {ingen kort ændret} one {# kort ændret} other {# kort ændret}}.",
+      "undo": "Fortryd skiftet"
     },
     "columns": {
       "title": "Kolonner",

@@ -5,6 +5,7 @@ import {
   changedCount,
   conversionTable,
   convert,
+  convertTotal,
   labelOf,
   scaleOf,
   sizeOf,
@@ -61,6 +62,16 @@ describe("the estimate scales", () => {
   it("never rounds estimated work away to nothing", () => {
     expect(convert(1, "points", "hours", 0.5)).toBeGreaterThanOrEqual(1);
     expect(convert(1, "hours", "points", 40)).toBeGreaterThanOrEqual(1);
+  });
+
+  it("scales a sum rather than snapping it onto the card ladder", () => {
+    // A sprint that committed 64 hours committed 16 points, not the 13
+    // the nearest rung would claim.
+    expect(convertTotal(64, "hours", "points", 4)).toBe(16);
+    expect(convertTotal(16, "points", "hours", 4)).toBe(64);
+    // Within a scale a total is untouched, sizes included.
+    expect(convertTotal(37, "points", "tshirt", 4)).toBe(37);
+    expect(convertTotal(0, "hours", "points", 4)).toBe(0);
   });
 
   it("answers a table of every distinct estimate and how many wear it", () => {
