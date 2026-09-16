@@ -1,9 +1,12 @@
+import { and, eq, isNotNull } from "drizzle-orm";
+import { cards, sprints } from "@/core/db/schema";
 import { todayInCopenhagen } from "@/core/dates";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 import { boardAreas } from "@/modules/boards/read";
 import { closeItem } from "@/modules/boards/structure/close";
 import { nextQuarter, quarterOf } from "@/modules/boards/structure/rules";
 import { createItem } from "@/modules/boards/structure/write-items";
+import { planFeature } from "@/modules/boards/structure/plan-feature";
 import { createArea, createTheme } from "@/modules/boards/structure/write-lists";
 import { placeOnMap } from "@/modules/boards/structure/write-map";
 import type { DemoStructure } from "./words";
@@ -114,5 +117,60 @@ export async function closeSeeded(
     if (outcome && !outcome.closed) {
       throw new Error(`demo: ${itemId} still has open children and cannot be closed`);
     }
+  }
+}
+
+/**
+ * Gives every feature the sprints its own work actually ran in
+ * (docs/adr/0023), rather than a span written down by hand that the
+ * cards could then drift away from: the plan is the first and last
+ * sprint holding one of the feature's cards. A feature whose work is
+ * all still in the backlog stays unplanned, which is the honest answer
+ * and what the roadmap's feature view is there to show.
+ */
+export async function planSeededFeatures(
+  tx: AppTransaction,
+  ctx: OrgContext,
+  boardId: string,
+): Promise<void> {
+  const rows = await tx
+    .select({
+      featureId: cards.featureId,
+      sprintId: cards.sprintId,
+      number: sprints.number,
+    })
+    .from(cards)
+    .innerJoin(sprints, eq(sprints.id, cards.sprintId))
+    .where(and(eq(cards.boardId, boardId), isNotNull(cards.featureId)));
+
+  const span = new Map<string, { first: string; last: string; from: number; to: number }>();
+  for (const row of rows) {
+    if (!row.featureId || !row.sprintId) continue;
+    const current = span.get(row.featureId);
+    if (!current) {
+      span.set(row.featureId, {
+        first: row.sprintId,
+        last: row.sprintId,
+        from: row.number,
+        to: row.number,
+      });
+      continue;
+    }
+    if (row.number < current.from) {
+      current.from = row.number;
+      current.first = row.sprintId;
+    }
+    if (row.number > current.to) {
+      current.to = row.number;
+      current.last = row.sprintId;
+    }
+  }
+
+  for (const [featureId, at] of span) {
+    await planFeature(tx, ctx, {
+      itemId: featureId,
+      startSprintId: at.first,
+      targetSprintId: at.last,
+    });
   }
 }

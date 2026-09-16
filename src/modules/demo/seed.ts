@@ -13,7 +13,13 @@ import {
 } from "@/modules/boards/write-sprints";
 import { addComment } from "@/modules/boards/comments";
 import { columnsOf } from "@/modules/boards/lanes";
-import { closeSeeded, placement, seedStructure, type SeededStructure } from "./seed-structure";
+import {
+  closeSeeded,
+  placement,
+  planSeededFeatures,
+  seedStructure,
+  type SeededStructure,
+} from "./seed-structure";
 import { DEMO_DA, DEMO_EN, type DemoWords } from "./words";
 
 /**
@@ -200,6 +206,9 @@ async function seedScrum(
     endDate: day(23),
   });
   await closeSeeded(tx, ctx, seeded);
+  // The features take the sprints their own cards ran in, so the
+  // roadmap's feature view has something to draw (docs/adr/0023).
+  await planSeededFeatures(tx, ctx, board.id);
   return seeded;
 }
 
