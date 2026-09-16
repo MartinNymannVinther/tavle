@@ -51,11 +51,20 @@ export function StoryMapView({ full }: { full: BoardFull }) {
   const structure = structureOf(full);
   const { view } = structure;
   const [showClosed, setShowClosed] = useState(false);
+  const [showDone, setShowDone] = useState(true);
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [drag, setDrag] = useState<Drag>(null);
   const screen = useFullscreen();
 
-  const cards = applyFilters(full.cards, filters);
+  const doneColumns = new Set(full.columns.filter((c) => c.category === "done").map((c) => c.id));
+  const isDone = (card: { columnId: string }) => doneColumns.has(card.columnId);
+  const filtered = applyFilters(full.cards, filters);
+  // Finished work can be taken off the wall: after a few months the cells
+  // are mostly strikethrough, and what is left is the interesting part.
+  // Everything downstream — the cells, the row counts, the off-map
+  // notice — reads this one list, so they cannot disagree.
+  const cards = showDone ? filtered : filtered.filter((card) => !isDone(card));
+  const doneShown = filtered.filter(isDone).length;
   const map = storyMap(full, structure.items, cards, { showClosed });
   const onMap = backbone(structure.items, { showClosed });
   // The server orders the whole lane, hidden closed features included, so
@@ -64,7 +73,6 @@ export function StoryMapView({ full }: { full: BoardFull }) {
   // Closed features still standing on the wall: what the tick reveals.
   const closedOnMap = wholeLane.filter((f) => f.state === "closed").length;
   const waiting = tray(structure.items);
-  const doneColumns = new Set(full.columns.filter((c) => c.category === "done").map((c) => c.id));
   // A sprint's card whose feature is not up on the backbone is invisible
   // in the cells; the row label offers it, and one pick puts its feature
   // up so the card lands where it belongs. Nothing is reassigned.
@@ -82,7 +90,7 @@ export function StoryMapView({ full }: { full: BoardFull }) {
       if (!feature || onMapIds.has(feature.id)) return [];
       return [{ card, featureId: feature.id, featureTitle: feature.title }];
     });
-  const doneIds = new Set(full.cards.filter((c) => doneColumns.has(c.columnId)).map((c) => c.id));
+  const doneIds = new Set(full.cards.filter(isDone).map((c) => c.id));
   const countOf = (featureId: string) => full.cards.filter((c) => c.featureId === featureId).length;
   // The wall and the rank answer different questions, so differing is
   // allowed — but worth a glance. The notice says so; the button is the
@@ -199,6 +207,19 @@ export function StoryMapView({ full }: { full: BoardFull }) {
             className="accent-[var(--primary)]"
           />
           {t("showClosedFeatures", { count: closedOnMap })}
+        </label>
+        <label
+          className="text-meta flex items-center gap-1.5 text-2sm has-disabled:opacity-50"
+          title={doneShown === 0 ? t("noDone") : undefined}
+        >
+          <input
+            type="checkbox"
+            checked={showDone}
+            disabled={doneShown === 0 && showDone}
+            onChange={(event) => setShowDone(event.target.checked)}
+            className="accent-[var(--primary)]"
+          />
+          {t("showDoneCards", { count: doneShown })}
         </label>
       </div>
       {onMap.length === 0 && (

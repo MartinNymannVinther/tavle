@@ -1546,8 +1546,10 @@
     "hiddenHint": "Vælg et kort — dets feature sættes op på mappet",
     "orderDrift": "Rækkefølgen her afviger fra backloggens prioritering — måske med vilje, måske værd at overveje.",
     "alignBacklog": "Lad backloggen følge mappet",
-    "showClosedFeatures": "{count, plural, =0 {Vis lukkede features} other {Vis # lukkede}}",
-    "noClosed": "Ingen lukkede features står på mappet."
+    "showClosedFeatures": "{count, plural, =0 {Vis lukkede features} one {Vis # lukket} other {Vis # lukkede}}",
+    "noClosed": "Ingen lukkede features står på mappet.",
+    "showDoneCards": "{count, plural, =0 {Vis færdige kort} one {Vis # færdigt} other {Vis # færdige}}",
+    "noDone": "Der er ingen færdige kort at vise."
   },
   "decompose": {
     "title": "Nedbrydning",
