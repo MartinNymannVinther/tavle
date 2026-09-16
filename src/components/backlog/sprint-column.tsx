@@ -25,6 +25,7 @@ export function SprintColumn({
   selected,
   onSelect,
   aiAvailable = false,
+  drag,
   run,
 }: {
   full: BoardFull;
@@ -35,6 +36,12 @@ export function SprintColumn({
   selected: Set<string>;
   onSelect: (cardId: string, checked: boolean) => void;
   aiAvailable?: boolean;
+  /** The page's one drag, so a story can be dropped straight into a sprint. */
+  drag?: {
+    id: string | null;
+    setId: (id: string | null) => void;
+    onDrop: (sprintId: string) => void;
+  };
   run: Run;
 }) {
   const t = useTranslations("backlog");
@@ -68,6 +75,7 @@ export function SprintColumn({
             open: !minimized.isOpen(sprint.id),
             onToggle: () => minimized.toggle(sprint.id),
           }}
+          drag={drag && { id: drag.id, setId: drag.setId, onDrop: () => drag.onDrop(sprint.id) }}
           run={run}
         />
       ))}

@@ -2,7 +2,8 @@ import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { boards, cards, columns, sprints, type Retro, type Sprint } from "@/core/db/schema";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 import { recordEvent, type ActorKind } from "./events";
-import { cardsInBoard, firstColumn, joiningSort, laneFor, placeCard, sumPoints } from "./lanes";
+import { cardsInBoard, firstColumn, joiningSort, laneFor, sumPoints } from "./lanes";
+import { placeInLane } from "./ordering";
 import { boardInWorkspace } from "./read";
 import { enterColumn } from "./transitions";
 import { orderedDates } from "./validation";
@@ -256,16 +257,50 @@ export async function setCardsSprint(
   return moved;
 }
 
-/** A backlog card to a new position among the backlog cards. */
+/**
+ * A backlog card past a neighbour in the board's one priority.
+ *
+ * The neighbour may itself be promised to a sprint. The backlog list
+ * shows the free rows and the committed ones on the one rank they share
+ * (docs/adr/0033), so an arrow or a drag has to move the card one row in
+ * what the person is reading — not one row among the rows that happen to
+ * be free, which would vault it silently past every marked row standing
+ * between them. That is why the lane here is the board's whole priority
+ * and the caller names a card rather than an index: an index only ever
+ * meant something in a list one of them could not be in.
+ */
 export async function reorderBacklog(
   tx: AppTransaction,
   cardId: string,
-  index: number,
+  siblingId: string,
+  after: boolean,
 ): Promise<boolean> {
+  if (cardId === siblingId) return false;
   const [card] = await tx.select().from(cards).where(eq(cards.id, cardId)).limit(1);
   if (!card || card.sprintId) return false;
-  await placeCard(tx, laneFor("scrum", { ...card, sprintId: null }), card.id, index);
+  const [sibling] = await tx.select().from(cards).where(eq(cards.id, siblingId)).limit(1);
+  if (!sibling || sibling.boardId !== card.boardId) return false;
+  const lane = await priorityCards(tx, card.boardId);
+  const at = lane.filter((row) => row.id !== cardId).findIndex((row) => row.id === siblingId);
+  if (at < 0) return false;
+  for (const change of placeInLane(lane, cardId, after ? at + 1 : at)) {
+    await tx.update(cards).set({ sort: change.sort }).where(eq(cards.id, change.id));
+  }
   return true;
+}
+
+/**
+ * Every card on the board that carries a rank, in rank order. One
+ * number orders the backlog and the sprints' columns alike, so the
+ * priority is the board's cards — archived ones excepted, having left
+ * the order altogether.
+ */
+async function priorityCards(tx: AppTransaction, boardId: string) {
+  return tx
+    .select({ id: cards.id, sort: cards.sort })
+    .from(cards)
+    .where(and(eq(cards.boardId, boardId), isNull(cards.archivedAt)))
+    .orderBy(asc(cards.sort), asc(cards.number));
 }
 
 export async function saveRetro(

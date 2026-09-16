@@ -115,21 +115,31 @@ describe("the backlog's one priority", () => {
     await run((tx) => moveCard(tx, ctx, card.id, sameColumn.id, 0));
   });
 
-  it("moves exactly the card that was moved and leaves the promised rows standing", async () => {
+  it("moves one row of what is read, even when that row is a promised one", async () => {
+    // The list reads En* · To · Tre · Fire · Fem* · Seks. One "move up" on
+    // the last row must pass exactly one row — and the row above it is
+    // Fem*, promised to the sprint. Ranking against the free rows alone
+    // would vault the card past both Fem* and Fire in one press.
     const before = (await getBoardFull(ctx, boardId))!.cards;
+    expect(await listed()).toEqual(["En*", "To", "Tre", "Fire", "Fem*", "Seks"]);
     const seks = before.find((c) => c.title === "Seks")!;
-    // One "move up" on the last row: past Fire, which is the row above it
-    // among the ones that can be ranked.
-    const freeOrder = before
-      .filter((c) => !c.sprintId)
-      .sort((a, b) => a.sort - b.sort || a.number - b.number)
-      .map((c) => c.id);
-    await run((tx) => reorderBacklog(tx, seks.id, freeOrder.indexOf(seks.id) - 1));
-    expect(await listed()).toEqual(["En*", "To", "Tre", "Seks", "Fire", "Fem*"]);
+    const fem = before.find((c) => c.title === "Fem")!;
+    await run((tx) => reorderBacklog(tx, seks.id, fem.id, false));
+    expect(await listed()).toEqual(["En*", "To", "Tre", "Fire", "Seks", "Fem*"]);
     const after = (await getBoardFull(ctx, boardId))!.cards;
     const stirred = after.filter(
       (card) => card.id !== seks.id && card.sort !== before.find((c) => c.id === card.id)!.sort,
     );
     expect(stirred.map((c) => c.title)).toEqual([]);
+  });
+
+  it("refuses to rank a card that is promised to a sprint", async () => {
+    // The marked row is not a person's to move: it stands at its rank and
+    // the way to change that is to take the promise back.
+    const cards = (await getBoardFull(ctx, boardId))!.cards;
+    const fem = cards.find((c) => c.title === "Fem")!;
+    const to = cards.find((c) => c.title === "To")!;
+    expect(await run((tx) => reorderBacklog(tx, fem.id, to.id, false))).toBe(false);
+    expect(await sortOf("Fem")).toBe(fem.sort);
   });
 });

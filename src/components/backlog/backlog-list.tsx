@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import type { ChipContext, StructureLookup } from "@/components/board/card-chips";
 import { mergeByRank } from "@/modules/boards/ordering";
 import type { CardView } from "@/modules/boards/types";
+import { cn } from "@/lib/utils";
 import { BacklogRow } from "./backlog-row";
 import type { Crumb } from "./backlog-selection";
 
@@ -26,6 +27,10 @@ export type StoryRowProps = {
   dragId: string | null;
   setDragId: (id: string | null) => void;
   onDropOn: (targetId: string, after: boolean) => void;
+  /** Whether the card being dragged is one promised to a sprint. */
+  fromSprint?: (cardId: string) => boolean;
+  /** A card dragged out of a sprint onto a backlog with no rows to land between. */
+  onDropOut?: () => void;
   /** The line under a title: where the story sits, as far as the heading has not said it. */
   crumbOf: (card: CardView) => Crumb;
   /** The place the heading already states, left out of the chips. */
@@ -51,13 +56,51 @@ export function StoryRows({
   // row under the pointer — the drop should never be a guess.
   const [hover, setHover] = useState<{ id: string; after: boolean } | null>(null);
   // Committed cards keep their place in the one priority (docs/adr/0013):
-  // the sequence merges on the rank both carry (docs/adr/0033), and only
-  // the free rows drag.
+  // the sequence merges on the rank both carry (docs/adr/0033). Only the
+  // free rows are dragged, but every row is a place to land — an arrow or
+  // a drop that skipped the marked rows would move the card further than
+  // the eye was told.
   const merged = mergeByRank(stories, extras?.cards ?? []);
-  const rankIndex = new Map(stories.map((card, index) => [card.id, index]));
+  const dragged = rows.dragId;
+  // A card from elsewhere: another group's row, or one being dragged out
+  // of a sprint. Either may land here; what it means differs.
+  const foreign = dragged ? !stories.some((c) => c.id === dragged) : false;
+  const released = Boolean(dragged && rows.fromSprint?.(dragged));
+  const canLand = !foreign || released || Boolean(groupDrop);
+  const landing = (card: CardView) => ({
+    onDragOver: (event: React.DragEvent) => {
+      if (!dragged || dragged === card.id || !canLand) return;
+      event.preventDefault();
+      const rect = event.currentTarget.getBoundingClientRect();
+      const below = event.clientY > rect.top + rect.height / 2;
+      if (hover?.id !== card.id || hover.after !== below) setHover({ id: card.id, after: below });
+    },
+    onDrop: () => {
+      const after = hover?.id === card.id ? hover.after : false;
+      // A card out of a sprint comes back to the backlog wherever it is
+      // dropped; a card from another group takes that group's field.
+      if (foreign && !released && groupDrop && dragged) {
+        groupDrop.onDrop(dragged, card.id, after);
+        rows.setDragId(null);
+      } else {
+        rows.onDropOn(card.id, after);
+      }
+      setHover(null);
+    },
+    onDragEnd: () => {
+      setHover(null);
+      rows.setDragId(null);
+    },
+    indicator:
+      hover?.id === card.id && dragged && dragged !== card.id
+        ? hover.after
+          ? ("below" as const)
+          : ("above" as const)
+        : null,
+  });
   return (
     <ol className="divide-hairline divide-y">
-      {merged.map(({ card, committed }) => {
+      {merged.map(({ card, committed }, seat) => {
         if (committed) {
           return (
             <BacklogRow
@@ -69,12 +112,12 @@ export function StoryRows({
               context={context ?? rows.context}
               crumb={rows.crumbOf(card)}
               sprintName={(card.sprintId && extras?.sprintNameOf?.get(card.sprintId)) || undefined}
+              {...landing(card)}
             />
           );
         }
-        const index = rankIndex.get(card.id)!;
-        const before = stories[index - 1];
-        const after = stories[index + 1];
+        const before = merged[seat - 1]?.card;
+        const after = merged[seat + 1]?.card;
         return (
           <BacklogRow
             key={card.id}
@@ -89,42 +132,9 @@ export function StoryRows({
             onMoveUp={before ? () => rows.onNudge(card.id, before.id, false) : undefined}
             onMoveDown={after ? () => rows.onNudge(card.id, after.id, true) : undefined}
             draggable
-            dragging={rows.dragId === card.id}
+            dragging={dragged === card.id}
             onDragStart={() => rows.setDragId(card.id)}
-            onDragOver={(event) => {
-              // A card from another group may land here only when the drop
-              // can honestly put it here (the group assigns its field).
-              const foreign = rows.dragId ? !stories.some((c) => c.id === rows.dragId) : false;
-              if (foreign && !groupDrop) return;
-              event.preventDefault();
-              const rect = event.currentTarget.getBoundingClientRect();
-              const below = event.clientY > rect.top + rect.height / 2;
-              if (hover?.id !== card.id || hover.after !== below) {
-                setHover({ id: card.id, after: below });
-              }
-            }}
-            onDrop={() => {
-              const after = hover?.id === card.id ? hover.after : false;
-              const foreign = rows.dragId ? !stories.some((c) => c.id === rows.dragId) : false;
-              if (foreign && groupDrop && rows.dragId) {
-                groupDrop.onDrop(rows.dragId, card.id, after);
-                rows.setDragId(null);
-              } else {
-                rows.onDropOn(card.id, after);
-              }
-              setHover(null);
-            }}
-            onDragEnd={() => {
-              setHover(null);
-              rows.setDragId(null);
-            }}
-            indicator={
-              hover?.id === card.id && rows.dragId && rows.dragId !== card.id
-                ? hover.after
-                  ? "below"
-                  : "above"
-                : null
-            }
+            {...landing(card)}
           />
         );
       })}
@@ -148,9 +158,31 @@ export function BacklogList({
   emptyText?: string;
 }) {
   const t = useTranslations("backlog");
+  const [over, setOver] = useState(false);
   if (stories.length === 0 && allocated.length === 0) {
+    // With no rows there is nothing to land between, but a card dragged
+    // out of a sprint still has somewhere to go: the empty backlog itself.
+    const released = Boolean(rows.dragId && rows.fromSprint?.(rows.dragId) && rows.onDropOut);
     return (
-      <p className="text-meta border-hairline border-t px-4 py-3 text-sm">
+      <p
+        onDragOver={(event) => {
+          if (!released) return;
+          event.preventDefault();
+          setOver(true);
+        }}
+        onDragLeave={() => setOver(false)}
+        onDrop={(event) => {
+          if (!released) return;
+          event.preventDefault();
+          setOver(false);
+          rows.onDropOut!();
+        }}
+        className={cn(
+          "text-meta border-hairline border-t px-4 py-3 text-sm",
+          released && "outline-primary/40 -outline-offset-4 outline-dashed",
+          released && over && "bg-accent/40",
+        )}
+      >
         {emptyText ?? t("nothingHere")}
       </p>
     );

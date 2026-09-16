@@ -225,7 +225,9 @@ export const CardSprintSchema = z.object({
 
 export const BacklogOrderSchema = z.object({
   cardId: id,
-  index: z.number().int().min(0).max(10_000),
+  /** The row it is moved past, named rather than counted (docs/adr/0033). */
+  siblingId: id,
+  after: z.boolean(),
 });
 
 export const NewCommentSchema = z.object({ cardId: id, text: shortText(4000).min(1) });

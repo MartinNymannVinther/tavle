@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { formatPlanDate } from "@/core/dates";
@@ -8,6 +9,7 @@ import type { StructureLookup } from "@/components/board/card-chips";
 import type { CardView } from "@/modules/boards/types";
 import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
 import { Link } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
 import type { Run } from "@/components/board/use-board-actions";
 import { FoldButton } from "./backlog-bits";
 import { BacklogRow } from "./backlog-row";
@@ -19,6 +21,12 @@ import { StartSprint } from "./start-sprint";
  * holds, its cards, and the button that starts it. The active sprint is
  * shown the same way, minus the start button, so cards can be pulled
  * into it mid-sprint when the team decides to.
+ *
+ * The whole panel is a place to drop a card on: dragging a story here
+ * from the backlog promises it to this sprint, which is the same write
+ * the selection bar's button makes — the drag is the quick path, never
+ * the only one. Its own cards can be dragged out again, back to the
+ * backlog or on to another sprint.
  */
 export function SprintPlan({
   sprint,
@@ -34,6 +42,7 @@ export function SprintPlan({
   velocityAverage = null,
   aiAvailable = false,
   fold,
+  drag,
   run,
 }: {
   sprint: Sprint;
@@ -51,16 +60,46 @@ export function SprintPlan({
   aiAvailable?: boolean;
   /** Folds the panel to its one header line, for a backlog that needs the room. */
   fold?: { open: boolean; onToggle: () => void };
+  /** The page's one drag: which card is in the air, and what a drop here means. */
+  drag?: { id: string | null; setId: (id: string | null) => void; onDrop: () => void };
   run: Run;
 }) {
   const t = useTranslations("backlog.sprint");
   const locale = useLocale();
+  const [over, setOver] = useState(false);
   const points = cards.reduce((total, c) => total + (c.estimate ?? 0), 0);
   const active = sprint.state === "active";
+  // A card already in this sprint has nowhere to land here, so the panel
+  // stays quiet rather than offering a move that would do nothing.
+  const canTake = Boolean(drag?.id) && !cards.some((c) => c.id === drag!.id);
 
   const open = fold?.open ?? true;
   return (
-    <section className="border-border bg-card @container rounded-xl border shadow-[var(--surface-shadow)]">
+    <section
+      onDragOver={(event) => {
+        if (!canTake) return;
+        event.preventDefault();
+        setOver(true);
+      }}
+      onDragLeave={(event) => {
+        // Crossing into a child fires dragleave on the section too; only a
+        // pointer that has actually left the panel should dim it.
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOver(false);
+      }}
+      onDrop={(event) => {
+        if (!canTake) return;
+        event.preventDefault();
+        setOver(false);
+        drag!.onDrop();
+      }}
+      className={cn(
+        "border-border bg-card @container rounded-xl border shadow-[var(--surface-shadow)] transition-colors",
+        canTake && "outline-primary/40 outline-dashed outline-offset-2",
+        // Both read the live drag, so a drag abandoned over the panel
+        // (Escape, a drop refused by the browser) leaves nothing lit.
+        canTake && over && "border-primary bg-accent/40",
+      )}
+    >
       <header className="flex flex-col gap-1 px-4 py-3">
         <div className="flex items-start gap-1">
           {fold && (
@@ -129,6 +168,10 @@ export function SprintPlan({
                 selected={selected.has(card.id)}
                 onSelect={(checked) => onSelect(card.id, checked)}
                 columnName={active ? columnNames.get(card.columnId) : undefined}
+                draggable={Boolean(drag)}
+                dragging={drag?.id === card.id}
+                onDragStart={drag ? () => drag.setId(card.id) : undefined}
+                onDragEnd={drag ? () => drag.setId(null) : undefined}
                 quiet
               />
             ))}

@@ -94,7 +94,7 @@ export async function setCardsSprintAction(raw: unknown): Promise<Result<number>
 export async function reorderBacklogAction(raw: unknown): Promise<Result<boolean>> {
   return action(BacklogOrderSchema, raw, async (tx, ctx, input, touch) => {
     touch((await cardInWorkspace(tx, input.cardId))?.boardId);
-    return found((await reorderBacklog(tx, input.cardId, input.index)) || null);
+    return found((await reorderBacklog(tx, input.cardId, input.siblingId, input.after)) || null);
   });
 }
 

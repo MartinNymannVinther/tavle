@@ -144,19 +144,55 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
     void run(() => placeCardAction({ cardId: id, featureId }));
   }
 
-  /** The backlog's own order is the only order; a nudge is a move past the sibling in it. */
+  /**
+   * The backlog's own order is the only order; a nudge is a move past the
+   * row beside it — which may be a row promised to a sprint, standing at
+   * its rank among the free ones (docs/adr/0033). The service ranks
+   * against the whole priority, so one step is one row of what is read.
+   */
   function nudge(cardId: string, siblingId: string, after: boolean) {
-    const order = all.map((c) => c.id).filter((id) => id !== cardId);
-    const at = order.indexOf(siblingId);
-    if (at < 0) return;
-    void run(() => reorderBacklogAction({ cardId, index: after ? at + 1 : at }));
+    void run(() => reorderBacklogAction({ cardId, siblingId, after }));
+  }
+
+  /** A card promised to a sprint, dragged: the promise is what a drop takes back. */
+  const committedDrag = (cardId: string) =>
+    Boolean(full.cards.find((c) => c.id === cardId)?.sprintId);
+
+  /** Takes the promise back, then does whatever the drop meant on top of it. */
+  async function release(cardId: string): Promise<boolean> {
+    return run(() => setCardsSprintAction({ cardIds: [cardId], sprintId: null }));
   }
 
   function dropOn(targetId: string, after: boolean) {
     const id = dragId;
     setDragId(null);
     if (!id || id === targetId) return;
+    // Dragged out of a sprint and onto a row: the card comes back to the
+    // backlog and lands where it was dropped, in that order.
+    if (committedDrag(id)) {
+      void release(id).then((ok) => {
+        if (ok) nudge(id, targetId, after);
+      });
+      return;
+    }
     nudge(id, targetId, after);
+  }
+
+  /** A card dropped on a sprint: the same promise the selection bar's button makes. */
+  function dropInSprint(sprintId: string) {
+    const id = dragId;
+    setDragId(null);
+    if (!id) return;
+    const card = full.cards.find((c) => c.id === id);
+    if (!card || card.sprintId === sprintId) return;
+    void run(() => setCardsSprintAction({ cardIds: [id], sprintId }));
+  }
+
+  /** A card dropped on a backlog with no rows to land between. */
+  function dropOut() {
+    const id = dragId;
+    setDragId(null);
+    if (id && committedDrag(id)) void release(id);
   }
 
   /** A card dropped into another group: the group's field first, then the spot it was dropped on. */
@@ -168,6 +204,8 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
   ) {
     const card = full.cards.find((c) => c.id === cardId);
     if (!card || grouping === "list") return;
+    // Out of the sprint first: a group says which field, never which sprint.
+    if (card.sprintId && !(await release(cardId))) return;
     const ok = await run(() =>
       grouping === "theme"
         ? placeCardAction({
@@ -224,6 +262,8 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
     dragId,
     setDragId,
     onDropOn: dropOn,
+    fromSprint: committedDrag,
+    onDropOut: dropOut,
     crumbOf: (card) => crumbFor(crumbOf(card, structure.items), selection),
     context: heading ? { areaId: heading.areaId, themeIds: heading.themeIds } : undefined,
   };
@@ -475,6 +515,7 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
         selected={selected}
         onSelect={select}
         aiAvailable={aiAvailable}
+        drag={{ id: dragId, setId: setDragId, onDrop: dropInSprint }}
         run={run}
       />
     </div>

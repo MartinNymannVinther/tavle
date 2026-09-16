@@ -67,7 +67,10 @@ describe("a Scrum board", () => {
   it("reorders the backlog", async () => {
     const full = (await getBoardFull(ctx, boardId))!;
     const betaling = full.cards.find((c) => c.title === "Betaling")!;
-    await run((tx) => reorderBacklog(tx, betaling.id, 0));
+    const login = full.cards.find((c) => c.title === "Login")!;
+    // Past the row it is moved past, named: an index only ever meant
+    // something in a list the marked rows could not be in (docs/adr/0033).
+    await run((tx) => reorderBacklog(tx, betaling.id, login.id, false));
     expect(await backlogTitles()).toEqual(["Betaling", "Login", "Søgning", "Kurv"]);
   });
 
