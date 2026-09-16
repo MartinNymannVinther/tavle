@@ -4,6 +4,8 @@ import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { EstimateUnit } from "@/core/db/schema";
+import { NativeSelect } from "@/components/ui/native-select";
+import { choicesFor, labelOf } from "@/modules/boards/estimates";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -47,6 +49,13 @@ export function AiPanel({
   run: Run;
 }) {
   const t = useTranslations("cards.ai");
+  /** One piece's size, from either control; an empty choice unestimates it. */
+  const setEstimate = (index: number, raw: string) =>
+    setPieces((current) =>
+      current.map((piece, n) =>
+        n === index ? { ...piece, estimate: raw === "" ? null : Number(raw) } : piece,
+      ),
+    );
   const [kind, setKind] = useState<"draft" | "split" | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -242,27 +251,32 @@ export function AiPanel({
                         }
                         className="h-9 text-2sm"
                       />
-                      <Input
-                        type="number"
-                        min={0}
-                        max={100}
-                        value={piece.estimate ?? ""}
-                        onChange={(event) =>
-                          setPieces(
-                            pieces.map((p, n) =>
-                              n === i
-                                ? {
-                                    ...p,
-                                    estimate:
-                                      event.target.value === "" ? null : Number(event.target.value),
-                                  }
-                                : p,
-                            ),
-                          )
-                        }
-                        aria-label={t("points", { unit })}
-                        className="h-9 w-20 text-2sm"
-                      />
+                      {/* The same closed ladder the card's own field offers. */}
+                      {unit === "hours" ? (
+                        <Input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={piece.estimate ?? ""}
+                          onChange={(event) => setEstimate(i, event.target.value)}
+                          aria-label={t("points", { unit })}
+                          className="h-9 w-20 text-2sm"
+                        />
+                      ) : (
+                        <NativeSelect
+                          value={piece.estimate === null ? "" : String(piece.estimate)}
+                          onChange={(event) => setEstimate(i, event.target.value)}
+                          aria-label={t("points", { unit })}
+                          className="h-9 w-20 text-2sm"
+                        >
+                          <option value="">–</option>
+                          {choicesFor(unit).map((value) => (
+                            <option key={value} value={value}>
+                              {labelOf(value, unit)}
+                            </option>
+                          ))}
+                        </NativeSelect>
+                      )}
                     </div>
                     {piece.note && <p className="text-meta text-xs">{piece.note}</p>}
                   </div>

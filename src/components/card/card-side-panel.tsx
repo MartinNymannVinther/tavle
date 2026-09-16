@@ -14,7 +14,7 @@ import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
 import type { Run } from "@/components/board/use-board-actions";
 import type { StructureView } from "@/modules/boards/structure/view";
 import { cn } from "@/lib/utils";
-import { TSHIRT } from "@/modules/boards/estimates";
+import { choicesFor, labelOf } from "@/modules/boards/estimates";
 import { PlacementFields } from "./placement-fields";
 
 /**
@@ -139,8 +139,10 @@ export function CardSidePanel({
 
       <PropertyGroup>
         <PropertyRow label={t(`estimateLabel.${unit}`)} htmlFor="card-estimate">
-          {unit === "tshirt" ? (
-            // Sizes are a closed list, so the size is picked, never typed.
+          {unit !== "hours" ? (
+            // Points and sizes are closed scales — the whole point of a
+            // ladder is that the rungs between it are not offered. Hours
+            // are a quantity, so they stay typed.
             <NativeSelect
               id="card-estimate"
               variant="xs"
@@ -151,11 +153,17 @@ export function CardSidePanel({
               }}
             >
               <option value="">{t("noEstimate")}</option>
-              {TSHIRT.map((size) => (
-                <option key={size.size} value={size.weight}>
-                  {size.size}
+              {choicesFor(unit).map((value) => (
+                <option key={value} value={value}>
+                  {labelOf(value, unit)}
                 </option>
               ))}
+              {/* A value the ladder does not hold — from an import, or from
+                  before the board changed unit — is offered so the field
+                  can show the truth rather than silently reading empty. */}
+              {card.estimate !== null && !choicesFor(unit).includes(card.estimate) && (
+                <option value={card.estimate}>{labelOf(card.estimate, unit)}</option>
+              )}
             </NativeSelect>
           ) : (
             <Input
