@@ -63,6 +63,9 @@ codebase to:
   and never forbid; Scrum is a backlog and one sprint at a time. The
   columns' categories (backlog, todo, doing, done), not their names, are
   what the numbers read.
+- Backlog care (ADR 0031) is the product owner's workbench: findings as
+  lists that link to the rows behind them, shown only when they have
+  something to say, and never a verdict on a state the tool supports.
 - Every number on the insight page is computed on request from the record
   of what happened (`card_transitions`, the cards' own clocks, the closed
   sprints' written-down points). Nothing is estimated and nothing is

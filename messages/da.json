@@ -518,7 +518,7 @@
       "settings": "Indstillinger",
       "archived": "arkiveret",
       "roadmap": "Roadmap",
-      "overview": "Overblik",
+      "overview": "Backlog-styring",
       "map": "Story map",
       "structure": "Nedbrydning"
     },
@@ -1473,29 +1473,55 @@
     "axisLabel": "Visning",
     "downloadPpt": "Hent som PowerPoint"
   },
+  "care": {
+    "title": "Hvad venter backloggen på?",
+    "body": "Det, en product owner bør tage stilling til, før der planlægges. Står her ingenting, er der ingenting at tage stilling til.",
+    "summary": "{cards, plural, one {# kort} other {# kort}} venter · {points} {unit, select, hours {timer} other {point}}",
+    "depth": "cirka {sprints} sprints arbejde",
+    "unweighed": "{count, plural, one {# uden estimat} other {# uden estimat}}",
+    "count": "{count}",
+    "clear": {
+      "title": "Backloggen er i orden.",
+      "body": "Alt har en plads, et “Færdig når” og noget arbejde under sig. Der er intet, der venter på en beslutning."
+    },
+    "unplaced": {
+      "title": "Venter på en plads",
+      "body": "{count, plural, one {# feature eller kort hører endnu ikke til noget} other {# features og kort hører endnu ikke til noget}}. Det er i orden — værktøjet opfinder ikke en kasse til dem — men nogen skal beslutte hvor de hører hjemme, eller at de ikke skal."
+    },
+    "noDoneWhen": {
+      "title": "Mangler “Færdig når”",
+      "body": "{count, plural, one {# epic eller feature} other {# epics og features}} kan ikke lukkes, før nogen har skrevet, hvornår den er færdig."
+    },
+    "emptyFeature": {
+      "title": "Features uden arbejde",
+      "body": "{count, plural, one {# feature har} other {# features har}} ingen kort under sig. Enten mangler nedbrydningen, eller også er løftet ikke aktuelt længere."
+    },
+    "emptyEpic": {
+      "title": "Epics uden features",
+      "body": "{count, plural, one {# epic er} other {# epics er}} ikke brudt ned endnu. Et mål uden vej derhen er svært at prioritere imod."
+    },
+    "review": {
+      "title": "Epics til genbesøg",
+      "body": "{count, plural, one {# epic har} other {# epics har}} stået åben længe, uden at nogen har bekræftet, at den stadig er et mål, I vil nå."
+    },
+    "unestimatedTop": {
+      "title": "Uvejet i toppen",
+      "body": "{count, plural, one {# af de ti øverste kort} other {# af de ti øverste kort}} mangler et estimat. Man kan ikke planlægge det, man ikke har vejet."
+    },
+    "tooDeep": {
+      "title": "Dybere end I når",
+      "body": "Der ligger {value} point rangeret, og I færdiggør omkring {of} pr. sprint. Den nederste del af listen bliver næppe til noget — overvej at lade den være uordnet."
+    }
+  },
   "overview": {
-    "title": "Overblik",
-    "healthTitle": "Holder strukturen?",
-    "healthBody": "Fem mål på om backloggen bliver holdt: intet af det her er en karakter, men alt sammen er noget, man kan gøre noget ved.",
-    "parentless": "Uden forælder",
-    "parentlessHint": "{count} af {total} åbne features og kort",
-    "review": "Epics til revision",
-    "reviewHint": "Åbne længere end {days} dage uden bekræftelse",
-    "withoutArea": "Uden område",
-    "withoutAreaHint": "{count} af {total} åbne items",
-    "enablerShare": "Enabler-andel",
-    "byPoints": "af de åbne {unit, select, hours {timer} other {point}}",
-    "byCards": "af de åbne kort",
-    "idle": "Uden åbent arbejde",
-    "idleHint": "Temaer og områder ingen bruger",
-    "idleThemes": "Temaer uden åbne items: {names}",
-    "idleAreas": "Områder uden åbne items: {names}",
+    "title": "Backlog-styring",
     "byThemeTitle": "Pr. tema",
     "byAreaTitle": "Pr. område",
     "byKindTitle": "Pr. art",
     "distributionBody": "{cards, plural, one {# åbent kort} other {# åbne kort}} · {points} {unit, select, hours {timer} other {point}}",
     "none": "Uden",
-    "bucketValue": "{cards} kort · {points} {unit, select, hours {timer} other {point}}"
+    "bucketValue": "{cards} kort · {points} {unit, select, hours {timer} other {point}}",
+    "weightTitle": "Hvor ligger vægten?"
   },
   "map": {
     "title": "Story map",

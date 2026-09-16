@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { EstimateUnit } from "@/core/db/schema";
 import { themeSwatch } from "@/components/board/tokens";
 import { overview, type Bucket } from "@/modules/boards/structure/overview";
+import { backlogCare } from "@/modules/boards/structure/hygiene";
+import { SegmentedChoice } from "@/components/ui/segmented";
+import { CareClear, CareList, CareSummary } from "./care-list";
 import { structureView } from "@/modules/boards/structure/view";
 import type { BoardFull } from "@/modules/boards/types";
-import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 /**
@@ -19,72 +22,33 @@ import { cn } from "@/lib/utils";
  */
 export function OverviewView({ full }: { full: BoardFull }) {
   const t = useTranslations("overview");
+  const c = useTranslations("care");
   const s = useTranslations("boards.structure");
   const data = overview(full);
+  const careData = backlogCare(full);
   const view = structureView(full.board);
   const unit = (full.board.estimateUnit as EstimateUnit) ?? "points";
-  const percent = (value: number) => `${Math.round(value * 100)} %`;
-  const share = (part: number, total: number) => (total > 0 ? percent(part / total) : "–");
-  const tile = (label: string, value: string, hint: string, warn = false) => (
-    <div key={label} className="flex flex-col gap-0.5">
-      <p className="text-label text-xs font-medium">{label}</p>
-      <p
-        className={cn(
-          "text-[1.375rem] leading-none font-semibold tabular-nums",
-          warn && "text-warning",
-        )}
-      >
-        {value}
-      </p>
-      <p className="text-meta text-xs">{hint}</p>
-    </div>
+  const [axis, setAxis] = useState<"byTheme" | "byArea" | "byKind">(
+    view.themes ? "byTheme" : view.areas ? "byArea" : "byKind",
   );
-  const idleThemes = view.themes ? data.health.idleThemes : [];
-  const idleAreas = view.areas ? data.health.idleAreas : [];
-  const reviewEpics = view.epics ? data.health.reviewEpics : [];
-  const tiles = [
-    view.features &&
-      tile(
-        t("parentless"),
-        share(data.health.parentless.count, data.health.parentless.total),
-        t("parentlessHint", data.health.parentless),
-        data.health.parentless.count > 0,
-      ),
-    view.epics &&
-      tile(
-        t("review"),
-        String(reviewEpics.length),
-        t("reviewHint", { days: full.board.epicReviewDays }),
-        reviewEpics.length > 0,
-      ),
-    view.areas &&
-      tile(
-        t("withoutArea"),
-        share(data.health.withoutArea.count, data.health.withoutArea.total),
-        t("withoutAreaHint", data.health.withoutArea),
-        data.health.withoutArea.count > 0,
-      ),
-    view.kind &&
-      tile(
-        t("enablerShare"),
-        data.openCards > 0 ? percent(data.enablerShare) : "–",
-        data.openPoints > 0 ? t("byPoints", { unit }) : t("byCards"),
-      ),
-    (view.themes || view.areas) &&
-      tile(
-        t("idle"),
-        String(idleThemes.length + idleAreas.length),
-        t("idleHint"),
-        idleThemes.length + idleAreas.length > 0,
-      ),
-  ].filter(Boolean);
-  const distributions = (
+
+  // A finding about a level the board does not show would be a demand to
+  // fix something the team cannot see.
+  const shown = careData.findings.filter((finding) => {
+    if (finding.key === "review" || finding.key === "emptyEpic") return view.epics;
+    if (finding.key === "emptyFeature") return view.features;
+    if (finding.key === "unplaced") return view.features;
+    return true;
+  });
+
+  const axes = (
     [
       ["byTheme", data.byTheme, view.themes],
       ["byArea", data.byArea, view.areas],
       ["byKind", data.byKind, view.kind],
     ] as const
-  ).filter(([, , shown]) => shown);
+  ).filter(([, , on]) => on);
+  const buckets = axes.find(([key]) => key === axis)?.[1] ?? [];
   const name = (bucket: Bucket) =>
     bucket.key === "none"
       ? t("none")
@@ -96,57 +60,51 @@ export function OverviewView({ full }: { full: BoardFull }) {
     <div className="flex flex-col gap-5">
       <Card>
         <CardHeader>
-          <CardTitle>{t("healthTitle")}</CardTitle>
-          <CardDescription>{t("healthBody")}</CardDescription>
+          <CardTitle>{c("title")}</CardTitle>
+          <CardDescription>{c("body")}</CardDescription>
+          <CareSummary
+            cards={careData.waiting.cards}
+            points={careData.waiting.points}
+            unestimated={careData.waiting.unestimated}
+            depth={careData.depthInSprints}
+            unit={unit}
+            boardId={full.board.id}
+          />
         </CardHeader>
-        {tiles.length > 0 && (
-          <CardContent className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">{tiles}</CardContent>
-        )}
-        {(reviewEpics.length > 0 || idleThemes.length > 0 || idleAreas.length > 0) && (
-          <CardContent className="border-hairline flex flex-col gap-1 border-t pt-4 text-sm">
-            {reviewEpics.map((epic) => (
-              <p key={epic.id}>
-                <span className="text-meta mr-2 text-xs tabular-nums">
-                  {full.board.key}-{epic.number}
-                </span>
-                <Link
-                  href={`/boards/${full.board.id}/items/${epic.number}`}
-                  className="font-medium hover:underline"
-                >
-                  {epic.title}
-                </Link>
-                <span className="text-warning ml-2 text-xs font-medium">{s("forReview")}</span>
-              </p>
-            ))}
-            {idleThemes.length > 0 && (
-              <p className="text-meta">
-                {t("idleThemes", { names: idleThemes.map((theme) => theme.name).join(", ") })}
-              </p>
-            )}
-            {idleAreas.length > 0 && (
-              <p className="text-meta">
-                {t("idleAreas", { names: idleAreas.map((a) => a.name).join(", ") })}
-              </p>
-            )}
-          </CardContent>
-        )}
+        <CardContent className="px-0 pb-2">
+          {shown.length > 0 ? (
+            <CareList findings={shown} boardKey={full.board.key} boardId={full.board.id} />
+          ) : (
+            <CareClear />
+          )}
+        </CardContent>
       </Card>
 
-      <div className="grid gap-5 lg:grid-cols-3">
-        {distributions.map(([key, buckets]) => (
-          <Card key={key}>
-            <CardHeader>
-              <CardTitle>{t(`${key}Title`)}</CardTitle>
-              <CardDescription>
-                {t("distributionBody", { unit, cards: data.openCards, points: data.openPoints })}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Distribution buckets={buckets} name={name} unit={unit} />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {axes.length > 0 && (
+        <Card>
+          <CardHeader className="gap-3">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <div>
+                <CardTitle>{t("weightTitle")}</CardTitle>
+                <CardDescription>
+                  {t("distributionBody", { unit, cards: data.openCards, points: data.openPoints })}
+                </CardDescription>
+              </div>
+              {axes.length > 1 && (
+                <SegmentedChoice<"byTheme" | "byArea" | "byKind">
+                  value={axis}
+                  onChange={setAxis}
+                  options={axes.map(([key]) => ({ value: key, label: t(`${key}Title`) }))}
+                  label={t("weightTitle")}
+                />
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Distribution buckets={buckets} name={name} unit={unit} />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

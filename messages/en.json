@@ -518,7 +518,7 @@
       "settings": "Settings",
       "archived": "archived",
       "roadmap": "Roadmap",
-      "overview": "Overview",
+      "overview": "Backlog care",
       "map": "Story map",
       "structure": "Breakdown"
     },
@@ -1473,29 +1473,55 @@
     "axisLabel": "View",
     "downloadPpt": "Download as PowerPoint"
   },
+  "care": {
+    "title": "What is the backlog waiting for?",
+    "body": "What a product owner should decide before planning. Nothing here means nothing to decide.",
+    "summary": "{cards, plural, one {# card} other {# cards}} waiting · {points} {unit, select, hours {hours} other {points}}",
+    "depth": "about {sprints} sprints of work",
+    "unweighed": "{count, plural, one {# unestimated} other {# unestimated}}",
+    "count": "{count}",
+    "clear": {
+      "title": "The backlog is in order.",
+      "body": "Everything has a place, a “done when” and work under it. Nothing is waiting on a decision."
+    },
+    "unplaced": {
+      "title": "Waiting for a place",
+      "body": "{count, plural, one {# feature or card does not belong to anything yet} other {# features and cards do not belong to anything yet}}. That is allowed — the tool never invents a container — but somebody has to decide where they belong, or that they should not."
+    },
+    "noDoneWhen": {
+      "title": "Missing a “done when”",
+      "body": "{count, plural, one {# epic or feature} other {# epics and features}} cannot be closed until somebody writes down when it is finished."
+    },
+    "emptyFeature": {
+      "title": "Features with no work",
+      "body": "{count, plural, one {# feature has} other {# features have}} no cards under them. Either the breakdown is missing, or the promise is no longer current."
+    },
+    "emptyEpic": {
+      "title": "Epics with no features",
+      "body": "{count, plural, one {# epic has} other {# epics have}} not been broken down yet. A goal with no road to it is hard to prioritise against."
+    },
+    "review": {
+      "title": "Epics to revisit",
+      "body": "{count, plural, one {# epic has} other {# epics have}} been open a long time without anyone confirming it is still a result you want."
+    },
+    "unestimatedTop": {
+      "title": "Unweighed at the top",
+      "body": "{count, plural, one {# of the top ten cards} other {# of the top ten cards}} has no estimate. You cannot plan what you have not weighed."
+    },
+    "tooDeep": {
+      "title": "Deeper than you reach",
+      "body": "There are {value} points ranked, and you finish about {of} per sprint. The bottom of the list is unlikely to happen — consider leaving it unordered."
+    }
+  },
   "overview": {
-    "title": "Overview",
-    "healthTitle": "Is the structure holding?",
-    "healthBody": "Five measures of whether the backlog is being kept: none of this is a grade, all of it is something that can be acted on.",
-    "parentless": "Without a parent",
-    "parentlessHint": "{count} of {total} open features and cards",
-    "review": "Epics for review",
-    "reviewHint": "Open longer than {days} days without confirmation",
-    "withoutArea": "Without an area",
-    "withoutAreaHint": "{count} of {total} open items",
-    "enablerShare": "Enabler share",
-    "byPoints": "of the open {unit, select, hours {hours} other {points}}",
-    "byCards": "of the open cards",
-    "idle": "Without open work",
-    "idleHint": "Themes and areas nobody uses",
-    "idleThemes": "Themes without open items: {names}",
-    "idleAreas": "Areas without open items: {names}",
+    "title": "Backlog care",
     "byThemeTitle": "By theme",
     "byAreaTitle": "By area",
     "byKindTitle": "By kind",
     "distributionBody": "{cards, plural, one {# open card} other {# open cards}} · {points} {unit, select, hours {hours} other {points}}",
     "none": "None",
-    "bucketValue": "{cards} cards · {points} {unit, select, hours {hours} other {points}}"
+    "bucketValue": "{cards} cards · {points} {unit, select, hours {hours} other {points}}",
+    "weightTitle": "Where is the weight?"
   },
   "map": {
     "title": "Story map",
