@@ -55,6 +55,28 @@ describe("lane ordering", () => {
     expect(placeInLane(lane, "c", undefined)).toEqual([]);
   });
 
+  it("writes as few rows as will make room, never the whole lane", () => {
+    // A board carrying years of work arrives with blocks of rows holding
+    // the same number — ranks written before docs/adr/0033 came from two
+    // lanes numbering independently. Spreading the whole lane for one
+    // arrow press rewrote, re-stamped and audited every card on the
+    // board; the window stops at the rows that actually need a number.
+    const crowded = [
+      ...Array.from({ length: 9 }, (_, i) => ({ id: `a${i}`, sort: 1000 })),
+      ...Array.from({ length: 9 }, (_, i) => ({ id: `b${i}`, sort: 2000 })),
+      ...Array.from({ length: 20 }, (_, i) => ({ id: `c${i}`, sort: 3000 + i * 1000 })),
+    ];
+    const moved = placeInLane(crowded, "c19", 2);
+    expect(moved.length).toBeLessThan(crowded.length / 2);
+    expect(moved.some((change) => change.id === "c19")).toBe(true);
+    // Whatever it wrote, the order it asked for is the order it leaves.
+    const after = new Map(crowded.map((c) => [c.id, c.sort]));
+    for (const change of moved) after.set(change.id, change.sort);
+    const order = [...after.entries()].sort((x, y) => x[1] - y[1]).map(([id]) => id);
+    expect(order.indexOf("c19")).toBe(2);
+    expect(new Set(moved.map((c) => c.sort)).size).toBe(moved.length);
+  });
+
   it("respaces the lane only when the neighbours have no number between them", () => {
     const tight = [
       { id: "a", sort: 1000 },

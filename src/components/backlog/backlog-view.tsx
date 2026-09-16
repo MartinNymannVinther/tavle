@@ -276,6 +276,10 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
     onDropOn: dropOn,
     fromSprint: committedDrag,
     onDropOut: dropOut,
+    // Only the whole backlog can take a card back on its own terms; a
+    // group writes its field instead, and a narrowed list would hide the
+    // card it just drew a line for.
+    adopts: grouping === "list" && selection.kind === "all",
     crumbOf: (card) => crumbFor(crumbOf(card, structure.items), selection),
     context: heading ? { areaId: heading.areaId, themeIds: heading.themeIds } : undefined,
   };

@@ -101,6 +101,13 @@ export function ItemBacklog({
    */
   const storyRow = (
     card: CardView,
+    /**
+     * The rows as they are drawn, the sprint-promised ones among them:
+     * an arrow moves the card one row of what is read, and the service
+     * takes a promised card as the row passed, only never as the one
+     * moved (docs/adr/0033). Ranking against the free rows alone vaulted
+     * the card past every marked row standing between them.
+     */
     siblings: CardView[],
     featureId: string | null,
     context?: { areaId: string | null; themeIds: string[] },
@@ -261,6 +268,10 @@ export function ItemBacklog({
     );
   };
 
+  // The cards with no feature, drawn as one sequence: the free rows and
+  // the promised ones on the rank they share.
+  const looseMerged = mergeByRank(tree.looseStories, allocatedOf(null));
+
   const cardRows = (node: FeatureNode, depth: number) => {
     // The feature's committed cards stand at their rank among the free
     // ones — one priority (docs/adr/0033), the sprint's name saying why
@@ -297,7 +308,12 @@ export function ItemBacklog({
               const place = { areaId: node.feature.areaId, themeIds: node.feature.themeIds };
               return committed
                 ? markedRow(card, place)
-                : storyRow(card, node.stories, node.feature.id, place);
+                : storyRow(
+                    card,
+                    merged.map((row) => row.card),
+                    node.feature.id,
+                    place,
+                  );
             })}
           </ol>
         )}
@@ -406,8 +422,14 @@ export function ItemBacklog({
           {/* The cards with no feature are each other's siblings under their
               own heading, so they rank like every other row on the page. */}
           <ol>
-            {mergeByRank(tree.looseStories, allocatedOf(null)).map(({ card, committed }) =>
-              committed ? markedRow(card) : storyRow(card, tree.looseStories, null),
+            {looseMerged.map(({ card, committed }) =>
+              committed
+                ? markedRow(card)
+                : storyRow(
+                    card,
+                    looseMerged.map((row) => row.card),
+                    null,
+                  ),
             )}
           </ol>
         </>

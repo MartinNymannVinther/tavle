@@ -29,6 +29,13 @@ export type StoryRowProps = {
   onDropOn: (targetId: string, after: boolean) => void;
   /** Whether the card being dragged is one promised to a sprint. */
   fromSprint?: (cardId: string) => boolean;
+  /**
+   * Whether this list takes back any card, whatever its fields — true of
+   * the whole backlog, false of a list narrowed to one feature or cut
+   * into groups, where a card that keeps its fields would land under a
+   * heading it does not belong to.
+   */
+  adopts?: boolean;
   /** A card dragged out of a sprint onto a backlog with no rows to land between. */
   onDropOut?: () => void;
   /** The line under a title: where the story sits, as far as the heading has not said it. */
@@ -66,7 +73,15 @@ export function StoryRows({
   // of a sprint. Either may land here; what it means differs.
   const foreign = dragged ? !stories.some((c) => c.id === dragged) : false;
   const released = Boolean(dragged && rows.fromSprint?.(dragged));
-  const canLand = !foreign || released || Boolean(groupDrop);
+  // A card from elsewhere may land only where the drop can honestly put
+  // it: a group writes the field its heading stands for, and the whole
+  // backlog takes any card back. Anywhere else the row would draw a line
+  // promising a place the card will not be in.
+  const canLand = !foreign || Boolean(groupDrop) || (released && rows.adopts === true);
+  // A drag can end without passing over a row again — dropped outside,
+  // or abandoned with Escape — and the line it left would otherwise
+  // still be lit when the next one starts.
+  if (!dragged && hover) setHover(null);
   const landing = (card: CardView) => ({
     onDragOver: (event: React.DragEvent) => {
       if (!dragged || dragged === card.id || !canLand) return;
@@ -77,9 +92,10 @@ export function StoryRows({
     },
     onDrop: () => {
       const after = hover?.id === card.id ? hover.after : false;
-      // A card out of a sprint comes back to the backlog wherever it is
-      // dropped; a card from another group takes that group's field.
-      if (foreign && !released && groupDrop && dragged) {
+      // A card from another group takes that group's field — including
+      // one just dragged out of a sprint, which `moveCardToGroup` takes
+      // the promise back for before it writes anything else.
+      if (foreign && groupDrop && dragged) {
         groupDrop.onDrop(dragged, card.id, after);
         rows.setDragId(null);
       } else {

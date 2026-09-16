@@ -37,8 +37,9 @@ export function sortAtTop(lane: Positioned[]): number {
  * changed. The card may or may not already be in the lane; either way it
  * ends up exactly once, at the asked-for position, clamped to the lane's
  * length. Normally that is one row: the moved card, numbered between the
- * neighbours it landed between. When those two neighbours are adjacent
- * numbers there is nowhere to land, and the whole lane is respaced.
+ * neighbours it landed between. When those two neighbours leave no whole
+ * number between them, the rows around the landing are spread out — as
+ * few of them as will make room, never the whole lane.
  */
 export function placeInLane(
   lane: Positioned[],
@@ -58,20 +59,75 @@ export function placeInLane(
   if (!below) return [{ id: cardId, sort: above.sort + STEP }];
   const room = below.sort - above.sort;
   if (room >= 2) return [{ id: cardId, sort: above.sort + Math.floor(room / 2) }];
-  return respace(others, cardId, at, new Map(ordered.map((c) => [c.id, c.sort])));
+  return spread(others, cardId, at, new Map(ordered.map((c) => [c.id, c.sort])));
 }
 
-/** The lane written out again as 1000, 2000, 3000 …, with the card at `at`. */
-function respace(
+/**
+ * Making room where there is none.
+ *
+ * The first cut of this wrote the whole lane out again as 1000, 2000,
+ * 3000 …, which is fine for a lane of six and quite another thing for a
+ * board carrying years of work: every card rewritten, every one of them
+ * re-stamped and audited, for one press of an arrow. Rows numbered
+ * before the one-rank decision (docs/adr/0033) arrive in blocks holding
+ * the same number, so a real board hit that on its first move.
+ *
+ * So the window grows from the landing outwards, one row at a time,
+ * until the numbers just outside it can hold everything inside with a
+ * whole number each — and only that window is written. A lane with room
+ * somewhere near costs two or three rows; the whole lane is the worst
+ * case, not the ordinary one.
+ */
+function spread(
   others: Positioned[],
   cardId: string,
   at: number,
   was: Map<string, number>,
 ): Array<{ id: string; sort: number }> {
-  const settled = [...others.slice(0, at), { id: cardId, sort: Number.NaN }, ...others.slice(at)];
+  let lo = at;
+  let hi = at;
+  for (;;) {
+    const under = others[lo - 1];
+    const over = others[hi];
+    // The moved card plus the rows inside the window, each needing a
+    // whole number of its own between the two that bound it.
+    const need = hi - lo + 1;
+    const gap = under && over ? over.sort - under.sort - 1 : Number.POSITIVE_INFINITY;
+    if (gap >= need) return written(others, cardId, at, lo, hi, under, over, need, was);
+    // Widen upwards first: a card put between two crammed rows pushes
+    // the ones after it along, which is what the eye expects, and it
+    // keeps the numbers positive instead of digging below the lane.
+    if (hi < others.length) hi += 1;
+    else if (lo > 0) lo -= 1;
+    else return written(others, cardId, at, lo, hi, undefined, undefined, need, was);
+  }
+}
+
+/** The window's rows, evenly spread between the numbers that bound it. */
+function written(
+  others: Positioned[],
+  cardId: string,
+  at: number,
+  lo: number,
+  hi: number,
+  under: Positioned | undefined,
+  over: Positioned | undefined,
+  need: number,
+  was: Map<string, number>,
+): Array<{ id: string; sort: number }> {
+  const inside = [
+    ...others.slice(lo, at),
+    { id: cardId, sort: Number.NaN },
+    ...others.slice(at, hi),
+  ];
+  // An open end is spread by the lane's own step, so the numbers stay
+  // the round ones a person reading an export would expect.
+  const first = under ? under.sort : over ? over.sort - need * STEP : STEP;
+  const step = under && over ? Math.floor((over.sort - under.sort) / (need + 1)) : STEP;
+  const base = under ? first + step : first;
   const changes: Array<{ id: string; sort: number }> = [];
-  settled.forEach((card, i) => {
-    const sort = (i + 1) * STEP;
+  inside.forEach((card, i) => {
+    const sort = base + i * step;
     if (was.get(card.id) !== sort) changes.push({ id: card.id, sort });
   });
   return changes;
