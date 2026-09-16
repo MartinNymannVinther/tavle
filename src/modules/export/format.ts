@@ -1,3 +1,4 @@
+import { todayInCopenhagen } from "@/core/dates";
 import { buildWorkbook, type CellValue, type Sheet } from "@/core/xlsx";
 import type { OrgExport } from "./service";
 
@@ -23,7 +24,9 @@ export function exportFileName(orgName: string, exportedAt: Date, extension: str
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "")
       .slice(0, 40) || "tavle";
-  const date = exportedAt.toISOString().slice(0, 10);
+  // The day the file is named for is the day here, not in UTC: an export
+  // taken at half past midnight in Copenhagen is not yesterday's.
+  const date = todayInCopenhagen(exportedAt);
   return `tavle-${slug}-${date}.${extension}`;
 }
 

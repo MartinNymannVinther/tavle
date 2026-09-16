@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getOrgContext } from "@/core/auth/session";
-import { formatPlanDate } from "@/core/dates";
+import { formatDay } from "@/core/dates";
 import { memberships, organizations } from "@/core/db/schema";
 import { withOrgContext } from "@/core/db/tenant";
 import { listPendingInvitations } from "@/core/team/service";
@@ -64,10 +64,12 @@ export default async function WorkspaceSettingsPage() {
       <div className="flex flex-col gap-1.5">
         <h2 className="text-base font-semibold">{workspace?.name ?? t("title")}</h2>
         <p className="text-meta text-2sm leading-relaxed">
+          {/* The workspace was made at a moment, not on a plan date, so it
+              goes through `formatDay`. Slicing the ISO string first read
+              the day in UTC, which told a workspace created at half past
+              midnight in Copenhagen that it was made the day before. */}
           {workspace
-            ? t("createdOn", {
-                date: formatPlanDate(workspace.createdAt.toISOString().slice(0, 10), locale),
-              })
+            ? t("createdOn", { date: formatDay(workspace.createdAt, locale) })
             : t("subtitle")}
         </p>
       </div>

@@ -136,7 +136,13 @@ export async function proposeSprintGoal(
       role: "user",
       content: [
         `Sprint: ${fenceUntrusted(sprint.name, 80)} (${sprint.startDate} to ${sprint.endDate})`,
-        `Planned points: ${points}${average !== null ? `; the team's recent average is ${average}` : ""}`,
+        // A prompt is machine-facing, so it carries no locale — but this
+        // number can come back out as UI copy: the model writes the goal
+        // a person reads, and `velocity()` hands over one decimal, so
+        // "4.3" could land in a Danish sentence that spells it 4,3.
+        // Rounded here, where a tenth of a point says nothing a sentence
+        // about an outcome needs, so no decimal separator can travel.
+        `Planned points: ${points}${average !== null ? `; the team's recent average is ${Math.round(average)}` : ""}`,
         `Cards:\n${fenceUntrusted(rows.map(line).join("\n"), 4000)}`,
       ].join("\n"),
     },

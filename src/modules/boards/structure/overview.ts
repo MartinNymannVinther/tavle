@@ -23,6 +23,7 @@ export type Bucket = {
 };
 
 export type Overview = {
+  /** Only buckets that hold open work; an empty row says nothing true. */
   byTheme: Bucket[];
   byArea: Bucket[];
   byKind: Bucket[];
@@ -89,43 +90,71 @@ export function overview(full: BoardFull, now: Date = new Date()): Overview {
    * fell out of the distribution entirely: not in its own value, because
    * the value was filtered away, and not under "none", because it has one.
    * A retired value keeps its bucket for as long as open work carries it.
+   *
+   * The one-bucket rule leaves a row that has to be handled rather than
+   * printed. A theme that is never a story's only theme holds no bucket
+   * of its own, and a row saying "0 cards · 0 points" beside its name is
+   * read as "no open work on this theme" — which is false while three
+   * shared stories carry it. The same row is written for a theme that
+   * genuinely has nothing open, so the reader cannot tell the true one
+   * from the false one. So an empty row is not printed at all: every row
+   * in the distribution stands for work that is there, the axis still
+   * accounts for the whole of the total stated above it (nothing is
+   * dropped but zero), and what a theme shares with another is counted
+   * where it is — under "more than one theme". A theme that no open work
+   * touches at all is named by the health measures instead, which is the
+   * place that says so on purpose.
    */
   const single = (card: CardView) => (card.themeIds.length === 1 ? card.themeIds[0]! : null);
-  const byTheme: Bucket[] = [];
-  for (const theme of full.themes) {
-    const rows = stories.filter((c) => single(c) === theme.id);
-    if (!theme.active && rows.length === 0) continue;
-    byTheme.push(bucket(theme.id, theme.name, theme.color, rows, !theme.active));
-  }
-  const several = stories.filter((c) => c.themeIds.length > 1);
-  if (several.length > 0) byTheme.push(bucket(MULTI, "", null, several));
-  byTheme.push(
+  const held = (rows: Bucket[]) => rows.filter((row) => row.cards > 0);
+  const byTheme = held([
+    ...full.themes.map((theme) =>
+      bucket(
+        theme.id,
+        theme.name,
+        theme.color,
+        stories.filter((c) => single(c) === theme.id),
+        !theme.active,
+      ),
+    ),
+    bucket(
+      MULTI,
+      "",
+      null,
+      stories.filter((c) => c.themeIds.length > 1),
+    ),
     bucket(
       NONE,
       "",
       null,
       stories.filter((c) => c.themeIds.length === 0),
     ),
-  );
+  ]);
 
-  const byArea: Bucket[] = [];
-  for (const area of full.areas) {
-    const rows = stories.filter((c) => c.areaId === area.id);
-    if (!area.active && rows.length === 0) continue;
-    byArea.push(bucket(area.id, area.name, null, rows, !area.active));
-  }
-  byArea.push(
+  const byArea = held([
+    ...full.areas.map((area) =>
+      bucket(
+        area.id,
+        area.name,
+        null,
+        stories.filter((c) => c.areaId === area.id),
+        !area.active,
+      ),
+    ),
     bucket(
       NONE,
       "",
       null,
       stories.filter((c) => !c.areaId),
     ),
-  );
+  ]);
 
   const business = stories.filter((c) => c.kind !== "enabler");
   const enabler = stories.filter((c) => c.kind === "enabler");
-  const byKind = [bucket("business", "", null, business), bucket("enabler", "", null, enabler)];
+  const byKind = held([
+    bucket("business", "", null, business),
+    bucket("enabler", "", null, enabler),
+  ]);
   const activeThemes = full.themes.filter((t) => t.active);
   const activeAreas = full.areas.filter((a) => a.active);
   const totalPoints = points(stories);

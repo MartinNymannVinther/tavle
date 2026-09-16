@@ -1,12 +1,14 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 import {
   backlogItems as backlogItemsTable,
+  cards as cardsTable,
   events,
   swimlanes,
   themes as themesTable,
   areas as areasTable,
 } from "@/core/db/schema";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
+import { itemInWorkspace } from "./structure/items";
 import { applySwimlaneAssignment, updateSwimlane } from "./write-swimlanes";
 import { archiveCard, deleteCard, restoreCard } from "./write-card-lifecycle";
 import { moveCard, updateCard, type CardUpdate } from "./write-cards";
@@ -58,7 +60,27 @@ const MANAGE_KINDS = new Set<UndoStep["kind"]>([
   "theme.active",
   "area.active",
   "swimlane.active",
+  "theme.update",
+  "area.update",
+  "swimlane.update",
 ]);
+
+/**
+ * Whether the row still stands where the event left it. A field-level
+ * reverse only holds while the field still holds what the event set it
+ * to: "estimated at 5", undone after someone estimated at 8, would put
+ * the 5 back and throw the 8 away without a word. That is the world
+ * moving on (docs/adr/0022), and the tool says no instead of guessing.
+ * Payloads written before the reverse carried what it set have nothing
+ * to compare against, and keep the behaviour they were written under.
+ */
+function unmoved(
+  row: Record<string, unknown>,
+  after: Record<string, unknown> | undefined,
+): boolean {
+  if (!after) return true;
+  return Object.entries(after).every(([field, value]) => (row[field] ?? null) === (value ?? null));
+}
 
 /** Runs one reverse through the ordinary services. Null means the thing is gone. */
 async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): Promise<void> {
@@ -80,6 +102,11 @@ async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): P
       if (!(await placeCardInStructure(tx, ctx, { ...step }))) throw new NotUndoable();
       return;
     case "card.update": {
+      const current = await cardInWorkspace(tx, step.cardId);
+      if (!current) throw new NotUndoable();
+      if (!unmoved(current as unknown as Record<string, unknown>, step.after)) {
+        throw new NotUndoable();
+      }
       // Steps written before docs/adr/0029 name the assignee by login;
       // the person that login stands behind is the same fact today. A
       // login that left no person means the world moved on: not undoable.
@@ -133,14 +160,28 @@ async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): P
       }
       return;
     }
-    case "item.delete":
+    case "item.delete": {
+      // Undoing a creation deletes the thing again — but children have
+      // arrived under it since, and the foreign key would quietly drop
+      // them to no parent at all, with nothing to take that back. The
+      // structure refuses rather than guesses everywhere else, and so
+      // here: empty it first, or delete it deliberately from its own
+      // page, where the conversation belongs.
+      if (await hasChildren(tx, step.itemId)) throw new NotUndoable();
       if (!(await deleteItem(tx, ctx, step.itemId))) throw new NotUndoable();
       return;
-    case "item.update":
+    }
+    case "item.update": {
+      const current = await itemInWorkspace(tx, step.itemId);
+      if (!current) throw new NotUndoable();
+      if (!unmoved(current as unknown as Record<string, unknown>, step.after)) {
+        throw new NotUndoable();
+      }
       if (!(await updateItem(tx, ctx, { itemId: step.itemId, ...step.fields }))) {
         throw new NotUndoable();
       }
       return;
+    }
     case "item.place":
       if (!(await placeItemInStructure(tx, ctx, { ...step }))) throw new NotUndoable();
       return;
@@ -259,7 +300,65 @@ async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): P
       await updateSwimlane(tx, ctx, { swimlaneId: row.id, name: row.name, active: step.active });
       return;
     }
+    // The names, colours and owners of the closed lists and the lanes.
+    // The active flag is read off the row rather than carried, so
+    // putting a name back never puts a deactivated entry back in use.
+    case "theme.update": {
+      const [row] = await tx
+        .select()
+        .from(themesTable)
+        .where(eq(themesTable.id, step.themeId))
+        .limit(1);
+      if (!row) throw new NotUndoable();
+      await updateTheme(tx, ctx, {
+        themeId: row.id,
+        name: step.name,
+        color: step.color,
+        ownerUserId: step.ownerUserId,
+        active: row.active,
+      });
+      return;
+    }
+    case "area.update": {
+      const [row] = await tx
+        .select()
+        .from(areasTable)
+        .where(eq(areasTable.id, step.areaId))
+        .limit(1);
+      if (!row) throw new NotUndoable();
+      await updateArea(tx, ctx, {
+        areaId: row.id,
+        name: step.name,
+        ownerUserId: step.ownerUserId,
+        active: row.active,
+      });
+      return;
+    }
+    case "swimlane.update": {
+      const [row] = await tx
+        .select()
+        .from(swimlanes)
+        .where(eq(swimlanes.id, step.swimlaneId))
+        .limit(1);
+      if (!row) throw new NotUndoable();
+      await updateSwimlane(tx, ctx, { swimlaneId: row.id, name: step.name, active: row.active });
+      return;
+    }
   }
+}
+
+/** Features under an epic, or cards under a feature: anything the delete would orphan. */
+async function hasChildren(tx: AppTransaction, itemId: string): Promise<boolean> {
+  const [items] = await tx
+    .select({ n: count() })
+    .from(backlogItemsTable)
+    .where(eq(backlogItemsTable.parentId, itemId));
+  if (Number(items?.n ?? 0) > 0) return true;
+  const [cards] = await tx
+    .select({ n: count() })
+    .from(cardsTable)
+    .where(eq(cardsTable.featureId, itemId));
+  return Number(cards?.n ?? 0) > 0;
 }
 
 async function moveCardTarget(tx: AppTransaction, cardId: string) {

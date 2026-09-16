@@ -126,6 +126,52 @@ describe("the sentence an event becomes", () => {
     ).toBe("WEB-61 venter på: Venter på design");
   });
 
+  it("reads a card's kind in words, never the database's own enum", () => {
+    const enabler = {
+      key: "WEB-67",
+      title: "Kø",
+      kind: "enabler",
+      enablerType: "infrastructure",
+    };
+    expect(line("da", "card.kind", enabler)).toBe("WEB-67 blev sat til Enabler (Infrastruktur)");
+    expect(line("en", "card.kind", enabler)).toBe("WEB-67 was set to Enabler (Infrastructure)");
+  });
+
+  it("leaves out the subtype, and its space, when there is none", () => {
+    const business = { key: "WEB-67", title: "Kø", kind: "business", enablerType: "" };
+    expect(line("da", "card.kind", business)).toBe("WEB-67 blev sat til Business");
+    expect(line("en", "card.kind", business)).toBe("WEB-67 was set to Business");
+    // An enabler nobody has given a subtype ends the same way.
+    expect(line("da", "card.kind", { key: "WEB-67", kind: "enabler", enablerType: "" })).toBe(
+      "WEB-67 blev sat til Enabler",
+    );
+  });
+
+  it("names both ends of a renamed theme, area or lane, and neither when nothing was renamed", () => {
+    expect(line("da", "theme.updated", { name: "Fart", from: "Hastighed" })).toBe(
+      "Temaet Hastighed blev omdøbt til Fart",
+    );
+    expect(line("en", "theme.updated", { name: "Fart", from: "Hastighed" })).toBe(
+      "The theme Hastighed was renamed to Fart",
+    );
+    // A recolour or a new owner keeps the name it had.
+    expect(line("da", "theme.updated", { name: "Fart", from: "Fart" })).toBe(
+      "Temaet Fart blev ændret",
+    );
+    expect(line("da", "area.updated", { name: "Butik", from: "Forside" })).toBe(
+      "Området Forside blev omdøbt til Butik",
+    );
+    expect(line("en", "area.updated", { name: "Butik", from: "Butik" })).toBe(
+      "The area Butik was changed",
+    );
+    expect(line("da", "swimlane.updated", { name: "Drift", from: "Support" })).toBe(
+      "Banen Support blev omdøbt til Drift",
+    );
+    expect(line("en", "swimlane.updated", { name: "Drift", from: "Support" })).toBe(
+      "The lane Support was renamed to Drift",
+    );
+  });
+
   it("answers an event type it has no sentence for with the type, not a key path", () => {
     expect(line("da", "card.somethingElse", { key: "WEB-1" })).toBe("card.somethingElse");
   });

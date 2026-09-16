@@ -21,28 +21,42 @@ export function plotHeight() {
   return CHART.height - CHART.top - CHART.bottom;
 }
 
-/** Evenly spaced y ticks that land on round numbers. */
+/**
+ * Evenly spaced y ticks that land on round numbers, and never on a
+ * fraction. Every chart here counts cards or points, and neither has a
+ * half — but all four floor their maximum at 1, so a quiet board used to
+ * draw 0, 0.5, 1 up the axis: a decimal point on a page whose language
+ * writes 0,5. The step floors at one, which makes the tick an integer at
+ * every scale and takes the whole question of a decimal separator off
+ * the axis. Thousands are left ungrouped, which is what an axis tick
+ * looks like in both languages, and a board big enough to argue about
+ * it has not been seen yet.
+ */
 export function yTicks(max: number, count = 4): number[] {
   if (max <= 0) return [0];
   const rough = max / count;
   const magnitude = 10 ** Math.floor(Math.log10(rough));
-  const step = [1, 2, 5, 10].map((m) => m * magnitude).find((s) => s >= rough) ?? magnitude;
+  const step = Math.max(
+    1,
+    [1, 2, 5, 10].map((m) => m * magnitude).find((s) => s >= rough) ?? magnitude,
+  );
   const ticks: number[] = [];
-  for (let v = 0; v <= max + 1e-9; v += step) ticks.push(Math.round(v * 100) / 100);
+  for (let v = 0; v <= max + 1e-9; v += step) ticks.push(v);
   if ((ticks.at(-1) ?? 0) < max) ticks.push((ticks.at(-1) ?? 0) + step);
   return ticks;
 }
 
+// No formatter hook on the axis: an optional one nobody passed is how
+// the halves went unnoticed. `yTicks` guarantees whole numbers, so the
+// tick is written as it is.
 export function Frame({
   ariaLabel,
   children,
   yMax,
-  yFormat = (v) => String(v),
 }: {
   ariaLabel: string;
   children: React.ReactNode;
   yMax: number;
-  yFormat?: (v: number) => string;
 }) {
   const ticks = yTicks(yMax);
   const top = ticks.at(-1) || 1;
@@ -65,7 +79,7 @@ export function Frame({
             strokeWidth={1}
           />
           <text x={CHART.left - 6} y={y(tick) + 3.5} textAnchor="end" fill="var(--label)">
-            {yFormat(tick)}
+            {tick}
           </text>
         </g>
       ))}

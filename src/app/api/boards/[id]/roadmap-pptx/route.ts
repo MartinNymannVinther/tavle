@@ -24,7 +24,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     ? (asked as Locale)
     : routing.defaultLocale;
   const t = await getTranslations({ locale, namespace: "roadmap" });
-  const buffer = await buildRoadmapPptx(ctx, id, { unplanned: t("pptUnplanned") });
+  const buffer = await buildRoadmapPptx(ctx, id, { unplanned: t("pptUnplanned"), locale });
   if (!buffer) return new NextResponse("Not found", { status: 404 });
   return new NextResponse(new Uint8Array(buffer), {
     headers: {

@@ -14,6 +14,12 @@ import { enablerTypeFor } from "./structure/rules";
  * stuck and what it waits for — and fold the rest into one "updated"
  * line that carries the field names as they stand in the database. The
  * feed translates them; the record keeps the facts (docs/adr/0022).
+ *
+ * Every reverse here carries both ends: `fields` is what the card held
+ * before, `after` is what this event set. The reverse is only honest
+ * while the field still holds what the event set it to — an estimate
+ * event undone after a second estimate would throw away the newer one
+ * without saying so — and `after` is what lets `undo.ts` see that.
  */
 
 export type CardUpdate = {
@@ -84,6 +90,7 @@ export async function updateCard(
             kind: "card.update",
             cardId: card.id,
             fields: { kind: card.kind, enablerType: card.enablerType },
+            after: { kind, enablerType },
           },
         },
       );
@@ -100,7 +107,12 @@ export async function updateCard(
       {
         cardId: card.id,
         actor,
-        undo: { kind: "card.update", cardId: card.id, fields: { bug: card.bug } },
+        undo: {
+          kind: "card.update",
+          cardId: card.id,
+          fields: { bug: card.bug },
+          after: { bug: input.bug },
+        },
       },
     );
   }
@@ -128,7 +140,12 @@ export async function updateCard(
       {
         cardId: card.id,
         actor,
-        undo: { kind: "card.update", cardId: card.id, fields: { estimate: card.estimate } },
+        undo: {
+          kind: "card.update",
+          cardId: card.id,
+          fields: { estimate: card.estimate },
+          after: { estimate: input.estimate },
+        },
       },
     );
   }
@@ -149,6 +166,7 @@ export async function updateCard(
           kind: "card.update",
           cardId: card.id,
           fields: { assigneePersonId: card.assigneePersonId },
+          after: { assigneePersonId: patch.assigneePersonId },
         },
       },
     );
@@ -169,6 +187,7 @@ export async function updateCard(
           kind: "card.update",
           cardId: card.id,
           fields: { blocked: card.blocked, blockedReason: card.blockedReason },
+          after: { blocked: input.blocked, blockedReason: patch.blockedReason },
         },
       },
     );
@@ -198,6 +217,7 @@ export async function updateCard(
             kind: "card.update",
             cardId: card.id,
             fields: { blockedReason: card.blockedReason },
+            after: { blockedReason: input.blockedReason },
           },
         },
       );
@@ -210,6 +230,9 @@ export async function updateCard(
     const oldFields = Object.fromEntries(
       changed.map((field) => [field, card[field as keyof typeof card] ?? null]),
     );
+    const newFields = Object.fromEntries(
+      changed.map((field) => [field, patch[field as keyof typeof patch] ?? null]),
+    );
     await recordEvent(
       tx,
       ctx,
@@ -219,7 +242,7 @@ export async function updateCard(
       {
         cardId: card.id,
         actor,
-        undo: { kind: "card.update", cardId: card.id, fields: oldFields },
+        undo: { kind: "card.update", cardId: card.id, fields: oldFields, after: newFields },
       },
     );
   }

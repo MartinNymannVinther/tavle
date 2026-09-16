@@ -89,6 +89,19 @@ export async function updateSwimlane(
     .update(swimlanes)
     .set({ name: input.name, active: input.active })
     .where(eq(swimlanes.id, lane.id));
+  // A lane has only its name, so a change to it is a rename — and the
+  // settings page promises a Fortryd on every change to the board's
+  // shape. Without this line the rename had no event and no reverse.
+  if (lane.name !== input.name) {
+    await recordEvent(
+      tx,
+      ctx,
+      lane.boardId,
+      "swimlane.updated",
+      { name: input.name, from: lane.name },
+      { undo: { kind: "swimlane.update", swimlaneId: lane.id, name: lane.name } },
+    );
+  }
   if (lane.active !== input.active) {
     await recordEvent(
       tx,

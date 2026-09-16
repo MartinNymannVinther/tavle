@@ -103,15 +103,38 @@ export async function updateTheme(
       throw new RuleViolation("themeLimit");
     }
   }
+  const owner = await ownerId(tx, input.ownerUserId);
   await tx
     .update(themes)
     .set({
       name: input.name,
       color: input.color,
-      ownerUserId: await ownerId(tx, input.ownerUserId),
+      ownerUserId: owner,
       active: input.active,
     })
     .where(eq(themes.id, theme.id));
+  // A rename, a recolour or a new owner is a change to the shape of the
+  // board like any other, and the settings page promises a Fortryd on
+  // it. Without a line of its own it had neither: the audit trigger saw
+  // it, but no feed did, and nothing carried its reverse.
+  if (theme.name !== input.name || theme.color !== input.color || theme.ownerUserId !== owner) {
+    await recordEvent(
+      tx,
+      ctx,
+      theme.boardId,
+      "theme.updated",
+      { name: input.name, from: theme.name },
+      {
+        undo: {
+          kind: "theme.update",
+          themeId: theme.id,
+          name: theme.name,
+          color: theme.color,
+          ownerUserId: theme.ownerUserId,
+        },
+      },
+    );
+  }
   if (theme.active !== input.active) {
     await recordEvent(
       tx,
@@ -163,14 +186,34 @@ export async function updateArea(
   const [area] = await tx.select().from(areas).where(eq(areas.id, input.areaId)).limit(1);
   if (!area) return null;
   if (!(await nameFree(tx, areas, area.boardId, input.name, area.id))) throw new NameTaken();
+  const owner = await ownerId(tx, input.ownerUserId);
   await tx
     .update(areas)
     .set({
       name: input.name,
-      ownerUserId: await ownerId(tx, input.ownerUserId),
+      ownerUserId: owner,
       active: input.active,
     })
     .where(eq(areas.id, area.id));
+  // As for a theme: the rename and the new owner are their own fact,
+  // with their own reverse.
+  if (area.name !== input.name || area.ownerUserId !== owner) {
+    await recordEvent(
+      tx,
+      ctx,
+      area.boardId,
+      "area.updated",
+      { name: input.name, from: area.name },
+      {
+        undo: {
+          kind: "area.update",
+          areaId: area.id,
+          name: area.name,
+          ownerUserId: area.ownerUserId,
+        },
+      },
+    );
+  }
   if (area.active !== input.active) {
     await recordEvent(
       tx,

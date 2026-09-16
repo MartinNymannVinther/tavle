@@ -117,7 +117,12 @@ export function formatDay(value: Date, locale: string): string {
   }).format(value);
 }
 
-/** A moment with its clock, for a feed: "26.08.2026, 14.05" / "26/08/2026, 14:05". */
+/**
+ * A moment with its clock: "26.08.2026, 14.05" / "26/08/2026, 14:05".
+ * Used by the activity feed and by anything else that states a point in
+ * time — a build stamp, a migration's arrival — so a page never grows a
+ * long date with an am/pm clock of its own beside these.
+ */
 export function formatStamp(value: Date, locale: string): string {
   return new Intl.DateTimeFormat(intlLocale(locale), {
     day: "2-digit",
@@ -128,3 +133,29 @@ export function formatStamp(value: Date, locale: string): string {
     timeZone: "Europe/Copenhagen",
   }).format(value);
 }
+
+/**
+ * A note about `<input type="date">`, which the three functions above do
+ * not reach and deliberately are not made to.
+ *
+ * Tavle has four of them — the card's due date, a release's target date,
+ * a sprint's start and end. A native date field always holds an ISO
+ * value and always *shows* the format the operating system is set to,
+ * and no stylesheet or script can change that: the widget is drawn by
+ * the browser. So an English page on a Danish machine shows
+ * "12.02.2026" in the field beside "12 Feb 2026" in the text around it.
+ *
+ * That is accepted rather than fixed, for three reasons. The format in
+ * the field is the one the person reads dates in everywhere else on
+ * their own machine, which is not a wrong format but their own. Writing
+ * the chosen date out again beside the field would put two spellings of
+ * one date next to each other, which is the very thing these formatters
+ * exist to prevent. And replacing the control with a calendar of our own
+ * costs a keyboard grid, a screen-reader contract and a mobile picker —
+ * far more than the mismatch it buys back, against a product principle
+ * that says everything works on a phone and with a keyboard.
+ *
+ * The bounds and the parsing stay ours: `src/modules/boards/plan-dates.ts`
+ * decides which dates a plan may point at, on both sides of the wire.
+ * Written down in TECH-DEBT.md so it stays a decision, not an oversight.
+ */

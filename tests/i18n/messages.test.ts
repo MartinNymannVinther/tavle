@@ -96,6 +96,13 @@ describe("keys used in the app", () => {
  * unit is handed over — the sentence disappears in front of the user,
  * which is how one was found in the sprint's close dialog. This proves
  * every call site of such a message passes one.
+ *
+ * The scan below is static, so it sees only literal keys. Backlog care
+ * asks for its findings with a key built at runtime
+ * (`t(`${finding.key}.body`)`, src/components/overview/care-list.tsx),
+ * and no static reader can follow that; `care.tooDeep.body` is covered
+ * instead by rendering it in tests/i18n/unit-sentences.test.ts, which
+ * walks the whole `care.*.body` family through the catalogue.
  */
 describe("messages that name the estimate unit", () => {
   const unitKeys = [...daKeys].filter((key) => {
@@ -160,5 +167,74 @@ describe("messages that name the estimate unit", () => {
       }
     }
     expect(broken.sort()).toEqual([]);
+  });
+
+  /**
+   * A select with only `hours` and `other` tells a T-shirt board its work
+   * is measured in points, on the same page whose cards read "L". A size
+   * names one card and there is no word for a total of sizes, so a sum on
+   * such a board is a weight (docs/adr/0030) — which is a branch of its
+   * own, never the leftover one.
+   */
+  it("spell out a T-shirt branch rather than letting sizes fall through to points", () => {
+    const missing: string[] = [];
+    for (const key of unitKeys) {
+      for (const [locale, catalogue] of [
+        ["da", da],
+        ["en", en],
+      ] as const) {
+        const value = resolve(catalogue as Messages, key);
+        if (typeof value !== "string" || !value.includes("{unit,")) continue;
+        for (const branch of ["hours {", "tshirt {"]) {
+          if (!value.includes(branch)) {
+            missing.push(`${locale}: "${key}" mangler gren ${branch.slice(0, -2)}`);
+          }
+        }
+      }
+    }
+    expect(missing.sort()).toEqual([]);
+  });
+
+  /**
+   * "{points} {unit, select, hours {timer} other {point}}" leaves the
+   * number outside the select, so no branch can ever agree with it: it
+   * reads "1 points" in English and "1 timer" on a Danish hours board.
+   * The number has to live inside the branch that knows its noun.
+   */
+  it("keep the count inside the branch that names it", () => {
+    const outside = /\{\w+\}\s+\{unit,/;
+    const found: string[] = [];
+    for (const key of unitKeys) {
+      for (const [locale, catalogue] of [
+        ["da", da],
+        ["en", en],
+      ] as const) {
+        const value = resolve(catalogue as Messages, key);
+        if (typeof value === "string" && outside.test(value)) {
+          found.push(`${locale}: "${key}" tæller uden for sin select`);
+        }
+      }
+    }
+    expect(found.sort()).toEqual([]);
+  });
+
+  /**
+   * English pluralises and Danish mostly does not, so a bare "{cards}
+   * cards" reads "1 cards". A count in front of an English noun has to go
+   * through a plural — either its own, or one wrapped around the clause.
+   */
+  it("never put a bare count in front of an English noun", () => {
+    const bare = /\{(\w+)\}\s+(points?|hours?|cards?|features?|epics?|sprints?)\b/g;
+    const found: string[] = [];
+    for (const key of unitKeys) {
+      const value = resolve(en as Messages, key);
+      if (typeof value !== "string") continue;
+      for (const match of value.matchAll(bare)) {
+        // A clause wrapped in `{n, plural, …}` already chose the noun form.
+        if (value.includes(`{${match[1]!}, plural`)) continue;
+        found.push(`en: "${key}" skriver "${match[0]}" uden plural`);
+      }
+    }
+    expect(found.sort()).toEqual([]);
   });
 });

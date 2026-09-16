@@ -63,6 +63,34 @@ describe("the weight distribution", () => {
     expect(overview(board, now).byTheme.map((b) => b.key)).not.toContain(MULTI);
   });
 
+  it("does not print a theme whose every story is shared as a theme with no work", () => {
+    // Stabil drift is on both of Selvbetjening's stories and on nothing
+    // else: eight points of real work, never a story's only theme.
+    const shared: BoardFull = {
+      ...board,
+      cards: board.cards.map((c) =>
+        c.themeIds.includes("t1") ? { ...c, themeIds: ["t1", "t2"] } : c,
+      ),
+    };
+    expectAxesReconcile(shared);
+    const data = overview(shared, now);
+    // The old row said "0 cards · 0 points" beside the theme's name,
+    // which reads as "nothing open here" while the work sits under the
+    // shared bucket. An absent row says nothing; a zero row said
+    // something false.
+    expect(data.byTheme.map((b) => b.key)).not.toContain("t2");
+    expect(data.byTheme.find((b) => b.key === MULTI)).toMatchObject({ cards: 2, points: 8 });
+  });
+
+  it("prints no empty row on any axis", () => {
+    for (const full of [board, kanban]) {
+      const data = overview(full, now);
+      for (const axis of [data.byTheme, data.byArea, data.byKind]) {
+        expect(axis.filter((b) => b.cards === 0)).toEqual([]);
+      }
+    }
+  });
+
   it("keeps a bucket for a theme taken off the list that open work still carries", () => {
     const retired: BoardFull = {
       ...board,

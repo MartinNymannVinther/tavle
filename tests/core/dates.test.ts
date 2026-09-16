@@ -101,4 +101,24 @@ describe("readable dates", () => {
     expect(formatDay(at, "en")).toBe("27 Aug 2026");
     expect(formatStamp(at, "en")).toBe("27/08/2026, 00:30");
   });
+
+  it("reads a moment's day in Copenhagen, which an ISO slice does not", () => {
+    // The trap the workspace page fell into: a workspace created between
+    // midnight and 02:00 here is still the day before in UTC, so
+    // `createdAt.toISOString().slice(0, 10)` dated it a day early.
+    const justAfterMidnight = new Date("2026-09-15T22:30:00Z");
+    expect(justAfterMidnight.toISOString().slice(0, 10)).toBe("2026-09-15");
+    expect(formatDay(justAfterMidnight, "da")).toContain("16");
+    expect(formatDay(justAfterMidnight, "en")).toContain("16");
+  });
+
+  it("keeps the clock day-first and 24-hour in both languages", () => {
+    // The about page used to hand next-intl's "en" straight to Intl,
+    // which resolves to en-US: "September 16, 2026 at 12:28 PM" beside a
+    // day-first product. Every stamp comes from here instead.
+    const at = new Date("2026-09-16T10:28:00Z");
+    expect(formatStamp(at, "da")).toBe("16.09.2026, 12.28");
+    expect(formatStamp(at, "en")).toBe("16/09/2026, 12:28");
+    expect(formatStamp(at, "en")).not.toMatch(/AM|PM/);
+  });
 });

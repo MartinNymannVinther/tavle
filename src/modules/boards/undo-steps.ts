@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { THEME_COLORS } from "@/core/db/schema";
 import { id } from "./validation";
 
 /**
@@ -58,7 +59,20 @@ export const UndoStepSchema = z.discriminatedUnion("kind", [
     areaId: id.nullable(),
     themeIds: z.array(id),
   }),
-  z.object({ kind: z.literal("card.update"), cardId: id, fields: cardFields }),
+  /**
+   * `fields` is what the card held before; `after` is what the event
+   * set. A field-level reverse is only honest while the field still
+   * holds what the event set it to — an estimate event undone after a
+   * second estimate would throw away the newer one without a word — so
+   * `undo.ts` refuses when the two no longer agree (docs/adr/0022).
+   * Absent on payloads written before the reverse carried both ends.
+   */
+  z.object({
+    kind: z.literal("card.update"),
+    cardId: id,
+    fields: cardFields,
+    after: cardFields.optional(),
+  }),
   z.object({ kind: z.literal("card.delete"), cardId: id }),
   z.object({ kind: z.literal("card.archive"), cardId: id }),
   z.object({ kind: z.literal("card.restore"), cardId: id }),
@@ -70,7 +84,12 @@ export const UndoStepSchema = z.discriminatedUnion("kind", [
     columnId: id.optional(),
   }),
   z.object({ kind: z.literal("item.delete"), itemId: id }),
-  z.object({ kind: z.literal("item.update"), itemId: id, fields: itemFields }),
+  z.object({
+    kind: z.literal("item.update"),
+    itemId: id,
+    fields: itemFields,
+    after: itemFields.optional(),
+  }),
   z.object({
     kind: z.literal("item.place"),
     itemId: id,
@@ -135,5 +154,26 @@ export const UndoStepSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("theme.active"), themeId: id, active: z.boolean() }),
   z.object({ kind: z.literal("area.active"), areaId: id, active: z.boolean() }),
   z.object({ kind: z.literal("swimlane.active"), swimlaneId: id, active: z.boolean() }),
+  /**
+   * The names, colours and owners of the closed lists and the lanes. A
+   * rename is as much a change to the board's shape as a deactivation,
+   * and the settings page offers a Fortryd on both. The active flag is
+   * not carried: it is its own event with its own reverse, and putting
+   * a name back must not quietly put a list entry back in use.
+   */
+  z.object({
+    kind: z.literal("theme.update"),
+    themeId: id,
+    name: z.string(),
+    color: z.enum(THEME_COLORS),
+    ownerUserId: id.nullable(),
+  }),
+  z.object({
+    kind: z.literal("area.update"),
+    areaId: id,
+    name: z.string(),
+    ownerUserId: id.nullable(),
+  }),
+  z.object({ kind: z.literal("swimlane.update"), swimlaneId: id, name: z.string() }),
 ]);
 export type UndoStep = z.infer<typeof UndoStepSchema>;

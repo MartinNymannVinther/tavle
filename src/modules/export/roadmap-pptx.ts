@@ -1,5 +1,7 @@
 import PptxGenJS from "pptxgenjs";
+import { formatPlanDate, todayInCopenhagen } from "@/core/dates";
 import type { OrgContext } from "@/core/db/tenant";
+import { routing } from "@/i18n/routing";
 import { getBoardFull } from "@/modules/boards/read";
 import { roadmap } from "@/modules/boards/structure/roadmap";
 
@@ -28,8 +30,14 @@ const SWATCH: Record<string, { bar: string; ink: string }> = {
   forest: { bar: "2C4A37", ink: PAPER },
 };
 
-/** The words the slide carries, resolved by the caller in the reader's language. */
-export type PptxLabels = { unplanned: string };
+/**
+ * The words the slide carries, resolved by the caller in the reader's
+ * language — and the language itself, because the deck dates its own
+ * footer and this is the one artefact that leaves the building. A
+ * caller that says nothing gets the installation's default language
+ * rather than a raw ISO date.
+ */
+export type PptxLabels = { unplanned: string; locale?: string };
 
 const PAGE = { width: 13.33, height: 7.5 };
 const CHART = { left: 3.2, top: 1.55, right: 0.5, rowHeight: 0.52, rowGap: 0.1 };
@@ -157,7 +165,11 @@ export async function buildRoadmapPptx(
         .join(" · ")}${data.unplanned.length > 4 ? ` (+${data.unplanned.length - 4})` : ""}`,
     );
   }
-  footnotes.push(`Tavle · ${new Date().toISOString().slice(0, 10)}`);
+  // The day the deck was made, in the reader's own format and read in
+  // Copenhagen — an ISO slice of `new Date()` is a UTC day, so a deck
+  // exported after midnight here was stamped with yesterday.
+  const stamped = formatPlanDate(todayInCopenhagen(), labels.locale ?? routing.defaultLocale);
+  footnotes.push(`Tavle · ${stamped}`);
   slide.addText(footnotes.join("     "), {
     x: 0.5,
     y: PAGE.height - 0.55,

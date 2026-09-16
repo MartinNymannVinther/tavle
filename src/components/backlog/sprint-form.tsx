@@ -144,7 +144,9 @@ export function SprintForm({
                 <FieldLabel htmlFor="sprint-start">{t("start")}</FieldLabel>
                 {/* Bounded, because a native date field passes through
                     0002, 0020 and 0202 on the way to 2026 and the service
-                    refuses those (src/modules/boards/plan-dates.ts). */}
+                    refuses those (src/modules/boards/plan-dates.ts). Both
+                    fields show the machine's date format rather than the
+                    page's — see the note at the foot of src/core/dates.ts. */}
                 <Input
                   id="sprint-start"
                   type="date"

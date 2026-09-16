@@ -18,9 +18,11 @@ export type EventType =
   | "column.updated"
   | "column.deleted"
   | "theme.created"
+  | "theme.updated"
   | "theme.activated"
   | "theme.deactivated"
   | "area.created"
+  | "area.updated"
   | "area.activated"
   | "area.deactivated"
   | "item.created"
@@ -71,6 +73,7 @@ export type EventType =
   | "ai.bootstrapped"
   | "undo.applied"
   | "swimlane.created"
+  | "swimlane.updated"
   | "swimlane.activated"
   | "swimlane.deactivated"
   | "comment.added"
@@ -182,33 +185,46 @@ type EventValues = Record<string, string | number | Date>;
 const spaced = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, "$1 $2").toLowerCase();
 
 /**
- * The name of a field, in the reader's language. The event stores the
- * column's own identifier, because that is the fact; a log is read by
- * people, so `dueDate` becomes "deadline" here under `events.field`. A
- * name the catalogue has not caught up with degrades to its own words
- * rather than breaking the line it sits in.
+ * One word from a catalogue, degrading to its own words rather than
+ * breaking the line it sits in when the catalogue has not caught up.
  */
-function fieldLabel(t: EventTranslator, name: string): string {
-  const key = `field.${name}`;
-  if (t.has && !t.has(key)) return spaced(name);
+function labelled(t: EventTranslator, key: string, fallback: string): string {
+  if (t.has && !t.has(key)) return fallback;
   try {
     // A missing message answers with its own path rather than throwing.
     const label = t(key);
-    return label.includes(key) ? spaced(name) : label;
+    return label.includes(key) ? fallback : label;
   } catch {
-    return spaced(name);
+    return fallback;
   }
 }
+
+/**
+ * The name of a field, in the reader's language. The event stores the
+ * column's own identifier, because that is the fact; a log is read by
+ * people, so `dueDate` becomes "deadline" here under `events.field`.
+ */
+const fieldLabel = (t: EventTranslator, name: string) => labelled(t, `field.${name}`, spaced(name));
+
+/**
+ * The same for a value out of a database enum. `kind` and `enablerType`
+ * are stored as the enum, because that is the fact and that is what the
+ * reverse and the AI read; nobody outside the database calls a card
+ * "enabler infrastructure", so the words are put on here, at render
+ * time, under `events.kind` and `events.enablerType`.
+ */
+const enumLabel = (t: EventTranslator, group: string, value: string) =>
+  labelled(t, `${group}.${value}`, spaced(value));
 
 const filled = (value: unknown) => typeof value === "string" && value.trim().length > 0;
 
 /**
  * What the sentence needs and the event does not carry: which of the
  * optional halves actually have a value, so a message can leave out the
- * ones that do not and never end mid-air, and the word this board puts
- * on a weight.
+ * ones that do not and never end mid-air, the word this board puts on a
+ * weight, and the words a database enum is read in.
  */
-function derive(type: string, values: EventValues): void {
+function derive(t: EventTranslator, type: string, values: EventValues): void {
   if (type === "card.placed" || type === "item.placed") {
     values.placed = filled(values.area)
       ? filled(values.themes)
@@ -221,6 +237,19 @@ function derive(type: string, values: EventValues): void {
   if (type === "card.blocked") values.why = filled(values.reason) ? "reason" : "none";
   if (type === "card.estimated" && typeof values.points === "number") {
     values.size = sizeOf(values.points);
+  }
+  if (type === "card.kind") {
+    // Business work has no subtype at all, and an enabler need not have
+    // named one yet; without this the sentence ended in a space.
+    const subtype = filled(values.enablerType);
+    values.subtype = subtype ? "some" : "none";
+    values.kind = filled(values.kind) ? enumLabel(t, "kind", String(values.kind)) : "";
+    values.enablerType = subtype ? enumLabel(t, "enablerType", String(values.enablerType)) : "";
+  }
+  if (type === "theme.updated" || type === "area.updated") {
+    // A rename is the change worth naming both ends of; a recolour or a
+    // new owner is not, and would read as "X was renamed to X".
+    values.renamed = filled(values.from) && values.from !== values.name ? "renamed" : "same";
   }
 }
 
@@ -269,7 +298,7 @@ export function renderEvent(
     else values[key] = String(value);
   }
   values.unit = unitFor(event.payload, options.unit);
-  derive(event.type, values);
+  derive(t, event.type, values);
   if (t.has && !t.has(event.type)) return event.type;
   try {
     return t(event.type, values);

@@ -237,14 +237,25 @@ pairs with the `public/fonts` item above: `next/font/local` with the
 files already in the repository, plus a decision about weight 500 and a
 local Geist Mono.
 
-### The about page still builds its own date
+### The four native date fields show the machine's format, not the page's
 
-`src/core/dates.ts` now holds the product's three date formats
-(`formatPlanDate`, `formatDay`, `formatStamp`), and every page goes
-through them — except `settings/about/page.tsx`, which builds a long
-date with a clock from scratch for the build stamp. It is locale-correct
-and nobody's plan date, so it is the one place left rather than a bug;
-fold it in when `dates.ts` grows a fourth format worth naming.
+`src/core/dates.ts` holds the product's three date formats
+(`formatPlanDate`, `formatDay`, `formatStamp`) and every rendered date
+goes through them. Four controls cannot: the card's due date, a
+release's target date and a sprint's start and end are
+`<input type="date">`, and a native date field is drawn by the browser
+in the operating system's format. No stylesheet or script reaches it.
+So an English page on a Danish machine shows `12.02.2026` in the field
+beside `12 Feb 2026` in the text around it.
+
+Accepted, with the reasoning written at the foot of `src/core/dates.ts`:
+the format in the field is the one that person reads dates in everywhere
+else on their own machine, and a second spelling of the same date beside
+it would be worse than the mismatch. The way out is a date picker of our
+own — a keyboard grid, a screen-reader contract and a mobile picker —
+which is a feature with its own ADR, not a formatting fix. If a real team
+reports it, the cheaper half-step is one quiet line under the field
+stating the chosen date in the page's language.
 
 ### Cards cannot be ticked at the Epics and Features altitudes
 

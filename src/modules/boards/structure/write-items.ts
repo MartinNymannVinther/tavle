@@ -131,11 +131,20 @@ export async function updateItem(
       changed.push("startQuarter");
     }
   }
-  // Quarters the wrong way round are swapped rather than refused; a bar
-  // dragged past its own end means the span the person drew.
+  // Quarters the wrong way round. A bar dragged past its own end does
+  // mean the span the person drew, and the bar is the one caller that
+  // names both ends in the same call: the drawing is one gesture, and
+  // which end was grabbed is not the point. The two selects under a
+  // planned epic's title name one end each, and there the swap rewrites
+  // the end nobody touched — picking 2026-Q1 as the target of an epic
+  // starting 2026-Q3 would silently move the start as well. So the swap
+  // stays with the drawn span, and a single pick that turns the span
+  // round is refused rather than guessed at.
   const start = patch.startQuarter !== undefined ? patch.startQuarter : item.startQuarter;
   const target = patch.targetQuarter !== undefined ? patch.targetQuarter : item.targetQuarter;
   if (start && target && compareQuarters(start, target) > 0) {
+    const drawn = input.startQuarter !== undefined && input.targetQuarter !== undefined;
+    if (!drawn) throw new Error("invalid");
     patch.startQuarter = target;
     patch.targetQuarter = start;
     // The swap writes both ends, so the feed and the reverse must carry
@@ -166,6 +175,19 @@ export async function updateItem(
                   ["enablerType", item.enablerType],
                 ]
               : [[field, item[field as keyof typeof item] ?? null]],
+          ),
+        ),
+        // What this edit set, beside what it replaced: the reverse only
+        // holds while the fields still stand where it left them
+        // (docs/adr/0022), and `undo.ts` needs both ends to see that.
+        after: Object.fromEntries(
+          changed.flatMap((field) =>
+            field === "kind"
+              ? [
+                  ["kind", kind],
+                  ["enablerType", enablerType],
+                ]
+              : [[field, patch[field as keyof typeof patch] ?? null]],
           ),
         ),
       },

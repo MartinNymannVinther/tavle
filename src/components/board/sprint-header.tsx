@@ -103,8 +103,11 @@ export function SprintHeader({
         <div>
           <p className="text-label text-2xs">{t("progress")}</p>
           <p className="font-semibold tabular-nums">
+            {/* The whole fraction is one message, because a T-shirt board
+                puts the word first — "vægt 3/8" — where points and hours
+                put it last (docs/adr/0030). */}
             {totalPoints > 0
-              ? `${donePoints}/${totalPoints} ${t("points", { unit })}`
+              ? t("progressValue", { unit, done: donePoints, total: totalPoints })
               : `${doneCards}/${totalCards}`}
             <span className="text-meta ml-1.5 font-normal">{share}%</span>
           </p>

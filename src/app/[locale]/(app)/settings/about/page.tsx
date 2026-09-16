@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatStamp } from "@/core/dates";
 import { env } from "@/core/env";
 import { buildInfo } from "@/core/version";
 import { getSchemaState } from "./schema-state";
@@ -22,13 +23,17 @@ export default async function AboutPage() {
   const locale = await getLocale();
   const schema = await getSchemaState();
 
-  const dateTime = new Intl.DateTimeFormat(locale, {
-    dateStyle: "long",
-    timeStyle: "short",
-    timeZone: "Europe/Copenhagen",
-  });
-  const format = (value: string | null) =>
-    value ? dateTime.format(new Date(value)) : t("unknown");
+  // Both stamps on this page go through `formatStamp` like every other
+  // moment in the product. Handing the next-intl locale straight to
+  // `Intl` is what made "en" mean en-US here: this page alone printed
+  // "September 16, 2026 at 12:28 PM" while the rest of the English UI
+  // was day-first. A stamp that cannot be read is written as unknown
+  // rather than thrown, because a build stamp must not take the page
+  // down with it.
+  const format = (value: string | null) => {
+    const at = value ? new Date(value) : null;
+    return at && !Number.isNaN(at.valueOf()) ? formatStamp(at, locale) : t("unknown");
+  };
 
   const rows: Array<{ label: string; value: string; mono?: boolean }> = [
     { label: t("versionLabel"), value: buildInfo.version, mono: true },

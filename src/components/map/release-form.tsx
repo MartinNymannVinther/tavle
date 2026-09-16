@@ -107,7 +107,9 @@ export function ReleaseForm({
               <FieldLabel htmlFor="release-date">{t("date")}</FieldLabel>
               {/* A native date field fires a change for every digit of the
                   year, so the bounds are what keep 0202 from reaching the
-                  service — which refuses it too (src/modules/boards/plan-dates.ts). */}
+                  service — which refuses it too (src/modules/boards/plan-dates.ts).
+                  It shows the machine's date format rather than the page's,
+                  which the note at the foot of src/core/dates.ts accepts. */}
               <Input
                 id="release-date"
                 type="date"

@@ -623,15 +623,15 @@
       "daysLeft": "Days left",
       "overdue": "{days, plural, one {# day over} other {# days over}}",
       "progress": "Progress",
-      "points": "{unit, select, hours {hours} other {points}}",
       "toBacklog": "Backlog",
       "close": "Close sprint",
       "closeTitle": "Close {name}",
-      "closeBody": "{done, plural, one {# card is done} other {# cards are done}} ({points} {unit, select, hours {hours} other {points}}). {open, plural, one {# is not} other {# are not}}. The sprint's numbers are written down as they stand now.",
+      "closeBody": "{done, plural, one {# card is done} other {# cards are done}} ({unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}}). {open, plural, one {# is not} other {# are not}}. The sprint's numbers are written down as they stand now.",
       "unfinishedGo": "The unfinished cards go to",
       "toBacklogOption": "The backlog, at the top",
       "closeConfirm": "Close the sprint",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "progressValue": "{unit, select, hours {{done}/{total} {total, plural, one {hour} other {hours}}} tshirt {weight {done}/{total}} other {{done}/{total} {total, plural, one {point} other {points}}}}"
     },
     "priority": {
       "low": "Low",
@@ -804,7 +804,7 @@
       "checklistField": "Checklist",
       "drop": "Drop",
       "keep": "Keep",
-      "points": "{unit, select, hours {Hours} other {Points}}",
+      "points": "{unit, select, hours {Hours} tshirt {Size} other {Points}}",
       "applyDraft": "Save to the card",
       "applySplit": "Create {count, plural, one {# card} other {# cards}}",
       "cancel": "Cancel",
@@ -844,7 +844,7 @@
   },
   "backlog": {
     "title": "Backlog",
-    "holds": "{cards, plural, one {# card} other {# cards}} · {points} {unit, select, hours {hours} other {points}}",
+    "holds": "{cards, plural, one {# card} other {# cards}} · {unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}}",
     "targetSprint": "Sprint",
     "commit": "Add to sprint",
     "empty": "The backlog is empty. Add the next thing the team should do.",
@@ -858,12 +858,12 @@
     "sprint": {
       "activeLabel": "running",
       "plannedLabel": "planned",
-      "holds": "{cards, plural, one {# card} other {# cards}} · {points} {unit, select, hours {hours} other {points}}",
+      "holds": "{cards, plural, one {# card} other {# cards}} · {unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}}",
       "edit": "Edit",
       "start": "Start the sprint",
       "anotherActive": "A sprint is already running. Close it first.",
       "toBoard": "See the board",
-      "empty": "No cards yet. Select cards in the backlog and put them here.",
+      "empty": "No cards yet. Drag cards here from the backlog, or tick them and put them in the sprint.",
       "toBacklog": "Move {count, plural, one {# card} other {# cards}} to the backlog",
       "againstAverage": "the average is {average, number}",
       "startAskTitle": "Start {name}",
@@ -919,8 +919,8 @@
     },
     "heading": {
       "doneWhen": "Done when:",
-      "epicCounts": "{features, plural, one {# feature} other {# features}} · {cards, plural, one {# card} other {# cards}} in the backlog · {points} {unit, select, hours {hours} other {points}}",
-      "featureCounts": "{cards, plural, one {# card} other {# cards}} in the backlog · {points} {unit, select, hours {hours} other {points}} · {open} under way",
+      "epicCounts": "{features, plural, one {# feature} other {# features}} · {cards, plural, one {# card} other {# cards}} in the backlog · {unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}}",
+      "featureCounts": "{cards, plural, one {# card} other {# cards}} in the backlog · {unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}} · {open} under way",
       "looseHint": "Cards that are not part of a feature yet"
     },
     "place": "Put under feature",
@@ -944,12 +944,12 @@
   "sprints": {
     "title": "Sprints",
     "velocityTitle": "Velocity",
-    "velocityBody": "{unit, select, hours {Hours} other {Points}} completed per closed sprint. Average of the last three: {average, number}.",
+    "velocityBody": "{unit, select, hours {Hours} tshirt {Weight} other {Points}} completed per closed sprint. Average of the last three: {average, number}.",
     "emptyTitle": "No sprints yet",
     "emptyBody": "Sprints are planned in the backlog. They are listed here once they have run.",
     "emptyCta": "Go to the backlog",
-    "closedPoints": "{completed} of {committed} {unit, select, hours {hours} other {points}}",
-    "committedPoints": "{committed} {unit, select, hours {hours} other {points}} committed",
+    "closedPoints": "{unit, select, hours {{completed} of {committed, plural, one {# hour} other {# hours}}} tshirt {weight {completed} of {committed}} other {{completed} of {committed, plural, one {# point} other {# points}}}}",
+    "committedPoints": "{unit, select, hours {{committed, plural, one {# hour} other {# hours}}} tshirt {weight {committed}} other {{committed, plural, one {# point} other {# points}}}} committed",
     "state": {
       "planned": "Planned",
       "active": "Running",
@@ -958,7 +958,7 @@
     "detail": {
       "back": "All sprints",
       "burndownTitle": "Burndown",
-      "numbers": "{done} of {total} cards done · {donePoints} of {totalPoints} {unit, select, hours {hours} other {points}}",
+      "numbers": "{total, plural, one {{done} of {total} card done} other {{done} of {total} cards done}} · {unit, select, hours {{donePoints} of {totalPoints, plural, one {# hour} other {# hours}}} tshirt {weight {donePoints} of {totalPoints}} other {{donePoints} of {totalPoints, plural, one {# point} other {# points}}}}",
       "notStarted": "The sprint has not started yet.",
       "cardsTitle": "Cards in the sprint",
       "noCards": "No cards."
@@ -1008,10 +1008,10 @@
     "weeklyHint": "Average {average, number} per week over eight weeks",
     "days": "{days, number} days",
     "burndownTitle": "Burndown",
-    "burndownBody": "{name}: {remaining} {unit, select, hours {hours} other {points}} left, {committed} committed at start. Ends {end}.",
+    "burndownBody": "{name}: {unit, select, hours {{remaining, plural, one {# hour} other {# hours}}} tshirt {weight {remaining}} other {{remaining, plural, one {# point} other {# points}}}} left, {committed} committed at start. Ends {end}.",
     "burndownNone": "No sprint is running right now.",
     "velocityTitle": "Velocity",
-    "velocityBody": "{unit, select, hours {Hours} other {Points}} completed per closed sprint. Average of the last three: {average, number}.",
+    "velocityBody": "{unit, select, hours {Hours} tshirt {Weight} other {Points}} completed per closed sprint. Average of the last three: {average, number}.",
     "velocityNone": "No closed sprints yet.",
     "throughputTitle": "Cards done per week",
     "throughputBody": "The last eight weeks. Steady is good; swinging is a sign of bottlenecks.",
@@ -1212,7 +1212,7 @@
       "created": "The board {name} was created",
       "updated": "The board was renamed to {name}",
       "view": "The board's view of the structure was changed",
-      "estimateUnit": "The board now counts in {unit, select, points {story points} hours {hours} tshirt {T-shirt sizes} other {{unit}}} ({cards} cards converted)"
+      "estimateUnit": "The board now counts in {unit, select, points {story points} hours {hours} tshirt {T-shirt sizes} other {{unit}}} ({cards, plural, one {# card converted} other {# cards converted}})"
     },
     "column": {
       "created": "The column {name} was added",
@@ -1237,7 +1237,7 @@
       "split": "{key} was split into {into}",
       "parent": "{key} was put under {parent}",
       "placed": "{placed, select, both {{key} got area {area} and themes {themes}} area {{key} got area {area}} themes {{key} got themes {themes}} other {{key} has no area or themes}}",
-      "kind": "{key} was set to {kind} {enablerType}",
+      "kind": "{key} was set to {kind}{subtype, select, some { ({enablerType})} other {}}",
       "bug": "{key} was marked as a bug",
       "notBug": "{key} is no longer marked as a bug",
       "swimlane": "{lane, select, none {{key} was put outside the lanes} other {{key} was put in the lane {lane}}}",
@@ -1253,8 +1253,8 @@
     "sprint": {
       "created": "{name} was planned",
       "updated": "{name} was changed",
-      "started": "{name} started with {cards} cards and {points} {unit, select, hours {hours} other {points}}",
-      "closed": "{name} was closed: {completed} of {committed} {unit, select, hours {hours} other {points}}, {carried} cards carried over",
+      "started": "{name} started with {cards, plural, one {# card} other {# cards}} and {unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}}",
+      "closed": "{name} was closed: {unit, select, hours {{completed} of {committed, plural, one {# hour} other {# hours}}} tshirt {weight {completed} of {committed}} other {{completed} of {committed, plural, one {# point} other {# points}}}}, {carried, plural, one {# card carried over} other {# cards carried over}}",
       "retro": "Retrospective written for {name}",
       "summary": "The story of {name} was saved",
       "series": "{count} sprints were laid ahead, {from} to {to}"
@@ -1266,12 +1266,14 @@
     "theme": {
       "created": "The theme {name} was created",
       "activated": "The theme {name} was activated again",
-      "deactivated": "The theme {name} was deactivated"
+      "deactivated": "The theme {name} was deactivated",
+      "updated": "{renamed, select, renamed {The theme {from} was renamed to {name}} other {The theme {name} was changed}}"
     },
     "area": {
       "created": "The area {name} was created",
       "activated": "The area {name} was activated again",
-      "deactivated": "The area {name} was deactivated"
+      "deactivated": "The area {name} was deactivated",
+      "updated": "{renamed, select, renamed {The area {from} was renamed to {name}} other {The area {name} was changed}}"
     },
     "item": {
       "created": "{key} was created as {level}: {title}",
@@ -1290,7 +1292,8 @@
     "swimlane": {
       "created": "The lane {name} was created",
       "activated": "The lane {name} was activated again",
-      "deactivated": "The lane {name} was deactivated"
+      "deactivated": "The lane {name} was deactivated",
+      "updated": "The lane {from} was renamed to {name}"
     },
     "undo": {
       "applied": "An action was undone"
@@ -1314,6 +1317,16 @@
       "kind": "kind",
       "targetQuarter": "target quarter",
       "startQuarter": "start quarter"
+    },
+    "kind": {
+      "business": "Business",
+      "enabler": "Enabler"
+    },
+    "enablerType": {
+      "architecture": "Architecture",
+      "infrastructure": "Infrastructure",
+      "exploration": "Exploration",
+      "compliance": "Compliance"
     }
   },
   "help": {
@@ -1331,7 +1344,7 @@
       },
       "scrum": {
         "title": "Scrum",
-        "body": "Cards sit in the backlog until you put them in a sprint. Plan the sprint under Backlog, pick the cards, and start it. The board shows only the running sprint. When you close it, the velocity is written down and the unfinished cards go back to the top of the backlog or into the next sprint. Future sprints can be laid ahead in one series under Roadmap, so features can be planned across them before the cards exist."
+        "body": "Cards sit in the backlog until you put them in a sprint — drag them into the sprint panel, or pick them and use the button. Plan the sprint under Backlog and start it. The board shows only the running sprint. When you close it, the velocity is written down and the unfinished cards go back to the top of the backlog or into the next sprint. Future sprints can be laid ahead in one series under Roadmap, so features can be planned across them before the cards exist."
       },
       "cards": {
         "title": "Cards",
@@ -1347,7 +1360,7 @@
       },
       "backlog": {
         "title": "The backlog",
-        "body": "The backlog is the ordered list of what the team does next, most important at the top. Drag the cards, or use the arrows. Select cards with the checkbox and put them in a sprint with one button. At the top of the list the level can switch: the epic backlog folds out to features and on to cards, the feature backlog to cards — and on a Scrum board the sprint panels can be shown or hidden, giving the list the whole width."
+        "body": "The backlog is the ordered list of what the team does next, most important at the top. Drag the cards, or use the arrows — one drag or one press moves the card exactly one row of what you are reading, past a card already promised to a sprint as readily as past a free one. A card can be dragged straight into a sprint panel, and out again the same way; to move several at once, tick them and use the button. At the top of the list the level can switch: the epic backlog folds out to features and on to cards, the feature backlog to cards — and on a Scrum board the sprint panels can be shown or hidden, giving the list the whole width."
       },
       "care": {
         "title": "Backlog care",
@@ -1537,7 +1550,7 @@
   "care": {
     "title": "What is the backlog waiting for?",
     "body": "What a product owner should decide before planning. Nothing here means nothing to decide.",
-    "summary": "{cards, plural, one {# card} other {# cards}} waiting · {points} {unit, select, hours {hours} other {points}}",
+    "summary": "{cards, plural, one {# card} other {# cards}} waiting · {unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}}",
     "depth": "about {sprints, number} sprints of work",
     "unweighed": "{count, plural, one {# unestimated} other {# unestimated}}",
     "count": "{count}",
@@ -1571,7 +1584,7 @@
     },
     "tooDeep": {
       "title": "Deeper than you reach",
-      "body": "There are {value} {unit, select, hours {hours} other {points}} ranked, and you finish about {of} per sprint. The bottom of the list is unlikely to happen — consider leaving it unordered."
+      "body": "{unit, select, hours {{value, plural, one {There is # hour} other {There are # hours}}} tshirt {There is a weight of {value}} other {{value, plural, one {There is # point} other {There are # points}}}} ranked, and you finish about {of} per sprint. The bottom of the list is unlikely to happen — consider leaving it unordered."
     }
   },
   "overview": {
@@ -1579,9 +1592,9 @@
     "byThemeTitle": "By theme",
     "byAreaTitle": "By area",
     "byKindTitle": "By kind",
-    "distributionBody": "{cards, plural, one {# open card} other {# open cards}} · {points} {unit, select, hours {hours} other {points}}",
+    "distributionBody": "{cards, plural, one {# open card} other {# open cards}} · {unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}}",
     "none": "None",
-    "bucketValue": "{cards, plural, one {# card} other {# cards}} · {points} {unit, select, hours {hours} other {points}}",
+    "bucketValue": "{cards, plural, one {# card} other {# cards}} · {unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}}",
     "weightTitle": "Where is the weight?",
     "multi": "More than one theme",
     "retired": "{name} (retired)"

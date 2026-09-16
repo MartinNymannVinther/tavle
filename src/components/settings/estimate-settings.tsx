@@ -24,6 +24,7 @@ import {
 import { previewEstimateUnitAction, setEstimateUnitAction } from "@/modules/boards/actions-boards";
 import { undoEventAction } from "@/modules/boards/actions-undo";
 import type { Run } from "@/components/board/use-board-actions";
+import { decimalValue } from "./decimal";
 
 /**
  * What the team counts in (docs/adr/0030). Points and T-shirt sizes are
@@ -55,7 +56,10 @@ export function EstimateSettings({
   const [busy, setBusy] = useState(false);
   const factorErrorId = useId();
 
-  const typedFactor = Number(factor);
+  // The message beside the field writes the bound in the reader's own
+  // language — "0,5" in Danish — so the field reads a comma as the half
+  // it is; see `decimalValue`.
+  const typedFactor = decimalValue(factor);
   const factorOk = isHoursPerPoint(typedFactor);
   const hoursPerPoint = factorOk ? typedFactor : DEFAULT_HOURS_PER_POINT;
   const crossesScales = scaleOf(current) !== scaleOf(choice);
@@ -122,10 +126,8 @@ export function EstimateSettings({
             <label className="flex flex-wrap items-center gap-2 text-2sm">
               <span>{t("factor")}</span>
               <Input
-                type="number"
-                min={HOURS_PER_POINT_MIN}
-                max={HOURS_PER_POINT_MAX}
-                step={0.5}
+                type="text"
+                inputMode="decimal"
                 value={factor}
                 onChange={(event) => setFactor(event.target.value)}
                 onBlur={() => void refresh(choice)}

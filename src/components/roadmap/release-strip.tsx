@@ -29,16 +29,40 @@ export function ReleaseStrip({
   const dated = releases.filter((r) => r.at !== null);
   const undated = releases.length - dated.length;
 
-  // Two markers closer than this share of the axis would overlap, so the
-  // later one steps down a lane. Measured against the widest label the
-  // strip allows, not guessed.
-  const MIN_GAP = 0.9;
+  /**
+   * Whether two markers touch is a question in pixels, and this component
+   * is never told how wide the strip is: the axis grows with what is
+   * planned on it, so the same column is 200px on one board and 40px on
+   * another. The lane rule used to compare positions in columns against a
+   * gap guessed from a pixel width — two units and no measurement — and
+   * markers duly painted over each other.
+   *
+   * So the pixels are taken out of the question. A marker is given at
+   * most two columns of the axis, capped in CSS where the strip's own
+   * width is known, and two markers less than two columns apart step
+   * apart into lanes. Both numbers are this one, so they cannot drift:
+   * whatever a column measures, a marker that keeps its distance keeps
+   * the half-gutter with it. `overflow-hidden` is what makes that a
+   * promise rather than a hope — it holds the pill to the cap even where
+   * a column is narrower than the label's shortest line.
+   *
+   * Two columns rather than one is a choice about reading: one column
+   * cuts "Sommer: anmeldelser og drift" to "Sommer: anm…" on a board
+   * where there is room for all of it, and a lane costs a line of strip
+   * where a truncation costs the name.
+   */
+  const MARKER_COLUMNS = 2;
+  // The lanes are packed on the position the marker is painted at, edge
+  // clamp included, so a date before the axis starts cannot be nudged
+  // into a neighbour it was measured clear of.
+  const edge = columns / 100;
+  const at = (row: RoadmapRelease) => Math.min(columns - edge, Math.max(edge, row.at!));
   const taken: number[][] = [];
   const laneOf = dated.map((row) => {
-    const at = row.at!;
+    const pos = at(row);
     let lane = 0;
-    while ((taken[lane] ?? []).some((other) => Math.abs(other - at) < MIN_GAP)) lane += 1;
-    taken[lane] = [...(taken[lane] ?? []), at];
+    while ((taken[lane] ?? []).some((other) => Math.abs(other - pos) < MARKER_COLUMNS)) lane += 1;
+    taken[lane] = [...(taken[lane] ?? []), pos];
     return lane;
   });
   const lanes = Math.max(1, taken.length);
@@ -62,7 +86,7 @@ export function ReleaseStrip({
       >
         {dated.map((row, index) => {
           // The marker sits where the date falls, as a share of the axis.
-          const left = (row.at! / columns) * 100;
+          const left = (at(row) / columns) * 100;
           // Releases land close together often — a quarter is three months
           // and a team ships more than once in it. Rather than painting
           // over each other, a marker steps down a lane until it clears
@@ -74,12 +98,18 @@ export function ReleaseStrip({
             <span
               key={row.release.id}
               className={cn(
-                "bg-card border-border absolute flex max-w-52 -translate-x-1/2 items-center gap-1.5",
-                "rounded-full border px-2 py-0.5 text-2xs shadow-[var(--surface-shadow)]",
+                "bg-card border-border absolute flex -translate-x-1/2 items-center gap-1.5",
+                "overflow-hidden rounded-full border px-2 py-0.5 text-2xs",
+                "shadow-[var(--surface-shadow)]",
               )}
               style={{
-                left: `${Math.min(99, Math.max(1, left))}%`,
+                left: `${left}%`,
                 top: `${0.375 + lane * 1.6}rem`,
+                // The marker's share of the strip, less the gutter that
+                // keeps two of them apart, and never wider than the
+                // longest label the strip allows. The lane rule above
+                // stands on this number.
+                maxWidth: `min(13rem, calc(${MARKER_COLUMNS * 100}% / ${columns} - 0.5rem))`,
               }}
               // The pill has room for a number; the tip has room for the
               // word, so the strip and the map's band say the same thing.

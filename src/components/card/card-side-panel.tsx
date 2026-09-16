@@ -177,6 +177,10 @@ export function CardSidePanel({
             defaultValue={card.dueDate ?? ""}
             min={PLAN_DATE_MIN}
             max={PLAN_DATE_MAX}
+            // This field shows the machine's date format, not the page's,
+            // and that is on purpose — the note at the foot of
+            // src/core/dates.ts says why.
+            //
             // A native date field fires a change for every digit of the
             // year, so typing 2026 passes through 0002, 0020 and 0202:
             // four writes, four lines in the feed, and whichever landed

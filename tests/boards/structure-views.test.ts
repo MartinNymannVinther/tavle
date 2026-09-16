@@ -176,10 +176,11 @@ describe("the overview", () => {
     const data = overview(board, now);
     expect(data.openCards).toBe(4);
     expect(data.openPoints).toBe(11);
+    // Stabil drift and Regulatorisk carry no open story, and a row that
+    // holds nothing is left out rather than printed as a zero
+    // (tests/boards/care-overview.test.ts says why).
     expect(data.byTheme.map((b) => [b.name || b.key, b.cards, b.points])).toEqual([
       ["Selvbetjening", 2, 8],
-      ["Stabil drift", 0, 0],
-      ["Regulatorisk", 0, 0],
       ["none", 2, 3],
     ]);
     expect(data.byArea.map((b) => [b.name || b.key, b.cards])).toEqual([

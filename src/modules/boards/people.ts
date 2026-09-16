@@ -18,9 +18,17 @@ export async function peopleOf(tx: AppTransaction, orgId: string): Promise<Perso
 }
 
 /**
- * How many open cards each person carries. Removing a person lets their
- * cards fall back to unassigned, so the question before it can say how
- * much falls — a count is the difference between a warning and a guess.
+ * How many cards each person carries. Removing a person lets their cards
+ * fall back to unassigned, so the question before it can say how much
+ * falls — a count is the difference between a warning and a guess.
+ *
+ * Which means this must count exactly what the removal touches, and the
+ * foreign key is `on delete set null` on every card, archived ones
+ * included. Counting only the open ones let the question say "this
+ * person holds no cards" while an archived card pointed straight at
+ * them: archiving is not deleting, the card comes back when it is
+ * restored, and it came back with its assignee silently gone. So the
+ * archived are counted here too, and the warning is true again.
  */
 export async function assignmentCounts(
   tx: AppTransaction,
@@ -29,7 +37,7 @@ export async function assignmentCounts(
   const rows = await tx
     .select({ personId: cards.assigneePersonId, count: count() })
     .from(cards)
-    .where(and(eq(cards.orgId, orgId), isNull(cards.archivedAt), isNotNull(cards.assigneePersonId)))
+    .where(and(eq(cards.orgId, orgId), isNotNull(cards.assigneePersonId)))
     .groupBy(cards.assigneePersonId);
   return new Map(rows.filter((row) => row.personId).map((row) => [row.personId!, row.count]));
 }

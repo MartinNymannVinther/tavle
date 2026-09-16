@@ -111,7 +111,16 @@ describe("a swapped quarter span carries its whole reverse", () => {
       }),
     );
     await run((tx) => updateItem(tx, ctx, { itemId: epic.id, startQuarter: "2026-Q3" }));
-    await run((tx) => updateItem(tx, ctx, { itemId: epic.id, targetQuarter: "2026-Q1" }));
+    // A drag names both ends in the same call, and that is the one call
+    // allowed to turn a span round: the drawing is one gesture. A select
+    // names one end, and is refused rather than rewriting the other.
+    await run((tx) =>
+      updateItem(tx, ctx, {
+        itemId: epic.id,
+        startQuarter: "2026-Q3",
+        targetQuarter: "2026-Q1",
+      }),
+    );
     let fresh = (await getBoardFull(ctx, boardId))!.items.find((i) => i.id === epic.id)!;
     expect([fresh.startQuarter, fresh.targetQuarter]).toEqual(["2026-Q1", "2026-Q3"]);
     const events = await run((tx) => recentBoardEvents(tx, boardId, 10));

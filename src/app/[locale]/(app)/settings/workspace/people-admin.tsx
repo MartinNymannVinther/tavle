@@ -30,7 +30,10 @@ export type PersonRow = {
   name: string;
   email: string | null;
   userId: string | null;
-  /** Open cards pointing at this person; they fall to unassigned if it goes. */
+  /**
+   * Every card pointing at this person, archived ones included; all of
+   * them fall to unassigned if the person goes, so all of them are said.
+   */
   cards: number;
 };
 export type LinkableMember = { userId: string; name: string; email: string };
@@ -188,8 +191,10 @@ export function PeopleAdmin({
                             </NativeSelect>
                           )}
                           {/* Removing lets every card the person carries
-                              fall back to unassigned, and writes no event
-                              to undo, so the question says how much. */}
+                              fall back to unassigned — the archived with
+                              the rest, and they keep their assignee until
+                              then — and writes no event to undo, so the
+                              question says how much. */}
                           <ConfirmButton
                             variant="ghost"
                             size="xs"
