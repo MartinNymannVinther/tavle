@@ -138,6 +138,7 @@ async function seedScrum(
       const card = await createCard(tx, ctx, {
         boardId: board.id,
         title: spec.title,
+        description: spec.description ?? "",
         estimate: spec.estimate,
         assigneePersonId: me,
         bug: spec.bug ?? false,
@@ -168,6 +169,7 @@ async function seedScrum(
     const card = await createCard(tx, ctx, {
       boardId: board.id,
       title: spec.title,
+      description: spec.description ?? "",
       estimate: spec.estimate,
       priority: spec.priority ?? "normal",
       assigneePersonId: spec.mine ? me : null,
@@ -191,6 +193,7 @@ async function seedScrum(
     await createCard(tx, ctx, {
       boardId: board.id,
       title: spec.title,
+      description: spec.description ?? "",
       estimate: spec.estimate,
       bug: spec.bug ?? false,
       kind: spec.enabler ? "enabler" : undefined,

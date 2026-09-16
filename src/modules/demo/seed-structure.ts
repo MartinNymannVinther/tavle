@@ -65,6 +65,7 @@ export async function seedStructure(
       boardId,
       level: "epic",
       title: spec.title,
+      description: spec.description,
       doneWhen: spec.doneWhen,
       kind: spec.enabler ? "enabler" : "business",
       enablerType: spec.enabler ?? null,
@@ -79,6 +80,7 @@ export async function seedStructure(
         boardId,
         level: "feature",
         title: featureSpec.title,
+        description: featureSpec.description,
         doneWhen: featureSpec.doneWhen,
         parentId: epic.id,
       });

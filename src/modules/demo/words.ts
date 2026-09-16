@@ -23,11 +23,19 @@ export type DemoCard = {
   enabler?: EnablerType;
 };
 
-export type DemoFeature = { title: string; doneWhen: string; closed?: boolean };
+export type DemoFeature = {
+  title: string;
+  doneWhen: string;
+  /** The paragraph the feature's own page reads as. */
+  description?: string;
+  closed?: boolean;
+};
 
 export type DemoEpic = {
   title: string;
   doneWhen: string;
+  /** The paragraph the epic's own page reads as. */
+  description?: string;
   area: string;
   themes: string[];
   enabler?: EnablerType;
@@ -47,6 +55,8 @@ export type DemoStructure = {
 
 export type SprintCard = {
   title: string;
+  /** What the card is about, beyond its title; the demo's cards all carry one. */
+  description?: string;
   estimate: number;
   feature?: string;
   area?: string;
