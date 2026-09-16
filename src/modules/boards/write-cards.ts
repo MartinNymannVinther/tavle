@@ -1,6 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import {
   cards,
+  releases,
   sprints,
   swimlanes,
   type Card,
@@ -56,6 +57,8 @@ export type NewCardInput = {
   themeIds?: string[];
   /** The manual swimlane the card starts in, when the board runs with them. */
   swimlaneId?: string | null;
+  /** The release it ships in (docs/adr/0032). */
+  releaseId?: string | null;
   kind?: Kind;
   enablerType?: EnablerType | null;
   bug?: boolean;
@@ -89,6 +92,13 @@ export async function createCard(
     sprintId = sprint.id;
   }
   const assignee = await personInWorkspace(tx, input.assigneePersonId);
+  const [releaseOf] = input.releaseId
+    ? await tx
+        .select({ id: releases.id })
+        .from(releases)
+        .where(and(eq(releases.id, input.releaseId), eq(releases.boardId, board.id)))
+        .limit(1)
+    : [];
   // Rule 1 and 3 of the structure: a parent is a feature on this board, and
   // a card without one needs an area. What the caller left out is the
   // parent's.
@@ -143,6 +153,8 @@ export async function createCard(
       featureId: feature?.id ?? null,
       areaId: area?.id ?? null,
       swimlaneId,
+      // Only this board's own release; an id from elsewhere is simply not taken.
+      releaseId: releaseOf?.id ?? null,
       kind: got.kind,
       enablerType: enablerTypeFor(got.kind, input.enablerType),
       bug: input.bug ?? false,

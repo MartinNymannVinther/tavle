@@ -26,6 +26,7 @@ import { enterColumn } from "./transitions";
 import { UndoStepSchema, type UndoStep } from "./undo-steps";
 import { updateStructureView } from "./write-boards";
 import { restoreEstimates } from "./write-estimates";
+import { reorderRelease, setCardsRelease, updateRelease } from "./write-releases";
 import { setCardsSprint } from "./write-sprints";
 import { recordEvent } from "./events";
 import type { StructureViewInput } from "./validation";
@@ -52,6 +53,8 @@ export class NotUndoable extends Error {
 const MANAGE_KINDS = new Set<UndoStep["kind"]>([
   "item.delete",
   "board.view",
+  "release.update",
+  "releases.order",
   "theme.active",
   "area.active",
   "swimlane.active",
@@ -175,6 +178,29 @@ async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): P
       if (!outcome) throw new NotUndoable();
       // Children have appeared since; closing again is a conversation, not an undo.
       if (!outcome.closed) throw new NotUndoable();
+      return;
+    }
+    case "card.release":
+      if ((await setCardsRelease(tx, ctx, [step.cardId], step.releaseId)) === 0) {
+        throw new NotUndoable();
+      }
+      return;
+    case "release.update":
+      if (
+        !(await updateRelease(tx, ctx, {
+          releaseId: step.releaseId,
+          name: step.name,
+          targetDate: step.targetDate,
+        }))
+      ) {
+        throw new NotUndoable();
+      }
+      return;
+    case "releases.order": {
+      // Back to the order that held, one placement per band.
+      for (const [index, releaseId] of step.order.entries()) {
+        await reorderRelease(tx, ctx, releaseId, index);
+      }
       return;
     }
     case "board.estimates":

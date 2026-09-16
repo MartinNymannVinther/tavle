@@ -5,6 +5,7 @@ import type { StructureLookup } from "@/components/board/card-chips";
 import type { CardView } from "@/modules/boards/types";
 import { cn } from "@/lib/utils";
 import { MapCell } from "./map-cell";
+import type { Release } from "@/core/db/schema";
 import { FeatureNote, LooseHead, RowLabel } from "./map-headers";
 import { cellKey, LOOSE_COLUMN, type MapRow, type StoryMap } from "./story-map";
 
@@ -31,6 +32,8 @@ export type GridHandlers = {
   /** The row's cards whose feature is off the backbone, offered from the label. */
   hiddenOf: (rowKey: string) => Array<{ card: CardView; featureId: string; featureTitle: string }>;
   onReveal: (featureId: string) => void;
+  /** Opens a band for renaming and dating. */
+  onEditRelease: (release: Release) => void;
 };
 
 export function MapGrid({
@@ -97,7 +100,8 @@ export function MapGrid({
         )}
         {map.rows.map((row, rowIndex) => {
           const rowCards = map.columns.flatMap((column) => cellsOf(row, column.key));
-          const active = row.kind === "sprint" && row.sprint.state === "active";
+          // The nearest release is the one the team is working toward.
+          const active = row.kind === "release" && rowIndex === 0;
           return (
             <div
               key={row.key}
@@ -112,6 +116,7 @@ export function MapGrid({
                 points={rowCards.reduce((sum, card) => sum + (card.estimate ?? 0), 0)}
                 unit={structure.estimateUnit}
                 hidden={handlers.hiddenOf(row.key)}
+                onEdit={handlers.onEditRelease}
                 onReveal={handlers.onReveal}
               />
               {map.columns.map((column, index) => (

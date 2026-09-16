@@ -16,6 +16,8 @@ import { roadmap } from "@/modules/boards/structure/roadmap";
 import type { RoadmapRow } from "@/modules/boards/structure/roadmap";
 import { structureView } from "@/modules/boards/structure/view";
 import { useFolded } from "@/components/backlog/use-folded";
+import type { EstimateUnit } from "@/core/db/schema";
+import { ReleaseStrip } from "./release-strip";
 import { RoadmapChildren } from "./roadmap-children";
 import { FeaturePlan } from "./feature-plan";
 import { QuarterSelect, RoadmapLine, type PlanSpan } from "./roadmap-line";
@@ -199,6 +201,13 @@ export function RoadmapView({ full }: { full: BoardFull }) {
               </div>
             ))}
           </div>
+          {view.epics && (
+            <ReleaseStrip
+              releases={data.releases}
+              columns={columns}
+              unit={(full.board.estimateUnit as EstimateUnit) ?? "points"}
+            />
+          )}
           {rows.length === 0 ? (
             <p className="text-meta px-4 py-6 text-sm">{t("empty")}</p>
           ) : (

@@ -1220,7 +1220,9 @@
       "kind": "{key} was set to {kind} {enablerType}",
       "bug": "{key} was marked as a bug",
       "notBug": "{key} is no longer marked as a bug",
-      "swimlane": "{lane, select, none {{key} was put outside the lanes} other {{key} was put in the lane {lane}}}"
+      "swimlane": "{lane, select, none {{key} was put outside the lanes} other {{key} was put in the lane {lane}}}",
+      "released": "{key} was put in the release {name}",
+      "unreleased": "{key} was taken out of its release"
     },
     "comment": {
       "added": "Comment on {key}",
@@ -1273,6 +1275,12 @@
     },
     "backlog": {
       "aligned": "The backlog's order followed the story map ({count} features moved)"
+    },
+    "release": {
+      "created": "The release {name} was created",
+      "updated": "The release {name} was updated",
+      "reordered": "The release {name} was moved",
+      "deleted": "The release {name} was deleted ({cards} cards freed)"
     }
   },
   "help": {
@@ -1471,7 +1479,12 @@
     "unplannedWord": "Pick a sprint …",
     "featureUnplanned": "unplanned",
     "axisLabel": "View",
-    "downloadPpt": "Download as PowerPoint"
+    "downloadPpt": "Download as PowerPoint",
+    "releases": {
+      "title": "Releases",
+      "undated": "{count, plural, one {# with no date} other {# with no date}}",
+      "tip": "{cards} cards · {done} % done"
+    }
   },
   "care": {
     "title": "What is the backlog waiting for?",
@@ -1549,7 +1562,26 @@
     "showClosedFeatures": "{count, plural, =0 {Show closed features} one {Show # closed} other {Show # closed}}",
     "noClosed": "No closed features are up on the map.",
     "showDoneCards": "{count, plural, =0 {Show finished cards} one {Show # finished} other {Show # finished}}",
-    "noDone": "There are no finished cards to show."
+    "noDone": "There are no finished cards to show.",
+    "release": {
+      "new": "New release",
+      "newTitle": "New release",
+      "editTitle": "Edit release",
+      "body": "A release is what you deliver together. It cuts across sprints and is the map's horizontal band.",
+      "name": "Name",
+      "namePlaceholder": "e.g. “Autumn edition” or “1.2”",
+      "date": "Target delivery date",
+      "dateHint": "May be left blank — not every release has a date yet.",
+      "create": "Create release",
+      "save": "Save",
+      "delete": "Delete release",
+      "deleteTitle": "Delete {name}?",
+      "deleteBody": "The band goes, the cards stay. They fall back into “Not in a release”, where you can place them again.",
+      "deleteConfirm": "Delete the band"
+    },
+    "unreleased": "Not in a release",
+    "noDate": "No date",
+    "editRelease": "Edit release"
   },
   "decompose": {
     "title": "Breakdown",

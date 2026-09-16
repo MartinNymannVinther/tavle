@@ -42,6 +42,10 @@ const TABLES: Array<{ table: string; row: (suffix: string) => Record<string, unk
     row: (s) => ({ id: `swimlane_${s}`, board_id: `board_${s}`, name: `Bane ${s}` }),
   },
   {
+    table: "releases",
+    row: (s) => ({ id: `release_${s}`, board_id: `board_${s}`, name: `Release ${s}` }),
+  },
+  {
     table: "backlog_items",
     row: (s) => ({
       id: `epic_${s}`,

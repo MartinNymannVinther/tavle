@@ -17,11 +17,13 @@ import { useBoardActions } from "@/components/board/use-board-actions";
 import { FullscreenButton, useFullscreen } from "@/components/board/use-fullscreen";
 import { Button } from "@/components/ui/button";
 import type { BoardFull } from "@/modules/boards/types";
-import { createCardAction, moveCardAction, placeCardAction } from "@/modules/boards/actions-cards";
+import { createCardAction, placeCardAction } from "@/modules/boards/actions-cards";
+import { setCardsReleaseAction } from "@/modules/boards/actions-releases";
 import { alignBacklogToMapAction, placeOnMapAction } from "@/modules/boards/actions-structure";
-import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
 import { cn } from "@/lib/utils";
+import type { Release } from "@/core/db/schema";
 import { MapGrid, type Drag } from "./map-grid";
+import { ReleaseForm } from "./release-form";
 import { MapTray } from "./map-tray";
 import {
   backbone,
@@ -55,6 +57,11 @@ export function StoryMapView({ full }: { full: BoardFull }) {
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [drag, setDrag] = useState<Drag>(null);
   const screen = useFullscreen();
+  // One dialog serves every band: null means a new one.
+  const [editing, setEditing] = useState<{ open: boolean; release: Release | null }>({
+    open: false,
+    release: null,
+  });
 
   const doneColumns = new Set(full.columns.filter((c) => c.category === "done").map((c) => c.id));
   const isDone = (card: { columnId: string }) => doneColumns.has(card.columnId);
@@ -85,7 +92,7 @@ export function StoryMapView({ full }: { full: BoardFull }) {
       : undefined;
   const hiddenOf = (rowKey: string) =>
     cards.flatMap((card) => {
-      if (rowOf(card, map.rows, scrum) !== rowKey) return [];
+      if (rowOf(card, map.rows) !== rowKey) return [];
       const feature = openFeatureOf(card.featureId);
       if (!feature || onMapIds.has(feature.id)) return [];
       return [{ card, featureId: feature.id, featureTitle: feature.title }];
@@ -111,12 +118,9 @@ export function StoryMapView({ full }: { full: BoardFull }) {
       const ok = await run(() => placeCardAction({ cardId: id, featureId }));
       if (!ok) return;
     }
-    if (row.kind === "sprint" && card.sprintId !== row.sprint.id) {
-      await run(() => setCardsSprintAction({ cardIds: [id], sprintId: row.sprint.id }));
-    } else if (row.kind === "backlog" && card.sprintId) {
-      await run(() => setCardsSprintAction({ cardIds: [id], sprintId: null }));
-    } else if (row.kind === "column" && card.columnId !== row.column.id) {
-      await run(() => moveCardAction({ cardId: id, columnId: row.column.id }));
+    const releaseId = row.kind === "release" ? row.release.id : null;
+    if (releaseId !== card.releaseId) {
+      await run(() => setCardsReleaseAction({ cardIds: [id], releaseId }));
     }
   }
 
@@ -151,8 +155,7 @@ export function StoryMapView({ full }: { full: BoardFull }) {
         boardId: board.id,
         title,
         ...place,
-        sprintId: row.kind === "sprint" ? row.sprint.id : undefined,
-        columnId: row.kind === "column" ? row.column.id : undefined,
+        releaseId: row.kind === "release" ? row.release.id : undefined,
       }),
     );
 
@@ -179,6 +182,14 @@ export function StoryMapView({ full }: { full: BoardFull }) {
             </Button>
           }
         />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setEditing({ open: true, release: null })}
+        >
+          {t("release.new")}
+        </Button>
         <FullscreenButton fullscreen={screen.fullscreen} onToggle={screen.toggle} />
       </header>
       <MapTray
@@ -261,8 +272,17 @@ export function StoryMapView({ full }: { full: BoardFull }) {
               full,
             ),
           hiddenOf,
+          onEditRelease: (release) => setEditing({ open: true, release }),
           onReveal: (featureId) => void run(() => placeOnMapAction({ itemId: featureId })),
         }}
+      />
+      <ReleaseForm
+        key={editing.release?.id ?? "new"}
+        boardId={board.id}
+        release={editing.release}
+        open={editing.open}
+        onOpenChange={(open) => setEditing((current) => ({ ...current, open }))}
+        run={run}
       />
       <div className="border-hairline flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t px-4 py-2">
         <TypeLegend types={legendTypes(view)} />

@@ -8,6 +8,7 @@ import {
   rowOf,
   storyMap,
   tray,
+  UNRELEASED,
 } from "@/components/map/story-map";
 import type { BoardFull, ItemView } from "@/modules/boards/types";
 import { at, board, card, item } from "../helpers/structure-board";
@@ -50,18 +51,44 @@ const scrum: BoardFull = {
   items: up(board.items),
   sprints: [sprint("s2", 2, "planned"), sprint("s1", 1, "active"), sprint("s0", 0, "closed")],
 };
+/** Two bands, nearest first, on the board the rest of the file uses. */
+const release = (id: string, name: string, sort: number) => ({
+  id,
+  orgId: "org",
+  boardId: "board",
+  name,
+  targetDate: null,
+  sort,
+  createdAt: at(20),
+  updatedAt: at(20),
+});
+const released: BoardFull = {
+  ...scrum,
+  releases: [release("r2", "Vinter", 2000), release("r1", "Efterår", 1000)],
+};
+
 const titles = (map: ReturnType<typeof storyMap>, row: string, column: string) =>
   (map.cells.get(cellKey(row, column)) ?? []).map((c) => c.title);
 
 describe("the story map", () => {
-  it("draws the open sprints down, the running one first, and the backlog last", () => {
-    expect(mapRows(scrum).map((row) => row.key)).toEqual(["sprint:s1", "sprint:s2", "backlog"]);
+  it("draws the releases down, nearest first, and the unreleased band last", () => {
+    expect(mapRows(released).map((row) => row.key)).toEqual([
+      "release:r1",
+      "release:r2",
+      UNRELEASED,
+    ]);
   });
 
-  it("draws a Kanban board's columns down, done first", () => {
-    const kanban: BoardFull = { ...board, board: { ...board.board, mode: "kanban" } };
-    expect(mapRows(kanban).map((row) => row.key)).toEqual(["column:done", "column:todo"]);
-    expect(rowOf(board.cards[0]!, mapRows(kanban), false)).toBe("column:todo");
+  it("gives a board with no releases the unreleased band alone, so the wall is honest", () => {
+    expect(mapRows(scrum).map((row) => row.key)).toEqual([UNRELEASED]);
+  });
+
+  it("puts a card in its own release's band, and one promised to none at the bottom", () => {
+    const rows = mapRows(released);
+    expect(rowOf(card({ id: "x", title: "Lovet", releaseId: "r1" }), rows)).toBe("release:r1");
+    expect(rowOf(card({ id: "y", title: "Uden" }), rows)).toBe(UNRELEASED);
+    // A release the view does not hold cannot swallow a card.
+    expect(rowOf(card({ id: "z", title: "Fremmed", releaseId: "r9" }), rows)).toBe(UNRELEASED);
   });
 
   it("puts the features up in the map's own order, and the loose column last", () => {
@@ -96,19 +123,18 @@ describe("the story map", () => {
     expect(backbone(items, { showClosed: true }).map((f) => f.id)).toEqual(["f3", "f2", "f1"]);
   });
 
-  it("puts every card in one cell, in the backlog's order, and a closed sprint's off the map", () => {
-    const cards = [
-      ...scrum.cards,
-      card({ id: "c6", title: "Gammelt", number: 11, sprintId: "s0" }),
-    ];
-    const map = storyMap(scrum, scrum.items, cards, { showClosed: false });
-    expect(titles(map, "sprint:s1", "f1")).toEqual(["Gjort", "Håndtér afvisning"]);
-    expect(titles(map, "backlog", "f1")).toEqual(["Vis knappen"]);
-    expect(titles(map, "backlog", "f2")).toEqual(["Gem kortet"]);
-    expect(titles(map, "backlog", LOOSE_COLUMN)).toEqual(["Rettelse"]);
-    const placed = [...map.cells.values()].flat();
-    expect(placed).toHaveLength(5);
-    expect(placed.map((c) => c.id)).not.toContain("c6");
+  it("puts every card in one cell, in the backlog's order, under its own band", () => {
+    const cards = released.cards.map((c) =>
+      c.id === "c1" || c.id === "c2" ? { ...c, releaseId: "r1" } : c,
+    );
+    const map = storyMap(released, released.items, cards, { showClosed: false });
+    // What is promised to the first release sits in its band, in rank order...
+    expect(titles(map, "release:r1", "f1")).toEqual(["Håndtér afvisning", "Vis knappen"]);
+    // ...and everything else waits in the one at the bottom.
+    expect(titles(map, UNRELEASED, "f1")).toEqual(["Gjort"]);
+    expect(titles(map, UNRELEASED, "f2")).toEqual(["Gem kortet"]);
+    expect(titles(map, UNRELEASED, LOOSE_COLUMN)).toEqual(["Rettelse"]);
+    expect([...map.cells.values()].flat()).toHaveLength(5);
   });
 
   it("adds up a feature from every card under it, on and off the map", () => {

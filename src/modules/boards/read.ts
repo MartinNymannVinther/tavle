@@ -20,6 +20,7 @@ import {
 } from "@/core/db/schema";
 import { withOrgContext, type AppTransaction, type OrgContext } from "@/core/db/tenant";
 import { cardEvents } from "./events";
+import { releasesOf } from "./write-releases";
 import { themeIdsByItem } from "./structure/items";
 import type { BoardFull, CardFull, CardView, ItemView, Member, PersonRef } from "./types";
 
@@ -141,6 +142,7 @@ export async function getBoardFull(ctx: OrgContext, boardId: string): Promise<Bo
       themeRows,
       areaRows,
       swimlaneRows,
+      releaseRows,
       itemRows,
       sprintRows,
       cardRows,
@@ -151,6 +153,7 @@ export async function getBoardFull(ctx: OrgContext, boardId: string): Promise<Bo
       boardThemes(tx, boardId),
       boardAreas(tx, boardId),
       boardSwimlanes(tx, boardId),
+      releasesOf(tx, boardId),
       boardItems(tx, boardId),
       tx.select().from(sprints).where(eq(sprints.boardId, boardId)).orderBy(desc(sprints.number)),
       tx
@@ -167,6 +170,7 @@ export async function getBoardFull(ctx: OrgContext, boardId: string): Promise<Bo
       themes: themeRows,
       areas: areaRows,
       swimlanes: swimlaneRows,
+      releases: releaseRows,
       items: itemRows,
       cards: await toViews(tx, cardRows),
       sprints: sprintRows,

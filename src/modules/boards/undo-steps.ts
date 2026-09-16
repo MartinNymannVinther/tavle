@@ -98,6 +98,14 @@ export const UndoStepSchema = z.discriminatedUnion("kind", [
     order: z.array(id).max(2000),
   }),
   z.object({ kind: z.literal("item.close"), itemId: id }),
+  z.object({ kind: z.literal("card.release"), cardId: id, releaseId: id.nullable() }),
+  z.object({
+    kind: z.literal("release.update"),
+    releaseId: id,
+    name: z.string(),
+    targetDate: z.string().nullable(),
+  }),
+  z.object({ kind: z.literal("releases.order"), boardId: id, order: z.array(id).max(200) }),
   z.object({
     kind: z.literal("board.estimates"),
     boardId: id,

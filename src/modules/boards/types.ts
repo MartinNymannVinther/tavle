@@ -7,6 +7,7 @@ import type {
   Card,
   Column,
   Comment,
+  Release,
   Sprint,
   Swimlane,
   Theme,
@@ -56,6 +57,8 @@ export type BoardFull = {
   areas: Area[];
   /** The board's manual swimlanes; empty unless the team has named some. */
   swimlanes: Swimlane[];
+  /** The bands the story map is divided into (docs/adr/0032). */
+  releases: Release[];
   /** Every epic and feature of the board, open and closed; closed ones still name a card's parent. */
   items: ItemView[];
   /** Every card that is not archived, backlog included on a Scrum board. */

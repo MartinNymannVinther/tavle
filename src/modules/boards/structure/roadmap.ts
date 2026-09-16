@@ -1,4 +1,4 @@
-import type { Theme } from "@/core/db/schema";
+import type { Release, Theme } from "@/core/db/schema";
 import { diffDays, todayInCopenhagen } from "@/core/dates";
 import type { BoardFull, ItemView } from "../types";
 import {
@@ -31,11 +31,23 @@ export type RoadmapRow = {
   features: number;
 };
 
+/** A release on the quarter axis: what ships, when, and how much of it is done. */
+export type RoadmapRelease = {
+  release: Release;
+  /** Where its date falls on the axis, in columns; null without a date. */
+  at: number | null;
+  cards: number;
+  points: number;
+  donePoints: number;
+};
+
 export type Roadmap = {
   quarters: string[];
   current: string;
   rows: RoadmapRow[];
   unplanned: RoadmapRow[];
+  /** The dated releases, nearest first, for the strip above the epics (docs/adr/0032). */
+  releases: RoadmapRelease[];
 };
 
 const CLOSED_QUARTERS_SHOWN = 2;
@@ -100,7 +112,24 @@ export function roadmap(full: BoardFull, now: Date = new Date()): Roadmap {
     (max, r) => (compareQuarters(r.endQuarter, max) > 0 ? r.endQuarter : max),
     shift(current, QUARTERS_AHEAD),
   );
-  return { quarters: quartersBetween(first, last), current, rows, unplanned };
+  const quarters = quartersBetween(first, last);
+  // A release is drawn where its date falls; one without a date has
+  // nowhere honest to sit on a time axis, so it is left off.
+  const releaseRows: RoadmapRelease[] = [...full.releases]
+    .sort((a, b) => a.sort - b.sort || a.createdAt.getTime() - b.createdAt.getTime())
+    .map((release) => {
+      const inside = full.cards.filter((c) => c.releaseId === release.id);
+      const done = inside.filter((c) => category.get(c.columnId) === "done");
+      const sum = (rows: typeof inside) => rows.reduce((total, c) => total + (c.estimate ?? 0), 0);
+      return {
+        release,
+        at: release.targetDate ? quarterPosition(release.targetDate, quarters) : null,
+        cards: inside.length,
+        points: sum(inside),
+        donePoints: sum(done),
+      };
+    });
+  return { quarters, current, rows, unplanned, releases: releaseRows };
 }
 
 /**

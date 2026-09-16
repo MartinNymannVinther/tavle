@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, CircleDashed, MoreHorizontal, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, CircleDashed, MoreHorizontal, Pencil, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +15,7 @@ import { ThemeDots } from "@/components/board/bits";
 import type { StructureLookup } from "@/components/board/card-chips";
 import { TypeIcon } from "@/components/board/type-icon";
 import { formatDateDa } from "@/core/dates";
-import type { EstimateUnit, Theme } from "@/core/db/schema";
+import type { EstimateUnit, Release, Theme } from "@/core/db/schema";
 import type { CardView, ItemView } from "@/modules/boards/types";
 import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -216,6 +216,7 @@ export function RowLabel({
   unit,
   hidden = [],
   onReveal,
+  onEdit,
 }: {
   row: MapRow;
   cards: number;
@@ -226,24 +227,36 @@ export function RowLabel({
   hidden?: Array<{ card: CardView; featureId: string; featureTitle: string }>;
   /** Puts the card's feature up, so the card lands in its own cell. */
   onReveal?: (featureId: string) => void;
+  /** Opens the band for renaming and dating; absent for the unreleased band. */
+  onEdit?: (release: Release) => void;
 }) {
   const t = useTranslations("map");
-  const sprint = useTranslations("backlog.sprint");
   return (
-    <div className="bg-card sticky left-0 z-10 flex flex-col gap-0.5 px-4 py-4 text-xs">
-      {row.kind === "sprint" && (
+    <div className="bg-card group/row sticky left-0 z-10 flex flex-col gap-0.5 px-4 py-4 text-xs">
+      {row.kind === "release" ? (
         <>
-          <span className="text-2sm font-semibold">{row.sprint.name}</span>
-          <span className="text-chart-2 font-medium">
-            {formatDateDa(row.sprint.startDate)} – {formatDateDa(row.sprint.endDate)}
+          <span className="flex items-start gap-1">
+            <span className="min-w-0 flex-1 text-2sm font-semibold">{row.release.name}</span>
+            {onEdit && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-xs"
+                aria-label={t("editRelease")}
+                onClick={() => onEdit(row.release)}
+                className="text-meta -mt-0.5 -mr-1.5 shrink-0 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/row:opacity-100 [@media(hover:hover)]:focus-visible:opacity-100"
+              >
+                <Pencil />
+              </Button>
+            )}
           </span>
-          <span className="text-meta">
-            {row.sprint.state === "active" ? sprint("activeLabel") : sprint("plannedLabel")}
+          <span className="text-chart-2 font-medium">
+            {row.release.targetDate ? formatDateDa(row.release.targetDate) : t("noDate")}
           </span>
         </>
+      ) : (
+        <span className="text-2sm font-semibold">{t("unreleased")}</span>
       )}
-      {row.kind === "backlog" && <span className="text-2sm font-semibold">{t("backlog")}</span>}
-      {row.kind === "column" && <span className="text-2sm font-semibold">{row.column.name}</span>}
       <span className="text-meta mt-1 tabular-nums">{t("rowCounts", { unit, cards, points })}</span>
       {hidden.length > 0 && onReveal && (
         <DropdownMenu>

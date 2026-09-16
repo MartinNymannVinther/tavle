@@ -76,6 +76,28 @@ export const EstimateUnitSchema = z.object({
 
 export const BoardIdSchema = z.object({ boardId: id });
 
+/** A release: a named bundle of work with a date the team aims at (docs/adr/0032). */
+export const NewReleaseSchema = z.object({
+  boardId: id,
+  name: shortText(60).min(1),
+  targetDate: isoDate.nullable().optional(),
+});
+export const ReleaseUpdateSchema = z.object({
+  releaseId: id,
+  name: shortText(60).min(1),
+  targetDate: isoDate.nullable(),
+});
+export const ReleaseIdSchema = z.object({ releaseId: id });
+export const ReleaseOrderSchema = z.object({
+  releaseId: id,
+  index: z.number().int().min(0).max(200),
+});
+export const CardsReleaseSchema = z.object({
+  cardIds: z.array(id).min(1).max(100),
+  /** Null takes the cards out of any release. */
+  releaseId: id.nullable(),
+});
+
 export const NewColumnSchema = z.object({
   boardId: id,
   name: shortText(40).min(1),
@@ -112,6 +134,8 @@ export const NewCardSchema = z.object({
   themeIds: z.array(id).max(8).optional(),
   /** The manual swimlane the card starts in, when the board runs with them. */
   swimlaneId: id.nullable().optional(),
+  /** The release it ships in (docs/adr/0032); absent leaves it unreleased. */
+  releaseId: id.nullable().optional(),
   kind: z.enum(KINDS).optional(),
   enablerType: z.enum(ENABLER_TYPES).nullable().optional(),
   bug: z.boolean().optional(),

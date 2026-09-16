@@ -1,13 +1,14 @@
-import type { Column, Sprint } from "@/core/db/schema";
+import type { Release } from "@/core/db/schema";
 import type { BoardFull, CardView, ItemView } from "@/modules/boards/types";
 
 /**
  * The story map as a grid, computed from the board. Across: the
  * backbone — the features somebody has put on the map, left to right
  * in the story's order (`mapSort`), and last a dashed column for the
- * cards with no feature at all. Down: the plan — on a Scrum board the
- * open sprints (the running one first) and the backlog, on a Kanban
- * board the columns from done to backlog. Every card under a feature
+ * cards with no feature at all. Down: the releases the team has named,
+ * nearest first, and last the band for work no release has promised
+ * (docs/adr/0032) — what a story map's bands are in the practice the
+ * map is named after. Every card under a feature
  * on the map sits in exactly one cell, in the backlog's order; cards
  * under a feature that is not on the map are not drawn, and the tray
  * says how many wait there.
@@ -19,9 +20,9 @@ export type MapColumn = {
 };
 
 export type MapRow =
-  | { key: string; kind: "sprint"; sprint: Sprint }
-  | { key: string; kind: "backlog" }
-  | { key: string; kind: "column"; column: Column };
+  | { key: string; kind: "release"; release: Release }
+  /** Everything not promised to a release yet; always last, always there. */
+  | { key: string; kind: "unreleased" };
 
 export type StoryMap = {
   columns: MapColumn[];
@@ -31,6 +32,9 @@ export type StoryMap = {
 };
 
 export const LOOSE_COLUMN = "loose";
+
+/** The band for work no release has promised. */
+export const UNRELEASED = "unreleased";
 export const cellKey = (row: string, column: string) => `${row}|${column}`;
 
 const byMapOrder = (a: ItemView, b: ItemView) =>
@@ -53,30 +57,33 @@ export function tray(items: ItemView[]): ItemView[] {
     .sort(byRank);
 }
 
+/**
+ * The map's bands are the board's releases, nearest first, with one
+ * band at the bottom for work not promised to any of them (docs/adr/
+ * 0032). A board with no releases is that last band alone: an honest
+ * empty wall rather than no wall at all.
+ */
 export function mapRows(full: BoardFull): MapRow[] {
-  if (full.board.mode === "scrum") {
-    const open = full.sprints
-      .filter((sprint) => sprint.state !== "closed")
-      .sort((a, b) => (a.state === b.state ? a.number - b.number : a.state === "active" ? -1 : 1));
-    return [
-      ...open.map((sprint) => ({ key: `sprint:${sprint.id}`, kind: "sprint" as const, sprint })),
-      { key: "backlog", kind: "backlog" as const },
-    ];
-  }
-  return [...full.columns]
-    .sort((a, b) => b.sort - a.sort)
-    .map((column) => ({ key: `column:${column.id}`, kind: "column" as const, column }));
+  const ordered = [...full.releases].sort(
+    (a, b) => a.sort - b.sort || a.createdAt.getTime() - b.createdAt.getTime(),
+  );
+  return [
+    ...ordered.map((release) => ({
+      key: `release:${release.id}`,
+      kind: "release" as const,
+      release,
+    })),
+    { key: UNRELEASED, kind: "unreleased" as const },
+  ];
 }
 
-/** The row a card belongs to, or null when it is in a closed sprint and off the map. */
-export function rowOf(card: CardView, rows: MapRow[], scrum: boolean): string | null {
-  if (scrum) {
-    if (!card.sprintId) return "backlog";
-    return rows.some((row) => row.key === `sprint:${card.sprintId}`)
-      ? `sprint:${card.sprintId}`
-      : null;
-  }
-  return `column:${card.columnId}`;
+/** The band a card sits in: its release, or the unreleased one. */
+export function rowOf(card: CardView, rows: MapRow[]): string {
+  if (!card.releaseId) return UNRELEASED;
+  const key = `release:${card.releaseId}`;
+  // A release the view does not hold cannot be drawn in; the card falls
+  // back to the band that is always there rather than disappearing.
+  return rows.some((row) => row.key === key) ? key : UNRELEASED;
 }
 
 export function storyMap(
@@ -93,11 +100,9 @@ export function storyMap(
   ];
   const onMap = new Set(features.map((f) => f.id));
   const rows = mapRows(full);
-  const scrum = full.board.mode === "scrum";
   const cells = new Map<string, CardView[]>();
   for (const card of [...cards].sort(byOrder)) {
-    const row = rowOf(card, rows, scrum);
-    if (!row) continue;
+    const row = rowOf(card, rows);
     const column = card.featureId
       ? onMap.has(card.featureId)
         ? card.featureId

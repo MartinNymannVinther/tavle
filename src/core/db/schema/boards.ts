@@ -167,6 +167,34 @@ export const swimlanes = pgTable(
   ],
 );
 
+/**
+ * A release (docs/adr/0032): a named bundle of work the team means to
+ * deliver together, with a date they are aiming at. It cuts across
+ * sprints — the sprint is the team's cadence, the release is what the
+ * customer gets — and it is the story map's horizontal band, which is
+ * what those bands are in the practice the map is named after.
+ */
+export const releases = pgTable(
+  "releases",
+  {
+    id: domainId("id"),
+    orgId: tenant(),
+    boardId: text("board_id")
+      .notNull()
+      .references(() => boards.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    /** The date the team is aiming at; null is a release with no date yet. */
+    targetDate: date("target_date", { mode: "string" }),
+    /** Top to bottom on the map, nearest release first. */
+    sort: integer("sort").notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("releases_board_name_uq").on(t.boardId, sql`lower(${t.name})`),
+    index("releases_board_idx").on(t.boardId, t.sort),
+  ],
+);
+
 export const columns = pgTable(
   "columns",
   {
@@ -236,6 +264,8 @@ export const cards = pgTable(
     areaId: text("area_id").references(() => areas.id, { onDelete: "set null" }),
     /** The card's manual swimlane, when the board runs with them; null is the "without" lane. */
     swimlaneId: text("swimlane_id").references(() => swimlanes.id, { onDelete: "set null" }),
+    /** The release this card ships in, or null; deleting a release frees its cards (docs/adr/0032). */
+    releaseId: text("release_id").references(() => releases.id, { onDelete: "set null" }),
     /** A bug is a story with a flag, not a fourth level; it follows every story rule and can be counted. */
     bug: boolean("bug").notNull().default(false),
     /** Acceptance criteria, optional. */
@@ -272,6 +302,7 @@ export const cards = pgTable(
     // The FK's set-null on swimlane delete walks this; without it every
     // lane row deleted in a cascade seq-scans the whole cards table.
     index("cards_swimlane_idx").on(t.swimlaneId),
+    index("cards_release_idx").on(t.releaseId),
     check("cards_enabler_type_ck", sql`${t.enablerType} is null or ${t.kind} = 'enabler'`),
   ],
 );
@@ -358,6 +389,7 @@ export type Person = typeof people.$inferSelect;
 export type Board = typeof boards.$inferSelect;
 export type Column = typeof columns.$inferSelect;
 export type Swimlane = typeof swimlanes.$inferSelect;
+export type Release = typeof releases.$inferSelect;
 export type Sprint = typeof sprints.$inferSelect;
 export type Card = typeof cards.$inferSelect;
 export type Comment = typeof comments.$inferSelect;

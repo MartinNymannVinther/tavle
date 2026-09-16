@@ -43,12 +43,13 @@ codebase to:
 
 ## Product principles
 
-- As few concepts as possible; each one must earn its place. Ten: board,
-  column, card, sprint, comment, the person (the workspace's roster —
-  who work is assigned to, with or without a login; ADR 0029), and the
-  four of the backlog structure — epic, feature, theme, area. Everything
-  else — the backlog, the roadmap, the overview, the numbers, "my
-  cards" — is a derived view.
+- As few concepts as possible; each one must earn its place. Eleven:
+  board, column, card, sprint, comment, the person (the workspace's
+  roster — who work is assigned to, with or without a login; ADR 0029),
+  the release (what ships together, and the story map's band; ADR
+  0032), and the four of the backlog structure — epic, feature, theme,
+  area. Everything else — the backlog, the roadmap, backlog care, the
+  numbers, "my cards" — is a derived view.
 - One backlog structure (ADR 0011). The hierarchy epic → feature → card
   is used only to break the product down; overview, grouping and
   belonging are fields on the item: kind (business/enabler), theme (why)
@@ -81,9 +82,10 @@ codebase to:
   to the feature or epic altitude, where the decomposition folds out as
   the list itself (ADR 0027). The story map is the team's wall
   (ADR 0015, 0016): the features the team has put up, across the top in
-  the story's own order (`map_sort`, never the backlog's rank), sprints
-  or columns down, every card in one cell, and a drag on it is the same
-  move as anywhere else.
+  the story's own order (`map_sort`, never the backlog's rank), the
+  team's own releases down (ADR 0032) with one band for what none has
+  promised, every card in one cell, and a drag on it is the same move
+  as anywhere else.
 - A detail page (a card, an epic, a feature) is two surfaces: the reading
   surface on the left, sections divided by hairlines, an empty field
   drawn as a dashed "add" row rather than a button somewhere else; the

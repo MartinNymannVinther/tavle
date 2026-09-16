@@ -53,6 +53,7 @@ export function card(partial: Partial<CardView> & Pick<CardView, "id" | "title">
     enablerType: null,
     areaId: "a1",
     swimlaneId: null,
+    releaseId: null,
     bug: false,
     number: 1,
     sort: 1000,
@@ -156,6 +157,7 @@ export const board: BoardFull = {
   ],
   areas: [area("a1", "Betalinger"), area("a2", "Login"), area("a3", "Gammelt", false)],
   swimlanes: [],
+  releases: [],
   items: [
     item({
       id: "e1",
