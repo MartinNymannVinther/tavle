@@ -47,6 +47,7 @@ export function ItemBacklog({
   onRankItem,
   onNudgeCard,
   onMoveCard,
+  pageDrag,
   allocated = [],
   sprintNameOf,
   newFeature,
@@ -62,6 +63,12 @@ export function ItemBacklog({
   onMoveCard: (cardId: string, featureId: string, siblingId: string | null, after: boolean) => void;
   /** Cards already committed to an open sprint: shown marked under their feature, not ranked. */
   allocated?: CardView[];
+  /**
+   * The page's one drag, beside this list's own. A story row here is a
+   * story row like any other: it can be lifted into a sprint panel, and
+   * the panel's copy says so.
+   */
+  pageDrag?: { setId: (id: string | null) => void };
   sprintNameOf?: Map<string, string>;
   newFeature: (epicId: string) => React.ReactNode;
 }) {
@@ -78,6 +85,7 @@ export function ItemBacklog({
   const settle = () => {
     setDrag(null);
     setHover(null);
+    pageDrag?.setId(null);
   };
 
   const allocatedOf = (featureId: string | null) =>
@@ -126,14 +134,20 @@ export function ItemBacklog({
         structure={structure}
         context={context}
         draggable
-        onDragStart={() => setDrag({ kind: "card", id: card.id, featureId })}
+        onDragStart={() => {
+          setDrag({ kind: "card", id: card.id, featureId });
+          // The sprint panels read the page's drag, so a story lifted
+          // here can be dropped into one, as it can from the flat list.
+          pageDrag?.setId(card.id);
+        }}
         onDragOver={(event) => {
           if (among) event.preventDefault();
         }}
         onDrop={() => {
           if (among && drag?.kind === "card") onNudgeCard(drag.id, card.id, false);
-          setDrag(null);
+          settle();
         }}
+        onDragEnd={settle}
         dragging={drag?.kind === "card" && drag.id === card.id}
         onMoveUp={
           index > 0 ? () => onNudgeCard(card.id, siblings[index - 1]!.id, false) : undefined

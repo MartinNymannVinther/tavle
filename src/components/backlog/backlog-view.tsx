@@ -403,6 +403,7 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
           }
           allocated={allocated}
           sprintNameOf={sprintNameOf}
+          pageDrag={{ setId: setDragId }}
           newFeature={newFeature}
         />
       ) : (
