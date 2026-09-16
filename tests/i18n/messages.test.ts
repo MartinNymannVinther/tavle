@@ -89,3 +89,76 @@ describe("keys used in the app", () => {
     expect(missing.sort()).toEqual([]);
   });
 });
+
+/**
+ * A message that names the board's estimate unit (docs/adr/0030) reads
+ * `{unit, select, …}`, and next-intl refuses the whole string when no
+ * unit is handed over — the sentence disappears in front of the user,
+ * which is how one was found in the sprint's close dialog. This proves
+ * every call site of such a message passes one.
+ */
+describe("messages that name the estimate unit", () => {
+  const unitKeys = [...daKeys].filter((key) => {
+    const value = resolve(da as Messages, key);
+    return typeof value === "string" && value.includes("{unit");
+  });
+
+  it("are asked for with a unit at every call site", () => {
+    const missing: string[] = [];
+
+    for (const file of sourceFiles("src")) {
+      const source = readFileSync(file, "utf8");
+      const namespaces = new Map<string, string>();
+      const declaration =
+        /(?:const|let)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:await\s+)?(?:useTranslations|getTranslations)\(\s*"([^"]+)"\s*\)/g;
+      for (const match of source.matchAll(declaration)) {
+        namespaces.set(match[1]!, match[2]!);
+      }
+
+      for (const [variable, namespace] of namespaces) {
+        const usage = new RegExp(`\\b${variable}\\(\\s*"([^"]+)"`, "g");
+        for (const match of source.matchAll(usage)) {
+          if (!unitKeys.includes(`${namespace}.${match[1]!}`)) continue;
+          // Read the call to its closing bracket; the values object, if
+          // any, has to mention a unit.
+          const rest = source.slice(match.index!);
+          let depth = 0;
+          let end = rest.length;
+          for (let i = 0; i < rest.length; i += 1) {
+            if (rest[i] === "(") depth += 1;
+            else if (rest[i] === ")") {
+              depth -= 1;
+              if (depth === 0) {
+                end = i;
+                break;
+              }
+            }
+          }
+          if (!/\bunit\b/.test(rest.slice(0, end))) {
+            missing.push(`${file}: "${namespace}.${match[1]!}" uden unit`);
+          }
+        }
+      }
+    }
+
+    expect(missing.sort()).toEqual([]);
+  });
+
+  it("always offer a branch for any unit, so no value can break the sentence", () => {
+    const broken: string[] = [];
+    for (const key of unitKeys) {
+      for (const [locale, catalogue] of [
+        ["da", da],
+        ["en", en],
+      ] as const) {
+        const value = resolve(catalogue as Messages, key);
+        if (typeof value !== "string") continue;
+        // The select holds nested braces, so look for the branch itself.
+        if (value.includes("{unit,") && !value.includes("other {")) {
+          broken.push(`${locale}: "${key}" mangler en other-gren`);
+        }
+      }
+    }
+    expect(broken.sort()).toEqual([]);
+  });
+});

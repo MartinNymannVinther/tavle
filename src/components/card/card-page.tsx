@@ -80,7 +80,13 @@ export function CardPage({
           <CardDescription card={card} run={run} />
           <CardAcceptance card={card} run={run} />
           <ChecklistEditor card={card} run={run} />
-          <AiPanel card={card} boardId={board.id} available={aiAvailable} run={run} />
+          <AiPanel
+            card={card}
+            boardId={board.id}
+            available={aiAvailable}
+            unit={(board.estimateUnit as EstimateUnit) ?? "points"}
+            run={run}
+          />
           <CommentsPanel
             cardId={card.id}
             comments={comments}

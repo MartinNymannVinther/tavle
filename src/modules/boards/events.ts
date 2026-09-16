@@ -134,12 +134,18 @@ export async function cardEvents(tx: AppTransaction, cardId: string, limit = 60)
  * lives at `events.card.moved` — because next-intl reads a dot as
  * nesting and refuses a flat key that contains one. Unknown payload keys
  * are passed through so a message can pick what it needs.
+ *
+ * The unit is defaulted rather than merely passed: a sentence about
+ * points asks for it (docs/adr/0030), and every event written before
+ * that decision carries none. Without a value the formatter refuses the
+ * whole string, and an old sprint would read as "sprint.closed"; with
+ * this one it reads as what it meant at the time, which was points.
  */
 export function renderEvent(
   t: (key: string, values?: Record<string, string | number | Date>) => string,
   event: { type: string; payload: Record<string, unknown> },
 ): string {
-  const values: Record<string, string | number | Date> = {};
+  const values: Record<string, string | number | Date> = { unit: "points" };
   for (const [key, value] of Object.entries(event.payload)) {
     if (value === null || value === undefined) values[key] = "";
     else if (Array.isArray(value)) values[key] = value.map(String).join(", ");

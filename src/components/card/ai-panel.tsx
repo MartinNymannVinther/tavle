@@ -3,6 +3,7 @@
 import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import type { EstimateUnit } from "@/core/db/schema";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -35,11 +36,14 @@ export function AiPanel({
   card,
   boardId,
   available,
+  unit,
   run,
 }: {
   card: CardDetail;
   boardId: string;
   available: boolean;
+  /** What the board counts in, so the size field is named right (docs/adr/0030). */
+  unit: EstimateUnit;
   run: Run;
 }) {
   const t = useTranslations("cards.ai");
@@ -256,7 +260,7 @@ export function AiPanel({
                             ),
                           )
                         }
-                        aria-label={t("points")}
+                        aria-label={t("points", { unit })}
                         className="h-9 w-20 text-2sm"
                       />
                     </div>

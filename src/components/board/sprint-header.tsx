@@ -124,6 +124,7 @@ export function SprintHeader({
               <DialogTitle>{t("closeTitle", { name: sprint.name })}</DialogTitle>
               <DialogDescription>
                 {t("closeBody", {
+                  unit,
                   done: doneCards,
                   open: totalCards - doneCards,
                   points: donePoints,
