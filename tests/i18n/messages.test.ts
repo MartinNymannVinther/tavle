@@ -238,3 +238,28 @@ describe("messages that name the estimate unit", () => {
     expect(found.sort()).toEqual([]);
   });
 });
+
+/**
+ * The same rule as the unit sentences', over the whole English
+ * catalogue. English has no invariant plural to hide behind: "{cards}
+ * cards" reads "1 cards" the first week a board is used, and the only
+ * reason the first sweep missed eleven of them is that it looked only
+ * where an estimate was named.
+ */
+describe("every English sentence that counts something", () => {
+  it("never puts a bare count in front of a noun", () => {
+    const bare =
+      /\{(\w+)\}\s+(points?|hours?|cards?|features?|epics?|sprints?|days?|weeks?|themes?|areas?|comments?|members?|people|releases?)\b/g;
+    const found: string[] = [];
+    for (const key of daKeys) {
+      const value = resolve(en as Messages, key);
+      if (typeof value !== "string") continue;
+      for (const match of value.matchAll(bare)) {
+        // A clause already wrapped in `{n, plural, …}` chose its noun form.
+        if (value.includes(`{${match[1]!}, plural`)) continue;
+        found.push(`en: "${key}" skriver "${match[0]}" uden plural`);
+      }
+    }
+    expect(found.sort()).toEqual([]);
+  });
+});

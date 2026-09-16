@@ -53,7 +53,7 @@
     },
     "demo": {
       "title": "Prøv uden at oprette noget",
-      "body": "Du får dit eget arbejdsrum med to tavler i fuld gang, en Kanban og en Scrum. Det slettes efter {hours} timer. Ingen e-mail, ingen tilmelding.",
+      "body": "Du får dit eget arbejdsrum med to tavler i fuld gang, en Kanban og en Scrum. Det slettes efter {hours, plural, one {# time} other {# timer}}. Ingen e-mail, ingen tilmelding.",
       "privacy": "Skriv ikke rigtige personoplysninger i demoen. Den passerer en database og eventuelt en sprogmodel på vejen.",
       "cta": "Åbn en demo"
     },
@@ -461,7 +461,7 @@
   },
   "demo": {
     "bannerTitle": "Det her er en demo.",
-    "bannerBody": "Arbejdsrummet og alt i det slettes efter {hours} timer. Skriv gerne i det.",
+    "bannerBody": "Arbejdsrummet og alt i det slettes efter {hours, plural, one {# time} other {# timer}}. Skriv gerne i det.",
     "bannerCta": "Ansøg om en rigtig konto"
   },
   "terms": {
@@ -1257,7 +1257,7 @@
       "closed": "{name} blev afsluttet: {unit, select, hours {{completed} af {committed, plural, one {# time} other {# timer}}} tshirt {vægt {completed} af {committed}} other {{completed} af {committed} point}}, {carried, plural, one {# kort båret videre} other {# kort båret videre}}",
       "retro": "Retrospektiv skrevet for {name}",
       "summary": "Historien om {name} blev gemt",
-      "series": "{count} sprints blev lagt forud, {from} til {to}"
+      "series": "{count, plural, one {# sprint blev lagt forud} other {# sprints blev lagt forud}}, {from} til {to}"
     },
     "ai": {
       "drafted": "AI skrev et udkast til {key} ({engine})",
@@ -1299,7 +1299,7 @@
       "applied": "En handling blev fortrudt"
     },
     "backlog": {
-      "aligned": "Backloggens rækkefølge fulgte story mappet ({count} features flyttet)"
+      "aligned": "Backloggens rækkefølge fulgte story mappet ({count, plural, one {# feature flyttet} other {# features flyttet}})"
     },
     "release": {
       "created": "Releasen {name} blev oprettet",
@@ -1463,7 +1463,7 @@
     },
     "page": {
       "closed": "Lukket",
-      "reviewBody": "Denne epic har været åben i mere end {days} dage. Er den stadig et resultat, teamet arbejder hen imod, eller er den blevet et tema?",
+      "reviewBody": "Denne epic har været åben i mere end {days, plural, one {# dag} other {# dage}}. Er den stadig et resultat, teamet arbejder hen imod, eller er den blevet et tema?",
       "reviewConfirm": "Ja, stadig et resultat",
       "created": "Oprettet {date}",
       "reviewed": "Bekræftet {date}",
@@ -1528,7 +1528,7 @@
     "featureColumn": "Feature",
     "createSeries": "Opret sprints forud",
     "seriesCount": "Antal sprints",
-    "seriesOption": "{count} sprints ({weeks} uger)",
+    "seriesOption": "{count, plural, one {# sprint} other {# sprints}} ({weeks, plural, one {# uge} other {# uger}})",
     "noSprints": "Ingen åbne sprints. Opret en række forud, så featurene har en tidslinje at ligge på.",
     "noPlanned": "Ingen features er planlagt endnu. Vælg en sprint på en feature herunder.",
     "unplannedFeatures": "Uplanlagte features ({count})",

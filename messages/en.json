@@ -53,7 +53,7 @@
     },
     "demo": {
       "title": "Try it without creating anything",
-      "body": "You get your own workspace with two boards in full swing, one Kanban and one Scrum. It is deleted after {hours} hours. No e-mail, no sign-up.",
+      "body": "You get your own workspace with two boards in full swing, one Kanban and one Scrum. It is deleted after {hours, plural, one {# hour} other {# hours}}. No e-mail, no sign-up.",
       "privacy": "Do not put real personal data in the demo. It passes a database and possibly a language model on the way.",
       "cta": "Open a demo"
     },
@@ -461,7 +461,7 @@
   },
   "demo": {
     "bannerTitle": "This is a demo.",
-    "bannerBody": "The workspace and everything in it is deleted after {hours} hours. Feel free to write in it.",
+    "bannerBody": "The workspace and everything in it is deleted after {hours, plural, one {# hour} other {# hours}}. Feel free to write in it.",
     "bannerCta": "Apply for a real account"
   },
   "terms": {
@@ -1001,7 +1001,7 @@
     "wipHint": "Cards in columns of the In progress kind",
     "cycle": "Cycle time",
     "cycleNone": "No cards finished in the last 30 days",
-    "cycleHint": "Median. Average {average, number} days over {sample} cards",
+    "cycleHint": "Median. Average {average, number} days over {sample, plural, one {# card} other {# cards}}",
     "lead": "Lead time",
     "leadHint": "From the card was created until it was done",
     "weekly": "Done this week",
@@ -1257,11 +1257,11 @@
       "closed": "{name} was closed: {unit, select, hours {{completed} of {committed, plural, one {# hour} other {# hours}}} tshirt {weight {completed} of {committed}} other {{completed} of {committed, plural, one {# point} other {# points}}}}, {carried, plural, one {# card carried over} other {# cards carried over}}",
       "retro": "Retrospective written for {name}",
       "summary": "The story of {name} was saved",
-      "series": "{count} sprints were laid ahead, {from} to {to}"
+      "series": "{count, plural, one {# sprint was laid ahead} other {# sprints were laid ahead}}, {from} to {to}"
     },
     "ai": {
       "drafted": "AI drafted {key} ({engine})",
-      "bootstrapped": "AI laid a starting point: {epics} epics, {features} features, {cards} cards ({engine})"
+      "bootstrapped": "AI laid a starting point: {epics, plural, one {# epic} other {# epics}}, {features, plural, one {# feature} other {# features}}, {cards, plural, one {# card} other {# cards}} ({engine})"
     },
     "theme": {
       "created": "The theme {name} was created",
@@ -1280,7 +1280,7 @@
       "updated": "{key} was edited ({fields})",
       "moved": "{key} was moved under {parent}",
       "placed": "{placed, select, both {{key} got area {area} and themes {themes}} area {{key} got area {area}} themes {{key} got themes {themes}} other {{key} has no area or themes}}",
-      "cascaded": "{key}: area and themes went down to {features} features and {cards} cards",
+      "cascaded": "{key}: area and themes went down to {features, plural, one {# feature} other {# features}} and {cards, plural, one {# card} other {# cards}}",
       "closed": "{key} was closed",
       "reopened": "{key} was reopened",
       "reviewed": "{key} was confirmed as still a result",
@@ -1299,13 +1299,13 @@
       "applied": "An action was undone"
     },
     "backlog": {
-      "aligned": "The backlog's order followed the story map ({count} features moved)"
+      "aligned": "The backlog's order followed the story map ({count, plural, one {# feature moved} other {# features moved}})"
     },
     "release": {
       "created": "The release {name} was created",
       "updated": "The release {name} was updated",
       "reordered": "The release {name} was moved",
-      "deleted": "The release {name} was deleted ({cards} cards freed)"
+      "deleted": "The release {name} was deleted ({cards, plural, one {# card was freed} other {# cards were freed}})"
     },
     "field": {
       "title": "title",
@@ -1463,7 +1463,7 @@
     },
     "page": {
       "closed": "Closed",
-      "reviewBody": "This epic has been open for more than {days} days. Is it still a result the team is working towards, or has it become a theme?",
+      "reviewBody": "This epic has been open for more than {days, plural, one {# day} other {# days}}. Is it still a result the team is working towards, or has it become a theme?",
       "reviewConfirm": "Yes, still a result",
       "created": "Created {date}",
       "reviewed": "Confirmed {date}",
@@ -1514,7 +1514,7 @@
     "empty": "No epics to draw yet. Give an epic a target quarter and it shows up here.",
     "unplanned": "{count, plural, one {# epic without a target quarter} other {# epics without a target quarter}}",
     "unplannedHint": "An epic without a target is not drawn. A roadmap that shows bars without an end is lying.",
-    "counts": "{features, plural, one {# feature} other {# features}} · {done} of {total} cards done",
+    "counts": "{features, plural, one {# feature} other {# features}} · {done} of {total, plural, one {# card} other {# cards}} done",
     "closed": "Closed",
     "noEpics": "The board does not show epics, so there is no roadmap to draw. Switch epics on under Settings → Structure.",
     "newEpic": "New epic",
@@ -1522,13 +1522,13 @@
     "planQuarter": "Quarter for {title}",
     "planSprint": "Sprint for {title}",
     "planStart": "Start of {title}",
-    "featureCards": "{done} of {total} cards",
+    "featureCards": "{done} of {total, plural, one {# card} other {# cards}}",
     "axisEpics": "Epics · quarters",
     "axisFeatures": "Features · sprints",
     "featureColumn": "Feature",
     "createSeries": "Create sprints ahead",
     "seriesCount": "Number of sprints",
-    "seriesOption": "{count} sprints ({weeks} weeks)",
+    "seriesOption": "{count, plural, one {# sprint} other {# sprints}} ({weeks, plural, one {# week} other {# weeks}})",
     "noSprints": "No open sprints. Create a run ahead so the features have a timeline to lie on.",
     "noPlanned": "No features are planned yet. Pick a sprint on one below.",
     "unplannedFeatures": "Unplanned features ({count})",
@@ -1539,7 +1539,7 @@
     "releases": {
       "title": "Releases",
       "undated": "{count, plural, one {# with no date} other {# with no date}}",
-      "tip": "{cards} cards · {done} % done",
+      "tip": "{cards, plural, one {# card} other {# cards}} · {done} % done",
       "weight": "{unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}}"
     },
     "startQuarterFor": "Start quarter for {title}",
