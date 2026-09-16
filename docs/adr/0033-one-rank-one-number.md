@@ -89,7 +89,13 @@ changes; where it _stands_ does not.
   own. The undo of a sprint move follows it — the reverse restores the
   column and leaves the number alone, because the move no longer
   touched it.
-- The arrows still move a card past its nearest row that can be ranked,
-  which may carry it past a marked row standing between them. The
-  marked row cannot be a target — nothing about it is a person's to
-  move — and the moved card is still the only row whose number changes.
+- The arrows and the drag move a card past the row beside it in what is
+  read, marked rows included: `reorderBacklog` names the row it passes
+  instead of counting an index in a list half the rows could not be in,
+  and ranks against the board's whole priority. The first cut of this
+  decision let them rank against the free rows alone and accepted the
+  vault that follows — one press carried a card past three rows nobody
+  had pointed at, which a user test duly found. A marked row is a place
+  to land and never a thing to move: the service still refuses to rank a
+  card that is promised to a sprint, which is why dragging one out of a
+  sprint takes the promise back first and ranks it second.
