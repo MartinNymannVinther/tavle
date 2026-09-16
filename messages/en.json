@@ -712,6 +712,10 @@
       "enabler": "Enabler",
       "legend": "Symbols:",
       "themes": "Themes:"
+    },
+    "fullscreen": {
+      "enter": "Full screen",
+      "exit": "Leave full screen"
     }
   },
   "cards": {
@@ -1530,8 +1534,6 @@
     "tray": "Without a parent",
     "trayHint": "Features and cards with no place in the breakdown. Drag them in — or out to here.",
     "trayEmpty": "Everything has a parent.",
-    "fullscreen": "Full screen",
-    "exitFullscreen": "Exit full screen",
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "planSprint": "Planned sprint",

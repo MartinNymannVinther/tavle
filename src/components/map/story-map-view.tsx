@@ -14,11 +14,13 @@ import { structureOf } from "@/components/board/card-chips";
 import type { Place } from "@/components/board/quick-add";
 import { legendTypes, ThemeLegend, TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
+import { FullscreenButton, useFullscreen } from "@/components/board/use-fullscreen";
 import { Button } from "@/components/ui/button";
 import type { BoardFull } from "@/modules/boards/types";
 import { createCardAction, moveCardAction, placeCardAction } from "@/modules/boards/actions-cards";
 import { alignBacklogToMapAction, placeOnMapAction } from "@/modules/boards/actions-structure";
 import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
+import { cn } from "@/lib/utils";
 import { MapGrid, type Drag } from "./map-grid";
 import { MapTray } from "./map-tray";
 import {
@@ -51,6 +53,7 @@ export function StoryMapView({ full }: { full: BoardFull }) {
   const [showClosed, setShowClosed] = useState(false);
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [drag, setDrag] = useState<Drag>(null);
+  const screen = useFullscreen();
 
   const cards = applyFilters(full.cards, filters);
   const map = storyMap(full, structure.items, cards, { showClosed });
@@ -144,7 +147,13 @@ export function StoryMapView({ full }: { full: BoardFull }) {
     );
 
   return (
-    <section className="border-border bg-card @container flex min-w-0 flex-col rounded-xl border shadow-[var(--surface-shadow)]">
+    <section
+      className={cn(
+        "border-border bg-card @container flex min-w-0 flex-col rounded-xl border shadow-[var(--surface-shadow)]",
+        // The wall is the one surface that wants the whole window.
+        screen.fullscreen && "fixed inset-4 z-40 overflow-auto",
+      )}
+    >
       <header className="border-hairline flex flex-wrap items-center gap-3 border-b px-4 py-3">
         <div className="min-w-0 flex-1">
           <h2 className="text-base font-semibold">{t("title")}</h2>
@@ -160,6 +169,7 @@ export function StoryMapView({ full }: { full: BoardFull }) {
             </Button>
           }
         />
+        <FullscreenButton fullscreen={screen.fullscreen} onToggle={screen.toggle} />
       </header>
       <MapTray
         features={waiting}

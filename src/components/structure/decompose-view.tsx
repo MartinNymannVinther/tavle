@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Maximize2, Minimize2, ZoomIn, ZoomOut } from "lucide-react";
+import { ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { segmentedTrack } from "@/components/ui/segmented";
 import { structureOf } from "@/components/board/card-chips";
 import { legendTypes, TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
+import { FullscreenButton, useFullscreen } from "@/components/board/use-fullscreen";
 import { BootstrapDialog } from "@/components/backlog/bootstrap-dialog";
 import { ItemForm } from "@/components/backlog/item-form";
 import { createCardAction, placeCardAction } from "@/modules/boards/actions-cards";
@@ -33,11 +34,7 @@ export function DecomposeView({ full, aiAvailable }: { full: BoardFull; aiAvaila
   const structure = structureOf(full);
   const { view } = structure;
   const [drag, setDrag] = useState<DragItem>(null);
-  // Full screen as a fixed overlay rather than the Fullscreen API: the
-  // dialogs and menus portal to the body, and the browser's fullscreen
-  // shows only the fullscreened element's own subtree — "Ny epic" would
-  // open invisibly behind the chart. An overlay keeps every popup alive.
-  const [fullscreen, setFullscreen] = useState(false);
+  const screen = useFullscreen();
   // Zoom: the whole surface scales, tray included, so a big breakdown
   // can be read at a glance or a corner of it up close. CSS zoom keeps
   // layout and hit-testing honest, so every drag still lands right.
@@ -47,15 +44,6 @@ export function DecomposeView({ full, aiAvailable }: { full: BoardFull; aiAvaila
     const at = STEPS.indexOf(zoom as (typeof STEPS)[number]);
     setZoom(STEPS[Math.min(STEPS.length - 1, Math.max(0, at + by))] ?? 1);
   };
-  useEffect(() => {
-    if (!fullscreen) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setFullscreen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [fullscreen]);
-
   const epics = full.items
     .filter((i) => i.level === "epic" && i.state === "open")
     .sort((a, b) => a.sort - b.sort || a.number - b.number);
@@ -114,12 +102,7 @@ export function DecomposeView({ full, aiAvailable }: { full: BoardFull; aiAvaila
   };
 
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-4",
-        fullscreen && "bg-background fixed inset-0 z-40 overflow-auto p-6",
-      )}
-    >
+    <div className={cn("flex flex-col gap-4", screen.overlay)}>
       <div className="flex items-center justify-end gap-2">
         <div className={segmentedTrack}>
           <Button
@@ -147,16 +130,7 @@ export function DecomposeView({ full, aiAvailable }: { full: BoardFull; aiAvaila
           </Button>
         </div>
         <BootstrapDialog boardId={board.id} run={run} available={aiAvailable} />
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="max-sm:hidden"
-          onClick={() => setFullscreen((current) => !current)}
-        >
-          {fullscreen ? <Minimize2 data-slot="icon" /> : <Maximize2 data-slot="icon" />}
-          {fullscreen ? t("exitFullscreen") : t("fullscreen")}
-        </Button>
+        <FullscreenButton fullscreen={screen.fullscreen} onToggle={screen.toggle} />
       </div>
       <div className="flex flex-col gap-4" style={{ zoom }}>
         <div className="-mx-5 min-w-0 flex-1 overflow-x-auto px-5 pb-2 sm:-mx-7 sm:px-7 lg:mx-0 lg:px-0">
