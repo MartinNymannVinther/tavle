@@ -216,14 +216,23 @@ codebase to:
   measures; labels removed. 0.10.2: the type symbols (ADR 0012). 0.10.3:
   the backlog as a navigator and a flat list (ADR 0013). 0.10.7: the
   structure's levels and fields chosen per board, view only (ADR 0014).
-- 0.11 (this): the story map — features across, stories in the cells —
-  as the decomposition's own view (ADR 0015). 0.11.1: the backbone is
-  the team's — chosen features in the story's order, a tray for the
-  rest, sticky notes (ADR 0016). 0.11.2: the bands down are the team's
-  own releases, on both board types (ADR 0032); the roster of people
-  work is assigned to (ADR 0029); estimation in points, hours or
-  T-shirt sizes (ADR 0030); the overview becomes backlog care (ADR
-  0031).
+- 0.11: the story map — features across, stories in the cells — as the
+  decomposition's own view (ADR 0015). 0.11.1: the backbone is the
+  team's — chosen features in the story's order, a tray for the rest,
+  sticky notes (ADR 0016). 0.11.2: the bands down are the team's own
+  releases, on both board types (ADR 0032); the roster of people work is
+  assigned to (ADR 0029); estimation in points, hours or T-shirt sizes
+  (ADR 0030); the overview becomes backlog care (ADR 0031).
+- 0.11.3 (this): what a fourteen-tester walk through the whole product
+  turned up, and what an adversarial pass over those fixes turned up
+  after it; one rank, one number, so a move writes one row and an arrow
+  moves one row of what is read (ADR 0033); a card dragged straight into
+  a sprint, and out again; an AI read served from a route rather than a
+  server action, so a slow model cannot hold a person's own writes (ADR
+  0034); a roof over the whole installation's model calls (ADR 0035);
+  and a pass over the tech debt — the actions pinned to commits, the
+  typefaces moved into the repository, the migrator slimmed to what it
+  runs.
 - Before 1.0: dogma seven — a real team runs a real board on it; the
   screenshots for the README; the tool card on haij.dk; whatever the
   first team asks for that the omissions list did not foresee.
