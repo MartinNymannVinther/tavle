@@ -2,7 +2,8 @@
 
 Status: accepted · Date: 2026-09-11 · Supersedes the section layout of
 ADR 0012 (the type symbols and the "a row says only what is its own"
-rule from 0012 stand)
+rule from 0012 stand) · Amended by ADR 0033 (what the one order is
+numbered in, and what a move past a neighbour writes)
 
 ## Context
 

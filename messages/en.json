@@ -397,7 +397,9 @@
       "withoutBody": "The board, the sprints and the numbers need no model. What the AI offers is proposals a person edits and says yes to: a draft for a card, a split of a card, the sprint's story, and a starting point for the backlog and the roadmap — plus the quiet assists along the way and a draft for the close conversation. Without a model the buttons say so, and everything else works as before.",
       "setupEuComment": "hosted in the EU (Mistral)",
       "setupLocalComment": "or locally (Ollama)",
-      "setupKeyPlaceholder": "your-key-here"
+      "setupKeyPlaceholder": "your-key-here",
+      "perInstallation": "Calls across the installation per day",
+      "failCeiling": "Tavle's own ceiling on AI calls was reached, not the provider's. The ceilings are under “Ceiling on AI calls” below; the installation's own is set with AI_DAILY_CALL_CAP. Try again shortly."
     },
     "members": {
       "title": "Members",

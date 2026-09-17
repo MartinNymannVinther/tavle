@@ -1,8 +1,9 @@
 # Production image for Tavle. Multi-stage:
-#   deps     -> install node_modules once
-#   build    -> next build (standalone output)
-#   migrator -> minimal image that runs drizzle migrations (compose "migrate")
-#   runner   -> non-root runtime serving the standalone build
+#   deps      -> install node_modules once
+#   prod-deps -> the same install without the development tree
+#   build     -> next build (standalone output)
+#   migrator  -> minimal image that runs drizzle migrations (compose "migrate")
+#   runner    -> non-root runtime serving the standalone build
 
 # Node 25 and later no longer ship corepack, so pnpm is installed outright.
 # Keep this version in step with "packageManager" in package.json.
@@ -17,6 +18,14 @@ WORKDIR /app
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
+
+# The same install without the development tree, for the migrator. It is
+# its own stage rather than a `pnpm prune` on top of deps, so nothing that
+# only ever existed for the build can be left behind by a prune that
+# missed it.
+FROM base AS prod-deps
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile --prod
 
 FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
@@ -35,17 +44,20 @@ ENV APP_DATABASE_URL=postgres://build:build@localhost:5432/build \
     BETTER_AUTH_URL=http://localhost:3000
 RUN pnpm build
 
-# The migrator carries the full install, dev dependencies included.
+# The migrator carries the production tree only. This image holds the
+# Postgres superuser connection string, and eslint, vitest, prettier and
+# the shadcn CLI have no business standing next to it.
 #
-# A --prod install would be the better shape here, because this image
-# holds the Postgres superuser connection string and has no need of
-# eslint or vitest next to it. It was tried and reverted at the launch:
-# `pnpm db:migrate` runs the scripts through tsx, tsx is a development
-# dependency, and `pnpm add --prod tsx` on top of a --prod install does
-# not place the binary, so the step fails with `sh: tsx: not found` after
-# the database is already up. See TECH-DEBT.md for what a real fix needs.
+# A --prod install was tried at the launch and reverted the same hour:
+# `pnpm db:migrate` runs the scripts through tsx, tsx was a development
+# dependency, and the step died with `sh: tsx: not found` after the
+# database was already up. The fix was to stop lying about tsx. It runs
+# in production, on every deploy, and so does dotenv (both migration
+# scripts open with `import "dotenv/config"`); both are dependencies now.
+# The CI step that runs this image against a port nobody listens on is
+# what keeps that honest.
 FROM base AS migrator
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=prod-deps /app/node_modules ./node_modules
 COPY package.json drizzle.config.ts ./
 COPY drizzle ./drizzle
 COPY src/core/db/schema ./src/core/db/schema

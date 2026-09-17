@@ -397,7 +397,9 @@
       "withoutBody": "Tavlen, sprintene og tallene har ikke brug for en model. Det AI'en tilbyder er forslag, som en person retter i og siger ja til: et udkast til et kort, en opdeling af et kort, sprintens historie, og et startpunkt for backlog og roadmap — plus de stille hjælp undervejs og et oplæg til lukkesamtalen. Uden model siger knapperne det, og alt andet virker som før.",
       "setupEuComment": "EU-hostet (Mistral)",
       "setupLocalComment": "eller lokalt (Ollama)",
-      "setupKeyPlaceholder": "din-nøgle-her"
+      "setupKeyPlaceholder": "din-nøgle-her",
+      "perInstallation": "Kald i hele installationen i døgnet",
+      "failCeiling": "Tavles eget loft over AI-kald blev nået, ikke udbyderens. Loftet står under “Loft over AI-kald” herunder; installationens samlede loft sættes med AI_DAILY_CALL_CAP. Prøv igen om lidt."
     },
     "members": {
       "title": "Medlemmer",

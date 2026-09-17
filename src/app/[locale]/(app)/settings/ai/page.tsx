@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { getOrgContext } from "@/core/auth/session";
 import { redirect } from "@/i18n/navigation";
 import {
+  MAX_CALLS_PER_INSTALLATION_PER_DAY,
   MAX_CALLS_PER_USER_PER_HOUR,
   MAX_CALLS_PER_WORKSPACE_PER_DAY,
   MAX_INPUT_CHARS,
@@ -42,6 +43,7 @@ export default async function AiSettingsPage() {
   const role = await currentRole(context);
   const canEdit = role === "owner" || role === "admin";
   const active = settings.effective.provider !== "none" && settings.effective.model !== "";
+  const installationCap = MAX_CALLS_PER_INSTALLATION_PER_DAY;
 
   return (
     <div className="flex max-w-2xl flex-col gap-5">
@@ -153,6 +155,16 @@ export default async function AiSettingsPage() {
             <span className="text-muted-foreground">{t("perWorkspace")}</span>
             <span className="font-medium tabular-nums">{MAX_CALLS_PER_WORKSPACE_PER_DAY}</span>
           </div>
+          {/* The installation's own roof (docs/adr/0035) can refuse a
+              workspace that has spent nothing, so a page that lists the
+              other two and not this one is a page that lies by omission.
+              Zero means the installation has taken the roof off. */}
+          {installationCap > 0 && (
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">{t("perInstallation")}</span>
+              <span className="font-medium tabular-nums">{installationCap}</span>
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">{t("messageLength")}</span>
             <span className="font-medium tabular-nums">{MAX_INPUT_CHARS}</span>

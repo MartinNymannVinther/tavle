@@ -20,7 +20,7 @@ export type LlmTestResult =
   | { status: "ok"; model: string; sample: string; ms: number }
   | {
       status: "failed";
-      reason: "auth" | "unreachable" | "config" | "rate_limit" | "generic";
+      reason: "auth" | "unreachable" | "config" | "rate_limit" | "ceiling" | "generic";
     };
 
 /**
@@ -53,7 +53,9 @@ export async function testLlmAction(): Promise<LlmTestResult> {
   try {
     await withOrgContext(ctx, (tx) => reserveAiCall(tx, ctx, "test", "test"));
   } catch (error) {
-    if (error instanceof RateLimited) return { status: "failed", reason: "rate_limit" };
+    // Our own ceiling, not the provider's: the person is told which, or
+    // they go looking for a billing page over a limit we set ourselves.
+    if (error instanceof RateLimited) return { status: "failed", reason: "ceiling" };
     console.error("llm: could not count the test call", error);
     return { status: "failed", reason: "generic" };
   }

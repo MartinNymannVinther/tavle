@@ -320,4 +320,49 @@ describe("rls coverage (guards future tables)", () => {
       await expectSqlError(admin.query("delete from audit_log where action = 'test.append-only'")),
     ).toBeTruthy();
   });
+
+  /**
+   * A SECURITY DEFINER function runs as its owner — here the migration
+   * superuser — so a runtime role that may call one is outside RLS for as
+   * long as it runs. That is the whole reason the roles themselves have no
+   * BYPASSRLS: the exceptions are named functions doing one thing each,
+   * not a role with the door left open.
+   *
+   * So the exceptions are named here too, and a new one has to be argued
+   * for in a pull request rather than merged quietly. Trigger functions
+   * are excluded because nothing calls them: they run on a write the
+   * policies already decided to allow.
+   */
+  const CALLABLE_DEFINER_FUNCTIONS = [
+    // Returns the installation's model-call count for the last day, across
+    // every workspace (docs/adr/0035). A number crosses the boundary; no
+    // row does, and it takes no arguments, so it can answer one question
+    // and only that one.
+    "ai_calls_last_day",
+    // Deletes a workspace the caller owns, audit rows included, which is
+    // dogma 3 and which RLS and the append-only guard would otherwise
+    // forbid (docs/adr/0003). Checks the caller's role itself.
+    "delete_workspace",
+  ];
+
+  it("only the named definer functions can be called by a runtime role", async () => {
+    const rows = await admin.query(
+      `select p.proname from pg_proc p
+       where p.pronamespace = 'public'::regnamespace and p.prosecdef
+         and pg_get_function_result(p.oid) <> 'trigger'
+         and (has_function_privilege('tavle_app', p.oid, 'execute')
+              or has_function_privilege('tavle_auth', p.oid, 'execute'))
+       order by p.proname`,
+    );
+    expect(rows.rows.map((r) => r.proname)).toEqual(CALLABLE_DEFINER_FUNCTIONS);
+  });
+
+  it("the ai call counter is reachable from the app role and nowhere else", async () => {
+    const rows = await admin.query(
+      `select has_function_privilege('tavle_app', 'ai_calls_last_day()', 'execute') as app,
+              has_function_privilege('tavle_auth', 'ai_calls_last_day()', 'execute') as auth,
+              has_function_privilege('public', 'ai_calls_last_day()', 'execute') as anyone`,
+    );
+    expect(rows.rows[0]).toEqual({ app: true, auth: false, anyone: false });
+  });
 });

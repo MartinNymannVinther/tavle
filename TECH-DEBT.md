@@ -24,23 +24,6 @@ answer from the armchair (dogma seven). What is **paid** is history.
 
 ## Open
 
-The five below are being paid as this is written; they stay here until
-the work lands, because a file that describes the future is the same
-kind of wrong as one that describes the past.
-
-### AI call ceilings are per workspace, with no installation-wide roof
-
-`src/modules/ai/limits.ts` counts 60 calls per user per hour and 600 per
-workspace per day, both scoped by the tenant context. A user who belongs
-to several workspaces therefore gets 60 × N, and an installation running
-`DEMO=on` has no total ceiling at all — and every demo visitor gets a
-workspace. The demo's own door is throttled (five workspaces per address
-per hour, `src/app/[locale]/demo/route.ts`), but the model spend behind
-it is not. Worth an installation-level daily cap read outside the tenant
-context before the demo is pointed at from haij.dk. `ai_calls` has forced
-RLS with an org-scoped policy, so the count has to cross the tenant
-boundary without the rows doing so.
-
 ### The web UI's font comes from Google at build time, and the files that ship have no reader
 
 `src/app/[locale]/layout.tsx` uses `next/font/google` for Archivo and
@@ -55,42 +38,6 @@ fix — `next/font/local` pointed at files in the repository — with a
 decision about weight 500, which `font-medium` asks for in a hundred
 places, and about a local Geist Mono.
 
-### The migrator image ships the whole development tree
-
-`Dockerfile`'s `migrator` stage copies the full `node_modules`, so the one
-image holding the Postgres superuser connection string also contains
-eslint, vitest, prettier and the shadcn CLI. Ajour tried a `--prod`
-install and reverted it the same hour: `pnpm db:migrate` runs through
-tsx, tsx is a development dependency, and a `--prod` install leaves
-`sh: tsx: not found` to be discovered at deploy time. The likeliest real
-fix is to stop calling tsx a development dependency — the migration step
-runs it in production, on every deploy — and to check `pnpm audit
---prod` afterwards, because tsx brings esbuild with it. CI runs the built
-migrator image against a port nobody listens on and requires it to reach
-its own connection error, which is the check that would catch a
-regression.
-
-### Error handling coupled to a Postgres message string
-
-`src/modules/export/workspace.ts` decides "not the owner" by matching the
-text `only the workspace owner` against the exception raised in
-`drizzle/0003_product_rls_audit.sql`. A later `CREATE OR REPLACE` that
-rewords the message would silently degrade the branch to a generic
-failure, and no test would notice. Raise with `ERRCODE = '42501'` and
-match `error.code` instead. Inherited from Ajour, and worth fixing in
-both.
-
-### The lockfile was pruned by hand
-
-`pnpm-lock.yaml` had `nodemailer`, `@types/nodemailer` and
-`@react-pdf/renderer` removed by editing the importers block and the
-direct package entries, because `pnpm install --lockfile-only` needs the
-registry and the registry was not reachable. `pnpm install
---frozen-lockfile` reported the lockfile up to date after the edit, which
-is the check that matters. The transitive entries those three packages
-pulled in may still be listed as orphans; `pnpm dedupe` is the one-line
-way to find out, committed on its own so the diff is readable.
-
 ### Files over 300 lines
 
 One responsibility per file and no file over roughly 300 lines. At 0.9
@@ -100,15 +47,21 @@ that keep growing, which is the whole reason for the rule.
 
 | lines | file                                      | the seam                                                        |
 | ----- | ----------------------------------------- | --------------------------------------------------------------- |
-| 548   | `components/backlog/backlog-view.tsx`     | the page's state, the drag's nine callbacks, the two layouts    |
 | 453   | `components/backlog/item-backlog.tsx`     | the epic altitude, the feature altitude, the row shared by both |
-| 416   | `modules/boards/undo.ts`                  | the step catalogue vs. the one switch that applies them         |
+| 444   | `components/backlog/backlog-view.tsx`     | the page's state vs. the two layouts it draws                   |
 | 397   | `core/db/schema/boards.ts`                | the board's own tables vs. the backlog structure's              |
 | 385   | `components/structure/decompose-tree.tsx` | the tree, the drag, and the row                                 |
+| 371   | `modules/demo/seed.ts`                    | the two boards it seeds                                         |
 | 350   | `components/board/board-view.tsx`         | the board vs. the swimlane rows                                 |
 | 345   | `components/map/map-headers.tsx`          | the feature note, the loose head, the row label                 |
 | 334   | `components/map/story-map-view.tsx`       | the wall's state vs. the handlers it hands down                 |
 | 333   | `modules/boards/write-sprints.ts`         | the sprint's life vs. what a card's promise to one costs        |
+
+Two were taken at 0.11.3 and are off the list: the backlog page gave up
+what a gesture writes to `use-backlog-moves.ts` (548 → 444), and
+`undo.ts` gave the card's eight reverses to `undo-cards.ts` (416 → 307).
+Both were split along the seam named here rather than by moving lines
+about, which is the only kind of split worth the churn.
 
 Six more sit between 300 and 332: `access-admin.tsx`, `ai-panel.tsx`,
 `core/access/service.ts`, `card-side-panel.tsx`, `events.ts` and
@@ -297,3 +250,41 @@ repository. Every action is pinned to a commit now, with the version it
 was at in a trailing comment, and `.github/dependabot.yml` watches the
 `github-actions` ecosystem so the pins move as pull requests that get
 read.
+
+### ~~AI call ceilings are per workspace, with no installation-wide roof~~
+
+Every demo visitor got a workspace and every workspace its own 600 calls
+a day, so the model spend behind the demo door had no roof at all. There
+is one now, counted across every workspace in a rolling 24 hours and set
+by the installation (`AI_DAILY_CALL_CAP`, 2000 by default, `0` to take it
+off). The count crosses the tenant boundary and the rows do not: a
+`SECURITY DEFINER` function that takes no arguments and answers one
+question, which `tests/rls` now holds to an allowlist so the next one has
+to be argued for. docs/adr/0035.
+
+### ~~The migrator image ships the whole development tree~~
+
+`tsx` and `dotenv` are dependencies now, because the migration step runs
+them in production on every deploy, and the migrator stage installs
+`--prod`: 1.48 GB → 1.25 GB, and eslint, vitest, prettier and the shadcn
+CLI are out of the one image that holds the Postgres superuser
+connection string. `pnpm audit --prod` is clean; plain `pnpm audit`
+reports three advisories that all used to sit in that image and no
+longer do. What is left is `next` and its native binaries, which the
+migrator has no use for either — shedding those needs a workspace split,
+which is a bigger decision than this was.
+
+### ~~Error handling coupled to a Postgres message string~~
+
+The owner refusal is raised with `ERRCODE = '42501'` and read from the
+error's SQLSTATE. The message match is gone rather than kept as a
+fallback: a fallback would have let the test pass on the old path while
+claiming the new one, which is the failure mode the item was about.
+
+### ~~The lockfile was pruned by hand~~
+
+Answered: `pnpm dedupe` found no orphans from the three hand-removed
+packages — pnpm prunes unreferenced entries on every install, so the
+first connected install had already cleaned up. It did collapse a
+pre-existing duplicate esbuild (drizzle-kit on 0.25.12 beside tsx and
+vite on 0.28.2), 27 entries gone, nothing added.

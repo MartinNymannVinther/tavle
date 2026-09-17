@@ -31,6 +31,7 @@ runtime but the machine.
    | `BETTER_AUTH_URL`     | `https://tavle.haij.dk` (public URL; passkeys bind to this origin) |
    | `LLM_PROVIDER`        | `mistral` hosted, `ollama` self-hosted, or leave unset for `none`  |
    | `MISTRAL_API_KEY`     | only with `LLM_PROVIDER=mistral`                                   |
+   | `AI_DAILY_CALL_CAP`   | model calls per day across the whole installation; `0` for no roof |
 
    Hex, not base64, for the three database passwords, and that is not a
    style preference. `docker-compose.yml` builds the connection strings by

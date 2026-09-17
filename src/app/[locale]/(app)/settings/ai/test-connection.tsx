@@ -70,9 +70,11 @@ export function TestConnection() {
                     ? t("failUnreachable")
                     : result.reason === "config"
                       ? t("failConfig")
-                      : result.reason === "rate_limit"
-                        ? t("failRateLimited")
-                        : t("failGeneric")}
+                      : result.reason === "ceiling"
+                        ? t("failCeiling")
+                        : result.reason === "rate_limit"
+                          ? t("failRateLimited")
+                          : t("failGeneric")}
               </p>
               <p className="text-meta mt-1 text-xs">{t("failWhereToLook")}</p>
             </div>

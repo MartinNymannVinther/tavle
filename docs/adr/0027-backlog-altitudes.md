@@ -1,6 +1,7 @@
 # ADR 0027: The backlog at three altitudes
 
-Status: accepted · Date: 2026-09-15
+Status: accepted · Date: 2026-09-15 · Amended by ADR 0033 (an arrow at
+any altitude moves one row of what is read, marked rows included)
 
 ## Context
 

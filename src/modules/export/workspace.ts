@@ -50,6 +50,26 @@ export async function currentRole(ctx: OrgContext): Promise<string | null> {
 
 export type DeleteResult = "deleted" | "notOwner" | "nameMismatch" | "failed";
 
+/** Postgres' `insufficient_privilege`, which is how a refusal says so. */
+const INSUFFICIENT_PRIVILEGE = "42501";
+
+/**
+ * The SQLSTATE behind a failed query, or undefined when there is none.
+ *
+ * Drizzle wraps what the driver threw, so the database's own error is the
+ * cause; `pg` puts the code on the error itself. Both are looked at, and
+ * the chain is walked rather than assumed to be one deep.
+ */
+export function sqlStateOf(error: unknown): string | undefined {
+  let current: unknown = error;
+  for (let depth = 0; current && depth < 5; depth += 1) {
+    const code = (current as { code?: unknown }).code;
+    if (typeof code === "string" && /^[0-9A-Z]{5}$/.test(code)) return code;
+    current = (current as { cause?: unknown }).cause;
+  }
+  return undefined;
+}
+
 /**
  * Deletes the active workspace. The person types the workspace's name to
  * confirm; the database function checks ownership itself, so the check
@@ -71,8 +91,19 @@ export async function deleteWorkspace(
       await tx.execute(sql`select delete_workspace(${ctx.orgId})`);
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    if (/only the workspace owner/.test(message)) return "notOwner";
+    // The code, not the wording. This branch used to match the text
+    // `only the workspace owner` against the exception raised in the
+    // database, so a later CREATE OR REPLACE that reworded the sentence
+    // would have degraded "you are not the owner" to a nameless failure
+    // with no test to notice. drizzle/0016_owner_errcode.sql gives that
+    // one raise ERRCODE 42501, and nothing else in delete_workspace()
+    // raises it. The old message match is gone rather than kept as a
+    // fallback: with it still here, tests/export/workspace would pass on
+    // the fallback and go on claiming a path it was no longer taking.
+    // Nothing runs against a database this migration has not reached —
+    // docker-compose.yml starts the app only on the migration step's
+    // `service_completed_successfully`.
+    if (sqlStateOf(error) === INSUFFICIENT_PRIVILEGE) return "notOwner";
     console.error("workspace: delete failed", error);
     return "failed";
   }
