@@ -3,9 +3,11 @@ import { cleanupExpiredDemos, demoEnabled } from "../src/modules/demo/service";
 /**
  * Deletes expired demo workspaces. The app does this on each visit, so
  * this script is for an installation that wants it on a timer instead —
- * a cron entry, or a Coolify scheduled task:
+ * a cron entry on a machine with a checkout. Not a task inside the
+ * container: neither image carries `scripts/` (see the Dockerfile), and
+ * the server's own way is a POST to `/api/demo/cleanup`.
  *
- *   pnpm tsx scripts/cleanup-demos.ts
+ *   pnpm script scripts/cleanup-demos.ts
  */
 async function main() {
   if (!demoEnabled()) {

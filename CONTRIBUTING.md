@@ -68,14 +68,26 @@ looked up at runtime is a version that can lie.
 
 ## The AI checklist (every feature that calls a model)
 
-1. All model access through `src/modules/ai/service.ts`, which is the
-   one door to `src/core/llm`; the feature says so, plainly, when the
-   provider is `none` or fails, and everything else keeps working.
+1. Every feature that asks a model to do work goes through `askForJson()`
+   in `src/modules/ai/service.ts`, the one door to `src/core/llm`: it
+   picks the workspace's provider, counts the call against the ceilings,
+   bounds the wait and parses the answer. The feature says so, plainly,
+   when the provider is `none` or fails, and everything else keeps
+   working. There is one exception, and it should stay the only one: the
+   connection test under Settings → AI
+   (`src/app/[locale]/(app)/settings/ai/actions.ts`) takes the provider
+   straight from `workspaceLlmProvider()`, because it tests the door
+   rather than using it — a token-free health check, then one plain-text
+   word back instead of JSON. It still counts its call with
+   `reserveAiCall`, as the `test` kind.
 2. User-written content goes into the prompt fenced as data
    (`fenceUntrusted`), never as instructions.
-3. Model output is cut to shape by a sanitizer in `src/modules/ai/sanitize.ts`
-   before it is shown, and every id in an apply action is checked against
-   the caller's workspace before anything is written.
+3. Model output is cut to shape by a `sanitize*` function next to the
+   feature that asked for it — `sanitize.ts` for the three big proposals,
+   `assists.ts`, `advice.ts` and `bootstrap.ts` for the rest — built from
+   the readers in `src/modules/ai/sanitize-helpers.ts`, before it is
+   shown, and every id in an apply action is checked against the caller's
+   workspace before anything is written.
 4. The AI only proposes. It never deletes, moves or assigns; what a person
    keeps is written through the ordinary services and marked
    `actor_kind = 'ai'` in the event log.

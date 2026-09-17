@@ -14,11 +14,13 @@ import type { BoardFull } from "@/modules/boards/types";
 import { cn } from "@/lib/utils";
 
 /**
- * The overview: where the open work sits, by theme, by area and by kind,
- * the enabler share as one number, and the five health measures that
- * say whether the structure is being kept. A distribution is one bar
- * split into shares — never a row of half-filled lines, which the eye
- * reads as progress that does not exist.
+ * Backlog care (docs/adr/0031): what the backlog is waiting for, said
+ * only when there is something to say, and where the open work sits —
+ * by theme, by area or by kind, one axis at a time, with the total
+ * stated once above them. A distribution is one bar split into shares,
+ * never a row of half-filled lines, which the eye reads as progress
+ * that does not exist. The five health percentages this page used to
+ * carry went with the decision: a page cannot both nag and help.
  */
 export function OverviewView({ full }: { full: BoardFull }) {
   const t = useTranslations("overview");

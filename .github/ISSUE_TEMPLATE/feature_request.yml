@@ -5,11 +5,11 @@ body:
   - type: markdown
     attributes:
       value: >-
-        Tavle keeps its concept count deliberately low — project,
-        milestone, task, decision, obstacle, status, budget line — and the
-        omissions are part of the product. An idea that earns a new
-        concept has to be worth it, so say what problem it solves before
-        what it should look like.
+        Tavle keeps its concept count deliberately low — board, column,
+        card, sprint, comment, person, release, epic, feature, theme,
+        area — and the omissions are part of the product. An idea that
+        earns a new concept has to be worth it, so say what problem it
+        solves before what it should look like.
   - type: textarea
     id: problem
     attributes:

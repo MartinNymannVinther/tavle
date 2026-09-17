@@ -60,7 +60,11 @@ runtime but the machine.
    are encrypted with a key derived from `BETTER_AUTH_SECRET`, so rotating
    that secret means each such workspace must enter its key again (ADR
    0009).
-   | `TAVLE_COMMIT` | the deployed commit, short form (see below) |
+
+   The deployed commit is not one of these. `TAVLE_COMMIT` is a build
+   argument, not a runtime variable — step 3 below is where it goes, and
+   a value set here would be ignored, because the commit is inlined into
+   the bundle when the image is built.
 
    `SIGNUP` is deliberately absent: it defaults to `closed`, which is what
    an installation on the open internet should be. See section 5.
@@ -194,8 +198,8 @@ scheduler. If yours is quiet, or you would rather not rely on that, use
 either:
 
 ```bash
-pnpm tsx scripts/cleanup-demos.ts      # on a checkout, or in the container
-curl -X POST https://tavle.haij.dk/api/demo/cleanup
+pnpm script scripts/cleanup-demos.ts   # on a checkout; the images carry no scripts
+curl -X POST https://tavle.haij.dk/api/demo/cleanup   # on the server
 ```
 
 The endpoint needs no secret because it can only delete demos that have

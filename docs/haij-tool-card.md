@@ -20,29 +20,35 @@ haij.dk is its own repo, and this file is the proposal to paste from.
 
 **Danish, the paragraph under it**
 
-> Et board skal ikke være et system. Tavle har seks begreber, og ikke ét
-> mere: tavle, kolonne, kort, label, sprint og kommentar. Kør Kanban med
-> WIP-grænser der advarer og aldrig forbyder, eller Scrum med en backlog og
-> ét sprint ad gangen. Burndown, velocity, gennemløb og cyklustid regnes ud
-> fra kortenes egne ure hver gang du kigger, ikke fra et skøn. AI'en kan
-> skrive kortet færdigt, foreslå en opdeling og fortælle sprintets
-> historie, og du retter og siger ja. Til teams på to til femten:
-> produktteamet, driftsteamet, foreningens app-projekt.
+> Et board skal ikke være et system. Tavle har elleve begreber, og ikke ét
+> mere: tavle, kolonne, kort, sprint, kommentar, personen arbejdet ligger
+> hos, releasen der leveres samlet, og backlogstrukturens fire — epic,
+> feature, tema og område. Kør Kanban med WIP-grænser der advarer og aldrig
+> forbyder, eller Scrum med en backlog og ét sprint ad gangen. Burndown,
+> velocity, gennemløb og cyklustid regnes ud fra kortenes egne ure hver
+> gang du kigger, ikke fra et skøn. AI'en kan skrive kortet færdigt,
+> foreslå en opdeling, fortælle sprintets historie og lægge et
+> udgangspunkt for backlog og roadmap ud fra jeres egen tekst, og du
+> retter og siger ja. Til teams på to til femten: produktteamet,
+> driftsteamet, foreningens app-projekt.
 
 **English, the paragraph under it**
 
-> A board should not be a system. Tavle has six concepts and not one more:
-> board, column, card, label, sprint and comment. Run Kanban with WIP
-> limits that warn and never forbid, or Scrum with a backlog and one sprint
-> at a time. Burndown, velocity, throughput and cycle time are computed
-> from the cards' own clocks every time you look, never from an estimate.
-> The AI can finish writing a card, suggest a split and tell the sprint's
-> story, and you edit and say yes. For teams of two to fifteen: the product
-> team, the ops team, the association's app project.
+> A board should not be a system. Tavle has eleven concepts and not one
+> more: board, column, card, sprint, comment, the person work is assigned
+> to, the release that ships together, and the four of the backlog
+> structure — epic, feature, theme and area. Run Kanban with WIP limits
+> that warn and never forbid, or Scrum with a backlog and one sprint at a
+> time. Burndown, velocity, throughput and cycle time are computed from
+> the cards' own clocks every time you look, never from an estimate. The
+> AI can finish writing a card, suggest a split, tell the sprint's story
+> and lay a starting point for backlog and roadmap from your own prose,
+> and you edit and say yes. For teams of two to fifteen: the product team,
+> the ops team, the association's app project.
 
 **Chips, if the card has them**
 
-Kanban · Scrum · Backlog · Sprints · Indsigt · Mine kort · Team
+Kanban · Scrum · Backlog · Story map · Sprints · Indsigt · Mine kort · Team
 
 **Buttons**
 

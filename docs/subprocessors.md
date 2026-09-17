@@ -6,10 +6,10 @@ public list of who can see what for the installation at tavle.haij.dk. A
 self-hosted Tavle with `LLM_PROVIDER=ollama` or `none` has no
 subprocessor at all beyond the machine it runs on.
 
-| Subprocessor        | Purpose                                                                    | Data                                                                                                                                 | Location                                      | Added      |
-| ------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------- | ---------- |
-| Hetzner Online GmbH | Hosting: the VPS running Docker and the database                           | Everything the installation holds                                                                                                    | Nuremberg, DE                                 | 2026-09-11 |
-| Mistral AI          | LLM adapter: the three proposals (finish a card, split a card, the sprint) | The card or sprint the feature works on: titles, descriptions, checklists, a sprint's goal and its cards' titles. Written out below. | EU/EFTA data centres, via `api.eu.mistral.ai` | 2026-09-11 |
+| Subprocessor        | Purpose                                                                                                                                                                                                                                                                                                              | Data                                                                                                                                                                                                                                                                                           | Location                                      | Added      |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- | ---------- |
+| Hetzner Online GmbH | Hosting: the VPS running Docker and the database                                                                                                                                                                                                                                                                     | Everything the installation holds                                                                                                                                                                                                                                                              | Nuremberg, DE                                 | 2026-09-11 |
+| Mistral AI          | LLM adapter: the nine AI features — the four proposals (finish a card, split a card, the sprint's story, a backlog and roadmap from the team's own prose), the three quiet assists (a done-when, a sprint goal, a placement with a duplicate glance) and the two counsels (the close conversation, the review brief) | The board's own text for the feature at hand: titles, descriptions, checklists, done-whens, estimates, sprint and column names, the board's feature, theme and area names, its activity lines, and the prose a team types into the bootstrap dialog. Never a person's name. Written out below. | EU/EFTA data centres, via `api.eu.mistral.ai` | 2026-09-11 |
 
 Tavle sends no mail, so there is no mail provider on this list and there
 will not be one without a row here first.
@@ -33,25 +33,79 @@ Ajour's list once said "Paris, FR" while its code called the endpoint
 with no location commitment; Tavle inherits the correction, not the
 mistake.
 
-Mistral receives what a prompt contains and nothing else. Written out
-rather than summarised, because "the card" is vague and the point of this
-list is that it is not:
+Mistral receives what a prompt contains and nothing else. There are nine
+prompts, and each is written out here rather than summarised, because
+"the card" is vague and the point of this list is that it is not. Four of
+them are the proposals a person asks for by pressing a button:
 
 - **Finishing a card**: the board's name, the card's title, its existing
   description and the titles of its existing checklist items. Not the
-  assignee, the comments, the labels or any other card.
+  assignee, the comments or any other card.
 - **Splitting a card**: the card's title, its description and its current
   estimate. Nothing else.
 - **The sprint's story**: the sprint's name, dates, state and goal, its
   committed and completed points, and one line per card in it — its
   title, its estimate and whether it is done, blocked or open. Not the
   descriptions, not the comments, not who did what.
+- **A backlog and a roadmap from the team's own prose** (ADR 0021): the
+  board's name, the names of the areas and themes it already has, the
+  description of the product the team types into the dialog, the line
+  about what should come first, and the quarters the chosen horizon
+  covers. Nothing else that is already on the board — no cards, no
+  features, no epics.
 
-No prompt carries a person's name. The assignee is not in any of them,
-and comments — where people write to each other by name — are never
-sent. What is sent is what the team wrote on its cards, and a team whose
-cards must not leave the machine runs `LLM_PROVIDER=ollama` or "none",
-which is the reason those options exist.
+Three are the quiet assists (ADR 0025), drafted where a person already
+stands:
+
+- **A done-when**: the board's name, the item's level, its title and its
+  description, the title of what it is part of, and the titles of up to
+  thirty items or cards standing underneath it.
+- **A sprint goal**: the sprint's name and dates, the points planned for
+  it and the team's recent average velocity, and one line per card in it
+  — its title, its feature's title and its estimate.
+- **A placement, and the duplicate glance beside it**: the card title as
+  it is being typed, the titles of every open feature on the board, the
+  names of every active area, and the number and title of the board's two
+  hundred newest cards. Two things about this one are worth saying
+  outright. It is the only prompt that carries cards other than the one
+  at hand, and that is what it is for: a duplicate cannot be noticed
+  without something to notice it against. And it is the only one that is
+  not a button: where a new card is typed with a place still to choose —
+  a column on the board, the field on the backlog — it goes out by
+  itself, 800 milliseconds after the typing stops, once the title has
+  reached eight characters. Nothing is written either way, and with no
+  model configured it is never asked at all.
+
+Two are the counsel (ADR 0026), which reads a state and says what it
+would do:
+
+- **The close conversation**: the item being closed — its level, its
+  title and its done-when — one line per open child with its key, its
+  title, whether it is a feature or a story, how many open stories a
+  feature still has and which column a story sits in, and the key and
+  title of every open item at the same level it could be moved to
+  instead.
+- **The review brief**: the item's level and title, its done-when and the
+  date it was last confirmed as still worth pursuing; one line for each
+  feature or story underneath it, with its state or its column and how
+  many of its stories are done; and up to thirty lines of that item's own
+  activity feed — a date, the kind of event, and the title written into
+  it. Not the audit log, which is a different record and is never sent.
+
+There is a tenth call, and it carries nothing from the board: the
+connection test under Settings → AI asks the provider for its health
+without a token and then sends one fixed sentence — "Svar med præcis ét
+ord: OK" — so that "configured" and "working" can be told apart.
+
+No prompt carries a person's name. The assignee is not in any of them — a
+person on the workspace's roster is a row the AI never reads — and
+comments, where people write to each other by name, are never sent.
+Eight of the nine carry the thing at hand and what stands immediately
+above or below it; the ninth, the duplicate glance, carries the titles of
+up to two hundred of the board's cards. So what leaves the machine is
+what the team wrote on its cards and in its backlog, and a team whose
+titles must not leave it runs `LLM_PROVIDER=ollama` or "none", which is
+the reason those options exist.
 
 ## A workspace can choose a different one
 
@@ -62,7 +116,7 @@ A workspace that chooses differently has chosen its own processor: its
 card text then goes to the provider named on its own settings page, under
 whatever agreement it has with them, and this list no longer describes
 it. A workspace that sets the provider to "none" sends nothing to any
-model at all; the three AI buttons say so and everything else works.
+model at all; every AI surface says so and everything else works.
 
 The Ollama address is not part of that choice — it belongs to the
 installation — so on the hosted instance the real options are Mistral or

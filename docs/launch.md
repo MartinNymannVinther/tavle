@@ -7,43 +7,43 @@ that are easy to do in the wrong order called out.
 Everything here is done once. If you are redeploying an existing
 installation, you want section 8 of the deploy guide instead.
 
-## 1. Publish the repository
+## 1. Make the repository public
 
-The code has only ever existed as a local clone and a set of bundles.
-Coolify deploys from a Git repository, and dogma one is not satisfied by
-code in a folder, so this comes first.
+The repository already exists — `origin` is
+`git@github.com:MartinNymannVinther/tavle.git`, `main` is pushed and CI
+runs on it — but it is private, and dogma one is not satisfied by a
+repository nobody can clone. What is left of this step is the flip.
+Coolify deploys from a Git repository either way, so this is about the
+dogma rather than about the deployment.
 
-```bash
-cd path/to/tavle
-gh repo create MartinNymannVinther/tavle --public \
-  --description "Teamets tavle, uden abonnementet. Kanban og Scrum, open source." \
-  --source . --remote origin --push
-```
-
-Without the `gh` CLI: create the repository empty on github.com, then
-
-```bash
-git remote add origin git@github.com:MartinNymannVinther/tavle.git
-git push -u origin main
-```
-
-Check before pushing that `git status` is clean and that `git ls-files`
+Check before the flip that `git status` is clean and that `git ls-files`
 lists no `.env` — `.gitignore` covers both, and CI's gitleaks job is the
-second line rather than the first.
+second line rather than the first. The check is cheap and the flip is
+one-way: the whole history becomes public with it, and nothing about it
+can be taken back afterwards.
 
-Then, on the repository page: set the description and the website to
-`https://tavle.haij.dk`, add the topics `kanban`, `scrum`, `nextjs`,
-`postgresql`, `open-source`, `danish`, and turn on issues. Check that the
-CI run on the first push is green — six jobs: quality, tests, build,
-image, audit, gitleaks. The audit job runs `pnpm audit --prod`, which is
-clean as of the pre-release review; `pnpm audit` on the whole tree still
-reports three advisories reached only through the `shadcn` CLI, which is
-a development dependency and never ships.
+```bash
+gh repo edit MartinNymannVinther/tavle --visibility public \
+  --accept-visibility-change-consequences
+gh repo edit MartinNymannVinther/tavle \
+  --description "Teamets tavle, uden abonnementet. Kanban og Scrum, open source." \
+  --homepage https://tavle.haij.dk \
+  --add-topic kanban --add-topic scrum --add-topic nextjs \
+  --add-topic postgresql --add-topic open-source --add-topic danish
+```
 
-`.github/dependabot.yml` starts opening pull requests as soon as the
-repository is public: one grouped patch PR a week for npm, plus GitHub
-Actions and Docker base images. Expect a small batch in the first days
-and read them rather than merging them blind.
+Issues are already on. Check that the CI run after the flip is green —
+six jobs: quality, tests, build, image, audit, gitleaks. The audit job
+runs `pnpm audit --prod`, which is clean as of the pre-release review;
+`pnpm audit` on the whole tree still reports three advisories reached
+only through the `shadcn` CLI, which is a development dependency and
+never ships.
+
+`.github/dependabot.yml` has been opening pull requests since the
+repository was created — one grouped pull request a week for the npm
+minor and patch traffic, majors on their own, plus GitHub Actions and
+Docker base images — and going public changes nothing about that. Keep
+reading them rather than merging them blind.
 
 ## 2. The Mistral key
 

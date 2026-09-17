@@ -161,9 +161,16 @@ codebase to:
   form. The structure's blocking rules are refused in the service, and
   rules 1, 4 and 5 again in the database.
 - Validate all input at the boundary (zod). Parameterized queries only.
-- Rate limiting on auth and all public endpoints, and a ceiling on AI
-  calls per user and on prompt length. Generic auth error messages, no
-  stack traces or version info in responses.
+- Rate limiting on auth and all public endpoints, ceilings on AI calls —
+  per user, per workspace and over the whole installation (ADR 0035) —
+  and a ceiling on prompt length. Generic auth error messages, no
+  stack traces and nothing in a response that is about this
+  installation. The release is the one exception: `GET /api/version`
+  names it without a login so a deploy can be verified from outside,
+  which an AGPL repository gives away anyway; `/api/health` still
+  answers nothing but `ok`, and the runtime picture — versions,
+  environment, migration state — stays behind the login on the About
+  page.
 - The AI surface: user-written content (titles, descriptions, checklists)
   is fenced as data in every prompt, never as instructions; model output
   is cut to shape by the sanitizers before it is shown and validated
@@ -219,10 +226,13 @@ codebase to:
 - 0.11: the story map — features across, stories in the cells — as the
   decomposition's own view (ADR 0015). 0.11.1: the backbone is the
   team's — chosen features in the story's order, a tray for the rest,
-  sticky notes (ADR 0016). 0.11.2: the bands down are the team's own
-  releases, on both board types (ADR 0032); the roster of people work is
-  assigned to (ADR 0029); estimation in points, hours or T-shirt sizes
-  (ADR 0030); the overview becomes backlog care (ADR 0031).
+  sticky notes (ADR 0016); and swimlanes on a Kanban board, rows by
+  kind, theme, area or the team's own named lanes, which is what took
+  them off the list below (ADR 0017). 0.11.2: the bands down are the
+  team's own releases, on both board types (ADR 0032); the roster of
+  people work is assigned to (ADR 0029); estimation in points, hours or
+  T-shirt sizes (ADR 0030); the overview becomes backlog care (ADR
+  0031).
 - 0.11.3 (this): what a fourteen-tester walk through the whole product
   turned up, and what an adversarial pass over those fixes turned up
   after it; one rank, one number, so a move writes one row and an arrow
@@ -236,5 +246,5 @@ codebase to:
 - Before 1.0: dogma seven — a real team runs a real board on it; the
   screenshots for the README; the tool card on haij.dk; whatever the
   first team asks for that the omissions list did not foresee.
-- Later, each as its own decision: swimlanes, card links, attachments,
+- Later, each as its own decision: card links, attachments,
   notifications, a public read-only board link.
