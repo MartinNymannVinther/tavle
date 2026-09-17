@@ -1,20 +1,8 @@
 {
   "common": {
-    "appName": "Tavle",
-    "loading": "Indlæser…",
-    "save": "Gem",
     "cancel": "Annuller",
     "close": "Luk",
-    "back": "Tilbage",
     "error": "Noget gik galt. Prøv igen.",
-    "edit": "Redigér",
-    "delete": "Slet",
-    "week": "Uge {number}",
-    "weekOf": "Uge {date}",
-    "thinking": {
-      "seconds": "{seconds} s",
-      "slow": "En lokal model kan tage op mod et minut. Svarer den ikke, tager regelmotoren over, og siden siger det."
-    },
     "hours": "{value} t"
   },
   "landing": {
@@ -41,7 +29,7 @@
       "securityTitle": "Sikkerhed fra første dag",
       "securityBody": "Arbejdsrum er adskilt i databasen, ikke kun i koden. Passkeys, totrinslogin og en log der ikke kan redigeres."
     },
-    "status": "Version 0.9 · bygget til at blive brugt",
+    "status": "Version {version} · bygget til at blive brugt",
     "family": {
       "body": "Tavle er ét værktøj i Haij-familien af open source-værktøjer til organisationer der vil eje deres egen teknologi.",
       "link": "Læs om Haij"
@@ -101,7 +89,6 @@
       "errorInvalid": "Tjek felterne og prøv igen.",
       "errorEmailExists": "Der findes allerede en konto med denne e-mail.",
       "errorGeneric": "Kontoen kunne ikke oprettes. Prøv igen.",
-      "closedTitle": "Oprettelse er lukket",
       "closedBody": "Denne installation af Tavle tager ikke imod nye brugere. Kontakt ejeren hvis du skal have adgang.",
       "invitedSubtitle": "Du er inviteret. Kontoen oprettes til den e-mail og det arbejdsrum, invitationen gælder for.",
       "lockedHint": "Fastlagt af invitationen.",
@@ -377,7 +364,7 @@
       "messageLength": "Tegn i det modellen får at læse, højst",
       "principlesTitle": "Sådan bruger Tavle AI",
       "principleDecides": "AI'en foreslår og udfører, men mennesket beslutter. Den sender aldrig noget ud af huset og sletter aldrig noget.",
-      "principleUndo": "Der gemmes en kopi af hele projektet før hver AI-ændring, og hver ændring kan fortrydes fra beskeden der lavede den.",
+      "principleUndo": "Intet gemmes, før du siger ja. Alt det AI'en skriver, står mærket i aktiviteten og kan fortrydes derfra, når hændelsen bærer sin modsatte handling med sig.",
       "principleData": "Det du og dine kolleger skriver, sendes til modellen som data, aldrig som instruktioner, og modellens svar valideres mod projektets egne id'er, før noget skrives.",
       "principleSovereign": "Modellen kan skiftes ud, også til en lokal. Hvem der kan se hvad står i docs/subprocessors.md.",
       "test": "Test forbindelsen",
@@ -490,7 +477,7 @@
     },
     "leaving": {
       "title": "At holde op",
-      "body": "Du kan slette dit arbejdsrum med det samme, uden at skrive til nogen og uden at vente. Eksporten ligger et klik væk, og den er læsbar uden Tavle. Vi opbevarer ikke en kopi bagefter ud over de natlige krypterede backups, som ruller ud efter 30 dage."
+      "body": "Du kan slette dit arbejdsrum med det samme, uden at skrive til nogen og uden at vente. Eksporten ligger et klik væk, og den er læsbar uden Tavle. Vi opbevarer ikke en kopi bagefter ud over de natlige krypterede backups, som ruller ud efter 30 dage — både på serveren og i det EU-lager de kopieres til."
     },
     "availability": {
       "title": "Drift og garantier",
@@ -1175,7 +1162,7 @@
     },
     "activity": {
       "title": "Seneste ændringer på tavlen",
-      "body": "Ændringer af selve tavlen — temaer, områder, baner, niveauer og releases. Står de her, kan de fortrydes."
+      "body": "Ændringer der ikke står på et kort eller et emne — temaer, områder, baner, niveauer, releases og sprints, og det der er slettet. Dem der kan fortrydes, har en Fortryd-knap."
     }
   },
   "my": {
@@ -1358,7 +1345,7 @@
       },
       "undo": {
         "title": "Fortryd",
-        "body": "Hver ændring står i aktiviteten på kortet eller emnet med en Fortryd-knap, og ændringer af selve tavlen — temaer, områder, baner, niveauer, releases — står under Indstillinger → Seneste ændringer på tavlen. Fortryd kører den modsatte handling gennem de samme regler som alt andet — er verden gået videre, fordi kortet er slettet eller featuren lukket, siger værktøjet nej i stedet for at gætte. Det fortrudte streges over i aktiviteten, og fortrydelsen selv skrives ned."
+        "body": "De fleste ændringer står i aktiviteten på kortet eller emnet med en Fortryd-knap ved siden af — en rettet tjekliste, en fjernet kommentar og en feature sat op på eller taget ned fra story mappet bærer ikke deres modsatte handling og står der uden knap. Og ændringer af selve tavlen — temaer, områder, baner, niveauer, releases — står under Indstillinger → Seneste ændringer på tavlen. Fortryd kører den modsatte handling gennem de samme regler som alt andet — er verden gået videre, fordi kortet er slettet eller featuren lukket, siger værktøjet nej i stedet for at gætte. Det fortrudte streges over i aktiviteten, og fortrydelsen selv skrives ned."
       },
       "backlog": {
         "title": "Backloggen",
@@ -1366,7 +1353,7 @@
       },
       "care": {
         "title": "Backlog-styring",
-        "body": "Siden svarer på ét spørgsmål: hvad venter backloggen på? Den viser kun det, der faktisk kræver en beslutning — features og kort uden en plads, epics og features uden et “Færdig når”, features uden arbejde under sig, epics ingen har bekræftet længe, uvejet arbejde i toppen, og en backlog rangeret dybere end I når. Hvert punkt folder ud til de faktiske rækker, så I kan gå direkte hen og rette det. Er der ingenting, siger siden det. Nederst står, hvor vægten af det åbne arbejde ligger, fordelt på tema, område eller art. Et kort med flere temaer tælles ét sted, under “Flere temaer”, så rækkerne lægger sammen til det tal, der står over dem."
+        "body": "Siden svarer på ét spørgsmål: hvad venter backloggen på? Den viser kun det, der faktisk kræver en beslutning — features og kort uden en plads, epics og features uden et “Færdig når”, features uden arbejde under sig, epics uden features, epics ingen har bekræftet længe, uvejet arbejde i toppen, og en backlog rangeret dybere end I når. Hvert punkt folder ud til de faktiske rækker, så I kan gå direkte hen og rette det. Er der ingenting, siger siden det. Nederst står, hvor vægten af det åbne arbejde ligger, fordelt på tema, område eller art. Et kort med flere temaer tælles ét sted, under “Flere temaer”, så rækkerne lægger sammen til det tal, der står over dem."
       },
       "insight": {
         "title": "Indsigt",
@@ -1374,7 +1361,7 @@
       },
       "team": {
         "title": "Teamet",
-        "body": "Inviter kollegerne under Indstillinger → Arbejdsrum. Du får et link, som du selv sender. Har personen ingen konto, bliver den oprettet gennem linket. Ejere og administratorer kan ændre tavlernes kolonner, svømmebaner, temaer og områder, invitere og fjerne medlemmer; alle andre kan alt det andet. Arbejdet lægges hos personer, ikke hos konti: under Indstillinger → Arbejdsrum kan I skrive en kollega ind som person, længe før de har et login, og når deres login kommer, knyttes det til af sig selv via e-mailadressen."
+        "body": "Inviter kollegerne under Indstillinger → Arbejdsrum. Du får et link, som du selv sender. Har personen ingen konto, bliver den oprettet gennem linket. Ejere og administratorer kan ændre tavlernes form — kolonner, svømmebaner, temaer, områder, releases, estimeringsenhed, navn og sprintlængde — skrive personerne ind, og invitere og fjerne medlemmer; alle andre kan arbejde på alt indholdet: kort, epics, features, sprints og kommentarer. Arbejdet lægges hos personer, ikke hos konti: under Indstillinger → Arbejdsrum kan I skrive en kollega ind som person, længe før de har et login, og når deres login kommer, knyttes det til af sig selv via e-mailadressen."
       },
       "ai": {
         "title": "AI-hjælpen",
@@ -1657,7 +1644,6 @@
     "newFeature": "Ny feature",
     "newFeaturePlaceholder": "Ny feature …",
     "add": "Tilføj",
-    "epicEmpty": "Ingen features endnu. Skriv den første herunder, eller træk én hertil.",
     "moveToEpic": "Flyt til epic",
     "moveToFeature": "Flyt til feature",
     "noParent": "Uden forælder",

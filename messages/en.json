@@ -1,20 +1,8 @@
 {
   "common": {
-    "appName": "Tavle",
-    "loading": "Loading…",
-    "save": "Save",
     "cancel": "Cancel",
     "close": "Close",
-    "back": "Back",
     "error": "Something went wrong. Please try again.",
-    "edit": "Edit",
-    "delete": "Delete",
-    "week": "Week {number}",
-    "weekOf": "Week of {date}",
-    "thinking": {
-      "seconds": "{seconds} s",
-      "slow": "A local model can take up to a minute. If it does not answer, the rules engine takes over and the page says so."
-    },
     "hours": "{value} h"
   },
   "landing": {
@@ -41,7 +29,7 @@
       "securityTitle": "Secure from day one",
       "securityBody": "Workspaces are separated in the database, not only in the code. Passkeys, two-factor sign-in and a log that cannot be edited."
     },
-    "status": "Version 0.9 · built to be used",
+    "status": "Version {version} · built to be used",
     "family": {
       "body": "Tavle is one tool in the Haij family of open source tools for organisations that want to own their technology.",
       "link": "Read about Haij"
@@ -101,7 +89,6 @@
       "errorInvalid": "Check the fields and try again.",
       "errorEmailExists": "An account with this email already exists.",
       "errorGeneric": "The account could not be created. Please try again.",
-      "closedTitle": "Registration is closed",
       "closedBody": "This Tavle installation is not accepting new users. Contact the owner if you need access.",
       "invitedSubtitle": "You are invited. The account is created for the email and the workspace the invitation is for.",
       "lockedHint": "Set by the invitation.",
@@ -377,7 +364,7 @@
       "messageLength": "Characters the model gets to read, at most",
       "principlesTitle": "How Tavle uses AI",
       "principleDecides": "The AI proposes and carries out, but the human decides. It never sends anything out of the house and never deletes.",
-      "principleUndo": "A copy of the whole project is taken before every AI change, and each change can be undone from the message that made it.",
+      "principleUndo": "Nothing is saved until you say yes. Everything the AI writes is marked in the activity and can be undone from there, when the event carries its own reverse.",
       "principleData": "What you and your colleagues write goes to the model as data, never as instructions, and the model's output is validated against the project's own ids before anything is written.",
       "principleSovereign": "The model can be swapped, including for a local one. Who can see what is listed in docs/subprocessors.md.",
       "test": "Test the connection",
@@ -490,7 +477,7 @@
     },
     "leaving": {
       "title": "Leaving",
-      "body": "You can delete your workspace immediately, without writing to anyone and without waiting. The export is one click away and readable without Tavle. We keep no copy afterwards beyond the nightly encrypted backups, which roll off after 30 days."
+      "body": "You can delete your workspace immediately, without writing to anyone and without waiting. The export is one click away and readable without Tavle. We keep no copy afterwards beyond the nightly encrypted backups, which roll off after 30 days — on the server and in the EU storage they are copied to."
     },
     "availability": {
       "title": "Running and guarantees",
@@ -1175,7 +1162,7 @@
     },
     "activity": {
       "title": "Recent changes to the board",
-      "body": "Changes to the board itself — themes, areas, lanes, levels and releases. What stands here can be undone."
+      "body": "Changes that stand on no card and no item — themes, areas, lanes, levels, releases and sprints, and what has been deleted. The ones that can be undone carry an Undo button."
     }
   },
   "my": {
@@ -1358,7 +1345,7 @@
       },
       "undo": {
         "title": "Undo",
-        "body": "Every change stands in the activity of its card or item with an Undo button, and changes to the board itself — themes, areas, lanes, levels, releases — stand under Settings → Recent changes to the board. Undo runs the opposite action through the same rules as everything else — if the world has moved on because the card was deleted or the feature closed, the tool says no instead of guessing. What was undone is struck through in the activity, and the undo itself is written down."
+        "body": "Most changes stand in the activity of their card or item with an Undo button beside them — a corrected checklist, a removed comment and a feature put on or taken off the story map carry no reverse and stand there without one. And changes to the board itself — themes, areas, lanes, levels, releases — stand under Settings → Recent changes to the board. Undo runs the opposite action through the same rules as everything else — if the world has moved on because the card was deleted or the feature closed, the tool says no instead of guessing. What was undone is struck through in the activity, and the undo itself is written down."
       },
       "backlog": {
         "title": "The backlog",
@@ -1366,7 +1353,7 @@
       },
       "care": {
         "title": "Backlog care",
-        "body": "The page answers one question: what is the backlog waiting for? It shows only what actually needs a decision — features and cards with no place, epics and features with no “done when”, features with no work under them, epics nobody has confirmed in a long time, unweighed work at the top, and a backlog ranked deeper than you will reach. Each line folds out to the real rows, so you can go straight there and fix it. If there is nothing, the page says so. At the bottom it shows where the weight of the open work sits, by theme, area or kind. A card with more than one theme is counted in one place, under “More than one theme”, so the rows add up to the total stated above them."
+        "body": "The page answers one question: what is the backlog waiting for? It shows only what actually needs a decision — features and cards with no place, epics and features with no “done when”, features with no work under them, epics with no features, epics nobody has confirmed in a long time, unweighed work at the top, and a backlog ranked deeper than you will reach. Each line folds out to the real rows, so you can go straight there and fix it. If there is nothing, the page says so. At the bottom it shows where the weight of the open work sits, by theme, area or kind. A card with more than one theme is counted in one place, under “More than one theme”, so the rows add up to the total stated above them."
       },
       "insight": {
         "title": "Insight",
@@ -1374,7 +1361,7 @@
       },
       "team": {
         "title": "The team",
-        "body": "Invite colleagues under Settings → Workspace. You get a link you send yourself. If the person has no account, it is created through the link. Owners and admins can change the boards' columns, swimlanes, themes and areas, invite and remove members; everyone else can do everything else. Work is assigned to people, not accounts: under Settings → Workspace you can write a colleague in as a person long before they have a login, and when their login arrives it attaches itself by the e-mail address."
+        "body": "Invite colleagues under Settings → Workspace. You get a link you send yourself. If the person has no account, it is created through the link. Owners and admins change the boards' shape — columns, swimlanes, themes, areas, releases, the estimate unit, the name and the sprint length — write the people in, and invite and remove members; everyone else works on all the content: cards, epics, features, sprints and comments. Work is assigned to people, not accounts: under Settings → Workspace you can write a colleague in as a person long before they have a login, and when their login arrives it attaches itself by the e-mail address."
       },
       "ai": {
         "title": "The AI help",
@@ -1657,7 +1644,6 @@
     "newFeature": "New feature",
     "newFeaturePlaceholder": "New feature …",
     "add": "Add",
-    "epicEmpty": "No features yet. Write the first one below, or drag one here.",
     "moveToEpic": "Move to epic",
     "moveToFeature": "Move to feature",
     "noParent": "Without a parent",

@@ -44,7 +44,14 @@ import {
  * or down moves it to another release band (docs/adr/0032). Every move
  * is the same write the backlog page would make, only in one motion.
  */
-export function StoryMapView({ full }: { full: BoardFull }) {
+export function StoryMapView({
+  full,
+  canManage = false,
+}: {
+  full: BoardFull;
+  /** Releases are the board's shape: only an owner or an admin may change them. */
+  canManage?: boolean;
+}) {
   const t = useTranslations("map");
   const b = useTranslations("backlog");
   const { run } = useBoardActions();
@@ -200,14 +207,16 @@ export function StoryMapView({ full }: { full: BoardFull }) {
             </Button>
           }
         />
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => setEditing({ open: true, release: null })}
-        >
-          {t("release.new")}
-        </Button>
+        {canManage && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setEditing({ open: true, release: null })}
+          >
+            {t("release.new")}
+          </Button>
+        )}
         <FullscreenButton fullscreen={screen.fullscreen} onToggle={screen.toggle} />
       </header>
       <MapTray
@@ -294,16 +303,18 @@ export function StoryMapView({ full }: { full: BoardFull }) {
             ),
           hiddenOf,
           bandOf: (rowKey) => cards.filter((card) => rowOf(card, map.rows) === rowKey),
-          onEditRelease: (release) => setEditing({ open: true, release }),
-          onNudgeRelease: (release, delta) => {
-            const order = [...full.releases].sort(
-              (a, b) => a.sort - b.sort || a.createdAt.getTime() - b.createdAt.getTime(),
-            );
-            const at = order.findIndex((r) => r.id === release.id);
-            const index = at + delta;
-            if (at < 0 || index < 0 || index >= order.length) return;
-            void run(() => reorderReleaseAction({ releaseId: release.id, index }));
-          },
+          onEditRelease: canManage ? (release) => setEditing({ open: true, release }) : undefined,
+          onNudgeRelease: !canManage
+            ? undefined
+            : (release, delta) => {
+                const order = [...full.releases].sort(
+                  (a, b) => a.sort - b.sort || a.createdAt.getTime() - b.createdAt.getTime(),
+                );
+                const at = order.findIndex((r) => r.id === release.id);
+                const index = at + delta;
+                if (at < 0 || index < 0 || index >= order.length) return;
+                void run(() => reorderReleaseAction({ releaseId: release.id, index }));
+              },
           onReveal: (featureId, reason) => {
             if (reason === "closed") {
               setShowClosed(true);

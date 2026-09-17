@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { buttonVariants } from "@/components/ui/button";
 import { Wordmark } from "@/components/wordmark";
 import { getSession } from "@/core/auth/session";
+import { buildInfo } from "@/core/version";
 import { signupAllowed } from "@/core/auth/signup";
 import { Link, redirect } from "@/i18n/navigation";
 import { demoEnabled, DEMO_TTL_HOURS } from "@/modules/demo/service";
@@ -59,7 +60,9 @@ export default async function HomePage() {
           <div className="mx-auto flex w-full max-w-3xl flex-col items-center px-6 pt-16 pb-12 text-center sm:pt-24">
             <p className="border-border/80 bg-card/60 text-muted-foreground mb-7 inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-xs shadow-xs">
               <span className="bg-primary inline-block size-1.5 animate-pulse rounded-full" />
-              {t("status")}
+              {/* Read from the build rather than written into the copy:
+                  a version in a sentence is a version that goes stale. */}
+              {t("status", { version: buildInfo.version })}
             </p>
             <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
               {t("hero.title")}

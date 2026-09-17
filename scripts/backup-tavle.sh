@@ -17,7 +17,10 @@ set -euo pipefail
 BACKUP_DIR="${BACKUP_DIR:-/root/backups}"
 RECIPIENT_FILE="${RECIPIENT_FILE:-/root/tavle-backup.pub}"
 REMOTE="${REMOTE:-eu-storage:tavle-backups}"
-KEEP_DAYS="${KEEP_DAYS:-14}"
+# What the terms page promises a workspace: thirty days, here and in the
+# bucket. Both ends are applied below, because a retention policy that
+# only prunes the copy you can see is not a retention policy.
+KEEP_DAYS="${KEEP_DAYS:-30}"
 # On a server that also runs Haij there is more than one "db" container,
 # so name Tavle's explicitly (docker ps, then DB_CONTAINER=<id> in cron).
 DB_CONTAINER="${DB_CONTAINER:-$(docker ps -qf name=db | head -1)}"
@@ -45,5 +48,6 @@ mv "$TARGET.partial" "$TARGET"
 rclone copy "$TARGET" "$REMOTE/"
 
 find "$BACKUP_DIR" -name 'tavle-*.dump.age' -mtime "+$KEEP_DAYS" -delete
+rclone delete --min-age "${KEEP_DAYS}d" "$REMOTE/"
 
 echo "backup-tavle: $TARGET ($(stat -c %s "$TARGET") bytes) -> $REMOTE/"

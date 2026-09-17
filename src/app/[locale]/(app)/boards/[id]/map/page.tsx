@@ -3,6 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { StoryMapView } from "@/components/map/story-map-view";
 import { requireOrgContext } from "@/core/auth/guard";
+import { withOrgContext } from "@/core/db/tenant";
+import { canManage, roleOf } from "@/modules/boards/members";
 import { getBoardFull } from "@/modules/boards/read";
 import { redirect as localeRedirect } from "@/i18n/navigation";
 
@@ -27,5 +29,10 @@ export default async function StoryMapPage({ params }: Params) {
   if (full.board.structureLevels === "card") {
     localeRedirect({ href: `/boards/${id}`, locale: await getLocale() });
   }
-  return <StoryMapView full={full} />;
+  // Making, renaming and reordering a release is a change to the board's
+  // shape, so the services ask for an owner or an admin. The wall asks
+  // the same question before it draws the buttons, rather than offering
+  // a member a move that would be refused.
+  const role = await withOrgContext(context, (tx) => roleOf(tx, context));
+  return <StoryMapView full={full} canManage={canManage(role)} />;
 }

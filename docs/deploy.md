@@ -249,6 +249,12 @@ Name the container explicitly: on a server that also runs Haij there is
 more than one database container called `db`, and the script's fallback
 picks the first one it finds.
 
+Thirty days is what the terms page promises a workspace whose data has
+been deleted, so the script keeps thirty at both ends: `KEEP_DAYS`
+prunes the dumps on the VPS and `rclone delete --min-age` prunes the
+bucket. Change one and you have changed a promise — change the sentence
+in `terms.leaving.body` with it.
+
 Keep the age private key offline, never on the server: a backup an attacker
 on the server can decrypt is not a backup, it is a second copy of the leak.
 Test a restore at least quarterly — an untested backup is a hope, not a

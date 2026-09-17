@@ -35,10 +35,10 @@ export type GridHandlers = {
   onReveal: (featureId: string, reason: HiddenCard["reason"]) => void;
   /** Every card in a band the view is showing, so the label's count and the row agree. */
   bandOf: (rowKey: string) => CardView[];
-  /** Opens a band for renaming and dating. */
-  onEditRelease: (release: Release) => void;
-  /** Moves a band one step nearer or further. */
-  onNudgeRelease: (release: Release, delta: -1 | 1) => void;
+  /** Opens a band for renaming and dating; absent for a reader who may not. */
+  onEditRelease?: (release: Release) => void;
+  /** Moves a band one step nearer or further; absent for a reader who may not. */
+  onNudgeRelease?: (release: Release, delta: -1 | 1) => void;
 };
 
 export function MapGrid({
@@ -128,15 +128,17 @@ export function MapGrid({
                 hidden={handlers.hiddenOf(row.key)}
                 onEdit={handlers.onEditRelease}
                 onNudge={
-                  row.kind === "release"
+                  row.kind === "release" && handlers.onNudgeRelease
                     ? {
                         up:
-                          rowIndex > 0 ? () => handlers.onNudgeRelease(row.release, -1) : undefined,
+                          rowIndex > 0
+                            ? () => handlers.onNudgeRelease!(row.release, -1)
+                            : undefined,
                         // The unreleased band is always last, so a release
                         // can go down only while another release is below it.
                         down:
                           rowIndex < map.rows.length - 2
-                            ? () => handlers.onNudgeRelease(row.release, 1)
+                            ? () => handlers.onNudgeRelease!(row.release, 1)
                             : undefined,
                       }
                     : undefined

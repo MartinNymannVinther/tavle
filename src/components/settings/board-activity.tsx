@@ -12,7 +12,7 @@ import { undoEventAction } from "@/modules/boards/actions-undo";
  * its lanes, the levels and fields it shows, a release renamed, the
  * backlog told to follow the map. These changes belong to no card and
  * no epic, so the feeds on those pages never showed them, and the
- * reverse each of them carries (docs/adr/0022) could not be pressed by
+ * reverse some of them carry (docs/adr/0022) could not be pressed by
  * anyone. This is that page: the same feed, the same Fortryd, for the
  * shape of the board.
  */
