@@ -1,6 +1,20 @@
 # ADR 0017: Swimlanes on a Kanban board — three views and one field
 
-Status: accepted · Date: 2026-09-14
+Status: accepted · Date: 2026-09-14 · The numeral in the trade-off is not
+the count the product kept (note below)
+
+> Overtaken on the count: the trade-off below calls the swimlane the
+> product's tenth concept, which was the arithmetic on this date. The
+> count the product kept leaves it out. CLAUDE.md lists eleven — board,
+> column, card, sprint, comment, the person, the release and the four of
+> the backlog structure — and the two decisions that count out loud
+> follow that list: ADR 0029 makes the person the tenth and ADR 0032 the
+> release the eleventh, neither counting past the lane. The list is of
+> concepts the whole product names; a manual lane is one Kanban board's
+> own rows, turned on board by board, and ADR 0032 says as much when it
+> sets the release apart from "a swimlane (one Kanban board's rows)".
+> What the sentence is there to say stands: the lanes are one new table,
+> and the only part of this feature that is data rather than view.
 
 ## Context
 

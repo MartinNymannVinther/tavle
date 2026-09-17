@@ -1,6 +1,8 @@
 # ADR 0019: The roadmap's bars are the plan — a chosen start, moved and stretched in place
 
-Status: accepted · Date: 2026-09-14
+Status: accepted · Date: 2026-09-14 · Amends ADR 0011 (rule 4's
+creation-time database check dropped, ADR 0018 having moved the rule to
+the close)
 
 ## Context
 

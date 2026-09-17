@@ -1,6 +1,19 @@
 # ADR 0011: One backlog structure — a hierarchy that finishes, categories that never do
 
-Status: accepted · Date: 2026-09-11
+Status: accepted · Date: 2026-09-11 · Rule 4 amended by ADR 0018 (it
+bites at the close, not at creation) and ADR 0019 (the creation-time
+database check dropped)
+
+> Amended by ADR 0018: rule 4 bites at the close, not at creation. An
+> epic or feature may be jotted down without its done-when and carries a
+> warning mark until it is written; the claim "this is finished" is what
+> the criterion answers, so that is where the refusal lives. Of the
+> three refusals named below, the schema and the service now let an
+> empty one through, and with ADR 0019 the `done_when <> ''` database
+> check went with them — what stands in the database is close-only
+> (`state <> 'closed' or btrim(done_when) <> ''`). The rule itself is
+> unchanged: an epic or feature must still say when it is done before it
+> can be done. Everything else below still holds.
 
 ## Context
 

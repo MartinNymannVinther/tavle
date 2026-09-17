@@ -1,6 +1,6 @@
 # ADR 0015: The story map is the decomposition's own view, computed from the board
 
-Status: accepted, amended by ADR 0016 · Date: 2026-09-12
+Status: accepted, amended by ADR 0016 and ADR 0032 · Date: 2026-09-12
 
 > Amended by ADR 0032: the bands down the map are no longer the
 > sprints or the columns but the team's own releases, on both board

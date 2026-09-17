@@ -1,6 +1,7 @@
 # ADR 0018: Building the backlog is one surface, and rule 4 bites at the close
 
-Status: accepted · Date: 2026-09-14
+Status: accepted · Date: 2026-09-14 · Amends ADR 0011 (rule 4 bites at
+the close) and ADR 0012 (a Kanban backlog draws the tick boxes too)
 
 ## Context
 

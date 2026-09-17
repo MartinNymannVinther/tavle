@@ -1,7 +1,18 @@
 # ADR 0033: One rank, one number — a move writes one row
 
-Status: accepted · Date: 2026-09-16 · Amends ADR 0013 (the flat list)
+Status: accepted · Date: 2026-09-16 · Amends ADR 0007 (a card's `sort`
+is a rank, not a place in a lane of its own), ADR 0013 (the flat list)
 and ADR 0027 (the altitudes)
+
+> Corrected 2026-09-17, not amended. The respace below was first written
+> down as the lane put out again as 1000, 2000, 3000. The code was
+> narrowed to a window around the landing the same evening this decision
+> was taken, and the paragraph did not follow. What moved is the worst
+> case inside the decision, not the decision — a move still writes one
+> row — and it moved on the decision's own day. A back-pointer would
+> send a reader looking for a second decision that was never taken, so
+> the sentence is put right where it stands instead. Why the window is
+> narrow is argued where it bites, in `modules/boards/ordering.ts`.
 
 ## Context
 
@@ -43,9 +54,13 @@ it always claimed to do.
 **A move writes one row.** `placeInLane` gives the moved card a whole
 number between the two neighbours it landed between and leaves every
 other number alone. Only when those two neighbours are adjacent whole
-numbers — after roughly ten moves into the same gap, or on a tie — is
-the lane written out again as 1000, 2000, 3000 …, and that is the only
-case that writes more than the row a person moved.
+numbers — after roughly ten moves into the same gap, or on a tie — does
+a move write more than the row a person moved: the window around the
+landing is spread apart, growing outwards a row at a time until the
+numbers just bounding it can hold everything inside with a whole number
+each, and only that window is written. A lane with room somewhere near
+costs two or three rows; the whole lane is the worst case, not the
+ordinary one.
 
 **The rank travels with the card, the column does not.** Entering the
 active sprint a card keeps its column; entering a planned one it starts
@@ -73,9 +88,9 @@ changes; where it _stands_ does not.
 ## Trade-offs accepted
 
 - The numbers are no longer an even 1000, 2000, 3000 in an export; they
-  are whole numbers in the right order, with gaps and, after a respace,
-  a fresh start. Order is what they mean, and order is all they ever
-  meant.
+  are whole numbers in the right order, with gaps and, where a respace
+  has made room, an even spread across the stretch it rewrote. Order is
+  what they mean, and order is all they ever meant.
 - Rows written before this decision keep the numbers their old lane
   gave them, so a board that has been used already can still show a
   marked row at a place no one chose. Nothing new drifts, and the next

@@ -1,6 +1,8 @@
 # ADR 0032: A release is the story map's band
 
-Status: accepted · Date: 2026-09-16
+Status: accepted · Date: 2026-09-16 · Amends ADR 0015 and ADR 0016 (the
+bands down the story map are the team's own releases, not the sprints or
+the columns)
 
 ## Context
 

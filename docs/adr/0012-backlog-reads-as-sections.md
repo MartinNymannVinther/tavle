@@ -2,7 +2,15 @@
 
 Status: accepted · Date: 2026-09-11 · The section layout and the fold were
 superseded the same day by ADR 0013; the type symbols and the rule that a
-row says only what is its own stand.
+row says only what is its own stand · Amended by ADR 0018 (a Kanban
+backlog draws the tick boxes too)
+
+> Amended by ADR 0018: the tick boxes are not the sprint's. A Kanban
+> backlog draws them as well, because the bar they bring up also puts
+> the ticked cards under one feature, and placing work is something both
+> board types do; only the bar's sprint half stays Scrum's. The reading
+> below — that nothing else in the header changes when a row is ticked —
+> still holds.
 
 ## Context
 

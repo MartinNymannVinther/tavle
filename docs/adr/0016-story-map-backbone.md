@@ -1,6 +1,7 @@
 # ADR 0016: The story map has its own backbone — chosen features, in the story's order
 
-Status: accepted · Date: 2026-09-12 · Amends ADR 0015
+Status: accepted · Date: 2026-09-12 · Amends ADR 0015 · Amended by ADR
+0032 (the bands down the map)
 
 > Amended by ADR 0032: the bands down the map are no longer the
 > sprints or the columns but the team's own releases, on both board

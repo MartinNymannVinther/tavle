@@ -9,8 +9,9 @@
  * field: on a Scrum board the backlog and the sprint's columns are one
  * priority read in two places (docs/adr/0033), and nobody else's row
  * stirs when one card moves. Only when two neighbours have no whole
- * number left between them is the lane respaced by STEP again, which is
- * the rare case and the only one that writes more than a single row.
+ * number left between them are the rows around the landing spread out
+ * to make room — as few of them as will do, never the whole lane, and
+ * that is the one case that writes more than a single row.
  */
 
 export const STEP = 1000;

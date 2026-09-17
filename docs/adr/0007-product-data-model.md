@@ -1,7 +1,18 @@
 # ADR 0007: The product's data model — six concepts and a record of moves
 
 Status: accepted · Date: 2026-09-11 · Amended by ADR 0011 (labels removed;
-epics, features, themes and areas added above the cards)
+epics, features, themes and areas added above the cards) and ADR 0033
+(a card's `sort` is a rank, and a move writes one row)
+
+> Amended by ADR 0033: `sort` is no longer a position within a lane of
+> its own but the card's rank in the board's one priority, which the
+> backlog and the sprint's columns read as the same number. A move gives
+> the moved card a whole number between its new neighbours and leaves
+> every other row alone; only a landing with no whole number left
+> between its neighbours spreads the rows around it. The reasoning below
+> — a readable number in an export, no fractional keys — is what 0033
+> kept; what it gave up is the rewrite that made every row's number a
+> function of somebody else's move. Everything else below still holds.
 
 ## Context
 
