@@ -1,6 +1,8 @@
 # ADR 0021: The fourth proposal — a starting point from the team's own prose
 
-Status: accepted · Date: 2026-09-14
+Status: accepted · Date: 2026-09-14 · Amended by ADR 0037 (the starting
+point is offered only while the backlog is still bare; on a backlog the
+team has built, an assistant takes the same slot)
 
 ## Context
 

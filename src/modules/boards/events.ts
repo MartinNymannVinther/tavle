@@ -71,6 +71,8 @@ export type EventType =
   | "card.split"
   | "card.swimlane"
   | "ai.bootstrapped"
+  /** The assistant's four writes on an existing backlog, counted (docs/adr/0037). */
+  | "ai.assisted"
   | "undo.applied"
   | "swimlane.created"
   | "swimlane.updated"

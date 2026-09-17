@@ -3,9 +3,11 @@
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import type { Run } from "@/components/board/use-board-actions";
+import { isBareDecomposition } from "@/modules/ai/bare-backlog";
 import type { StructureView } from "@/modules/boards/structure/view";
 import type { BoardFull, CardView } from "@/modules/boards/types";
 import { selectionKey, type Selection } from "./backlog-selection";
+import { AssistDialog } from "./assist-dialog";
 import { BootstrapDialog } from "./bootstrap-dialog";
 import { ItemForm } from "./item-form";
 
@@ -45,9 +47,14 @@ export function BacklogHeader({
           })}
         </p>
       </div>
-      {view.features && (
-        <BootstrapDialog boardId={full.board.id} run={run} available={aiAvailable} />
-      )}
+      {/* One slot, two offers: a starting point while the backlog is bare,
+          the assistant once the team has built one (docs/adr/0037). */}
+      {view.features &&
+        (isBareDecomposition(full.items) ? (
+          <BootstrapDialog boardId={full.board.id} run={run} available={aiAvailable} />
+        ) : (
+          <AssistDialog boardId={full.board.id} run={run} available={aiAvailable} />
+        ))}
       {view.epics && (
         <ItemForm
           full={full}

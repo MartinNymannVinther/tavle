@@ -1254,7 +1254,8 @@
     },
     "ai": {
       "drafted": "AI drafted {key} ({engine})",
-      "bootstrapped": "AI laid a starting point: {epics, plural, one {# epic} other {# epics}}, {features, plural, one {# feature} other {# features}}, {cards, plural, one {# card} other {# cards}} ({engine})"
+      "bootstrapped": "AI laid a starting point: {epics, plural, one {# epic} other {# epics}}, {features, plural, one {# feature} other {# features}}, {cards, plural, one {# card} other {# cards}} ({engine})",
+      "assisted": "AI helped with the backlog: {epics, plural, one {# new epic} other {# new epics}}, {features, plural, one {# new feature} other {# new features}}, {cards, plural, one {# new card} other {# new cards}}, {edits, plural, one {# edit} other {# edits}} ({engine})"
     },
     "theme": {
       "created": "The theme {name} was created",
@@ -1685,5 +1686,35 @@
     "keepEpic": "Keep epic {title}",
     "keepFeature": "Keep feature {title}",
     "keepCard": "Keep card {title}"
+  },
+  "aiAssist": {
+    "cta": "Ask for a proposal",
+    "title": "Ask the AI for a proposal",
+    "subtitle": "Write what should be done to the backlog. The model reads it as it stands and answers with new epics, features, cards and text edits — you prune and edit before anything is saved.",
+    "reviewSubtitle": "The proposal. Untick what should not come along and edit the texts. Only what is ticked is saved.",
+    "instruction": "Task",
+    "instructionPlaceholder": "For example: we are missing everything about returns — put it under the epic it belongs to.",
+    "instructionHint": "Your text goes to the chosen model as data. The AI can neither delete, close, move nor reprioritise anything — only propose new items and edit text.",
+    "propose": "Propose",
+    "thinking": "The model is thinking …",
+    "apply": "Save selected",
+    "back": "Back",
+    "cancel": "Cancel",
+    "nothing": "The model had nothing to propose for that task. Try writing it more concretely.",
+    "newEpics": "New epics",
+    "newFeatures": "New features",
+    "newCards": "New cards",
+    "edits": "Edits",
+    "under": "under {parent}",
+    "doneWhen": "Done when:",
+    "editTitle": "New title",
+    "editDoneWhen": "New done-when",
+    "today": "Today: {text}",
+    "todayEmpty": "Today: empty",
+    "marked": "Proposal from {engine}. Everything saved is marked as AI in the activity and can be undone.",
+    "keepEpic": "Keep epic {title}",
+    "keepFeature": "Keep feature {title}",
+    "keepCard": "Keep card {title}",
+    "keepEdit": "Keep edit to {key}"
   }
 }

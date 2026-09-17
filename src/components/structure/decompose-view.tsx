@@ -9,8 +9,10 @@ import { structureOf } from "@/components/board/card-chips";
 import { legendTypes, TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
 import { FullscreenButton, useFullscreen } from "@/components/board/use-fullscreen";
+import { AssistDialog } from "@/components/backlog/assist-dialog";
 import { BootstrapDialog } from "@/components/backlog/bootstrap-dialog";
 import { ItemForm } from "@/components/backlog/item-form";
+import { isBareDecomposition } from "@/modules/ai/bare-backlog";
 import { createCardAction, placeCardAction } from "@/modules/boards/actions-cards";
 import { createItemAction, placeItemAction } from "@/modules/boards/actions-structure";
 import { planFeatureAction } from "@/modules/boards/actions-sprints";
@@ -129,7 +131,12 @@ export function DecomposeView({ full, aiAvailable }: { full: BoardFull; aiAvaila
             <ZoomIn />
           </Button>
         </div>
-        <BootstrapDialog boardId={board.id} run={run} available={aiAvailable} />
+        {/* The same slot and the same offer as the backlog's header. */}
+        {isBareDecomposition(full.items) ? (
+          <BootstrapDialog boardId={board.id} run={run} available={aiAvailable} />
+        ) : (
+          <AssistDialog boardId={board.id} run={run} available={aiAvailable} />
+        )}
         <FullscreenButton fullscreen={screen.fullscreen} onToggle={screen.toggle} />
       </div>
       <div className="flex flex-col gap-4" style={{ zoom }}>

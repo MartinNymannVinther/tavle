@@ -37,7 +37,7 @@ session reads, and **TECH-DEBT.md** is what we know is not right yet.
 | [0018](0018-backlog-building-flow.md)              | Building the backlog is one surface, and rule 4 bites at the close              | Amends 0011, 0012                           |
 | [0019](0019-roadmap-interactive-spans.md)          | The roadmap's bars are the plan — a chosen start, moved and stretched in place  | Amends 0011                                 |
 | [0020](0020-decomposition-build-surface.md)        | The breakdown is a surface of its own — containment, a tray, and the same moves |                                             |
-| [0021](0021-ai-bootstrap.md)                       | The fourth proposal — a starting point from the team's own prose                |                                             |
+| [0021](0021-ai-bootstrap.md)                       | The fourth proposal — a starting point from the team's own prose                | Amended by 0037                             |
 | [0022](0022-undo.md)                               | Undo — every event carries its own reverse                                      |                                             |
 | [0023](0023-feature-plan-on-sprints.md)            | Features plan on sprints — and sprints can be laid ahead                        |                                             |
 | [0024](0024-design-scale-and-tokens.md)            | A named small-text scale, and the last hard-coded values become tokens          |                                             |
@@ -52,3 +52,5 @@ session reads, and **TECH-DEBT.md** is what we know is not right yet.
 | [0033](0033-one-rank-one-number.md)                | One rank, one number — a move writes one row                                    | Amends 0007, 0013, 0027                     |
 | [0034](0034-ai-reads-on-their-own-route.md)        | An AI read is a route, not an action                                            |                                             |
 | [0035](0035-ai-installation-roof.md)               | The installation's own roof over the AI                                         |                                             |
+| [0036](0036-three-places-and-a-door.md)            | Three places and a door                                                         |                                             |
+| [0037](0037-backlog-assistant.md)                  | The fifth proposal — an assistant for a backlog that exists                     | Amends 0021                                 |

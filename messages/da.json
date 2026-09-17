@@ -1254,7 +1254,8 @@
     },
     "ai": {
       "drafted": "AI skrev et udkast til {key} ({engine})",
-      "bootstrapped": "AI lagde et udgangspunkt: {epics} epics, {features} features, {cards} kort ({engine})"
+      "bootstrapped": "AI lagde et udgangspunkt: {epics} epics, {features} features, {cards} kort ({engine})",
+      "assisted": "AI hjalp med backloggen: {epics} nye epics, {features} nye features, {cards} nye kort, {edits} rettelser ({engine})"
     },
     "theme": {
       "created": "Temaet {name} blev oprettet",
@@ -1685,5 +1686,35 @@
     "keepEpic": "Behold epic {title}",
     "keepFeature": "Behold feature {title}",
     "keepCard": "Behold kort {title}"
+  },
+  "aiAssist": {
+    "cta": "Bed om et forslag",
+    "title": "Bed AI om et forslag",
+    "subtitle": "Skriv, hvad der skal gøres ved backloggen. Modellen læser den, som den står, og svarer med nye epics, features, kort og rettelser af tekst — du beskærer og retter, før noget gemmes.",
+    "reviewSubtitle": "Forslaget. Fjern flueben ved det, der ikke skal med, og ret teksterne. Kun det valgte gemmes.",
+    "instruction": "Opgave",
+    "instructionPlaceholder": "Fx: Vi mangler alt om returvarer — læg det ind under den epic, det hører til.",
+    "instructionHint": "Din tekst sendes til den valgte model som data. AI'en kan hverken slette, lukke, flytte eller omprioritere — kun foreslå nyt og rette tekst.",
+    "propose": "Foreslå",
+    "thinking": "Modellen tænker …",
+    "apply": "Gem valgte",
+    "back": "Tilbage",
+    "cancel": "Annuller",
+    "nothing": "Modellen havde ikke noget at foreslå til den opgave. Prøv at skrive den mere konkret.",
+    "newEpics": "Nye epics",
+    "newFeatures": "Nye features",
+    "newCards": "Nye kort",
+    "edits": "Rettelser",
+    "under": "under {parent}",
+    "doneWhen": "Færdig når:",
+    "editTitle": "Ny titel",
+    "editDoneWhen": "Ny færdig-når",
+    "today": "I dag: {text}",
+    "todayEmpty": "I dag: tom",
+    "marked": "Forslag fra {engine}. Alt der gemmes, mærkes som AI i aktiviteten og kan fortrydes.",
+    "keepEpic": "Behold epic {title}",
+    "keepFeature": "Behold feature {title}",
+    "keepCard": "Behold kort {title}",
+    "keepEdit": "Behold rettelse til {key}"
   }
 }
