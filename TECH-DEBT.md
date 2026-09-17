@@ -33,14 +33,14 @@ that keep growing, which is the whole reason for the rule.
 
 | lines | file                                      | the seam                                                        |
 | ----- | ----------------------------------------- | --------------------------------------------------------------- |
-| 453   | `components/backlog/item-backlog.tsx`     | the epic altitude, the feature altitude, the row shared by both |
-| 444   | `components/backlog/backlog-view.tsx`     | the page's state vs. the two layouts it draws                   |
-| 397   | `core/db/schema/boards.ts`                | the board's own tables vs. the backlog structure's              |
+| 460   | `components/backlog/item-backlog.tsx`     | the epic altitude, the feature altitude, the row shared by both |
+| 446   | `components/backlog/backlog-view.tsx`     | the page's state vs. the two layouts it draws                   |
+| 402   | `core/db/schema/boards.ts`                | the board's own tables vs. the backlog structure's              |
 | 385   | `components/structure/decompose-tree.tsx` | the tree, the drag, and the row                                 |
 | 371   | `modules/demo/seed.ts`                    | the two boards it seeds                                         |
 | 350   | `components/board/board-view.tsx`         | the board vs. the swimlane rows                                 |
 | 345   | `components/map/map-headers.tsx`          | the feature note, the loose head, the row label                 |
-| 334   | `components/map/story-map-view.tsx`       | the wall's state vs. the handlers it hands down                 |
+| 345   | `components/map/story-map-view.tsx`       | the wall's state vs. the handlers it hands down                 |
 | 333   | `modules/boards/write-sprints.ts`         | the sprint's life vs. what a card's promise to one costs        |
 
 Two were taken at 0.11.3: the backlog page gave up what a gesture writes
@@ -158,6 +158,32 @@ numberings, so a free row and a sprint-committed one can hold the same
 creation order and means nothing to a reader. Nothing new ties — a
 placement always lands strictly between its neighbours — and moving
 either row settles it, so this drains as boards are used.
+
+### Two AI features share one label in `ai_calls`
+
+The backlog assistant (docs/adr/0037) counts its model calls under the
+existing `assist` kind, together with the quiet placement assist that
+runs while a card title is typed. The ceilings are unaffected — they
+count calls, not kinds — but an installation reading `ai_calls` cannot
+tell a paragraph-long proposal from a one-line suggestion. A new kind in
+`modules/ai/limits.ts` is the whole fix, and it was left out rather than
+widened on the way past.
+
+### The story map's release dialog is keyed on the band's id alone
+
+`components/map/story-map-view.tsx` keys `ReleaseForm` on the release id,
+so a band whose date changed behind an open dialog would hand back the
+day it was opened with. Inert today: nothing on the map changes a date
+except that dialog. The roadmap's strip, where a drag does exactly that,
+keys on the id and the date together — that is the shape to copy the day
+the map grows a second way in.
+
+### The "no model configured" paragraph is written twice
+
+`bootstrap-dialog.tsx` and `assist-dialog.tsx` each carry their own copy
+of the eight lines that say, honestly, that no model is set up and point
+at Settings → AI. The two were written a release apart and will drift.
+One small component, used by both.
 
 ## Waiting for a real team
 
