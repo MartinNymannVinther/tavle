@@ -6,8 +6,11 @@ import { describe, expect, it } from "vitest";
  * see. Both were found by measuring a real board at 414px, not by reading
  * the code, which is why they are pinned here.
  *
- * The board's tab strip is up to nine links wide and means to scroll
- * inside its own box. It is handed to PageHeader's actions slot, and the
+ * The board's tab strip is three links and a menu button wide (ADR 0036)
+ * and still means to scroll inside its own box: the button takes the
+ * longest of the menu's six words whenever you stand behind it, and the
+ * three words themselves are the team's to translate. It is handed to
+ * PageHeader's actions slot, and the
  * strip's own `max-w-full` only means something when the box above it has
  * a width of its own: the slot is `shrink-0`, so without a cap it grows to
  * its content, `max-w-full` resolves against those 749px, nothing scrolls,
@@ -38,6 +41,27 @@ describe("the page header keeps to the viewport", () => {
     expect(box, "the tab track should still sit in a box of its own").toBeDefined();
     expect(box).toContain("overflow-x-auto");
     expect(box).toContain("min-w-0");
+  });
+
+  it("lets the element in the actions slot shrink, not only the box inside it", async () => {
+    // A flex item's floor is its content width unless it is told
+    // otherwise, and `min-w-0` on a grandchild cannot lower it. The nav
+    // is what the slot lays out, so the nav is what has to carry it —
+    // without it the box never becomes narrower than its track, nothing
+    // scrolls, and the document widens on a phone instead.
+    const source = await read("src/app/[locale]/(app)/boards/[id]/board-tabs.tsx");
+    const nav = source.match(/<nav aria-label=\{t\("navLabel"\)\} className=\{cn\(([^)]+)\)/)?.[1];
+    expect(nav, "the nav should still be the element handed to the actions slot").toBeDefined();
+    expect(nav).toContain("min-w-0");
+  });
+
+  it("marks the menu's trigger as current, so the sideways rescue can find it", async () => {
+    // useScrollActiveIntoView looks the active segment up with
+    // `[aria-current]` and gives up on null. On the six pages behind the
+    // menu the trigger is the only thing carrying it, and those are
+    // exactly the pages whose long words can push the track off a phone.
+    const source = await read("src/app/[locale]/(app)/boards/[id]/board-more-menu.tsx");
+    expect(source).toMatch(/aria-current=\{activeInMenu/);
   });
 });
 

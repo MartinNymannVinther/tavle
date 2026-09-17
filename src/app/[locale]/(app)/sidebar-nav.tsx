@@ -33,7 +33,13 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-2">
       {ITEMS.map((item) => {
-        const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+        // Inside a board the board's own navigation says where you are, so
+        // "Tavler" stands for the list alone — otherwise two navigations
+        // light at once, on two words a letter apart.
+        const active =
+          item.key === "boards"
+            ? pathname === item.href
+            : pathname === item.href || pathname.startsWith(`${item.href}/`);
         return (
           <Link
             key={item.href}

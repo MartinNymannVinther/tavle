@@ -511,12 +511,16 @@
       "backlog": "Backlog",
       "sprints": "Sprints",
       "insight": "Insight",
-      "settings": "Settings",
+      "settings": "Board settings",
       "archived": "archived",
       "roadmap": "Roadmap",
       "overview": "Backlog care",
       "map": "Story map",
-      "structure": "Breakdown"
+      "structure": "Breakdown",
+      "more": "More",
+      "groupPlan": "Planning",
+      "groupFollow": "Follow-up",
+      "navLabel": "Board pages"
     },
     "list": {
       "title": "Boards",
@@ -1341,11 +1345,11 @@
       },
       "estimates": {
         "title": "Estimation",
-        "body": "A board can count in story points, in hours or in T-shirt sizes — choose under Settings → Estimation. Sizes and points are the same numbers, because a size is only a name for a weight (XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13), so moving between them changes no sums. Hours are another scale, and there the tool shows a table of every estimate on the board and what it would become, with a conversion factor you can adjust. Nothing is written until you say yes, and the switch can be taken back with the button on the settings page."
+        "body": "A board can count in story points, in hours or in T-shirt sizes — choose under Board settings → Estimation. Sizes and points are the same numbers, because a size is only a name for a weight (XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13), so moving between them changes no sums. Hours are another scale, and there the tool shows a table of every estimate on the board and what it would become, with a conversion factor you can adjust. Nothing is written until you say yes, and the switch can be taken back with the button on the settings page."
       },
       "undo": {
         "title": "Undo",
-        "body": "Most changes stand in the activity of their card or item with an Undo button beside them — a corrected checklist, a removed comment and a feature put on or taken off the story map carry no reverse and stand there without one. And changes to the board itself — themes, areas, lanes, levels, releases — stand under Settings → Recent changes to the board. Undo runs the opposite action through the same rules as everything else — if the world has moved on because the card was deleted or the feature closed, the tool says no instead of guessing. What was undone is struck through in the activity, and the undo itself is written down."
+        "body": "Most changes stand in the activity of their card or item with an Undo button beside them — a corrected checklist, a removed comment and a feature put on or taken off the story map carry no reverse and stand there without one. And changes to the board itself — themes, areas, lanes, levels, releases — stand under Board settings → Recent changes to the board. Undo runs the opposite action through the same rules as everything else — if the world has moved on because the card was deleted or the feature closed, the tool says no instead of guessing. What was undone is struck through in the activity, and the undo itself is written down."
       },
       "backlog": {
         "title": "The backlog",
@@ -1373,7 +1377,7 @@
       },
       "structure": {
         "title": "Epics, features, themes and areas",
-        "body": "The backlog has one hierarchy with three levels: an epic is a result the team can reach in one or two quarters, a feature is a releasable slice of it, a card is the smallest deliverable and fits in one sprint. All three have a kind, Business or Enabler. Overview and grouping are handled by two fields on each item: Theme answers why, Area answers where. Two tests decide where something belongs, and the tool enforces them: if it can be finished, it is in the hierarchy; if it can never be finished, it is a theme or an area. If it has exactly one parent, it is hierarchy; if it can belong to several at once, it is a category. The Breakdown tab draws the hierarchy as a chart: epics on top, features and cards below, and everything without a parent waits in the tray. Drag things into place, or use the menu on each card — and zoom out when you need the whole picture."
+        "body": "The backlog has one hierarchy with three levels: an epic is a result the team can reach in one or two quarters, a feature is a releasable slice of it, a card is the smallest deliverable and fits in one sprint. All three have a kind, Business or Enabler. Overview and grouping are handled by two fields on each item: Theme answers why, Area answers where. Two tests decide where something belongs, and the tool enforces them: if it can be finished, it is in the hierarchy; if it can never be finished, it is a theme or an area. If it has exactly one parent, it is hierarchy; if it can belong to several at once, it is a category. Breakdown draws the hierarchy as a chart: epics on top, features and cards below, and everything without a parent waits in the tray. Drag things into place, or use the menu on each card — and zoom out when you need the whole picture."
       },
       "roadmap": {
         "title": "Roadmap and backlog care",
@@ -1505,7 +1509,7 @@
     "unplannedHint": "An epic without a target is not drawn. A roadmap that shows bars without an end is lying.",
     "counts": "{features, plural, one {# feature} other {# features}} · {done} of {total, plural, one {# card} other {# cards}} done",
     "closed": "Closed",
-    "noEpics": "The board does not show epics, so there is no roadmap to draw. Switch epics on under Settings → Structure.",
+    "noEpics": "The board does not show epics, so there is no roadmap to draw. Switch epics on under Board settings → Structure.",
     "newEpic": "New epic",
     "addInQuarter": "New epic in {quarter}",
     "planQuarter": "Quarter for {title}",

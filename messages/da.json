@@ -511,12 +511,16 @@
       "backlog": "Backlog",
       "sprints": "Sprints",
       "insight": "Indsigt",
-      "settings": "Indstillinger",
+      "settings": "Tavlens indstillinger",
       "archived": "arkiveret",
       "roadmap": "Roadmap",
       "overview": "Backlog-styring",
       "map": "Story map",
-      "structure": "Nedbrydning"
+      "structure": "Nedbrydning",
+      "more": "Mere",
+      "groupPlan": "Planlægning",
+      "groupFollow": "Opfølgning",
+      "navLabel": "Tavlens sider"
     },
     "list": {
       "title": "Tavler",
@@ -1341,11 +1345,11 @@
       },
       "estimates": {
         "title": "Estimering",
-        "body": "Tavlen kan tælle i story points, i timer eller i T-shirt-størrelser — vælg under Indstillinger → Estimering. Størrelser og point er de samme tal, for en størrelse er blot et navn på en vægt (XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13), så skiftet mellem dem ændrer ingen summer. Timer er en anden skala, og der viser værktøjet en tabel over hvert estimat på tavlen og hvad det bliver til, med en omregningsfaktor du selv kan rette. Intet skrives, før du siger ja, og skiftet kan fortrydes med knappen på indstillingssiden."
+        "body": "Tavlen kan tælle i story points, i timer eller i T-shirt-størrelser — vælg under Tavlens indstillinger → Estimering. Størrelser og point er de samme tal, for en størrelse er blot et navn på en vægt (XS 1 · S 2 · M 3 · L 5 · XL 8 · XXL 13), så skiftet mellem dem ændrer ingen summer. Timer er en anden skala, og der viser værktøjet en tabel over hvert estimat på tavlen og hvad det bliver til, med en omregningsfaktor du selv kan rette. Intet skrives, før du siger ja, og skiftet kan fortrydes med knappen på indstillingssiden."
       },
       "undo": {
         "title": "Fortryd",
-        "body": "De fleste ændringer står i aktiviteten på kortet eller emnet med en Fortryd-knap ved siden af — en rettet tjekliste, en fjernet kommentar og en feature sat op på eller taget ned fra story mappet bærer ikke deres modsatte handling og står der uden knap. Og ændringer af selve tavlen — temaer, områder, baner, niveauer, releases — står under Indstillinger → Seneste ændringer på tavlen. Fortryd kører den modsatte handling gennem de samme regler som alt andet — er verden gået videre, fordi kortet er slettet eller featuren lukket, siger værktøjet nej i stedet for at gætte. Det fortrudte streges over i aktiviteten, og fortrydelsen selv skrives ned."
+        "body": "De fleste ændringer står i aktiviteten på kortet eller emnet med en Fortryd-knap ved siden af — en rettet tjekliste, en fjernet kommentar og en feature sat op på eller taget ned fra story mappet bærer ikke deres modsatte handling og står der uden knap. Og ændringer af selve tavlen — temaer, områder, baner, niveauer, releases — står under Tavlens indstillinger → Seneste ændringer på tavlen. Fortryd kører den modsatte handling gennem de samme regler som alt andet — er verden gået videre, fordi kortet er slettet eller featuren lukket, siger værktøjet nej i stedet for at gætte. Det fortrudte streges over i aktiviteten, og fortrydelsen selv skrives ned."
       },
       "backlog": {
         "title": "Backloggen",
@@ -1373,7 +1377,7 @@
       },
       "structure": {
         "title": "Epics, features, temaer og områder",
-        "body": "Backloggen har ét hierarki med tre niveauer: en epic er et resultat teamet kan nå på et til to kvartaler, en feature er en frigivelig skive af den, et kort er den mindste leverance og passer i ét sprint. Alle tre har en art, Business eller Enabler. Overblik og gruppering løses med to felter på det enkelte item: Tema svarer på hvorfor, Område på hvor. To tests afgør hvor noget hører hjemme, og værktøjet håndhæver dem: kan det blive færdigt, er det i hierarkiet; kan det aldrig blive færdigt, er det et tema eller et område. Har det præcis én forælder, er det hierarki; kan det høre til flere på én gang, er det en kategori. Under fanen Nedbrydning tegnes hierarkiet som et diagram: epics øverst, features og kort nedenunder, og alt uden forælder venter i bakken. Træk tingene på plads, eller brug menuen på hvert kort — og zoom ud, når hele billedet skal med."
+        "body": "Backloggen har ét hierarki med tre niveauer: en epic er et resultat teamet kan nå på et til to kvartaler, en feature er en frigivelig skive af den, et kort er den mindste leverance og passer i ét sprint. Alle tre har en art, Business eller Enabler. Overblik og gruppering løses med to felter på det enkelte item: Tema svarer på hvorfor, Område på hvor. To tests afgør hvor noget hører hjemme, og værktøjet håndhæver dem: kan det blive færdigt, er det i hierarkiet; kan det aldrig blive færdigt, er det et tema eller et område. Har det præcis én forælder, er det hierarki; kan det høre til flere på én gang, er det en kategori. Under Nedbrydning tegnes hierarkiet som et diagram: epics øverst, features og kort nedenunder, og alt uden forælder venter i bakken. Træk tingene på plads, eller brug menuen på hvert kort — og zoom ud, når hele billedet skal med."
       },
       "roadmap": {
         "title": "Roadmap og backlog-styring",
@@ -1505,7 +1509,7 @@
     "unplannedHint": "En epic uden mål tegnes ikke. Et roadmap, der viser bjælker uden ende, lyver.",
     "counts": "{features, plural, one {# feature} other {# features}} · {done} af {total} kort færdige",
     "closed": "Lukket",
-    "noEpics": "Tavlen viser ikke epics, så der er intet roadmap at tegne. Slå epics til under Indstillinger → Struktur.",
+    "noEpics": "Tavlen viser ikke epics, så der er intet roadmap at tegne. Slå epics til under Tavlens indstillinger → Struktur.",
     "newEpic": "Ny epic",
     "addInQuarter": "Ny epic i {quarter}",
     "planQuarter": "Kvartal for {title}",

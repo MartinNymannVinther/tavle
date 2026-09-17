@@ -14,6 +14,7 @@ const segment = (active: boolean) =>
       ? "bg-card text-foreground shadow-[var(--surface-shadow)] font-semibold"
       : "text-meta hover:text-foreground",
   );
+export { segment as segmentedSegment };
 
 /**
  * The 2a segmented filter: one track on the secondary ground where the active
@@ -21,9 +22,12 @@ const segment = (active: boolean) =>
  */
 function SegmentedFilter({
   items,
+  trailing,
   className,
 }: {
   items: Array<{ key: string; label: React.ReactNode; href: Href; active: boolean }>;
+  /** Last on the track, for something that is not a link — a menu trigger. */
+  trailing?: React.ReactNode;
   className?: string;
 }) {
   return (
@@ -38,6 +42,7 @@ function SegmentedFilter({
           {item.label}
         </Link>
       ))}
+      {trailing}
     </div>
   );
 }
