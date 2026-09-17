@@ -285,6 +285,17 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
           )}
         </div>
       )}
+      <SelectionBar
+        count={backlogIds.length}
+        scrum={scrum}
+        sprints={scrum ? open : []}
+        target={commitTarget}
+        onTarget={setTarget}
+        onCommit={() => void commit()}
+        features={view.features ? openFeatures : []}
+        onPlace={(featureId) => void place(featureId)}
+        onClear={() => setSelected(new Set())}
+      />
       {levelChoice !== "cards" ? (
         <ItemBacklog
           full={full}
@@ -299,6 +310,8 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
           }
           allocated={allocated}
           sprintNameOf={sprintNameOf}
+          selected={selected}
+          onSelect={select}
           pageDrag={{ setId: setDragId }}
           newFeature={newFeature}
         />
@@ -364,17 +377,6 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
               }}
               people={full.people}
               structure={structure}
-            />
-            <SelectionBar
-              count={backlogIds.length}
-              scrum={scrum}
-              sprints={scrum ? open : []}
-              target={commitTarget}
-              onTarget={setTarget}
-              onCommit={() => void commit()}
-              features={view.features ? openFeatures : []}
-              onPlace={(featureId) => void place(featureId)}
-              onClear={() => setSelected(new Set())}
             />
             <div className="border-hairline border-b px-2 py-2">
               <QuickAdd

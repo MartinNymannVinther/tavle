@@ -47,6 +47,8 @@ export function ItemBacklog({
   onRankItem,
   onNudgeCard,
   onMoveCard,
+  selected,
+  onSelect,
   pageDrag,
   allocated = [],
   sprintNameOf,
@@ -63,6 +65,9 @@ export function ItemBacklog({
   onMoveCard: (cardId: string, featureId: string, siblingId: string | null, after: boolean) => void;
   /** Cards already committed to an open sprint: shown marked under their feature, not ranked. */
   allocated?: CardView[];
+  /** The page's ticks: the same set at every altitude, so the bar counts one selection. */
+  selected?: Set<string>;
+  onSelect?: (cardId: string, checked: boolean) => void;
   /**
    * The page's one drag, beside this list's own. A story row here is a
    * story row like any other: it can be lifted into a sprint panel, and
@@ -133,6 +138,8 @@ export function ItemBacklog({
         boardId={board.id}
         structure={structure}
         context={context}
+        selected={selected?.has(card.id)}
+        onSelect={onSelect ? (checked) => onSelect(card.id, checked) : undefined}
         draggable
         onDragStart={() => {
           setDrag({ kind: "card", id: card.id, featureId });

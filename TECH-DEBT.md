@@ -74,16 +74,6 @@ tests are exempt in spirit but not in the rule's wording.
 Worth doing along the named seams, worst first, not as a sweep — a split
 that only moves lines about buys nothing.
 
-### Cards cannot be ticked at the Epics and Features altitudes
-
-`ItemBacklog` is never given `selected`/`onSelect`, so at those two
-altitudes no card has a tick box and the selection bar's bulk actions —
-put in a sprint, place under a feature — are out of reach; the flat list
-has them. Ranking and dragging work everywhere since docs/adr/0033.
-Wiring it needs a prop through `backlog-view.tsx` and
-`item-backlog.tsx`, and a decision about whether a selection survives a
-change of altitude.
-
 ## Accepted, with the reason written down
 
 ### The content policy still allows inline scripts
@@ -304,3 +294,13 @@ per-subset `unicode-range`: the choice was nine juggled font variables,
 or losing Vietnamese and Cyrillic to a silent Arial fallback. Files in
 `public/` are served without a long cache, so `next.config.ts` gained a
 second headers rule giving `/fonts/*` a year.
+
+### ~~Cards cannot be ticked at the Epics and Features altitudes~~
+
+The tick box is on the story row at every altitude now, and the
+selection bar moved out of the flat list's branch to stand over the
+whole page — so "put in a sprint" and "place under a feature" are
+reachable wherever the cards are read. The selection is one set of card
+ids and survives a change of altitude, which is the answer to the
+question the item left open: you tick three under one epic, switch to
+the flat list, and the bar still counts three.
