@@ -1,25 +1,23 @@
 import type { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
-import { Archivo, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
+import { preload } from "react-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
-const archivo = Archivo({
-  // Must match --font-sans in globals.css; otherwise the UI falls back to
-  // the browser's default serif. 2a uses one family at 400/500/600.
-  variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+/**
+ * The two faces every page paints with: the Latin subsets of Archivo and
+ * Geist Mono. The other seven subsets in globals.css are fetched only if
+ * a page has a glyph that needs one, so they are not preloaded.
+ *
+ * Without this the browser finds the files only after it has parsed the
+ * stylesheet and laid out the first glyph, which is one round trip of
+ * Arial. next/font emitted the same two links while it owned the fonts.
+ */
+const PRELOADED_FONTS = ["/fonts/archivo-latin.woff2", "/fonts/geist-mono-latin.woff2"];
 
 export const metadata: Metadata = {
   title: {
@@ -47,12 +45,12 @@ export default async function LocaleLayout({
   }
   setRequestLocale(locale);
 
+  for (const href of PRELOADED_FONTS) {
+    preload(href, { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
+  }
+
   return (
-    <html
-      lang={locale}
-      suppressHydrationWarning
-      className={`${archivo.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang={locale} suppressHydrationWarning className="h-full antialiased">
       <body className="bg-background text-foreground flex min-h-full flex-col">
         <ThemeProvider>
           <NextIntlClientProvider>{children}</NextIntlClientProvider>

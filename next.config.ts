@@ -46,9 +46,9 @@ const migration = journal.entries.at(-1)?.tag ?? "unknown";
  *
  * Tavle is in a good position to have a strict one: nothing in the app
  * renders HTML it did not write (`dangerouslySetInnerHTML` appears
- * nowhere), no script, style, image or font is loaded from another host,
- * and next/font copies its files into the build. So everything is 'self',
- * and the two exceptions are named rather than assumed:
+ * nowhere), and no script, style, image or font is loaded from another
+ * host - the two typefaces are files in `public/fonts`. So everything is
+ * 'self', and the two exceptions are named rather than assumed:
  *
  * - script-src keeps 'unsafe-inline' because Next.js writes its own
  *   bootstrap script inline and next-themes writes the one that sets the
@@ -57,7 +57,7 @@ const migration = journal.entries.at(-1)?.tag ?? "unknown";
  *   with a real cost, and one that deserves its own change rather than a
  *   line in a hardening pass. What is here already stops a script being
  *   loaded from anywhere else, which is the vector that matters.
- * - style-src keeps it because next/font and Base UI both inject style
+ * - style-src keeps it because next-themes and Base UI both inject style
  *   elements. An inline style is a far smaller thing than an inline script.
  *
  * img-src allows data: for the TOTP enrolment QR code, which is drawn to
@@ -159,7 +159,19 @@ const nextConfig: NextConfig = {
     TAVLE_MIGRATION_COUNT: String(journal.entries.length),
   },
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders(process.env.NODE_ENV === "production") }];
+    return [
+      { source: "/(.*)", headers: securityHeaders(process.env.NODE_ENV === "production") },
+      // The typefaces are served from `public`, which Next answers with
+      // `max-age=0` - a revalidation round trip before the first glyph on
+      // every visit. They used to sit under a content-hashed /_next/static
+      // URL and be cached for a year, and nothing about them changed, so
+      // say so. The file name is the contract: a replaced face gets a new
+      // name rather than the same one with new bytes.
+      {
+        source: "/fonts/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+    ];
   },
 };
 

@@ -24,19 +24,19 @@ answer from the armchair (dogma seven). What is **paid** is history.
 
 ## Open
 
-### The web UI's font comes from Google at build time, and the files that ship have no reader
+### Two font files in `public/fonts` still have no reader
 
-`src/app/[locale]/layout.tsx` uses `next/font/google` for Archivo and
-Geist Mono. Next downloads and self-hosts them, so there is no runtime
-call to Google — but `pnpm build` and every `docker build` reaches out to
-`fonts.googleapis.com`, which makes the build non-hermetic and puts a US
-dependency in the build path of a product whose second dogma is that
-cutting the internet must leave everything essential working. Meanwhile
-`public/fonts` carries Archivo as `.ttf` files that nothing opens: Ajour
-used them for its PDF renderer and Tavle has no PDF. The two are one
-fix — `next/font/local` pointed at files in the repository — with a
-decision about weight 500, which `font-medium` asks for in a hundred
-places, and about a local Geist Mono.
+Archivo arrives as `.woff2` subsets harvested from what the build was
+already downloading, so `Archivo-Regular.ttf` and `Archivo-SemiBold.ttf`
+are the last of the Ajour inheritance with nothing opening them. They
+were deliberately not used: static TTFs with no weight 500, 220 KB
+against 81 KB for the three subsets, and a different build of the
+typeface from the variable file the UI actually renders — using them
+would have changed the look, which was the one thing ruled out.
+
+The recommendation is to delete them and leave `OFL.txt` (the licence
+covers the woff2 files too). Deleting is the owner's call under
+CLAUDE.md rule 7, so they stay until it is made.
 
 ### Files over 300 lines
 
@@ -288,3 +288,19 @@ packages — pnpm prunes unreferenced entries on every install, so the
 first connected install had already cleaned up. It did collapse a
 pre-existing duplicate esbuild (drizzle-kit on 0.25.12 beside tsx and
 vite on 0.28.2), 27 entries gone, nothing added.
+
+### ~~The web UI's font comes from Google at build time~~
+
+Both typefaces are files in the repository now, harvested from what the
+build was already downloading and checked byte-for-byte against what
+`fonts.gstatic.com` serves, so the rendering could not change — computed
+styles and full-page screenshots agree to the pixel outside the version
+stamp. `pnpm build` was run under a sandbox denying every outbound
+connection and succeeded, with a control proving the old path genuinely
+needed the network. The `@font-face` rules are declared by hand in
+`globals.css` rather than through `next/font/local`, because that helper
+applies one `declarations` block to every source and so cannot carry a
+per-subset `unicode-range`: the choice was nine juggled font variables,
+or losing Vietnamese and Cyrillic to a silent Arial fallback. Files in
+`public/` are served without a long cache, so `next.config.ts` gained a
+second headers rule giving `/fonts/*` a year.

@@ -46,12 +46,23 @@ function map(headers: Array<{ key: string; value: string }>): Record<string, str
 }
 
 describe("security headers", () => {
-  it("applies one rule to every path", async () => {
+  it("applies the hardening rule to every path", async () => {
     const rules = (await config.headers!()) as Rule[];
-    expect(rules).toHaveLength(1);
     expect(rules[0]?.source).toBe("/(.*)");
     // The suite runs outside production, so this is the development set.
     expect(map(rules[0]!.headers)["Content-Security-Policy"]).toBe(DEV_CSP);
+    // Every other rule is about caching, and none of them may carry a
+    // security header: a narrower source would then override the one above
+    // on the paths it matches.
+    for (const rule of rules.slice(1)) {
+      expect(Object.keys(map(rule.headers))).toEqual(["Cache-Control"]);
+    }
+  });
+
+  it("caches the typefaces rather than revalidating them every visit", async () => {
+    const rules = (await config.headers!()) as Rule[];
+    const fonts = rules.find((rule) => rule.source.startsWith("/fonts/"));
+    expect(map(fonts!.headers)["Cache-Control"]).toBe("public, max-age=31536000, immutable");
   });
 
   it("sends the full set in production", () => {

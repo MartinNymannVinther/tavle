@@ -182,4 +182,4 @@ What we know is not right yet is written down rather than hoped away:
 [TECH-DEBT.md](TECH-DEBT.md) lists it, with the reason it is still there
 and what fixing it would take.
 
-License: [AGPL-3.0](LICENSE). The Archivo typeface in `public/fonts` is by the Archivo Project Authors under the [SIL Open Font License 1.1](public/fonts/OFL.txt).
+License: [AGPL-3.0](LICENSE). The two typefaces the interface is set in ship in `public/fonts`, both under the SIL Open Font License 1.1: Archivo by the Archivo Project Authors ([OFL.txt](public/fonts/OFL.txt)) and Geist Mono by the Geist Project Authors ([OFL-Geist.txt](public/fonts/OFL-Geist.txt)). The `.woff2` files are Google Fonts' own subsets, copied in so that a build needs no network.
