@@ -9,27 +9,22 @@ import {
 } from "@/core/db/schema";
 import type { AppTransaction, OrgContext } from "@/core/db/tenant";
 import { itemInWorkspace } from "./structure/items";
-import { applySwimlaneAssignment, updateSwimlane } from "./write-swimlanes";
-import { archiveCard, deleteCard, restoreCard } from "./write-card-lifecycle";
-import { moveCard, updateCard, type CardUpdate } from "./write-cards";
+import { updateSwimlane } from "./write-swimlanes";
 import { deleteComment } from "./comments";
-import { cardInWorkspace, columnInBoard } from "./lanes";
 import { canManage, roleOf } from "./members";
-import { people } from "@/core/db/schema";
 import { closeItem, type CloseOutcome } from "./structure/close";
 import { levelLane } from "./structure/items";
 import { STEP } from "./ordering";
-import { placeCardInStructure } from "./structure/write-card-placement";
 import { placeItemInStructure, restoreSubtree } from "./structure/place-item";
 import { planFeature } from "./structure/plan-feature";
 import { deleteItem, reopenItem, updateItem } from "./structure/write-items";
 import { updateArea, updateTheme } from "./structure/write-lists";
-import { enterColumn } from "./transitions";
-import { UndoStepSchema, type UndoStep } from "./undo-steps";
+import { unmoved, UndoStepSchema, type UndoStep } from "./undo-steps";
+import { applyCardUndo, isCardUndoStep } from "./undo-cards";
+import { NotUndoable } from "./undo-failure";
 import { updateStructureView } from "./write-boards";
 import { restoreEstimates } from "./write-estimates";
-import { reorderRelease, setCardsRelease, updateRelease } from "./write-releases";
-import { setCardsSprint } from "./write-sprints";
+import { reorderRelease, updateRelease } from "./write-releases";
 import { recordEvent } from "./events";
 import type { StructureViewInput } from "./validation";
 
@@ -44,12 +39,7 @@ import type { StructureViewInput } from "./validation";
 
 export { UndoStepSchema, type UndoStep } from "./undo-steps";
 
-export class NotUndoable extends Error {
-  constructor() {
-    super("notUndoable");
-    this.name = "NotUndoable";
-  }
-}
+export { NotUndoable } from "./undo-failure";
 
 /** The reverses of owner/admin actions: undoing a board-shape change is a board-shape change. */
 const MANAGE_KINDS = new Set<UndoStep["kind"]>([
@@ -65,101 +55,13 @@ const MANAGE_KINDS = new Set<UndoStep["kind"]>([
   "swimlane.update",
 ]);
 
-/**
- * Whether the row still stands where the event left it. A field-level
- * reverse only holds while the field still holds what the event set it
- * to: "estimated at 5", undone after someone estimated at 8, would put
- * the 5 back and throw the 8 away without a word. That is the world
- * moving on (docs/adr/0022), and the tool says no instead of guessing.
- * Payloads written before the reverse carried what it set have nothing
- * to compare against, and keep the behaviour they were written under.
- */
-function unmoved(
-  row: Record<string, unknown>,
-  after: Record<string, unknown> | undefined,
-): boolean {
-  if (!after) return true;
-  return Object.entries(after).every(([field, value]) => (row[field] ?? null) === (value ?? null));
-}
-
 /** Runs one reverse through the ordinary services. Null means the thing is gone. */
 async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): Promise<void> {
+  // What happens to a card is its own subject and its own file; what is
+  // left here is the shape of the board — the structure, the lists, the
+  // lanes, the releases and the board's own settings.
+  if (isCardUndoStep(step)) return applyCardUndo(tx, ctx, step);
   switch (step.kind) {
-    case "card.move": {
-      const card = await moveCard(tx, ctx, step.cardId, step.columnId, step.index);
-      if (!card) throw new NotUndoable();
-      return;
-    }
-    case "card.swimlane": {
-      const card = await moveCardTarget(tx, step.cardId);
-      await applySwimlaneAssignment(tx, ctx, card, {
-        by: "manual",
-        swimlaneId: step.swimlaneId,
-      });
-      return;
-    }
-    case "card.place":
-      if (!(await placeCardInStructure(tx, ctx, { ...step }))) throw new NotUndoable();
-      return;
-    case "card.update": {
-      const current = await cardInWorkspace(tx, step.cardId);
-      if (!current) throw new NotUndoable();
-      if (!unmoved(current as unknown as Record<string, unknown>, step.after)) {
-        throw new NotUndoable();
-      }
-      // Steps written before docs/adr/0029 name the assignee by login;
-      // the person that login stands behind is the same fact today. A
-      // login that left no person means the world moved on: not undoable.
-      const { assigneeUserId, ...fields } = step.fields;
-      const update: CardUpdate = fields as CardUpdate;
-      if (assigneeUserId !== undefined) {
-        if (assigneeUserId === null) {
-          update.assigneePersonId = null;
-        } else {
-          const [person] = await tx
-            .select({ id: people.id })
-            .from(people)
-            .where(and(eq(people.orgId, ctx.orgId), eq(people.userId, assigneeUserId)))
-            .limit(1);
-          if (!person) throw new NotUndoable();
-          update.assigneePersonId = person.id;
-        }
-      }
-      if (!(await updateCard(tx, ctx, step.cardId, update))) {
-        throw new NotUndoable();
-      }
-      return;
-    }
-    case "card.delete":
-      if (!(await deleteCard(tx, ctx, step.cardId))) throw new NotUndoable();
-      return;
-    case "card.archive":
-      if (!(await archiveCard(tx, ctx, step.cardId))) throw new NotUndoable();
-      return;
-    case "card.restore":
-      if (!(await restoreCard(tx, ctx, step.cardId))) throw new NotUndoable();
-      return;
-    case "card.sprint": {
-      if ((await setCardsSprint(tx, ctx, [step.cardId], step.sprintId)) === 0) {
-        throw new NotUndoable();
-      }
-      // The move between backlog and a planned sprint reset the column
-      // too; the reverse re-enters the one the card stood in, when it
-      // still exists — the done clock restarts with the transition. The
-      // rank is left where it was: an undo restores what a move changed,
-      // and the move no longer changes the number (docs/adr/0033).
-      if (step.columnId) {
-        const card = await cardInWorkspace(tx, step.cardId);
-        if (card && card.columnId !== step.columnId) {
-          const to = await columnInBoard(tx, card.boardId, step.columnId);
-          if (to) {
-            const from = await columnInBoard(tx, card.boardId, card.columnId);
-            await enterColumn(tx, ctx, card, from, to);
-          }
-        }
-      }
-      return;
-    }
     case "item.delete": {
       // Undoing a creation deletes the thing again — but children have
       // arrived under it since, and the foreign key would quietly drop
@@ -219,11 +121,6 @@ async function applyUndo(tx: AppTransaction, ctx: OrgContext, step: UndoStep): P
       if (!outcome.closed) throw new NotUndoable();
       return;
     }
-    case "card.release":
-      if ((await setCardsRelease(tx, ctx, [step.cardId], step.releaseId)) === 0) {
-        throw new NotUndoable();
-      }
-      return;
     case "release.update":
       if (
         !(await updateRelease(tx, ctx, {
@@ -359,12 +256,6 @@ async function hasChildren(tx: AppTransaction, itemId: string): Promise<boolean>
     .from(cardsTable)
     .where(eq(cardsTable.featureId, itemId));
   return Number(cards?.n ?? 0) > 0;
-}
-
-async function moveCardTarget(tx: AppTransaction, cardId: string) {
-  const card = await cardInWorkspace(tx, cardId);
-  if (!card) throw new NotUndoable();
-  return card;
 }
 
 /**

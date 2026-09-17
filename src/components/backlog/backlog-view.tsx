@@ -10,16 +10,11 @@ import { structureOf } from "@/components/board/card-chips";
 import { QuickAdd } from "@/components/board/quick-add";
 import { legendTypes, TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
+import { useBacklogMoves } from "./use-backlog-moves";
 import { cn } from "@/lib/utils";
 import type { BoardFull, CardView } from "@/modules/boards/types";
-import {
-  createCardAction,
-  placeCardAction,
-  placeCardsAction,
-  updateCardAction,
-} from "@/modules/boards/actions-cards";
-import { reorderItemAction } from "@/modules/boards/actions-structure";
-import { reorderBacklogAction, setCardsSprintAction } from "@/modules/boards/actions-sprints";
+import { createCardAction, placeCardsAction } from "@/modules/boards/actions-cards";
+import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
 import { FeaturePlanFields } from "@/components/item/feature-plan-fields";
 import { BacklogHeader } from "./backlog-header";
 import { BacklogHeading } from "./backlog-heading";
@@ -81,7 +76,7 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
   // from a card that was never written at all — the form clears, nothing
   // appears, and the person types the sentence again.
   const [justAdded, setJustAdded] = useState<string[]>([]);
-  const [dragId, setDragId] = useState<string | null>(null);
+
   // The backlog's altitude (docs/adr/0027) and whether the sprints stand
   // beside it — both remembered per board, like the folds.
   const [levelPref, setLevelPref] = usePref<"epics" | "features" | "cards">(
@@ -93,6 +88,9 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
     "on",
   );
   const [navPref, setNavPref] = usePref<"on" | "off">(`tavle.backlog.${board.id}.nav`, "on");
+
+  const moves = useBacklogMoves({ cards: full.cards, grouping, run });
+  const { dragId, setDragId, nudge, committedDrag } = moves;
 
   const all = backlogStories(full);
   /** The filter's answer, plus whatever was just made here. */
@@ -148,108 +146,6 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
     if (ok) setSelected(new Set());
   }
 
-  /** A card dropped on the navigator: the same placement as the story map's drag. */
-  function dropOnNav(featureId: string | null) {
-    const id = dragId;
-    setDragId(null);
-    if (!id) return;
-    void run(() => placeCardAction({ cardId: id, featureId }));
-  }
-
-  /**
-   * The backlog's own order is the only order; a nudge is a move past the
-   * row beside it — which may be a row promised to a sprint, standing at
-   * its rank among the free ones (docs/adr/0033). The service ranks
-   * against the whole priority, so one step is one row of what is read.
-   */
-  function nudge(cardId: string, siblingId: string, after: boolean) {
-    void run(() => reorderBacklogAction({ cardId, siblingId, after }));
-  }
-
-  /** A card promised to a sprint, dragged: the promise is what a drop takes back. */
-  const committedDrag = (cardId: string) =>
-    Boolean(full.cards.find((c) => c.id === cardId)?.sprintId);
-
-  /** Takes the promise back, then does whatever the drop meant on top of it. */
-  async function release(cardId: string): Promise<boolean> {
-    return run(() => setCardsSprintAction({ cardIds: [cardId], sprintId: null }));
-  }
-
-  function dropOn(targetId: string, after: boolean) {
-    const id = dragId;
-    setDragId(null);
-    if (!id || id === targetId) return;
-    // Dragged out of a sprint and onto a row: the card comes back to the
-    // backlog and lands where it was dropped, in that order.
-    if (committedDrag(id)) {
-      void release(id).then((ok) => {
-        if (ok) nudge(id, targetId, after);
-      });
-      return;
-    }
-    nudge(id, targetId, after);
-  }
-
-  /** A card dropped on a sprint: the same promise the selection bar's button makes. */
-  function dropInSprint(sprintId: string) {
-    const id = dragId;
-    setDragId(null);
-    if (!id) return;
-    const card = full.cards.find((c) => c.id === id);
-    if (!card || card.sprintId === sprintId) return;
-    void run(() => setCardsSprintAction({ cardIds: [id], sprintId }));
-  }
-
-  /** A card dropped on a backlog with no rows to land between. */
-  function dropOut() {
-    const id = dragId;
-    setDragId(null);
-    if (id && committedDrag(id)) void release(id);
-  }
-
-  /** A card dropped into another group: the group's field first, then the spot it was dropped on. */
-  async function moveCardToGroup(
-    cardId: string,
-    groupKey: string,
-    siblingId: string | null,
-    after: boolean,
-  ) {
-    const card = full.cards.find((c) => c.id === cardId);
-    if (!card || grouping === "list") return;
-    // Out of the sprint first: a group says which field, never which sprint.
-    if (card.sprintId && !(await release(cardId))) return;
-    const ok = await run(() =>
-      grouping === "theme"
-        ? placeCardAction({
-            cardId,
-            themeIds: [groupKey, ...card.themeIds.filter((themeId) => themeId !== groupKey)],
-          })
-        : grouping === "area"
-          ? placeCardAction({ cardId, areaId: groupKey })
-          : updateCardAction({ cardId, kind: groupKey as "business" | "enabler" }),
-    );
-    if (ok && siblingId && siblingId !== cardId) nudge(cardId, siblingId, after);
-  }
-
-  /** A card dragged to another feature's fold-out: placement first, then the spot it was dropped on. */
-  async function moveCardToFeature(
-    cardId: string,
-    featureId: string,
-    siblingId: string | null,
-    after: boolean,
-  ) {
-    const card = full.cards.find((c) => c.id === cardId);
-    if (!card) return;
-    if (card.featureId !== featureId) {
-      const ok = await run(() => placeCardAction({ cardId, featureId }));
-      if (!ok) return;
-    }
-    if (siblingId && siblingId !== cardId) nudge(cardId, siblingId, after);
-  }
-
-  const rank = (itemId: string, siblingId: string, after: boolean) =>
-    void run(() => reorderItemAction({ itemId, siblingId, after }));
-
   const levelChoice =
     levelPref === "epics" && view.epics
       ? "epics"
@@ -273,9 +169,9 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
     onNudge: nudge,
     dragId,
     setDragId,
-    onDropOn: dropOn,
+    onDropOn: moves.dropOn,
     fromSprint: committedDrag,
-    onDropOut: dropOut,
+    onDropOut: moves.dropOut,
     // Only the whole backlog can take a card back on its own terms; a
     // group writes its field instead, and a narrowed list would hide the
     // card it just drew a line for.
@@ -396,10 +292,10 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
           structure={structure}
           tree={tree}
           run={run}
-          onRankItem={rank}
+          onRankItem={moves.rank}
           onNudgeCard={nudge}
           onMoveCard={(cardId, featureId, siblingId, after) =>
-            void moveCardToFeature(cardId, featureId, siblingId, after)
+            void moves.moveCardToFeature(cardId, featureId, siblingId, after)
           }
           allocated={allocated}
           sprintNameOf={sprintNameOf}
@@ -421,8 +317,8 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
                 toggle={folded.toggle}
                 showClosed={showClosed}
                 onShowClosed={setShowClosed}
-                onRank={rank}
-                onDropCard={dropOnNav}
+                onRank={moves.rank}
+                onDropCard={moves.dropOnNav}
                 newFeature={newFeature}
               />
             </aside>
@@ -515,7 +411,7 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
                     ? undefined
                     : {
                         onDrop: (cardId, siblingId, after) =>
-                          void moveCardToGroup(cardId, group.key, siblingId, after),
+                          void moves.moveCardToGroup(cardId, group.key, siblingId, after),
                       }
                 }
               />
@@ -540,7 +436,7 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
         selected={selected}
         onSelect={select}
         aiAvailable={aiAvailable}
-        drag={{ id: dragId, setId: setDragId, onDrop: dropInSprint }}
+        drag={{ id: dragId, setId: setDragId, onDrop: moves.dropInSprint }}
         run={run}
       />
     </div>

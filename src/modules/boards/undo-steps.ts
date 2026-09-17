@@ -177,3 +177,20 @@ export const UndoStepSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("swimlane.update"), swimlaneId: id, name: z.string() }),
 ]);
 export type UndoStep = z.infer<typeof UndoStepSchema>;
+
+/**
+ * Whether the row still stands where the event left it. A field-level
+ * reverse only holds while the field still holds what the event set it
+ * to: "estimated at 5", undone after someone estimated at 8, would put
+ * the 5 back and throw the 8 away without a word. That is the world
+ * moving on (docs/adr/0022), and the tool says no instead of guessing.
+ * Payloads written before the reverse carried what it set have nothing
+ * to compare against, and keep the behaviour they were written under.
+ */
+export function unmoved(
+  row: Record<string, unknown>,
+  after: Record<string, unknown> | undefined,
+): boolean {
+  if (!after) return true;
+  return Object.entries(after).every(([field, value]) => (row[field] ?? null) === (value ?? null));
+}
