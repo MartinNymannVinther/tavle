@@ -2,8 +2,8 @@ version: 2
 
 # Tavle promises a 90-day fix window in SECURITY.md. That promise needs a
 # mechanism, not good intentions: this is it. The github-actions ecosystem
-# is here partly to keep the workflow's action versions current, and
-# partly because it is what will pin them to commit SHAs over time.
+# keeps the workflow's pinned commits current: the actions are pinned to
+# SHAs, so without this they would stay where they were pinned forever.
 updates:
   - package-ecosystem: npm
     directory: /
