@@ -11,7 +11,6 @@ import { TypeIcon } from "@/components/board/type-icon";
 import { TypeLegend } from "@/components/board/type-legend";
 import { useBoardActions } from "@/components/board/use-board-actions";
 import { ItemForm } from "@/components/backlog/item-form";
-import { updateItemAction } from "@/modules/boards/actions-structure";
 import { roadmap } from "@/modules/boards/structure/roadmap";
 import type { RoadmapRow } from "@/modules/boards/structure/roadmap";
 import { structureView } from "@/modules/boards/structure/view";
@@ -21,7 +20,8 @@ import { ReleaseStrip } from "./release-strip";
 import { RoadmapChildren } from "./roadmap-children";
 import { FeaturePlan } from "./feature-plan";
 import { QuarterSelect } from "./quarter-selects";
-import { RoadmapLine, type PlanSpan } from "./roadmap-line";
+import { usePlanOverrides } from "./use-plan-overrides";
+import { RoadmapLine } from "./roadmap-line";
 import type { BoardFull } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -36,8 +36,11 @@ import { cn } from "@/lib/utils";
  * backlog can be built from here too: a new epic from the header or
  * from a quarter's own "+", and every open epic's quarter is a select
  * on its row, so planning is a change here rather than a trip away.
+ * The releases' strip is planning too, for whoever may change the
+ * board's shape: a marker dragged to a new day, or opened in the same
+ * dialog the story map uses.
  */
-export function RoadmapView({ full }: { full: BoardFull }) {
+export function RoadmapView({ full, canManage }: { full: BoardFull; canManage: boolean }) {
   const t = useTranslations("roadmap");
   const s = useTranslations("boards.structure");
   // The deck is built in a route with no locale in its path, so the page
@@ -54,29 +57,12 @@ export function RoadmapView({ full }: { full: BoardFull }) {
   const [areaId, setAreaId] = useState("");
   // Its own fold memory, apart from the backlog's: two pages, two looks.
   const folded = useFolded(`${full.board.id}:roadmap`);
-  // A dragged bar lands where it was dropped, before the server answers;
-  // fresh rows from the server clear the overrides.
-  const [seed, setSeed] = useState(full.items);
-  const [plans, setPlans] = useState<Map<string, { start: string; target: string }>>(new Map());
-  if (seed !== full.items) {
-    setSeed(full.items);
-    setPlans(new Map());
-  }
-  const plan: PlanSpan = (epicId, startQuarter, targetQuarter) => {
-    setPlans((prev) => new Map(prev).set(epicId, { start: startQuarter, target: targetQuarter }));
-    void run(() => updateItemAction({ itemId: epicId, startQuarter, targetQuarter })).then((ok) => {
-      if (!ok) {
-        setPlans((prev) => {
-          const next = new Map(prev);
-          next.delete(epicId);
-          return next;
-        });
-      }
-    });
-  };
-  const data = roadmap(full);
+  // A dragged bar or marker lands where it was dropped, before the
+  // server answers (src/components/roadmap/use-plan-overrides.ts).
+  const overrides = usePlanOverrides(full, run);
+  const data = roadmap(overrides.withDates(full));
   const planned = (row: RoadmapRow): RoadmapRow => {
-    const override = plans.get(row.epic.id);
+    const override = overrides.spanOf(row.epic.id);
     return override ? { ...row, startQuarter: override.start, endQuarter: override.target } : row;
   };
   const rows = (areaId ? data.rows.filter((r) => r.epic.areaId === areaId) : data.rows).map(
@@ -208,8 +194,11 @@ export function RoadmapView({ full }: { full: BoardFull }) {
           {view.epics && (
             <ReleaseStrip
               releases={data.releases}
-              columns={columns}
+              quarters={data.quarters}
+              boardId={full.board.id}
               unit={(full.board.estimateUnit as EstimateUnit) ?? "points"}
+              run={run}
+              onMove={canManage ? overrides.moveRelease : undefined}
             />
           )}
           {rows.length === 0 ? (
@@ -229,7 +218,7 @@ export function RoadmapView({ full }: { full: BoardFull }) {
                     current={data.current}
                     boardId={full.board.id}
                     boardKey={full.board.key}
-                    onPlan={plan}
+                    onPlan={overrides.plan}
                     run={run}
                     fold={{
                       open: folded.isOpen(row.epic.id),

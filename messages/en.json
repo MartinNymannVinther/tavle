@@ -1533,7 +1533,9 @@
       "title": "Releases",
       "undated": "{count, plural, one {# with no date} other {# with no date}}",
       "tip": "{cards, plural, one {# card} other {# cards}} · {done} % done",
-      "weight": "{unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}}"
+      "weight": "{unit, select, hours {{points, plural, one {# hour} other {# hours}}} tshirt {weight {points}} other {{points, plural, one {# point} other {# points}}}}",
+      "edit": "Edit release {name}",
+      "moveHint": "Drag to move the date, or click to edit"
     },
     "startQuarterFor": "Start quarter for {title}",
     "noStartQuarter": "No start quarter",

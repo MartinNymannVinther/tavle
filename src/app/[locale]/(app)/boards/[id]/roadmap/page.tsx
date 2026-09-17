@@ -3,6 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { RoadmapView } from "@/components/roadmap/roadmap-view";
 import { requireOrgContext } from "@/core/auth/guard";
+import { withOrgContext } from "@/core/db/tenant";
+import { canManage, roleOf } from "@/modules/boards/members";
 import { getBoardFull } from "@/modules/boards/read";
 import { redirect as localeRedirect } from "@/i18n/navigation";
 
@@ -27,5 +29,9 @@ export default async function RoadmapPage({ params }: Params) {
     full.board.structureLevels === "epic" ||
     (full.board.mode === "scrum" && full.board.structureLevels !== "card");
   if (!roadmap) localeRedirect({ href: `/boards/${id}`, locale: await getLocale() });
-  return <RoadmapView full={full} />;
+  // A release's date is the board's shape, so the service asks for an
+  // owner or an admin. The strip asks the same question before it draws
+  // a grip, rather than offering a member a drag that would be refused.
+  const role = await withOrgContext(context, (tx) => roleOf(tx, context));
+  return <RoadmapView full={full} canManage={canManage(role)} />;
 }

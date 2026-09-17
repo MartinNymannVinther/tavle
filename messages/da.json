@@ -1533,7 +1533,9 @@
       "title": "Releases",
       "undated": "{count, plural, one {# uden dato} other {# uden dato}}",
       "tip": "{cards} kort · {done} % færdigt",
-      "weight": "{unit, select, hours {{points, plural, one {# time} other {# timer}}} tshirt {vægt {points}} other {{points} point}}"
+      "weight": "{unit, select, hours {{points, plural, one {# time} other {# timer}}} tshirt {vægt {points}} other {{points} point}}",
+      "edit": "Rediger release {name}",
+      "moveHint": "Træk for at flytte datoen, eller klik for at redigere"
     },
     "startQuarterFor": "Startkvartal for {title}",
     "noStartQuarter": "Intet startkvartal",

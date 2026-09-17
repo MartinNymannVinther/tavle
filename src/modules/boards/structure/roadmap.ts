@@ -1,5 +1,6 @@
 import type { Release, Theme } from "@/core/db/schema";
-import { diffDays, todayInCopenhagen } from "@/core/dates";
+import { addDaysIso, diffDays, todayInCopenhagen } from "@/core/dates";
+import { PLAN_DATE_MAX, PLAN_DATE_MIN } from "../plan-dates";
 import type { BoardFull, ItemView } from "../types";
 import {
   compareQuarters,
@@ -155,6 +156,37 @@ export function quarterPosition(dateIso: string, quarters: string[]): number {
   const range = quarterRange(q);
   const days = diffDays(range.start, range.end) + 1;
   return index + diffDays(range.start, dateIso) / days;
+}
+
+/**
+ * The day a position on the axis stands on: quarterPosition read
+ * backwards, so a release dragged along the strip can be put down on
+ * the day it was let go over (docs/adr/0019 — a plan is changed by
+ * dragging it, and the epics' bars already are).
+ *
+ * The position is clamped onto the drawn axis before it is read: the
+ * strip has no column for a day outside it, and a pointer that ran off
+ * the end means the last day drawn rather than a day in a quarter
+ * nobody is looking at. The answer is then held inside the plannable
+ * range, which the service refuses outside anyway
+ * (src/modules/boards/plan-dates.ts) — an axis can reach 2101 where a
+ * plan date cannot.
+ */
+export function dateAtPosition(position: number, quarters: string[]): string {
+  // An axis with no columns has no day to read off it. The strip is
+  // never drawn in that state; today is the honest stand-in.
+  if (quarters.length === 0) return todayInCopenhagen();
+  const clamped = Math.min(quarters.length, Math.max(0, position));
+  const index = Math.min(quarters.length - 1, Math.floor(clamped));
+  const range = quarterRange(quarters[index]!);
+  const days = diffDays(range.start, range.end) + 1;
+  // The remainder is a share of that quarter's own days — 90 in one, 92
+  // in the next. The nudge covers the subtraction: a position that came
+  // out of quarterPosition can land a hair under the whole day it was
+  // made from, and a day is not a thing to be off by one of.
+  const day = Math.min(days - 1, Math.floor((clamped - index) * days + 1e-9));
+  const date = addDaysIso(range.start, day);
+  return date < PLAN_DATE_MIN ? PLAN_DATE_MIN : date > PLAN_DATE_MAX ? PLAN_DATE_MAX : date;
 }
 
 export function shiftQuarter(quarter: string, by: number): string {
