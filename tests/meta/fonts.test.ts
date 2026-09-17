@@ -14,13 +14,11 @@ import { describe, expect, it } from "vitest";
  * So the faces are files now, and these are the three ways that can rot:
  * an import of next/font creeping back in, a rule pointing at a file that
  * is not there, and a file sitting there that no rule opens. The last one
- * is the debt this replaced - `public/fonts` carried a typeface nobody
- * read for a whole release.
- *
- * The two Archivo `.ttf` files in that directory are exactly that leftover:
- * Ajour's PDF renderer read them, Tavle has no PDF, and nothing opens them.
- * They are checked in, so removing them is the owner's call, not this
- * test's; the sweep below is over `.woff2` until that call is made.
+ * is the debt this replaced - `public/fonts` carried Ajour's two Archivo
+ * `.ttf` files for a whole release, read by a PDF renderer Tavle does not
+ * have. They are gone, and the sweep below is over every font file in the
+ * directory rather than only the ones in use, so the next leftover is
+ * caught by the suite instead of by a reader a release later.
  */
 
 const ROOT = join(import.meta.dirname, "..", "..");
@@ -82,7 +80,9 @@ describe("fonts", () => {
 
   it("every file that is here has a rule that opens it", async () => {
     const css = await readFile(GLOBALS, "utf8");
-    const present = (await readdir(FONT_DIR)).filter((f) => f.endsWith(".woff2"));
+    // Any font file, not only the ones the stylesheet happens to name:
+    // a face nobody reads is the debt this replaced.
+    const present = (await readdir(FONT_DIR)).filter((f) => /\.(woff2?|ttf|otf|eot)$/i.test(f));
     expect(present.length).toBeGreaterThan(0);
     expect(present.filter((f) => !css.includes(`/fonts/${f}`))).toEqual([]);
   });

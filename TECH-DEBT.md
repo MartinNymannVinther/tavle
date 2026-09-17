@@ -24,20 +24,6 @@ answer from the armchair (dogma seven). What is **paid** is history.
 
 ## Open
 
-### Two font files in `public/fonts` still have no reader
-
-Archivo arrives as `.woff2` subsets harvested from what the build was
-already downloading, so `Archivo-Regular.ttf` and `Archivo-SemiBold.ttf`
-are the last of the Ajour inheritance with nothing opening them. They
-were deliberately not used: static TTFs with no weight 500, 220 KB
-against 81 KB for the three subsets, and a different build of the
-typeface from the variable file the UI actually renders — using them
-would have changed the look, which was the one thing ruled out.
-
-The recommendation is to delete them and leave `OFL.txt` (the licence
-covers the woff2 files too). Deleting is the owner's call under
-CLAUDE.md rule 7, so they stay until it is made.
-
 ### Files over 300 lines
 
 One responsibility per file and no file over roughly 300 lines. At 0.9
@@ -306,3 +292,17 @@ reachable wherever the cards are read. The selection is one set of card
 ids and survives a change of altitude, which is the answer to the
 question the item left open: you tick three under one epic, switch to
 the flat list, and the bar still counts three.
+
+### ~~The Archivo files in `public/fonts` had no reader~~
+
+Ajour's PDF renderer read them; Tavle has no PDF, and when the
+typefaces moved into the repository they came as `.woff2` subsets
+harvested from what the build was already downloading, so the two
+`.ttf` files were the last of the inheritance with nothing opening
+them. Deleted on the owner's word. `OFL.txt` stays: it is the licence
+of the Archivo the interface is actually set in.
+
+The sweep in `tests/meta/fonts.test.ts` now covers every font file in
+the directory rather than only the ones a rule names, so the next
+leftover is caught by the suite rather than by a reader a release
+later.
