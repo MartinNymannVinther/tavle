@@ -35,8 +35,8 @@ import type { MapRow } from "./story-map";
  * feature, in the story's order: a note can be dragged past its
  * neighbours, nudged with the arrows, or taken down from its menu.
  * Last comes the dashed head of the column for cards with no feature,
- * and down the left the row labels — a sprint with its dates, the
- * backlog, or a column of the board.
+ * and down the left the row labels — a release with its date and its
+ * weight, or the band for work no release has promised (docs/adr/0032).
  */
 export function FeatureNote({
   feature,

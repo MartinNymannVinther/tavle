@@ -17,6 +17,12 @@ const B = { orgId: "org_prod_b", userId: "user_prod_b" };
 /** Table → a row factory keyed by workspace suffix. */
 const TABLES: Array<{ table: string; row: (suffix: string) => Record<string, unknown> }> = [
   {
+    // The roster (docs/adr/0029) belongs to the workspace and to no
+    // board, so it stands first and needs nothing else to exist.
+    table: "people",
+    row: (s) => ({ id: `person_${s}`, name: `Person ${s}` }),
+  },
+  {
     table: "boards",
     row: (s) => ({ id: `board_${s}`, name: `Board ${s}`, key: `B${s.toUpperCase()}` }),
   },

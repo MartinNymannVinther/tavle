@@ -41,8 +41,8 @@ import {
  * meet. The backbone is the team's to build — a feature goes up from
  * the tray, is dragged or nudged into its place, and comes down from
  * its menu. Dragging a card sideways moves it to another feature; up
- * or down moves it to another sprint (or column). Every move is the
- * same write the backlog page would make, only in one motion.
+ * or down moves it to another release band (docs/adr/0032). Every move
+ * is the same write the backlog page would make, only in one motion.
  */
 export function StoryMapView({ full }: { full: BoardFull }) {
   const t = useTranslations("map");

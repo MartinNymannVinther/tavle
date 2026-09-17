@@ -173,7 +173,7 @@ describe("the board's view of the structure", () => {
 
 describe("the overview", () => {
   it("counts open stories and points per theme, area and kind, and the enabler share by points", () => {
-    const data = overview(board, now);
+    const data = overview(board);
     expect(data.openCards).toBe(4);
     expect(data.openPoints).toBe(11);
     // Stabil drift and Regulatorisk carry no open story, and a row that
@@ -190,18 +190,6 @@ describe("the overview", () => {
     ]);
     expect(data.byKind.map((b) => b.points)).toEqual([9, 2]);
     expect(data.enablerShare).toBeCloseTo(2 / 11);
-  });
-
-  it("measures the health of the structure", () => {
-    const { health } = overview(board, now);
-    // f2 and c4 have no parent, among 2 open features and 4 open stories.
-    expect(health.parentless).toEqual({ count: 2, total: 6 });
-    expect(health.reviewEpics.map((e) => e.number)).toEqual([1]);
-    // c4 has no area, among 4 open items and 4 open stories.
-    expect(health.withoutArea).toEqual({ count: 1, total: 8 });
-    // "Stabil drift" is carried by the open enabler epic, so only the third theme is idle.
-    expect(health.idleThemes.map((t) => t.name)).toEqual(["Regulatorisk"]);
-    expect(health.idleAreas).toEqual([]);
   });
 });
 

@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 import { MapCard } from "./map-card";
 
 /**
- * One cell of the map: the cards of one feature in one sprint or
- * column, a place to drop a card from elsewhere, and a way to add one
+ * One cell of the map: the cards of one feature in one release band
+ * (docs/adr/0032), a place to drop a card from elsewhere, and a way to add one
  * that lands here. Air around the notes on purpose; the wall is the
  * point, not the grid.
  */

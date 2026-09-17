@@ -31,9 +31,9 @@ export type LlmTestResult =
  * proven rather than assumed.
  *
  * This exists because the settings page could otherwise say a model is
- * configured while every call quietly failed and the rules engine
- * answered. "Configured" and "working" are different claims, and only
- * one of them is worth making.
+ * configured while every call quietly failed and every AI surface said
+ * there was no model. "Configured" and "working" are different claims,
+ * and only one of them is worth making.
  *
  * Owners and admins only, and counted like any other model call. It
  * spends the workspace's money, and the provider's own error text names

@@ -25,7 +25,7 @@ const sum = (buckets: Bucket[], of: "cards" | "points") =>
 
 /** Every axis accounts for the whole of the total it is printed under. */
 function expectAxesReconcile(full: BoardFull) {
-  const data = overview(full, now);
+  const data = overview(full);
   for (const [name, axis] of [
     ["byTheme", data.byTheme],
     ["byArea", data.byArea],
@@ -50,7 +50,7 @@ describe("the weight distribution", () => {
       cards: board.cards.map((c) => (c.id === "c1" ? { ...c, themeIds: ["t1", "t2"] } : c)),
     };
     expectAxesReconcile(shared);
-    const data = overview(shared, now);
+    const data = overview(shared);
     const several = data.byTheme.find((b) => b.key === MULTI)!;
     expect(several).toMatchObject({ cards: 1, points: 3 });
     // The card left Selvbetjening's own row; it did not leave the total.
@@ -60,7 +60,7 @@ describe("the weight distribution", () => {
   });
 
   it("leaves the extra row out when no story carries more than one theme", () => {
-    expect(overview(board, now).byTheme.map((b) => b.key)).not.toContain(MULTI);
+    expect(overview(board).byTheme.map((b) => b.key)).not.toContain(MULTI);
   });
 
   it("does not print a theme whose every story is shared as a theme with no work", () => {
@@ -73,7 +73,7 @@ describe("the weight distribution", () => {
       ),
     };
     expectAxesReconcile(shared);
-    const data = overview(shared, now);
+    const data = overview(shared);
     // The old row said "0 cards · 0 points" beside the theme's name,
     // which reads as "nothing open here" while the work sits under the
     // shared bucket. An absent row says nothing; a zero row said
@@ -84,7 +84,7 @@ describe("the weight distribution", () => {
 
   it("prints no empty row on any axis", () => {
     for (const full of [board, kanban]) {
-      const data = overview(full, now);
+      const data = overview(full);
       for (const axis of [data.byTheme, data.byArea, data.byKind]) {
         expect(axis.filter((b) => b.cards === 0)).toEqual([]);
       }
@@ -97,7 +97,7 @@ describe("the weight distribution", () => {
       themes: board.themes.map((t) => (t.id === "t1" ? { ...t, active: false } : t)),
     };
     expectAxesReconcile(retired);
-    expect(overview(retired, now).byTheme.find((b) => b.key === "t1")).toMatchObject({
+    expect(overview(retired).byTheme.find((b) => b.key === "t1")).toMatchObject({
       retired: true,
       cards: 2,
       points: 8,
@@ -110,12 +110,12 @@ describe("the weight distribution", () => {
       areas: board.areas.map((a) => (a.id === "a2" ? { ...a, active: false } : a)),
     };
     expectAxesReconcile(retired);
-    expect(overview(retired, now).byArea.find((b) => b.key === "a2")).toMatchObject({
+    expect(overview(retired).byArea.find((b) => b.key === "a2")).toMatchObject({
       retired: true,
       cards: 1,
     });
     // "Gammelt" is off the list and carries nothing, so it stays off the page.
-    expect(overview(retired, now).byArea.map((b) => b.key)).not.toContain("a3");
+    expect(overview(retired).byArea.map((b) => b.key)).not.toContain("a3");
   });
 });
 

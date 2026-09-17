@@ -2,7 +2,8 @@
  * What a model wrote, as JSON. Models wrap the object in a code fence, add
  * a sentence before it, or both; this strips what it can and parses what
  * is left. Null when nothing parsable remains — the caller decides what
- * that means (usually: the rules engine takes over).
+ * that means, which in this product is always the same thing: the
+ * surface says the model did not answer and writes nothing (ADR 0009).
  */
 export function parseModelJson(content: string): unknown | null {
   const cleaned = content

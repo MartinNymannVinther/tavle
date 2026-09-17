@@ -273,7 +273,12 @@ export const cards = pgTable(
     number: integer("number").notNull(),
     title: text("title").notNull(),
     description: text("description").notNull().default(""),
-    /** Position within its lane (column, or the backlog). Rewritten as whole numbers on every move. */
+    /**
+     * The card's rank in the board's one priority (docs/adr/0033): the
+     * backlog and the sprint's columns read the same number, a move
+     * writes this row and leaves the others alone, and the rows around
+     * a landing are spread only when there is no number between them.
+     */
     sort: doublePrecision("sort").notNull().default(0),
     assigneePersonId: text("assignee_person_id").references(() => people.id, {
       onDelete: "set null",

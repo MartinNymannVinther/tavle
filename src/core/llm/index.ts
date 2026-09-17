@@ -42,7 +42,7 @@ export function installationLlmConfig(): LlmConfig {
  * Builds a provider from a resolved configuration. Returns null when AI is
  * off, and also when a hosted provider has no key at all: a configuration
  * that cannot answer is the same thing as no configuration, and callers
- * already degrade to the rules engine.
+ * already answer by saying there is no model.
  */
 export function llmProviderFrom(config: LlmConfig): LlmProvider | null {
   switch (config.provider) {

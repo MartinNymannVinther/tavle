@@ -28,6 +28,10 @@ export const EXPORT_TABLES: ExportTable[] = [
   { table: "people", sheet: "Personer", orderBy: "created_at" },
   { table: "boards", sheet: "Tavler", orderBy: "created_at" },
   { table: "columns", sheet: "Kolonner", orderBy: "board_id, sort" },
+  // The cards sheet carries a swimlane id, so the lanes have to travel
+  // with it or the export hands out a reference to nothing. A team's own
+  // lane names are the team's (dogma three), like its themes and areas.
+  { table: "swimlanes", sheet: "Svømmebaner", orderBy: "board_id, sort" },
   { table: "backlog_items", sheet: "Epics og features", orderBy: "board_id, number" },
   { table: "cards", sheet: "Kort", orderBy: "board_id, number" },
   { table: "themes", sheet: "Temaer", orderBy: "board_id, sort" },

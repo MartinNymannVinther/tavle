@@ -136,23 +136,3 @@ export function laneFor(mode: string, card: Pick<Card, "boardId" | "columnId" | 
 export function sumPoints(rows: Array<Pick<Card, "estimate">>): number {
   return rows.reduce((total, card) => total + (card.estimate ?? 0), 0);
 }
-
-/** How many cards sit in each column right now, for WIP limits and the board header. */
-export async function columnCounts(
-  tx: AppTransaction,
-  boardId: string,
-  sprintId: string | null,
-): Promise<Map<string, number>> {
-  const rows = await tx
-    .select({ columnId: cards.columnId, n: sql<number>`count(*)::int` })
-    .from(cards)
-    .where(
-      and(
-        eq(cards.boardId, boardId),
-        isNull(cards.archivedAt),
-        sprintId ? eq(cards.sprintId, sprintId) : isNull(cards.sprintId),
-      ),
-    )
-    .groupBy(cards.columnId);
-  return new Map(rows.map((r) => [r.columnId, Number(r.n)]));
-}

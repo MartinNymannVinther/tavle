@@ -57,15 +57,17 @@ that keep growing, which is the whole reason for the rule.
 | 334   | `components/map/story-map-view.tsx`       | the wall's state vs. the handlers it hands down                 |
 | 333   | `modules/boards/write-sprints.ts`         | the sprint's life vs. what a card's promise to one costs        |
 
-Two were taken at 0.11.3 and are off the list: the backlog page gave up
-what a gesture writes to `use-backlog-moves.ts` (548 → 444), and
-`undo.ts` gave the card's eight reverses to `undo-cards.ts` (416 → 307).
+Two were taken at 0.11.3: the backlog page gave up what a gesture writes
+to `use-backlog-moves.ts` (548 → 444), and `undo.ts` gave the card's
+eight reverses to `undo-cards.ts` (416 → 307, which is still seven over
+and is counted below).
 Both were split along the seam named here rather than by moving lines
 about, which is the only kind of split worth the churn.
 
-Six more sit between 300 and 332: `access-admin.tsx`, `ai-panel.tsx`,
-`core/access/service.ts`, `card-side-panel.tsx`, `events.ts` and
-`schema/foundation.ts`. The demo's `words-da.ts` and `words-en.ts` are
+Seven more sit between 300 and 332: `access-admin.tsx`, `ai-panel.tsx`,
+`core/access/service.ts`, `card-side-panel.tsx`, `events.ts`,
+`schema/foundation.ts` and `undo.ts`, which came down from 416 to 307
+and is over the line by seven. The demo's `words-da.ts` and `words-en.ts` are
 content rather than code and exempt in spirit; `demo/seed.ts` at 371 is
 code, and is the eighteenth. Two tests are over the line as well
 (`tests/access/admission.test.ts`, `tests/rls/tenant-isolation.test.ts`);
