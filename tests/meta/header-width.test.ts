@@ -55,6 +55,24 @@ describe("the page header keeps to the viewport", () => {
     expect(nav).toContain("min-w-0");
   });
 
+  it("draws the navigation exactly once at every width", async () => {
+    // Two copies, each hidden by the other's condition (docs/adr/0036).
+    // The pair has to stay complementary and pinned to the same
+    // breakpoint: change one string and the reader gets two navigations
+    // or — the failure that actually gets reported — none at all, with
+    // nothing in the console to say why.
+    const source = await read("src/app/[locale]/(app)/boards/[id]/board-header.tsx");
+    const classes = [...source.matchAll(/<BoardTabs[\s\S]*?className="([^"]+)"/g)].map(
+      (m) => m[1]!,
+    );
+    expect(classes, "the header should still draw BoardTabs twice").toHaveLength(2);
+    const [inline, band] = classes;
+    expect(inline).toContain("hidden");
+    expect(inline).toContain("lg:block");
+    expect(band).toContain("lg:hidden");
+    expect(band).not.toContain("hidden ");
+  });
+
   it("marks the menu's trigger as current, so the sideways rescue can find it", async () => {
     // useScrollActiveIntoView looks the active segment up with
     // `[aria-current]` and gives up on null. On the six pages behind the
