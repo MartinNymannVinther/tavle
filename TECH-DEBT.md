@@ -34,17 +34,18 @@ that keep growing, which is the whole reason for the rule.
 | lines | file                                      | the seam                                                        |
 | ----- | ----------------------------------------- | --------------------------------------------------------------- |
 | 460   | `components/backlog/item-backlog.tsx`     | the epic altitude, the feature altitude, the row shared by both |
-| 446   | `components/backlog/backlog-view.tsx`     | the page's state vs. the two layouts it draws                   |
+| 454   | `components/backlog/backlog-view.tsx`     | the page's state vs. the two layouts it draws                   |
 | 402   | `core/db/schema/boards.ts`                | the board's own tables vs. the backlog structure's              |
 | 385   | `components/structure/decompose-tree.tsx` | the tree, the drag, and the row                                 |
 | 371   | `modules/demo/seed.ts`                    | the two boards it seeds                                         |
-| 350   | `components/board/board-view.tsx`         | the board vs. the swimlane rows                                 |
+| 355   | `components/board/board-view.tsx`         | the board vs. the swimlane rows                                 |
+| 355   | `components/map/story-map-view.tsx`       | the wall's state vs. the handlers it hands down                 |
 | 345   | `components/map/map-headers.tsx`          | the feature note, the loose head, the row label                 |
-| 345   | `components/map/story-map-view.tsx`       | the wall's state vs. the handlers it hands down                 |
 | 333   | `modules/boards/write-sprints.ts`         | the sprint's life vs. what a card's promise to one costs        |
 
 Two were taken at 0.11.3: the backlog page gave up what a gesture writes
-to `use-backlog-moves.ts` (548 → 444), and `undo.ts` gave the card's
+to `use-backlog-moves.ts` (548 → 444, and back to 454 since: the seam was
+right, the file is simply still the page's own state), and `undo.ts` gave the card's
 eight reverses to `undo-cards.ts` (416 → 307, which is still seven over
 and is counted below).
 Both were split along the seam named here rather than by moving lines
