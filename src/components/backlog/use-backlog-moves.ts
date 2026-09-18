@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Run } from "@/components/board/use-board-actions";
+import { useLanded } from "@/components/board/use-landed";
 import { setCardsSprintAction, reorderBacklogAction } from "@/modules/boards/actions-sprints";
 import { placeCardAction, updateCardAction } from "@/modules/boards/actions-cards";
 import { reorderItemAction } from "@/modules/boards/actions-structure";
@@ -36,6 +37,10 @@ export function useBacklogMoves({
   run: Run;
 }) {
   const [dragId, setDragId] = useState<string | null>(null);
+  // Every move below answers the same way once it lands, whichever of the
+  // page's six surfaces or which gesture asked for it
+  // (src/components/board/use-landed.tsx).
+  const { mark } = useLanded();
 
   /**
    * The backlog's own order is the only order; a nudge is a move past the
@@ -44,7 +49,9 @@ export function useBacklogMoves({
    * against the whole priority, so one step is one row of what is read.
    */
   function nudge(cardId: string, siblingId: string, after: boolean) {
-    void run(() => reorderBacklogAction({ cardId, siblingId, after }));
+    void run(() => reorderBacklogAction({ cardId, siblingId, after })).then((ok) => {
+      if (ok) mark([cardId]);
+    });
   }
 
   /** A card promised to a sprint, dragged: the promise is what a drop takes back. */
@@ -66,6 +73,8 @@ export function useBacklogMoves({
     setDragId,
     nudge,
     committedDrag,
+    /** For the selection bar, whose bulk moves land the same way. */
+    mark,
 
     /** A card dropped on a row: the rank it was dropped at. */
     dropOn(targetId: string, after: boolean) {
@@ -88,20 +97,28 @@ export function useBacklogMoves({
       if (!id) return;
       const card = cards.find((c) => c.id === id);
       if (!card || card.sprintId === sprintId) return;
-      void run(() => setCardsSprintAction({ cardIds: [id], sprintId }));
+      void run(() => setCardsSprintAction({ cardIds: [id], sprintId })).then((ok) => {
+        if (ok) mark([id]);
+      });
     },
 
     /** A card dropped on a backlog with no rows to land between. */
     dropOut() {
       const id = lift();
-      if (id && committedDrag(id)) void release(id);
+      if (id && committedDrag(id)) {
+        void release(id).then((ok) => {
+          if (ok) mark([id]);
+        });
+      }
     },
 
     /** A card dropped on the navigator: the same placement as the story map's drag. */
     dropOnNav(featureId: string | null) {
       const id = lift();
       if (!id) return;
-      void run(() => placeCardAction({ cardId: id, featureId }));
+      void run(() => placeCardAction({ cardId: id, featureId })).then((ok) => {
+        if (ok) mark([id]);
+      });
     },
 
     /** A card dropped into another group: the group's field first, then the spot it landed on. */
@@ -125,7 +142,9 @@ export function useBacklogMoves({
             ? placeCardAction({ cardId, areaId: groupKey })
             : updateCardAction({ cardId, kind: groupKey as "business" | "enabler" }),
       );
-      if (ok && siblingId && siblingId !== cardId) nudge(cardId, siblingId, after);
+      if (!ok) return;
+      if (siblingId && siblingId !== cardId) nudge(cardId, siblingId, after);
+      else mark([cardId]);
     },
 
     /** A card dragged to another feature's fold-out: placement first, then the spot it landed on. */
@@ -142,11 +161,14 @@ export function useBacklogMoves({
         if (!ok) return;
       }
       if (siblingId && siblingId !== cardId) nudge(cardId, siblingId, after);
+      else mark([cardId]);
     },
 
     /** An epic or a feature past its neighbour, at whatever altitude it is read. */
     rank(itemId: string, siblingId: string, after: boolean) {
-      void run(() => reorderItemAction({ itemId, siblingId, after }));
+      void run(() => reorderItemAction({ itemId, siblingId, after })).then((ok) => {
+        if (ok) mark([itemId]);
+      });
     },
   };
 }

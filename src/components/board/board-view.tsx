@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { createCardAction, moveCardAction } from "@/modules/boards/actions-cards";
+import { useLanded } from "./use-landed";
 import type { BoardFull, CardView } from "@/modules/boards/types";
 import { placeInLane } from "@/modules/boards/ordering";
 import {
@@ -38,6 +39,7 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
   const t = useTranslations("boards.view");
   const kinds = useTranslations("boards.structure.kind");
   const { run } = useBoardActions();
+  const { mark } = useLanded();
   const [seed, setSeed] = useState(full.cards);
   const [cards, setCards] = useState(full.cards);
   if (seed !== full.cards) {
@@ -149,6 +151,9 @@ export function BoardView({ full, today }: { full: BoardFull; today: string }) {
     moveLocally(cardId, columnId, index, assignment);
     const ok = await run(() => moveCardAction({ cardId, columnId, index, swimlane: assignment }));
     if (!ok) setCards(before);
+    // Drag, arrow keys and the card's own move menu all arrive here, so
+    // one mark answers for every way of moving a card on the board.
+    else mark([cardId]);
   }
 
   /** One step past a visible neighbour, indexed in the lane the server orders. */

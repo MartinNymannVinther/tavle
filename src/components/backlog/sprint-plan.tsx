@@ -8,6 +8,7 @@ import type { Sprint } from "@/core/db/schema";
 import type { StructureLookup } from "@/components/board/card-chips";
 import type { CardView } from "@/modules/boards/types";
 import { setCardsSprintAction } from "@/modules/boards/actions-sprints";
+import { useLanded } from "@/components/board/use-landed";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import type { Run } from "@/components/board/use-board-actions";
@@ -66,6 +67,7 @@ export function SprintPlan({
 }) {
   const t = useTranslations("backlog.sprint");
   const locale = useLocale();
+  const { mark, isLanded } = useLanded();
   const [over, setOver] = useState(false);
   const points = cards.reduce((total, c) => total + (c.estimate ?? 0), 0);
   const active = sprint.state === "active";
@@ -100,7 +102,16 @@ export function SprintPlan({
         canTake && over && "border-primary bg-accent/40",
       )}
     >
-      <header className="flex flex-col gap-1 px-4 py-3">
+      {/* Folded, the panel draws none of its cards, so the card that just
+          landed has nowhere to be marked. The panel answers for it — a
+          move into a folded sprint is the one that vanishes most
+          completely, and it is the one a person most needs to see. */}
+      <header
+        className={cn(
+          "flex flex-col gap-1 px-4 py-3",
+          !open && cards.some((card) => isLanded(card.id)) && "landed",
+        )}
+      >
         <div className="flex items-start gap-1">
           {fold && (
             <span className="-ml-2">
@@ -183,14 +194,14 @@ export function SprintPlan({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() =>
-              void run(() =>
-                setCardsSprintAction({
-                  cardIds: cards.filter((c) => selected.has(c.id)).map((c) => c.id),
-                  sprintId: null,
-                }),
-              )
-            }
+            onClick={() => {
+              const leaving = cards.filter((c) => selected.has(c.id)).map((c) => c.id);
+              void run(() => setCardsSprintAction({ cardIds: leaving, sprintId: null })).then(
+                (ok) => {
+                  if (ok) mark(leaving);
+                },
+              );
+            }}
           >
             {t("toBacklog", { count: cards.filter((c) => selected.has(c.id)).length })}
           </Button>

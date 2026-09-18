@@ -137,13 +137,21 @@ export function BacklogView({ full, aiAvailable }: { full: BoardFull; aiAvailabl
     const ok = await run(() =>
       setCardsSprintAction({ cardIds: backlogIds, sprintId: commitTarget }),
     );
-    if (ok) setSelected(new Set());
+    // The bar empties on success, so the marks are the only thing left
+    // saying which cards the sprint just took.
+    if (ok) {
+      moves.mark(backlogIds);
+      setSelected(new Set());
+    }
   }
 
   async function place(featureId: string | null) {
     if (backlogIds.length === 0) return;
     const ok = await run(() => placeCardsAction({ cardIds: backlogIds, featureId }));
-    if (ok) setSelected(new Set());
+    if (ok) {
+      moves.mark(backlogIds);
+      setSelected(new Set());
+    }
   }
 
   const levelChoice =

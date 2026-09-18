@@ -54,3 +54,4 @@ session reads, and **TECH-DEBT.md** is what we know is not right yet.
 | [0035](0035-ai-installation-roof.md)               | The installation's own roof over the AI                                         |                                             |
 | [0036](0036-three-places-and-a-door.md)            | Three places and a door                                                         |                                             |
 | [0037](0037-backlog-assistant.md)                  | The fifth proposal — an assistant for a backlog that exists                     | Amends 0021                                 |
+| [0038](0038-the-landing-mark.md)                   | The landing mark — motion answers a move, not a gesture                         |                                             |

@@ -260,6 +260,42 @@
     @apply rounded-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring;
   }
 
+  /* A card that just moved, marked where it now stands
+     (src/components/board/use-landed.tsx). The tint is laid over the row
+     rather than set on it: a row has its own ground — the list's, the
+     card's, a sprint panel's — and animating the background itself would
+     fade each of them to nothing on the way out. 1100ms here is
+     LANDED_MS there, and tests/meta/landed.test.ts holds them together. */
+  .landed {
+    position: relative;
+  }
+  .landed::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background-color: color-mix(in oklch, var(--primary) 16%, transparent);
+    animation: landed 1100ms ease-out forwards;
+  }
+  @keyframes landed {
+    0%,
+    35% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  /* Reduced motion keeps the answer and drops the movement: the tint
+     stands for the same second and simply stops fading. */
+  @media (prefers-reduced-motion: reduce) {
+    .landed::after {
+      animation: none;
+      opacity: 1;
+    }
+  }
+
   /* Full-bleed tables placed directly in a card align their gutter with the
      card's padding; tables inside padded card content keep symmetric cells. */
   [data-slot="card"]

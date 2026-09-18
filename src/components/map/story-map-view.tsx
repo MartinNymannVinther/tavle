@@ -23,6 +23,7 @@ import { alignBacklogToMapAction, placeOnMapAction } from "@/modules/boards/acti
 import { cn } from "@/lib/utils";
 import type { Release } from "@/core/db/schema";
 import { MapGrid, type Drag } from "./map-grid";
+import { useLanded } from "@/components/board/use-landed";
 import { ReleaseForm } from "./release-form";
 import { MapTray } from "./map-tray";
 import {
@@ -55,6 +56,7 @@ export function StoryMapView({
   const t = useTranslations("map");
   const b = useTranslations("backlog");
   const { run } = useBoardActions();
+  const { mark } = useLanded();
   const { board } = full;
   const scrum = board.mode === "scrum";
   const structure = structureOf(full);
@@ -137,14 +139,22 @@ export function StoryMapView({
     const card = full.cards.find((c) => c.id === id);
     if (!card) return;
     const featureId = columnKey === LOOSE_COLUMN ? null : columnKey;
-    if (featureId !== card.featureId) {
-      const ok = await run(() => placeCardAction({ cardId: id, featureId }));
-      if (!ok) return;
-    }
     const releaseId = row.kind === "release" ? row.release.id : null;
-    if (releaseId !== card.releaseId) {
-      await run(() => setCardsReleaseAction({ cardIds: [id], releaseId }));
+    let moved = false;
+    if (featureId !== card.featureId) {
+      if (!(await run(() => placeCardAction({ cardId: id, featureId })))) return;
+      moved = true;
     }
+    if (releaseId !== card.releaseId) {
+      if (!(await run(() => setCardsReleaseAction({ cardIds: [id], releaseId })))) return;
+      moved = true;
+    }
+    // A cell is a feature and a release meeting, so a card can cross the
+    // wall in two directions at once and land a long way from the hand
+    // that sent it (src/components/board/use-landed.tsx). Dropped back
+    // in the cell it came from it has not moved, and a mark would be
+    // answering a question nobody asked.
+    if (moved) mark([id]);
   }
 
   /** The backbone's order is the map's own; a note lands before another, or at the end. */

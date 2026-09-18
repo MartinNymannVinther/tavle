@@ -11,6 +11,7 @@ import { Initials, Points, PriorityMark, ThemeDots } from "./bits";
 import type { LaneOption } from "./board-column";
 import { CardChips, PartOf, type StructureLookup } from "./card-chips";
 import { MoveMenu } from "./move-menu";
+import { useLanded } from "./use-landed";
 
 /**
  * One card on the board. The title is a real link to the card's page;
@@ -61,6 +62,7 @@ export function BoardCard({
   const t = useTranslations("boards.card");
   const locale = useLocale();
   const priorities = useTranslations("boards.priority");
+  const { isLanded } = useLanded();
   const overdue = Boolean(card.dueDate && card.dueDate < today && !card.doneAt);
   const href = `/boards/${boardId}/cards/${card.number}`;
   const themes = structure.view.themes
@@ -81,6 +83,7 @@ export function BoardCard({
         "hover:border-primary/40 focus-within:border-primary/40",
         card.blocked && "border-destructive/50",
         dragging && "opacity-40",
+        isLanded(card.id) && "landed",
       )}
     >
       <div className="flex items-start gap-2">

@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { FlagChip, Initials, Points, PriorityMark, ThemeDots } from "@/components/board/bits";
 import type { StructureLookup } from "@/components/board/card-chips";
 import { TypeIcon } from "@/components/board/type-icon";
+import { useLanded } from "@/components/board/use-landed";
 import type { Priority, Theme } from "@/core/db/schema";
 import type { CardView } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
@@ -34,6 +35,7 @@ export function MapCard({
 }) {
   const s = useTranslations("boards.structure");
   const priorities = useTranslations("boards.priority");
+  const { isLanded } = useLanded();
   const { view } = structure;
   const themes = view.themes
     ? card.themeIds
@@ -57,6 +59,7 @@ export function MapCard({
         "hover:shadow-[var(--note-shadow-hover)] focus-within:shadow-[var(--note-shadow-hover)]",
         done && "opacity-55",
         dragging && "opacity-40",
+        isLanded(card.id) && "landed",
       )}
     >
       <TypeIcon type={card.bug ? "bug" : "card"} className="mt-px size-4 rounded-xs" />

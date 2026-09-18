@@ -11,6 +11,7 @@ import { TypeGlyph, TypeIcon } from "@/components/board/type-icon";
 import type { Priority, Theme } from "@/core/db/schema";
 import type { CardView } from "@/modules/boards/types";
 import { Link } from "@/i18n/navigation";
+import { useLanded } from "@/components/board/use-landed";
 import { cn } from "@/lib/utils";
 import { Key, RankArrows } from "./backlog-bits";
 import type { Crumb } from "./backlog-selection";
@@ -76,6 +77,7 @@ export function BacklogRow({
   const t = useTranslations("backlog.row");
   const s = useTranslations("boards.structure");
   const priorities = useTranslations("boards.priority");
+  const { isLanded } = useLanded();
   const { view } = structure;
   const own = deviatingPlace(card, context);
   const themes = view.themes
@@ -113,6 +115,7 @@ export function BacklogRow({
       className={cn(
         "group/row hover:bg-secondary/40 relative flex items-center gap-2 py-2 pr-3 pl-3 transition-colors duration-[120ms]",
         dragging && "opacity-40",
+        isLanded(card.id) && "landed",
       )}
     >
       {indicator && (

@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requireOrgContext } from "@/core/auth/guard";
 import { getBoardHeader } from "@/modules/boards/read";
+import { LandedProvider } from "@/components/board/use-landed";
 import { BoardHeader } from "./board-header";
 
 /**
@@ -43,7 +44,9 @@ export default async function BoardLayout({
           (board.mode === "scrum" && board.structureLevels !== "card")
         }
       />
-      {children}
+      {/* What just moved, marked where it landed, across every page of the
+          board — the backlog and its sprint panels, the columns, the wall. */}
+      <LandedProvider>{children}</LandedProvider>
     </div>
   );
 }
