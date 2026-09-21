@@ -206,20 +206,22 @@ Written down here rather than left to be discovered, because the failure
 mode is silent and the first person to meet it will be the one who did
 not choose it.
 
-### Three of the launch guards test less than they read as testing
+### The demo quota's day window has no test
 
-The meta-tests written for the launch pass, and two of them cover less
-than their names promise. `tests/meta/privacy-notice.test.ts` pins that
-the notice still carries a controller, a basis, the rights and
-Datatilsynet — but not that its retention numbers are the numbers the
-code keeps, so `DEMO_TTL_HOURS` or `KEEP_DAYS` could move and the page
-would go on saying the old figure. `tests/meta/source-offer.test.ts`
-reads two files, so a third place could hardcode the repository URL and
-escape it. And `tests/demo/quota.test.ts` exercises the hour window but
-not the day window, which is the bound that actually stops a script.
+`tests/demo/quota.test.ts` exercises the per-address hour window and the
+installation ceiling. It does not exercise the day window, which is the
+bound that actually stops a script: the hour's allowance of three is
+spent long before the day's ten can be reached, and `resetRateLimits()`
+clears both at once, so reaching the day in isolation needs a seam for
+time that `src/core/rate-limit.ts` does not have.
 
-None is wrong; each is narrower than it looks, which is the failure mode
-a meta-test is supposed to prevent rather than have.
+It was one of three launch guards that read as testing more than they
+tested. The other two were paid the same day — the privacy notice's
+retention figures are now read out of `scripts/backup-tavle.sh` and
+`DEMO_TTL_HOURS` rather than trusted as prose, and the source offer's
+stray-URL check walks all of `src` rather than the two files the offer
+lives in. This is the one that needs a change to the rate limiter first,
+which is why it is still here.
 
 ### The postal address and CVR number are missing from the privacy notice
 
