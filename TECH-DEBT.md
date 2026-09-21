@@ -206,6 +206,21 @@ Written down here rather than left to be discovered, because the failure
 mode is silent and the first person to meet it will be the one who did
 not choose it.
 
+### Three of the launch guards test less than they read as testing
+
+The meta-tests written for the launch pass, and two of them cover less
+than their names promise. `tests/meta/privacy-notice.test.ts` pins that
+the notice still carries a controller, a basis, the rights and
+Datatilsynet — but not that its retention numbers are the numbers the
+code keeps, so `DEMO_TTL_HOURS` or `KEEP_DAYS` could move and the page
+would go on saying the old figure. `tests/meta/source-offer.test.ts`
+reads two files, so a third place could hardcode the repository URL and
+escape it. And `tests/demo/quota.test.ts` exercises the hour window but
+not the day window, which is the bound that actually stops a script.
+
+None is wrong; each is narrower than it looks, which is the failure mode
+a meta-test is supposed to prevent rather than have.
+
 ### The postal address and CVR number are missing from the privacy notice
 
 `/terms` names Vinther Consulting as the entity and gives an e-mail, which

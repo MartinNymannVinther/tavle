@@ -165,6 +165,15 @@ function exportedValues(ast: ts.SourceFile): { functions: Fn[]; others: string[]
   const fns: Fn[] = [];
   const others: string[] = [];
   for (const statement of ast.statements) {
+    // `export { a } from "./b"` carries no export *modifier* — the
+    // statement kind is the export — so it slips past the check below and
+    // would be a re-exported action nothing here ever looked at. Named
+    // here so the shape test refuses it and somebody has to write the
+    // action where it can be read.
+    if (ts.isExportDeclaration(statement) && !statement.isTypeOnly) {
+      others.push(statement.getText().split("\n")[0]!);
+      continue;
+    }
     if (!exported(statement)) continue;
     if (ts.isTypeAliasDeclaration(statement) || ts.isInterfaceDeclaration(statement)) continue;
     if (ts.isFunctionDeclaration(statement) && statement.name) {
@@ -271,12 +280,22 @@ describe("every server action is guarded", () => {
   it("refuses when the guard comes back empty", () => {
     // `const ctx = await requireOrgContext()` with no `if (!ctx) return`
     // under it type-checks and then runs the action for a stranger.
+    //
+    // Asked of each function's own text rather than the file's. Over the
+    // file, one action that does check excuses every action that does
+    // not: the same `ctx` is the commonest name in the codebase, so the
+    // second action in a file would inherit the first one's guard and
+    // this test would go on passing while an unauthenticated write
+    // shipped.
     const ignored: string[] = [];
     for (const source of actionFiles) {
-      for (const match of source.text.matchAll(/const (\w+) = await requireOrgContext\(\)/g)) {
-        const name = match[1]!;
-        if (!new RegExp(`if \\(!${name}\\)\\s*return`).test(source.text)) {
-          ignored.push(`${rel(source.file)}: ${name}`);
+      for (const fn of exportedValues(source.ast).functions) {
+        const body = fn.node.getText();
+        for (const match of body.matchAll(/const (\w+) = await requireOrgContext\(\)/g)) {
+          const name = match[1]!;
+          if (!new RegExp(`if \\(!${name}\\)\\s*return`).test(body)) {
+            ignored.push(`${rel(source.file)}: ${fn.name} ignores ${name}`);
+          }
         }
       }
     }

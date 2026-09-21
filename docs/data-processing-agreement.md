@@ -85,14 +85,17 @@ make deliberately.
 ## 5. Subprocessors
 
 The current list is `docs/subprocessors.md` in this repository, and it
-is public. Today it is Hetzner (hosting) and Mistral (the language
-model, on its EU endpoint).
+is public. Today it is Hetzner (hosting), Mistral (the language model,
+on its EU endpoint) and whoever holds the nightly encrypted backup,
+which that file names per installation.
 
 The controller gives general authorisation to the subprocessors on that
-list. Before a new one is added, the row goes into that file and the
-controller is told, so there is time to object before anything is taken
-into use — the list is version-controlled, so what changed and when is
-visible to anyone. If the controller objects and we cannot run the
+list. Before a new one is taken into use, its row goes into that file
+and we write to the controller at the address on this agreement, so
+there is time to object. Tavle sends no mail of its own — there is no
+notification feature and this document is not going to invent one — so
+the notice is a message from us to you, and the file is the record: it
+is version-controlled, so what changed and when is visible to anyone. If the controller objects and we cannot run the
 service without the new subprocessor, either side may end the agreement
 and the controller exports and leaves.
 

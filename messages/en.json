@@ -514,7 +514,7 @@
     },
     "who": {
       "title": "Who is behind it",
-      "body": "The service at tavle.haij.dk is run by Vinther Consulting, martin@vintherconsulting.dk. The postal address and company registration number go here before launch. We have two roles, and they are not the same one. For your account and your application — name, email, IP address, browser — we are the data controller: we are the ones who decided those details should exist. For everything your team writes on the board you are the controller and we are the processor: we store it and show it to you and do nothing else with it. A data processing agreement is the frame around that part; the template is in the repository, and we are happy to sign it."
+      "body": "The service at tavle.haij.dk is run by Vinther Consulting, martin@vintherconsulting.dk. The postal address and company registration number go here before launch. We have two roles and they are not the same. For your account and your application — name, e-mail, IP address, browser — we are the controller: we are the ones who decided that information should exist. For everything your team writes on the board you are the controller and we are the processor: we store it, show it to you, take an encrypted backup at night, and send it to a language model in the cases the AI section describes — and otherwise nothing. We do not read along, and we use none of it for anything of our own. The frame around that part is a data processing agreement; the template is in the code repository and we are glad to sign it."
     },
     "basis": {
       "title": "What we may do, and why",
