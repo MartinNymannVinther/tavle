@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { REPOSITORY_URL, sourceOffer } from "../../src/core/version";
@@ -22,6 +22,8 @@ import { REPOSITORY_URL, sourceOffer } from "../../src/core/version";
 const ROOT = join(import.meta.dirname, "..", "..");
 const LANDING = join(ROOT, "src", "app", "[locale]", "page.tsx");
 const ABOUT = join(ROOT, "src", "app", "[locale]", "(app)", "settings", "about", "page.tsx");
+/** The one file allowed to spell the repository out. */
+const VERSION = join(ROOT, "src", "core", "version.ts");
 
 function read(path: string): string {
   return readFileSync(path, "utf8");
@@ -76,9 +78,19 @@ describe("the offer the running app makes", () => {
   });
 
   it("names the repository in one place and nowhere else in src", () => {
+    // The default, which is what an installation that did not fork runs.
     expect(REPOSITORY_URL).toBe("https://github.com/MartinNymannVinther/tavle");
-    expect(read(LANDING)).not.toContain("github.com");
-    expect(read(ABOUT)).not.toContain("github.com");
+    // And nowhere else, across all of src rather than the two files the
+    // offer happens to live in today. A second copy typed somewhere is a
+    // copy that keeps pointing here after a fork sets TAVLE_SOURCE_URL —
+    // which is the section 13 breach, not the answer to it.
+    const strays = readdirSync(join(ROOT, "src"), { recursive: true, encoding: "utf8" })
+      .filter((entry) => /\.tsx?$/.test(entry))
+      .filter((entry) => {
+        const file = join(ROOT, "src", entry);
+        return file !== VERSION && read(file).includes("github.com");
+      });
+    expect(strays).toEqual([]);
   });
 
   it("offers the same repository the README tells people to clone", () => {
