@@ -43,7 +43,20 @@ export const EXPORT_TABLES: ExportTable[] = [
   { table: "comments", sheet: "Kommentarer", orderBy: "created_at" },
   { table: "card_transitions", sheet: "Flytninger", orderBy: "at" },
   { table: "events", sheet: "Hændelser", orderBy: "created_at" },
-  { table: "audit_log", sheet: "Revisionsspor", orderBy: "created_at" },
+  // The audit trail travels, minus where the person was sitting. A login
+  // row carries the address it came from and the browser it came from
+  // (src/core/audit/events.ts), and the export is open to every member:
+  // without this, one click hands the whole team a record of when each
+  // colleague signed in, from which IP and on which device. That is
+  // security telemetry about a person, not work the workspace owns, so
+  // dogma three does not reach it — and the rows themselves stay where
+  // they are, unedited and answerable to an investigation.
+  {
+    table: "audit_log",
+    sheet: "Revisionsspor",
+    redact: ["ip_address", "user_agent"],
+    orderBy: "created_at",
+  },
 ];
 
 /**
@@ -58,5 +71,8 @@ export const EXPORT_TABLES: ExportTable[] = [
  * - `access_requests` and `access_invitations`: they belong to the
  *   installation, not to any workspace, and describe people who are not
  *   users of it. The application role cannot read them anyway.
+ * - `audit_log.ip_address` and `audit_log.user_agent`, redacted above: a
+ *   colleague's address and device, which is the one kind of personal
+ *   data in here that the workspace does not own.
  */
 export const MEMBERS_SHEET = "Brugere";

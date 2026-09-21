@@ -1,0 +1,25 @@
+-- A demo that fell over halfway leaves as little behind as one that ran
+-- its course.
+--
+-- Building a demo workspace is several writes: an account, an
+-- organization, a membership, the seeded boards, and the row in
+-- `demo_workspaces` that gives the thing its twenty-four hours. Anything
+-- can throw in the middle. What survives then is the worst of both
+-- worlds — an organization with a user and a full audit trail, and no
+-- row in `demo_workspaces` to ever expire it. Nothing sweeps it. It sits
+-- there for the life of the installation.
+--
+-- The service takes it back by bringing the demo's own expiry forward and
+-- letting `delete_demo_workspace` (0017) run it, so the half-built thing
+-- leaves by exactly the same door as a finished one and the audit rows go
+-- with it. That needs UPDATE, and `tavle_auth` had SELECT, INSERT and
+-- DELETE on this table but not UPDATE — so the take-back threw on its
+-- first statement, was swallowed by its own catch, and did nothing at
+-- all. It was dead code that looked like a fix.
+--
+-- The grant is small and its bounds are the table: a role that may INSERT
+-- a demo row and DELETE it outright is not held back by being unable to
+-- edit one, and `demo_workspaces` holds no workspace a team works in.
+-- What it must NOT become is a way to move an ordinary workspace's
+-- expiry, and it cannot: the table has a row for demos and nothing else.
+GRANT UPDATE ON TABLE demo_workspaces TO tavle_auth;

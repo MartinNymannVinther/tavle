@@ -119,7 +119,19 @@ export function AccessRequestForm() {
             {pending ? <Loader2 data-slot="icon" className="animate-spin" /> : null}
             {t("submit")}
           </Button>
-          <p className="text-muted-foreground text-xs leading-relaxed">{t("privacy")}</p>
+          {/*
+            Article 13 wants the information at the point of collection,
+            and this form is that point: a stranger hands over a name, an
+            address and free text before any account exists. The sentence
+            says what is kept; the link is where the rest of it stands.
+          */}
+          <p className="text-muted-foreground text-xs leading-relaxed">
+            {t("privacy")}{" "}
+            <Link href="/terms" className="font-medium underline-offset-4 hover:underline">
+              {t("privacyLink")}
+            </Link>
+            .
+          </p>
         </form>
       </CardContent>
       <CardFooter className="justify-center text-sm">

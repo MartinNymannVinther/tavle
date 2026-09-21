@@ -95,7 +95,9 @@
       "errorInvitationInvalid": "Invitationen er udløbet eller allerede brugt. Bed om et nyt link.",
       "invitationInvalidTitle": "Linket virker ikke længere",
       "invitationInvalidBody": "Invitationen er udløbet, brugt eller erstattet af en nyere. Bed den der inviterede dig om et nyt link, eller ansøg om adgang igen.",
-      "applyLink": "Ansøg om adgang"
+      "applyLink": "Ansøg om adgang",
+      "privacy": "Vi gemmer dit navn, din e-mail og dit arbejdsrums navn, så længe kontoen findes, og din IP-adresse og browser i revisionssporet. Hvad vi gør med det, står i",
+      "privacyLink": "vilkår og privatliv"
     },
     "twoFactor": {
       "title": "Totrinsbekræftelse",
@@ -123,9 +125,10 @@
       "sentBody": "Du hører fra ejeren af denne installation på {email}. Svaret kommer fra et menneske, så regn med en dag eller to.",
       "errorInvalid": "Tjek felterne og prøv igen.",
       "errorTooMany": "Der er sendt mange ansøgninger herfra på kort tid. Prøv igen om en time.",
-      "privacy": "Vi gemmer navn, e-mail og organisation for at behandle ansøgningen, og ikke andet. Bliver den afvist, står oplysningerne kun tilbage som en note om afgørelsen.",
+      "privacy": "Vi gemmer dit navn, din e-mail, organisationens navn og det du skriver i beskeden, så ejeren kan behandle ansøgningen — og den IP-adresse og browser den kom fra, så formularen ikke kan misbruges. Bliver ansøgningen afvist, står oplysningerne tilbage som en note om afgørelsen, indtil du beder om at få dem slettet.",
       "haveAccount": "Har du allerede en konto?",
-      "loginLink": "Log ind"
+      "loginLink": "Log ind",
+      "privacyLink": "Sådan behandler vi oplysningerne"
     }
   },
   "app": {
@@ -223,7 +226,13 @@
       "appliedValue": "{applied} af {expected}",
       "appliedAtLabel": "Senest kørt",
       "unknown": "Ukendt",
-      "license": "Tavle er open source under AGPL-3.0 og en del af Haij-familien."
+      "license": "Tavle er en del af Haij-familien.",
+      "source": {
+        "title": "Kildekoden",
+        "exact": "Tavle er open source under AGPL-3.0, og licensen giver dig ret til kildekoden til præcis den udgave du sidder med. Linket peger på det commit, denne installation er bygget af.",
+        "inexact": "Tavle er open source under AGPL-3.0, og licensen giver dig ret til kildekoden til præcis den udgave du sidder med. Koden her kan bare ikke peges ud som ét commit — arbejdsmappen havde ændringer, der ikke var committet, eller commit-nummeret mangler — så linket peger på projektet i stedet.",
+        "link": "Kildekoden på GitHub"
+      }
     },
     "dataExport": {
       "title": "Data og eksport",
@@ -451,29 +460,32 @@
   "demo": {
     "bannerTitle": "Det her er en demo.",
     "bannerBody": "Arbejdsrummet og alt i det slettes efter {hours, plural, one {# time} other {# timer}}. Skriv gerne i det.",
-    "bannerCta": "Ansøg om en rigtig konto"
+    "bannerCta": "Ansøg om en rigtig konto",
+    "refusedAddress": "Der er oprettet demo-arbejdsrum fra den her forbindelse for nylig. Prøv igen om lidt.",
+    "refusedFull": "Der er lige nu så mange demoer i gang, som installationen har plads til. Hvert demo-arbejdsrum lever {hours, plural, one {# time} other {# timer}} og giver så plads til det næste — prøv igen senere.",
+    "refusedFailed": "Demoen kunne ikke åbnes lige nu. Prøv igen senere."
   },
   "terms": {
     "title": "Vilkår og privatliv",
-    "updated": "Senest opdateret 4. september 2026.",
+    "updated": "Senest opdateret 21. september 2026.",
     "back": "Tilbage",
     "language": "In English",
-    "intro": "Tavle er et open source-værktøj til Kanban- og Scrum-teams, drevet af Haij. Det her er aftalen mellem dig og os, når du bruger den udgave vi driver. Kører du koden selv, gælder kun licensen.",
+    "intro": "Tavle er et open source-værktøj til Kanban- og Scrum-teams, ét af værktøjerne i Haij-familien. Siden her er to ting på én gang: aftalen mellem dig og os, når du bruger den udgave vi driver, og den besked om personoplysninger som databeskyttelsesforordningen siger du skal have, inden du giver os noget. Kører du koden selv, gælder kun licensen.",
     "what": {
       "title": "Hvad Tavle er",
       "body": "Et værktøj til at holde et teams arbejde synligt: tavler, kort, sprints og de tal der kan regnes ud fra dem. Vi giver ingen garanti for at det passer til jeres måde at arbejde på; prøv demoen først."
     },
     "account": {
       "title": "Konto og adgang",
-      "body": "Du får adgang ved at ansøge eller blive inviteret. Vi gemmer dit navn, din e-mail og navnet på dit arbejdsrum, og vi bruger dem til at logge dig ind og til at skrive til dig om tjenesten. Adgangskoder gemmes hashet, og du kan tilføje passkey og totrinsbekræftelse. Vi sælger ikke noget, og vi sender ikke markedsmails du ikke har bedt om."
+      "body": "Du opretter en konto med navn, e-mail og en adgangskode, eller du ansøger om adgang og bliver inviteret. Adgangskoden gemmes hashet, du kan tilføje passkey og totrinsbekræftelse, og en session udløber efter syv dage. Vi sætter ingen cookies til måling eller markedsføring; dem der er, holder dig logget ind, husker om du læser dansk eller engelsk, og husker om du har foldet menuen til venstre sammen. Vi sælger ikke noget, og Tavle sender overhovedet ingen mails — heller ikke markedsmails."
     },
     "yourData": {
       "title": "Jeres data",
-      "body": "Alt et arbejdsrum lægger ind, tilhører arbejdsrummet. Det kan hentes ud som regneark og JSON med ét klik og slettes helt igen, revisionssporet inklusive. Vi kigger ikke i det, medmindre I beder os om hjælp, og vi videregiver det aldrig."
+      "body": "Alt et arbejdsrum lægger ind — kort, kommentarer, sprints og navnene på de personer arbejdet fordeles på — tilhører arbejdsrummet. Det kan hentes ud som regneark og JSON med ét klik og slettes helt igen, revisionssporet inklusive. Vi kigger ikke i det, medmindre I beder os om hjælp, og vi videregiver det aldrig. Skriver I andres personoplysninger ind — en kollegas navn på et kort, en kundes navn i en kommentar — er det jer der er dataansvarlige for dem, og databehandleraftalen er rammen om det vi gør med dem."
     },
     "ai": {
       "title": "AI",
-      "body": "Er der sat en sprogmodel op, sendes de kort og sprints en person beder om hjælp til, til modeludbyderen. Hvem det er, står under Indstillinger → AI og i listen over underdatabehandlere. Modellen foreslår; intet gemmes uden at en person siger ja."
+      "body": "Er der sat en sprogmodel op, sendes tekst fra tavlen til modeludbyderen. Otte af de ti ting modellen kan, sker først når nogen trykker på en knap, og så sendes det kort, det sprint eller det punkt der bliver spurgt til. To sender mere end det. Mens du skriver titlen på et nyt kort, foreslår Tavle af sig selv hvor det hører hjemme og om det ligner noget der findes i forvejen — 800 millisekunder efter du holder op med at taste, uden at du trykker på noget — og til det sendes titlerne på op til to hundrede af tavlens kort. Og beder du assistenten om et forslag til backloggen, sendes hele den åbne nedbrydning: hver åben epic og feature med sin titel, sit område, sine temaer og om den har et “færdig når”. Intet felt med et navn i sendes — hverken hvem et kort er tildelt, eller jeres liste over personer — og kommentarer sendes aldrig. Men titler, beskrivelser og “færdig når” er fri tekst, så nævner I en kollega eller en kunde dér, følger navnet med. Hvem udbyderen er, står under Indstillinger → AI og i listen over underdatabehandlere; vælger et arbejdsrum sin egen udbyder, har det selv valgt sin databehandler. Modellen foreslår; intet gemmes uden at en person siger ja, og er der ingen model, sendes der intet, mens resten virker."
     },
     "leaving": {
       "title": "At holde op",
@@ -493,13 +505,52 @@
     },
     "contact": {
       "title": "Kontakt",
-      "body": "Skriv til martin@vintherconsulting.dk. Har du fundet et sikkerhedsproblem, står fremgangsmåden i SECURITY.md i kodearkivet; meld det der frem for i en almindelig mail."
+      "body": "Skriv til Vinther Consulting på martin@vintherconsulting.dk. Det er også adressen for alt om personoplysninger. Har du fundet et sikkerhedsproblem, står fremgangsmåden i SECURITY.md i kodearkivet; meld det der frem for i en almindelig mail."
     },
     "subprocessorsNote": "Hvem der kan se hvad, står i",
     "shareLinks": {
       "title": "Invitationer",
       "body": "Et invitationslink gælder én adresse og udløber efter to døgn. Det er dig der sender det; vi sender ingen mails."
-    }
+    },
+    "who": {
+      "title": "Hvem står bag",
+      "body": "Tjenesten på tavle.haij.dk drives af Vinther Consulting, martin@vintherconsulting.dk. Postadresse og CVR-nummer indsættes her inden lancering. Vi har to roller, og de er ikke den samme. For din konto og din ansøgning — navn, e-mail, IP-adresse, browser — er vi dataansvarlige: det er os der har bestemt at de oplysninger skal findes. For alt hvad jeres team skriver på tavlen er I dataansvarlige, og vi er databehandlere: vi opbevarer det og viser det for jer og gør ikke andet med det. Rammen om den del er en databehandleraftale; skabelonen ligger i kodearkivet, og vi skriver den gerne under."
+    },
+    "basis": {
+      "title": "Hvad vi må, og hvorfor",
+      "body": "Tre formål, hvert med sit grundlag. At levere tjenesten — konto, login, tavler, eksport — sker for at opfylde aftalen med dig (artikel 6, stk. 1, litra b). At behandle en ansøgning om adgang sker af samme grund, på din egen anmodning. At holde installationen sikker og fri for misbrug — revisionssporet, loginlinjerne, tællerne bag grænserne på formularer og AI-kald — sker i vores legitime interesse i at kunne se hvad der er sket og stoppe det der ikke skulle ske (artikel 6, stk. 1, litra f). Der er ikke et fjerde formål, og intet her hviler på samtykke, for der er ikke noget at samtykke til: ingen sporing, ingen statistik, ingen markedsføring."
+    },
+    "retention": {
+      "title": "Hvor længe vi gemmer",
+      "body": "Her står der det koden faktisk gør, også hvor svaret er at noget ikke udløber. En frist vi ikke håndhæver, ville være en frist vi havde fundet på.",
+      "rows": {
+        "account": "Kontoen: så længe du har den. Sletter du dit arbejdsrum, ryger arbejdsrummet og alt i det med det samme, men selve kontoen bliver stående, indtil du beder os fjerne den. Der er endnu ingen knap til det; skriv til os, så gør vi det.",
+        "workspace": "Forladte arbejdsrum: de udløber ikke af sig selv i dag. Et arbejdsrum ingen har rørt i årevis bliver stående, til nogen beder om at få det slettet. Det er en mangel og ikke en beslutning, og den dag den er lukket, kommer der til at stå noget andet her.",
+        "audit": "Revisionssporet: så længe arbejdsrummet findes. Det kan hverken rettes eller slettes undervejs — det er hele pointen med det — og når arbejdsrummet slettes, ryger sporet med. De få linjer der ikke hører til noget arbejdsrum, om at en konto blev oprettet eller logget ind, bliver stående; de rummer ikke noget fra en tavle.",
+        "ai": "Linjerne over AI-kald: én per kald med hvem, hvilken slags og hvornår, aldrig indholdet. De udløber ikke af sig selv; de følger arbejdsrummet ud, den dag det slettes.",
+        "requests": "Ansøgninger om adgang: gemmes uden udløbsdato, også de afviste, som en note om hvad der blev besluttet. Bed om at få din slettet, og vi sletter den.",
+        "demo": "Demo-arbejdsrum: {hours, plural, one {# time} other {# timer}}, kontoen inklusive, og så er der ikke mere.",
+        "backups": "Backups: de natlige krypterede kopier ruller ud efter 30 dage, både på serveren og i det EU-lager de kopieres til. Noget du har slettet kan derfor ligge i en kopi en måned endnu."
+      }
+    },
+    "rights": {
+      "title": "Dine rettigheder",
+      "body": "Over de oplysninger vi er dataansvarlige for, har du rettighederne herunder. To af dem er knapper i selve værktøjet; resten koster en mail til martin@vintherconsulting.dk, og vi svarer inden en måned. Er det derimod det jeres team har skrevet på tavlen, du vil have indsigt i eller slettet, er det arbejdsrummet selv der er dataansvarlig — spørg dem, så hjælper vi dem med at svare.",
+      "list": {
+        "access": "Indsigt: du kan få at vide hvad vi har om dig, og få en kopi af det.",
+        "rectification": "Berigtigelse: er noget forkert, retter vi det. Navn og e-mail kan endnu ikke rettes fra indstillingerne, så den vej går gennem os.",
+        "erasure": "Sletning: arbejdsrummets ejer sletter det med alt i, med det samme og uden at spørge nogen. Er du ikke ejer, beder du ejeren — eller os. Kontoen og en ansøgning fjerner vi, når du beder om det; der er ikke en knap til det endnu.",
+        "portability": "Dataportabilitet: Indstillinger → Data giver jer det hele som regneark og JSON, læsbart uden Tavle.",
+        "restriction": "Begrænsning: du kan bede os om at lade oplysningerne ligge urørt, mens vi er uenige om noget.",
+        "objection": "Indsigelse: du kan gøre indsigelse mod det vi gør i legitim interesse — sikkerhedsloggen og misbrugsbeskyttelsen — og så ser vi på det og svarer dig."
+      }
+    },
+    "complaint": {
+      "title": "Klage",
+      "body": "Er du utilfreds med måden vi behandler dine oplysninger på, så sig det til os først; det er hurtigere end alt andet. Du kan også klage til Datatilsynet, Carl Jacobsens Vej 35, 2500 Valby, dt@datatilsynet.dk, som er tilsynsmyndighed her i landet."
+    },
+    "dpaNote": "Databehandleraftalen, et arbejdsrum kan få skrevet under, ligger i",
+    "recordNote": "Fortegnelsen over vores behandlingsaktiviteter ligger i"
   },
   "boards": {
     "mode": {
@@ -1370,7 +1421,7 @@
       },
       "ai": {
         "title": "AI-hjælpen",
-        "body": "AI-hjælpen findes dér hvor arbejdet står, og følger altid samme lov: den foreslår, du retter til og siger ja — intet gemmes uden dig, alt den skriver mærkes i aktiviteten og kan fortrydes, og det den læser behandles som data, aldrig som instruktioner. Sæt den op under Indstillinger → AI: vælg udbyder og model for arbejdsrummet — en hostet model i EU eller jeres egen lokale gennem Ollama. Herefter kan den skrive et kort færdigt og foreslå at dele et stort op (på kortets side), skrive sprintens historie (på sprintens side), og lægge et udgangspunkt for backlog og roadmap ud fra jeres egen beskrivelse af produktet — “Byg et udgangspunkt” på backloggen og nedbrydningen, eller AI-start i samme øjeblik en ny tavle oprettes. “Foreslå”-knapperne udkaster et “Færdig når” på epics og features og et mål for sprinten; lukker du en epic eller feature med åbne børn, kommer luk-samtalen med et begrundet forslag til hvert af dem; og “Lav et rids” skriver et kort overblik når en epic er til revision. Mens du skriver en ny korttitel, foreslår den stille hvor kortet hører til, og siger til hvis det ligner et kort I allerede har. Uden en model siger knapperne det ærligt, og alt andet virker."
+        "body": "AI-hjælpen findes dér hvor arbejdet står, og følger altid samme lov: den foreslår, du retter til og siger ja — intet gemmes uden dig, alt den skriver mærkes i aktiviteten og kan fortrydes, og det den læser behandles som data, aldrig som instruktioner. Sæt den op under Indstillinger → AI: vælg udbyder og model for arbejdsrummet — en hostet model i EU eller jeres egen lokale gennem Ollama. Herefter kan den skrive et kort færdigt og foreslå at dele et stort op (på kortets side), skrive sprintens historie (på sprintens side), og lægge et udgangspunkt for backlog og roadmap ud fra jeres egen beskrivelse af produktet — “Byg et udgangspunkt” på backloggen og nedbrydningen, eller AI-start i samme øjeblik en ny tavle oprettes. Når backloggen først står, skifter den plads indhold: “Bed om et forslag” tager over, og der skriver du opgaven i dine egne ord — modellen læser backloggen som den står og svarer med nye epics, features, kort og rettelser af tekst, og den kan hverken slette, lukke, flytte eller omprioritere noget. “Foreslå”-knapperne udkaster et “Færdig når” på epics og features og et mål for sprinten; lukker du en epic eller feature med åbne børn, kommer luk-samtalen med et begrundet forslag til hvert af dem; og “Lav et rids” skriver et kort overblik når en epic er til revision. Mens du skriver en ny korttitel, foreslår den stille hvor kortet hører til, og siger til hvis det ligner et kort I allerede har. Uden en model siger knapperne det ærligt, og alt andet virker."
       },
       "data": {
         "title": "Dine data",

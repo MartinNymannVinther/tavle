@@ -95,7 +95,9 @@
       "errorInvitationInvalid": "The invitation has expired or has already been used. Ask for a new link.",
       "invitationInvalidTitle": "This link no longer works",
       "invitationInvalidBody": "The invitation has expired, been used, or been replaced by a newer one. Ask the person who invited you for a new link, or apply for access again.",
-      "applyLink": "Apply for access"
+      "applyLink": "Apply for access",
+      "privacy": "We keep your name, your e-mail and your workspace's name for as long as the account exists, and your IP address and browser in the audit trail. What we do with it is in",
+      "privacyLink": "terms and privacy"
     },
     "twoFactor": {
       "title": "Two-factor authentication",
@@ -123,9 +125,10 @@
       "sentBody": "You will hear from the owner of this installation at {email}. The reply comes from a person, so allow a day or two.",
       "errorInvalid": "Check the fields and try again.",
       "errorTooMany": "Many applications have been sent from here in a short time. Try again in an hour.",
-      "privacy": "We store your name, email and organisation to handle the application, and nothing else. If it is declined, the details remain only as a note of the decision.",
+      "privacy": "We store your name, your email, the organisation's name and what you write in the message so the owner can handle the application — and the IP address and browser it came from, so the form cannot be abused. If the application is declined, the details remain as a note of the decision until you ask for them to be deleted.",
       "haveAccount": "Already have an account?",
-      "loginLink": "Log in"
+      "loginLink": "Log in",
+      "privacyLink": "How we handle the data"
     }
   },
   "app": {
@@ -223,7 +226,13 @@
       "appliedValue": "{applied} of {expected}",
       "appliedAtLabel": "Last applied",
       "unknown": "Unknown",
-      "license": "Tavle is open source under AGPL-3.0 and part of the Haij family."
+      "license": "Tavle is part of the Haij family.",
+      "source": {
+        "title": "The source",
+        "exact": "Tavle is open source under AGPL-3.0, and the licence gives you the right to the source of exactly the version you are using. The link points at the commit this installation was built from.",
+        "inexact": "Tavle is open source under AGPL-3.0, and the licence gives you the right to the source of exactly the version you are using. The code running here cannot be pointed out as a single commit — the working tree had uncommitted changes, or the commit is missing — so the link points at the project instead.",
+        "link": "The source on GitHub"
+      }
     },
     "dataExport": {
       "title": "Data and export",
@@ -451,29 +460,32 @@
   "demo": {
     "bannerTitle": "This is a demo.",
     "bannerBody": "The workspace and everything in it is deleted after {hours, plural, one {# hour} other {# hours}}. Feel free to write in it.",
-    "bannerCta": "Apply for a real account"
+    "bannerCta": "Apply for a real account",
+    "refusedAddress": "Demo workspaces have been created from this connection recently. Try again in a little while.",
+    "refusedFull": "As many demos are running as this installation has room for. Each demo workspace lives {hours, plural, one {# hour} other {# hours}} and then makes room for the next one — try again later.",
+    "refusedFailed": "The demo could not be opened right now. Try again later."
   },
   "terms": {
     "title": "Terms and privacy",
-    "updated": "Last updated 4 September 2026.",
+    "updated": "Last updated 21 September 2026.",
     "back": "Back",
     "language": "På dansk",
-    "intro": "Tavle is an open source tool for Kanban and Scrum teams, run by Haij. This is the agreement between you and us when you use the edition we run. If you run the code yourself, only the licence applies.",
+    "intro": "Tavle is an open source tool for Kanban and Scrum teams, one of the tools in the Haij family. This page is two things at once: the agreement between you and us when you use the edition we run, and the information about personal data the GDPR says you must be given before you hand us anything. If you run the code yourself, only the licence applies.",
     "what": {
       "title": "What Tavle is",
       "body": "A tool for keeping a team's work visible: boards, cards, sprints and the numbers that can be computed from them. We make no promise that it fits the way you work; try the demo first."
     },
     "account": {
       "title": "Accounts and access",
-      "body": "You get in by applying or being invited. We store your name, your email and your workspace's name, and use them to sign you in and to write to you about the service. Passwords are stored hashed, and you can add a passkey and two-factor. We sell nothing, and we do not send marketing you did not ask for."
+      "body": "You create an account with a name, an e-mail and a password, or you apply for access and are invited. The password is stored hashed, you can add a passkey and two-step verification, and a session expires after seven days. We set no cookies for measurement or marketing; the ones there keep you signed in, remember whether you read Danish or English, and remember whether you have folded away the menu on the left. We sell nothing, and Tavle sends no mail at all — not even marketing mail."
     },
     "yourData": {
       "title": "Your data",
-      "body": "Everything a workspace puts in belongs to the workspace. It can be downloaded as a spreadsheet and JSON with one click and deleted entirely again, audit trail included. We do not look at it unless you ask us for help, and we never pass it on."
+      "body": "Everything a workspace puts in — cards, comments, sprints and the names of the people work is assigned to — belongs to the workspace. It can be downloaded as a spreadsheet and JSON with one click and deleted entirely again, audit trail included. We do not look at it unless you ask us for help, and we never pass it on. If you write other people's personal data into it — a colleague's name on a card, a customer's name in a comment — you are the controller for those, and the data processing agreement is the frame around what we do with them."
     },
     "ai": {
       "title": "AI",
-      "body": "With a language model set up, the cards and sprints a person asks for help with are sent to the model provider. Who that is stands under Settings → AI and in the list of subprocessors. The model proposes; nothing is saved without a person saying yes."
+      "body": "With a language model set up, text from the board is sent to the model provider. Eight of the ten things the model can do happen only when somebody presses a button, and then the card, the sprint or the item being asked about is what is sent. Two send more than that. While you type the title of a new card, Tavle suggests by itself where it belongs and whether it looks like something that already exists — 800 milliseconds after you stop typing, with no button pressed — and for that the titles of up to two hundred of the board's cards are sent. And when you ask the assistant for a proposal for the backlog, the whole open decomposition goes: every open epic and feature with its title, its area, its themes and whether it has a “done when”. No field holding a person's name is sent — not who a card is assigned to, not your roster of people — and comments are never sent. But titles, descriptions and “done when” are free text, so if you name a colleague or a customer there, the name goes with them. Who the provider is stands under Settings → AI and in the list of subprocessors; a workspace that picks its own provider has chosen its own processor. The model proposes; nothing is saved without a person saying yes, and with no model nothing is sent while everything else works."
     },
     "leaving": {
       "title": "Leaving",
@@ -493,13 +505,52 @@
     },
     "contact": {
       "title": "Contact",
-      "body": "Write to martin@vintherconsulting.dk. If you have found a security problem, SECURITY.md in the repository says how to report it; use that rather than an ordinary email."
+      "body": "Write to Vinther Consulting at martin@vintherconsulting.dk. That is also the address for anything about personal data. If you have found a security problem, SECURITY.md in the repository says how to report it; use that rather than an ordinary email."
     },
     "subprocessorsNote": "Who can see what is listed in",
     "shareLinks": {
       "title": "Invitations",
       "body": "An invitation link is for one address and expires after two days. You send it; we send no mail."
-    }
+    },
+    "who": {
+      "title": "Who is behind it",
+      "body": "The service at tavle.haij.dk is run by Vinther Consulting, martin@vintherconsulting.dk. The postal address and company registration number go here before launch. We have two roles, and they are not the same one. For your account and your application — name, email, IP address, browser — we are the data controller: we are the ones who decided those details should exist. For everything your team writes on the board you are the controller and we are the processor: we store it and show it to you and do nothing else with it. A data processing agreement is the frame around that part; the template is in the repository, and we are happy to sign it."
+    },
+    "basis": {
+      "title": "What we may do, and why",
+      "body": "Three purposes, each with its own basis. Running the service — account, sign-in, boards, export — is to perform the agreement with you (Article 6(1)(b)). Handling an application for access is the same basis, at your own request. Keeping the installation safe and free of abuse — the audit trail, the sign-in lines, the counters behind the limits on forms and AI calls — is our legitimate interest in being able to see what happened and stop what should not have (Article 6(1)(f)). There is no fourth purpose, and nothing here rests on consent, because there is nothing to consent to: no tracking, no statistics, no marketing."
+    },
+    "retention": {
+      "title": "How long we keep things",
+      "body": "What stands here is what the code actually does, including where the answer is that nothing expires. A period we do not enforce would be a period we made up.",
+      "rows": {
+        "account": "The account: as long as you have it. Deleting your workspace takes the workspace and everything in it at once, but the account itself stays until you ask us to remove it. There is no button for that yet; write to us and we will do it.",
+        "workspace": "Abandoned workspaces: they do not expire on their own today. A workspace nobody has touched for years stays until somebody asks for it to be deleted. That is a gap rather than a decision, and the day it is closed something else will stand here.",
+        "audit": "The audit trail: for as long as the workspace exists. It can be neither edited nor deleted along the way — that is the whole point of it — and when the workspace is deleted the trail goes with it. The few lines that belong to no workspace, that an account was created or signed in, stay; they hold nothing from a board.",
+        "ai": "The AI call lines: one per call with who, what kind and when, never the content. They do not expire on their own; they follow the workspace out on the day it is deleted.",
+        "requests": "Applications for access: kept with no expiry, declined ones included, as a note of what was decided. Ask for yours to be deleted and we delete it.",
+        "demo": "Demo workspaces: {hours, plural, one {# hour} other {# hours}}, the account included, and then there is nothing left.",
+        "backups": "Backups: the nightly encrypted copies roll off after 30 days, on the server and in the EU storage they are copied to. Something you deleted may therefore sit in a copy for another month."
+      }
+    },
+    "rights": {
+      "title": "Your rights",
+      "body": "Over the data we are the controller for, you have the rights below. Two of them are buttons in the tool itself; the rest cost an email to martin@vintherconsulting.dk, and we answer within a month. If it is what your team wrote on the board you want access to or deleted, the workspace itself is the controller — ask them, and we will help them answer.",
+      "list": {
+        "access": "Access: you can be told what we hold about you, and get a copy of it.",
+        "rectification": "Rectification: if something is wrong, we correct it. Name and email cannot be changed from the settings yet, so that way runs through us.",
+        "erasure": "Erasure: the workspace's owner deletes it with everything in it, at once and without asking anybody. If you are not the owner, ask the owner — or us. We remove an account or an application when you ask; there is no button for that yet.",
+        "portability": "Portability: Settings → Data gives you all of it as a spreadsheet and JSON, readable without Tavle.",
+        "restriction": "Restriction: you can ask us to leave the data untouched while we disagree about something.",
+        "objection": "Objection: you can object to what we do under legitimate interest — the security log and the abuse protection — and we will consider it and answer you."
+      }
+    },
+    "complaint": {
+      "title": "Complaints",
+      "body": "If you are unhappy with the way we handle your data, tell us first; it is faster than anything else. You may also complain to Datatilsynet, Carl Jacobsens Vej 35, 2500 Valby, Denmark, dt@datatilsynet.dk, which is the supervisory authority here."
+    },
+    "dpaNote": "The data processing agreement a workspace can have signed is in",
+    "recordNote": "The record of our processing activities is in"
   },
   "boards": {
     "mode": {
@@ -1370,7 +1421,7 @@
       },
       "ai": {
         "title": "The AI help",
-        "body": "The AI help lives where the work stands, and always follows the same law: it proposes, you rework and say yes — nothing is saved without you, everything it writes is marked in the activity and can be undone, and what it reads is treated as data, never as instructions. Set it up under Settings → AI: choose a provider and model for the workspace — a hosted model in the EU, or your own local one through Ollama. It can then finish writing a card and suggest splitting a big one (on the card's page), write the sprint's story (on the sprint's page), and lay a starting point for backlog and roadmap from your own description of the product — “Build a starting point” on the backlog and the breakdown, or AI start the moment a new board is created. The “Suggest” buttons draft a “Done when” on epics and features and a goal for the sprint; closing an epic or feature with open children, the close conversation arrives with a reasoned proposal for each of them; and “Draft a brief” writes a short overview when an epic is due for review. While you type a new card title, it quietly suggests where the card belongs, and says so if it looks like a card you already have. Without a model the buttons say so honestly, and everything else works."
+        "body": "The AI help lives where the work stands, and always follows the same law: it proposes, you rework and say yes — nothing is saved without you, everything it writes is marked in the activity and can be undone, and what it reads is treated as data, never as instructions. Set it up under Settings → AI: choose a provider and model for the workspace — a hosted model in the EU, or your own local one through Ollama. It can then finish writing a card and suggest splitting a big one (on the card's page), write the sprint's story (on the sprint's page), and lay a starting point for backlog and roadmap from your own description of the product — “Build a starting point” on the backlog and the breakdown, or AI start the moment a new board is created. Once the backlog stands, that slot changes its contents: “Ask for a proposal” takes over, and there you write the task in your own words — the model reads the backlog as it stands and answers with new epics, features, cards and text edits, and it can neither delete, close, move nor reprioritise anything. The “Suggest” buttons draft a “Done when” on epics and features and a goal for the sprint; closing an epic or feature with open children, the close conversation arrives with a reasoned proposal for each of them; and “Draft a brief” writes a short overview when an epic is due for review. While you type a new card title, it quietly suggests where the card belongs, and says so if it looks like a card you already have. Without a model the buttons say so honestly, and everything else works."
       },
       "data": {
         "title": "Your data",

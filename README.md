@@ -8,8 +8,9 @@ that finish, themes and areas that never do — that holds when the team
 grows; and the numbers a team wants to see — burndown, velocity,
 throughput, cycle time, cumulative flow — computed from what actually
 happened to the cards, never from an estimate. An AI can finish writing a
-card, suggest a split, tell the sprint's story and turn the team's own
-prose into a first backlog and roadmap; beside those it drafts a
+card, suggest a split, tell the sprint's story, turn the team's own
+prose into a first backlog and roadmap, and take a written task about the
+backlog a team already has; beside those it drafts a
 done-when, a sprint goal, a placement, a plan for closing an epic and a
 brief for reviewing one. Every one of them is a proposal a person edits
 and says yes to.
@@ -31,7 +32,7 @@ sizes — the backlog structure with its eleven rules enforced by the tool,
 the backlog with sprint planning and one sprint at a time, the story map
 with the team's own releases as its bands, the roadmap, backlog care, the
 insight page, my cards, inviting colleagues into a workspace with a link,
-the four AI proposals with the quiet assists and the counsel beside them,
+the five AI proposals with the quiet assists and the counsel beside them,
 a demo with two boards in full swing, export and deletion, and the help
 page with the board's ABC. Dogma seven is the one still open: a
 real team runs a real board before Tavle goes in the window, and 1.0 is

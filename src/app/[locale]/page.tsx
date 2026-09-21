@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { buttonVariants } from "@/components/ui/button";
 import { Wordmark } from "@/components/wordmark";
 import { getSession } from "@/core/auth/session";
-import { buildInfo } from "@/core/version";
+import { buildInfo, sourceOffer } from "@/core/version";
 import { signupAllowed } from "@/core/auth/signup";
 import { Link, redirect } from "@/i18n/navigation";
 import { demoEnabled, DEMO_TTL_HOURS } from "@/modules/demo/service";
@@ -32,6 +32,13 @@ export default async function HomePage() {
     return null;
   }
   const t = await getTranslations("landing");
+  // AGPL-3.0 section 13 asks that everyone who reaches the program over a
+  // network be offered its Corresponding Source. This page is what an
+  // anonymous visitor and the demo meet, so the offer has to stand here
+  // and not only behind the login, where the About page carries the
+  // longer version of the same sentence.
+  const tSource = await getTranslations("app.about.source");
+  const source = sourceOffer();
 
   return (
     <div className="bg-background flex min-h-svh flex-col">
@@ -158,9 +165,17 @@ export default async function HomePage() {
 
       <footer className="border-t">
         <div className="text-muted-foreground mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-8 text-sm">
-          <p className="flex items-center gap-2">
+          <p className="flex flex-wrap items-center gap-2">
             <Wordmark />
             <span>· {t("footer.license")}</span>
+            <span aria-hidden>·</span>
+            <a
+              href={source.url}
+              rel="noreferrer"
+              className="text-foreground font-medium underline-offset-4 hover:underline"
+            >
+              {tSource("link")}
+            </a>
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <Link href="/terms" className="underline-offset-4 hover:underline">

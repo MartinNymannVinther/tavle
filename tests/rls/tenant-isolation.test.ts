@@ -339,6 +339,16 @@ describe("rls coverage (guards future tables)", () => {
     // row does, and it takes no arguments, so it can answer one question
     // and only that one.
     "ai_calls_last_day",
+    // Deletes an expired demo workspace, audit rows included, so the
+    // demo's own promise — gone in twenty-four hours, account included —
+    // is kept rather than left in the trigger's row images. It cannot
+    // borrow `delete_workspace` below: that one asks whether the caller
+    // owns the active workspace, and the cleanup is a timer with no
+    // session and no org context at all. The guard is therefore the
+    // `demo_workspaces` table and an expiry in the past, both checked in
+    // the function: a workspace a team works in is not in that table and
+    // never was, so no argument to this function reaches one.
+    "delete_demo_workspace",
     // Deletes a workspace the caller owns, audit rows included, which is
     // dogma 3 and which RLS and the append-only guard would otherwise
     // forbid (docs/adr/0003). Checks the caller's role itself.

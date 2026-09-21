@@ -45,3 +45,45 @@ export const buildInfo: BuildInfo = {
   migration: process.env.TAVLE_MIGRATION || "unknown",
   migrationCount: Number(process.env.TAVLE_MIGRATION_COUNT || "0"),
 };
+
+/**
+ * The one place the repository is named. Everything that offers the
+ * source builds its link from here, so moving the repository is one edit
+ * rather than a search.
+ *
+ * An installation that changed the code is running its own version, and
+ * section 13 asks it to offer *that* — pointing a modified Tavle's users
+ * upstream would offer them code nobody is running, which is the breach
+ * rather than the answer. So the URL is a build-time setting with this
+ * repository as its default: fork, set `TAVLE_SOURCE_URL`, and the offer
+ * follows the fork. Left unset it names the project it came from, which
+ * is correct for the overwhelmingly common case of running it unchanged.
+ */
+export const REPOSITORY_URL =
+  process.env.TAVLE_SOURCE_URL || "https://github.com/MartinNymannVinther/tavle";
+
+export type SourceOffer = {
+  /** Where to send a person who wants the code. */
+  url: string;
+  /** The url is the very code answering here, commit for commit. */
+  exact: boolean;
+};
+
+/**
+ * What the app offers its users under AGPL-3.0 section 13: an
+ * opportunity to receive the Corresponding Source of the version they
+ * are interacting with. The build already stamps in the commit, so the
+ * offer can be that precise - `/tree/<commit>` is the tree this
+ * container was built from, not merely the project it came from.
+ *
+ * Two cases where it cannot be: a build made outside a git checkout
+ * knows no commit, and a build made from a working tree with
+ * uncommitted changes is running code that is not in the repository at
+ * all. Both are answered by pointing at the project and saying so,
+ * because a commit link that is not what is running is a worse answer
+ * than an honest one.
+ */
+export function sourceOffer(info: BuildInfo = buildInfo): SourceOffer {
+  const exact = info.commit !== "" && info.commit !== "unknown" && !info.dirty;
+  return { url: exact ? `${REPOSITORY_URL}/tree/${info.commit}` : REPOSITORY_URL, exact };
+}

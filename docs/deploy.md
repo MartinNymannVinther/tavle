@@ -193,9 +193,12 @@ sees is the product rather than a mock of it. Three things keep it
 bounded: five demos an hour per address, two hundred live demos at once,
 and an expiry on every one of them.
 
-Cleanup runs on each visit, so an installation that gets visitors needs no
-scheduler. If yours is quiet, or you would rather not rely on that, use
-either:
+Cleanup runs on each visit. That is enough for an installation nobody
+publishes a promise about — but /terms tells every visitor their demo is
+gone within twenty-four hours, and "when the next person happens to
+arrive" is not a way to keep a promise made in writing. **An installation
+with the demo on schedules one of these.** A quiet night is exactly when
+the sweep does not run and exactly when nobody is there to notice.
 
 ```bash
 pnpm script scripts/cleanup-demos.ts   # on a checkout; the images carry no scripts

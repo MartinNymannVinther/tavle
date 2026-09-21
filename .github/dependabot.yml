@@ -15,6 +15,23 @@ updates:
       # One PR for the routine patch traffic; anything that changes a
       # major version still arrives on its own and gets read properly.
       minor-and-patch:
+        # Better Auth carries the whole of dogma six's front door —
+        # sessions, organizations, passkeys, TOTP — and package.json pins
+        # all three of its packages to one exact version on purpose,
+        # because they only work together. In the group, a version bump
+        # nobody has run the auth suite against decides whether every
+        # other harmless update that week can be merged.
+        #
+        # Excluded from the group rather than ignored outright, and the
+        # difference matters: `ignore` would silence Dependabot's
+        # SECURITY updates for the library that holds the front door,
+        # which is the opposite of what dogma six asks for. Out of the
+        # group it still gets its own pull request, which somebody reads
+        # with the release notes open and tests/auth watched — and a
+        # security advisory still arrives.
+        exclude-patterns:
+          - better-auth
+          - "@better-auth/*"
         update-types:
           - minor
           - patch

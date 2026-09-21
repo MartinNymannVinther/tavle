@@ -93,9 +93,11 @@ codebase to:
   rows, grouped by hairlines (`src/components/ui/property-row.tsx`). The
   board's header steps back to one line on these pages so the thing
   itself is the title.
-- The AI writes four kinds of proposal — finish a card, split a card, the
-  sprint's story, and a starting point for backlog and roadmap from the
-  team's own prose (ADR 0021) — and a person edits and says yes. Beside
+- The AI writes five kinds of proposal — finish a card, split a card, the
+  sprint's story, a starting point for backlog and roadmap from the
+  team's own prose (ADR 0021), and an assistant that takes a written task
+  about the backlog a team already has (ADR 0037) — and a person edits
+  and says yes. Beside
   them stand the quiet assists (ADR 0025) and the counsel (ADR 0026):
   a done-when and a sprint goal drafted on request, a placement
   suggestion with a duplicate glance while a card title is typed, the

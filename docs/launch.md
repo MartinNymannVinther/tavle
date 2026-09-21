@@ -119,6 +119,11 @@ Set it up now rather than after the first real board, and then do the
 thing almost nobody does — restore one dump into a scratch database and
 open it. A backup nobody has restored is a hope, not a backup.
 
+Then write the provider into `docs/subprocessors.md`, which has a row
+waiting for it. A copy of everything is a subprocessor even though `age`
+encrypts it before it leaves the machine, and the list is the document
+dogma four points customers at.
+
 ## 7. Turn the demo on
 
 Set `DEMO=on` in Coolify and redeploy. Open `https://tavle.haij.dk/demo`
@@ -131,7 +136,15 @@ Be clear-eyed about what this does: `DEMO=on` hands out throwaway
 accounts on this installation. That is the point of a public instance
 whose job is to show the tool, and it is exactly what you would not do on
 an organisation's own Tavle. The accounts and their workspaces expire
-after 24 hours and cleanup runs on every visit.
+after 24 hours, and the door is bounded twice — what one address may
+build, and how many demos may live at once
+(`src/modules/demo/quota.ts`) — with a ceiling inside each one so a
+visitor who is through the door cannot fill the database either.
+
+**Schedule the cleanup.** It runs on every visit, which is enough on a
+busy day and nothing at all on a quiet one — and /terms promises
+twenty-four hours in writing to every visitor. Deploy guide section on
+the demo has the two ways; pick one before you turn this on.
 
 Read `/terms` on the live site once, out loud if necessary. It is the page
 that tells visitors what happens to what they type, and it should say what

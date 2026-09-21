@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { lt, sql } from "drizzle-orm";
+import { eq, lt, sql } from "drizzle-orm";
 import { auth } from "@/core/auth/auth";
 import { authDb } from "@/core/db/client";
 import { demoWorkspaces } from "@/core/db/schema";
@@ -7,6 +7,7 @@ import { withOrgContext } from "@/core/db/tenant";
 import { DEMO_HEADER, demoSignupHeaderValue } from "@/core/auth/signup";
 import { env } from "@/core/env";
 import { organizationSlug } from "@/lib/slug";
+import { MAX_LIVE_DEMOS } from "./quota";
 import { seedDemoWorkspace } from "./seed";
 
 /**
@@ -20,8 +21,6 @@ import { seedDemoWorkspace } from "./seed";
  */
 
 export const DEMO_TTL_HOURS = 24;
-/** A ceiling on how many demo workspaces may exist at once. */
-export const MAX_LIVE_DEMOS = 200;
 
 export function demoEnabled(): boolean {
   return env.DEMO === "on";
@@ -53,7 +52,14 @@ export function demoCookieSecure(): boolean {
   return env.BETTER_AUTH_URL.startsWith("https://");
 }
 
-export type DemoSession = { headers: Headers; boardId: string } | null;
+/**
+ * What came of asking for a demo. A refusal says which one, because the
+ * three are three different sentences to the visitor: the demo is not on
+ * here, the installation is full, or something broke.
+ */
+export type DemoSession =
+  | { ok: true; headers: Headers; boardId: string }
+  | { ok: false; reason: "off" | "full" | "failed" };
 
 /** Turns the set-cookie headers of an API response into a cookie header. */
 function cookieHeaderFrom(responseHeaders: Headers): Headers {
@@ -70,25 +76,37 @@ function cookieHeaderFrom(responseHeaders: Headers): Headers {
  * installation that gets visitors needs no scheduler; `scripts/cleanup-demos.ts`
  * and the endpoint exist for one that does not.
  *
- * The organization's cascades take the workspace's rows with it. The
- * throwaway user is removed too, because a demo that leaves accounts
- * behind is a demo that leaks addresses nobody gave.
+ * The deleting itself is `delete_demo_workspace()` (drizzle/0017), which
+ * takes the workspace, the throwaway account and — this is the point of
+ * it — the audit rows both of them left. The screen promises the whole
+ * thing is gone within the day, account included, and everything the
+ * visitor typed passes through the audit triggers on its way into the
+ * table. A demo whose card titles outlive it by a year is not the demo
+ * the screen described.
+ *
+ * The rule that the function may only touch a workspace registered in
+ * `demo_workspaces`, and only once its time is up, is checked there as
+ * well as here: this loop has no session behind it, so the database is
+ * where that guard has to be able to stand on its own.
  */
-export async function cleanupExpiredDemos(now = new Date()): Promise<number> {
+export async function cleanupExpiredDemos(): Promise<number> {
   const expired = await authDb
-    .delete(demoWorkspaces)
-    .where(lt(demoWorkspaces.expiresAt, now))
-    .returning({ organizationId: demoWorkspaces.organizationId, userId: demoWorkspaces.userId });
+    .select({ organizationId: demoWorkspaces.organizationId })
+    .from(demoWorkspaces)
+    .where(lt(demoWorkspaces.expiresAt, new Date()));
+  let removed = 0;
   for (const row of expired) {
     try {
-      await authDb.execute(sql`delete from organizations where id = ${row.organizationId}`);
-      await authDb.execute(sql`delete from users where id = ${row.userId}`);
+      const result = await authDb.execute<{ deleted: boolean }>(
+        sql`select delete_demo_workspace(${row.organizationId}) as deleted`,
+      );
+      if (result.rows[0]?.deleted) removed += 1;
     } catch (error) {
       // One stuck demo must not stop the others being cleaned up.
       console.error("demo: cleanup failed for", row.organizationId, error);
     }
   }
-  return expired.length;
+  return removed;
 }
 
 async function liveDemoCount(): Promise<number> {
@@ -101,11 +119,19 @@ async function liveDemoCount(): Promise<number> {
  * The account is created through the ordinary sign-up path rather than by
  * writing rows, so a demo session is a session like any other and every
  * guard behaves the way it will for a real user.
+ *
+ * The expired demos are cleared before the live ones are counted, so the
+ * ceiling is a ceiling on demos that still exist rather than on demos
+ * that were ever made. Like the AI's ceilings it is read and then acted
+ * on, so two visitors arriving at the same moment can both find room and
+ * both be let in: it overshoots by the number of demos in flight and
+ * never by more, and serialising the front door to close that would cost
+ * every visitor a queue.
  */
 export async function createDemoWorkspace(locale: "da" | "en"): Promise<DemoSession> {
-  if (!demoEnabled()) return null;
+  if (!demoEnabled()) return { ok: false, reason: "off" };
   await cleanupExpiredDemos();
-  if ((await liveDemoCount()) >= MAX_LIVE_DEMOS) return null;
+  if ((await liveDemoCount()) >= MAX_LIVE_DEMOS) return { ok: false, reason: "full" };
 
   const key = randomBytes(9).toString("hex");
   const email = `demo-${key}@demo.invalid`;
@@ -127,30 +153,66 @@ export async function createDemoWorkspace(locale: "da" | "en"): Promise<DemoSess
     userId = response.user!.id;
   } catch (error) {
     console.error("demo: could not create the visitor's account", error);
-    return null;
+    return { ok: false, reason: "failed" };
   }
 
-  const organization = await auth.api.createOrganization({
-    body: { name: workspaceName, slug: organizationSlug(`${workspaceName}-${key}`) },
-    headers: sessionHeaders,
-  });
-  if (!organization) return null;
-  await auth.api.setActiveOrganization({
-    body: { organizationId: organization.id },
-    headers: sessionHeaders,
-  });
+  let organizationId: string | null = null;
+  try {
+    const organization = await auth.api.createOrganization({
+      body: { name: workspaceName, slug: organizationSlug(`${workspaceName}-${key}`) },
+      headers: sessionHeaders,
+    });
+    if (!organization) throw new Error("the workspace was not created");
+    organizationId = organization.id;
+    await auth.api.setActiveOrganization({
+      body: { organizationId: organization.id },
+      headers: sessionHeaders,
+    });
 
-  await authDb.insert(demoWorkspaces).values({
-    organizationId: organization.id,
-    userId,
-    expiresAt: new Date(Date.now() + DEMO_TTL_HOURS * 60 * 60 * 1000),
-  });
+    await authDb.insert(demoWorkspaces).values({
+      organizationId: organization.id,
+      userId,
+      expiresAt: new Date(Date.now() + DEMO_TTL_HOURS * 60 * 60 * 1000),
+    });
 
-  const boardId = await withOrgContext({ orgId: organization.id, userId }, (tx) =>
-    seedDemoWorkspace(tx, { orgId: organization.id, userId }, locale),
-  );
+    const boardId = await withOrgContext({ orgId: organization.id, userId }, (tx) =>
+      seedDemoWorkspace(tx, { orgId: organization.id, userId }, locale),
+    );
 
-  return { headers: sessionHeaders, boardId };
+    return { ok: true, headers: sessionHeaders, boardId };
+  } catch (error) {
+    console.error("demo: could not build the workspace", error);
+    await abandonHalfBuiltDemo(userId, organizationId);
+    return { ok: false, reason: "failed" };
+  }
+}
+
+/**
+ * Takes back what a build that failed halfway left behind. The account is
+ * made first and is covered by nothing on its own: no demo row names it,
+ * so no cleanup would ever come for it, and it would sit in the users
+ * table for good.
+ *
+ * Where the demo did get as far as being registered, its own expiry is
+ * brought forward and the ordinary cleanup runs it, so the half-built
+ * thing leaves exactly as little behind as a finished one does. The two
+ * deletes after that are for the case where it did not get that far, and
+ * are no-ops when it did.
+ */
+async function abandonHalfBuiltDemo(userId: string, organizationId: string | null): Promise<void> {
+  try {
+    if (organizationId) {
+      await authDb
+        .update(demoWorkspaces)
+        .set({ expiresAt: new Date(Date.now() - 1000) })
+        .where(eq(demoWorkspaces.organizationId, organizationId));
+      await authDb.execute(sql`select delete_demo_workspace(${organizationId})`);
+      await authDb.execute(sql`delete from organizations where id = ${organizationId}`);
+    }
+    await authDb.execute(sql`delete from users where id = ${userId}`);
+  } catch (error) {
+    console.error("demo: could not take back a half-built demo", error);
+  }
 }
 
 /** True when the workspace the caller is in is a demo. */

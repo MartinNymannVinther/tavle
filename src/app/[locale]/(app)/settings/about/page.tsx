@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatStamp } from "@/core/dates";
 import { env } from "@/core/env";
-import { buildInfo } from "@/core/version";
+import { buildInfo, sourceOffer } from "@/core/version";
 import { getSchemaState } from "./schema-state";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,11 +17,17 @@ export async function generateMetadata(): Promise<Metadata> {
  * have" without asking anyone, and to show the two things that make that
  * answer trustworthy: when it was built, and whether the database has kept
  * up with it.
+ *
+ * And, because the page already knows exactly which code is answering,
+ * the place to make the offer AGPL-3.0 section 13 asks of a program
+ * people reach over a network: the Corresponding Source of this version,
+ * not merely of the project.
  */
 export default async function AboutPage() {
   const t = await getTranslations("app.about");
   const locale = await getLocale();
   const schema = await getSchemaState();
+  const source = sourceOffer();
 
   // Both stamps on this page go through `formatStamp` like every other
   // moment in the product. Handing the next-intl locale straight to
@@ -87,6 +93,24 @@ export default async function AboutPage() {
         </CardHeader>
         <CardContent>
           <DetailList rows={schemaRows} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("source.title")}</CardTitle>
+          <CardDescription>
+            {source.exact ? t("source.exact") : t("source.inexact")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <a
+            href={source.url}
+            rel="noreferrer"
+            className="text-foreground text-2sm font-medium underline underline-offset-4"
+          >
+            {t("source.link")}
+          </a>
         </CardContent>
       </Card>
 

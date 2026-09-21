@@ -157,6 +157,13 @@ const nextConfig: NextConfig = {
     TAVLE_BUILT_AT: builtAt,
     TAVLE_MIGRATION: migration,
     TAVLE_MIGRATION_COUNT: String(journal.entries.length),
+    // Where this build's source lives. AGPL-3.0 section 13 obliges
+    // whoever offers Tavle over a network to offer the source of the
+    // version they are running — and a fork that changed something is
+    // running its own. Baked in here because the offer is drawn by a
+    // client component; an installation that forked sets it at build
+    // time and the offer follows the code rather than pointing home.
+    TAVLE_SOURCE_URL: process.env.TAVLE_SOURCE_URL ?? "",
   },
   async headers() {
     return [

@@ -123,6 +123,18 @@ export function RegisterForm({ invitation }: { invitation?: InvitationPrefill })
             {pending ? <Loader2 data-slot="icon" className="animate-spin" /> : null}
             {t("submit")}
           </Button>
+          {/* Article 13 wants the information where the data is handed
+              over, not a click away on a page nobody visits. This form is
+              the other door — the first account on an empty installation,
+              and every account where SIGNUP=open — so it carries the same
+              sentence as the application form beside it. */}
+          <p className="text-muted-foreground text-sm">
+            {t("privacy")}{" "}
+            <Link href="/terms" className="font-medium underline-offset-4 hover:underline">
+              {t("privacyLink")}
+            </Link>
+            .
+          </p>
         </form>
       </CardContent>
       <CardFooter className="justify-center text-sm">

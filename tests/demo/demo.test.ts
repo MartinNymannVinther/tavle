@@ -35,9 +35,10 @@ afterAll(async () => {
 describe("a demo workspace", () => {
   it("is created with two boards and a signed-in guest", async () => {
     const demo = await createDemoWorkspace("da");
-    expect(demo).not.toBeNull();
-    boardId = demo!.boardId;
-    expect(demo!.headers.get("cookie")).toMatch(/better-auth/);
+    expect(demo.ok).toBe(true);
+    if (!demo.ok) return;
+    boardId = demo.boardId;
+    expect(demo.headers.get("cookie")).toMatch(/better-auth/);
     const row = await admin.query(
       `select organization_id, user_id from demo_workspaces order by created_at desc limit 1`,
     );
@@ -124,7 +125,20 @@ describe("a demo workspace", () => {
     expect(insight.flow[0]?.counts.done).toBeGreaterThan(0);
   });
 
+  /**
+   * The screen promises the whole thing is gone within the day, account
+   * included. Everything the visitor typed passes through the audit
+   * triggers on its way in, so "gone" has to mean the audit rows too —
+   * and the deliberate, bounded exception that makes that possible
+   * (drizzle/0017) is worth a test that would notice if it stopped
+   * happening.
+   */
   it("is deleted whole when its time is up, guest account included", async () => {
+    const before = await admin.query(`select count(*)::int as n from audit_log where org_id = $1`, [
+      orgId,
+    ]);
+    expect(before.rows[0].n).toBeGreaterThan(0);
+
     await admin.query(
       `update demo_workspaces set expires_at = now() - interval '1 minute' where organization_id = $1`,
       [orgId],
@@ -134,5 +148,50 @@ describe("a demo workspace", () => {
     const user = await admin.query(`select 1 from users where id = $1`, [userId]);
     const cards = await admin.query(`select 1 from cards where org_id = $1`, [orgId]);
     expect([org.rowCount, user.rowCount, cards.rowCount]).toEqual([0, 0, 0]);
+
+    // Nothing the visitor wrote, and no row about the account itself.
+    const orgTrail = await admin.query(`select 1 from audit_log where org_id = $1`, [orgId]);
+    const accountTrail = await admin.query(
+      `select 1 from audit_log
+       where actor_user_id = $1 or (entity_type = 'users' and entity_id = $1)`,
+      [userId],
+    );
+    expect([orgTrail.rowCount, accountTrail.rowCount]).toEqual([0, 0]);
+
+    // One context-free row is left, so an installation can see it happen.
+    const mark = await admin.query(
+      `select org_id, actor_type from audit_log where action = 'demo.expired' and entity_id = $1`,
+      [orgId],
+    );
+    expect(mark.rows).toEqual([{ org_id: null, actor_type: "system" }]);
+  });
+
+  /**
+   * The guard is the demo_workspaces row, not the caller's word for it.
+   * A workspace a team works in is not in that table, so there is no
+   * argument to this function that reaches one.
+   */
+  it("refuses to purge a workspace that is not an expired demo", async () => {
+    const other = await admin.query(
+      `insert into organizations (id, name, slug) values ($1, 'Ikke en demo', $1) returning id`,
+      [`not-a-demo-${Date.now()}`],
+    );
+    const id = other.rows[0].id;
+    const refused = await admin.query(`select delete_demo_workspace($1) as deleted`, [id]);
+    expect(refused.rows[0].deleted).toBe(false);
+    const still = await admin.query(`select 1 from organizations where id = $1`, [id]);
+    expect(still.rowCount).toBe(1);
+    await admin.query(`delete from organizations where id = $1`, [id]);
+
+    // And it is reachable from the one pool that runs the cleanup, and
+    // from nowhere else. CREATE FUNCTION grants EXECUTE to PUBLIC by
+    // default, so this is a test about a REVOKE that has to stay written.
+    const grants = await admin.query(
+      `select has_function_privilege($1, 'delete_demo_workspace(text)', 'execute') as auth,
+              has_function_privilege($2, 'delete_demo_workspace(text)', 'execute') as app,
+              has_function_privilege('public', 'delete_demo_workspace(text)', 'execute') as anyone`,
+      ["tavle_auth", "tavle_app"],
+    );
+    expect(grants.rows[0]).toEqual({ auth: true, app: false, anyone: false });
   });
 });

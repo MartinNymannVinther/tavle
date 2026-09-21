@@ -186,6 +186,34 @@ of the eight lines that say, honestly, that no model is set up and point
 at Settings → AI. The two were written a release apart and will drift.
 One small component, used by both.
 
+### Nothing gates `main`, and the deploy does not wait for CI
+
+At 0.11.3 every one of the 121 commits went straight to `main` with no
+pull request, there is no branch protection, and Coolify redeploys on
+push regardless of what CI says. A commit that fails `pnpm test` is on
+tavle.haij.dk before the run goes red; the only signal is an email after
+the fact.
+
+This is a decision, not an oversight: the repository has one developer,
+and a pull request to oneself is a ceremony that buys nothing while that
+is true. It stops being true the day a second person has push rights, or
+the day a team other than ours has a board on the hosted instance —
+whichever comes first. At that point both halves are wanted: a required
+green check before merge, and a deploy that waits for the check rather
+than for the push.
+
+Written down here rather than left to be discovered, because the failure
+mode is silent and the first person to meet it will be the one who did
+not choose it.
+
+### The postal address and CVR number are missing from the privacy notice
+
+`/terms` names Vinther Consulting as the entity and gives an e-mail, which
+is identity and contact enough for the letter of Article 13. Danish
+practice is to give a registered address and a CVR number as well, and
+the notice has an obvious slot for both. It is a fact only the owner can
+supply, not a code change.
+
 ## Waiting for a real team
 
 Not debt: product questions the tool refuses to answer from the armchair

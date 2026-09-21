@@ -81,6 +81,32 @@ describe("the workspace export", () => {
       "tavle-team-aeble-2026-09-11.xlsx",
     );
   });
+
+  /**
+   * Dogma three is about what the workspace owns. A login row in the audit
+   * trail says where a colleague was sitting and on what — telemetry about
+   * a person, kept for security and readable by nobody through this door.
+   * The export is open to every member, so without the redaction one click
+   * would hand the whole team each other's addresses.
+   */
+  it("carries the audit trail without anyone's address or browser", async () => {
+    await admin.query(
+      `insert into audit_log (org_id, actor_user_id, actor_type, action, entity_type, entity_id,
+                              ip_address, user_agent)
+       values ($1, $2, 'user', 'auth.login', 'sessions', 'ses_export_a',
+               '203.0.113.7', 'Mozilla/5.0 (Test)')`,
+      [a.orgId, a.userId],
+    );
+    const data = await buildOrgExport(a);
+    const trail = data.sections.find((s) => s.sheet === "Revisionsspor")!;
+    expect(trail.rows.length).toBeGreaterThan(0);
+    expect(trail.columns).not.toContain("ip_address");
+    expect(trail.columns).not.toContain("user_agent");
+    // And not by another road: the JSON is built from the same columns.
+    const json = exportToJson(data);
+    expect(json).not.toContain("203.0.113.7");
+    expect(json).not.toContain("Mozilla/5.0 (Test)");
+  });
 });
 
 /**
