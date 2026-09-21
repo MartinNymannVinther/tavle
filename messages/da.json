@@ -501,7 +501,7 @@
     },
     "demo": {
       "title": "Demoen",
-      "body": "Et demo-arbejdsrum oprettes uden e-mail eller tilmelding og slettes helt efter 24 timer, konto inklusive. Læg ikke rigtige personoplysninger i det. Vi gemmer kun de tekniske logdata der skal til for at holde demoen kørende."
+      "body": "Et demo-arbejdsrum oprettes uden e-mail eller tilmelding og slettes helt efter {hours, plural, one {# time} other {# timer}}, konto inklusive. Læg ikke rigtige personoplysninger i det. Vi gemmer kun de tekniske logdata der skal til for at holde demoen kørende."
     },
     "contact": {
       "title": "Kontakt",

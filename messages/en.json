@@ -501,7 +501,7 @@
     },
     "demo": {
       "title": "The demo",
-      "body": "A demo workspace is created without e-mail or sign-up and deleted entirely after 24 hours, account included. Do not put real personal data in it. We keep only the technical log data needed to keep the demo running."
+      "body": "A demo workspace is created without e-mail or sign-up and deleted entirely after {hours, plural, one {# hour} other {# hours}}, account included. Do not put real personal data in it. We keep only the technical log data needed to keep the demo running."
     },
     "contact": {
       "title": "Contact",

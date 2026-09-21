@@ -151,4 +151,27 @@ describe("the page and the form still show it", () => {
     // three fields the sentence used to stop at.
     expect(messages.auth.apply.privacy).toMatch(/IP-adresse|IP address/);
   });
+
+  it.each(CATALOGUES)("%s promises the number of backup days the script keeps", async (_l, m) => {
+    // The one retention figure the notice states as a bare number that no
+    // code can interpolate: the backup script is shell, so the page and
+    // the script agree only for as long as somebody keeps them agreeing.
+    // They were reconciled once already — the promise said thirty days
+    // while only one end of the pipeline pruned at all — and nothing has
+    // stopped it drifting back since.
+    const script = await read("scripts/backup-tavle.sh");
+    const days = script.match(/KEEP_DAYS="\$\{KEEP_DAYS:-(\d+)\}"/)?.[1];
+    expect(days, "the backup script should still carry a default").toBeDefined();
+    expect(
+      m.terms.retention.rows.backups,
+      `the notice should say ${days} days, the number the script prunes at`,
+    ).toContain(days!);
+  });
+
+  it.each(CATALOGUES)("%s tells the demo's hours from the constant, not by hand", (_l, m) => {
+    // DEMO_TTL_HOURS reaches the page as {hours}; a literal here would
+    // be a number that stops being true the day the constant moves.
+    expect(m.terms.retention.rows.demo).toContain("{hours");
+    expect(m.terms.demo.body).not.toMatch(/\b24\b/);
+  });
 });
