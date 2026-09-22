@@ -245,8 +245,9 @@ codebase to:
   and a pass over the tech debt — the actions pinned to commits, the
   typefaces moved into the repository, the migrator slimmed to what it
   runs.
-- Before 1.0: dogma seven — a real team runs a real board on it; the
-  screenshots for the README; the tool card on haij.dk; whatever the
-  first team asks for that the omissions list did not foresee.
+- Before 1.0: dogma seven is met — a real team ran a whole sprint on a
+  real board before anything was shown (2026-09-22). What is left of
+  this line: the screenshots for the README; the tool card on haij.dk;
+  whatever that team asks for that the omissions list did not foresee.
 - Later, each as its own decision: card links, attachments,
   notifications, a public read-only board link.

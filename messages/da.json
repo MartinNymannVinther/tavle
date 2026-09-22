@@ -514,7 +514,7 @@
     },
     "who": {
       "title": "Hvem står bag",
-      "body": "Tjenesten på tavle.haij.dk drives af Vinther Consulting, martin@vintherconsulting.dk. Postadresse og CVR-nummer indsættes her inden lancering. Vi har to roller, og de er ikke den samme. For din konto og din ansøgning — navn, e-mail, IP-adresse, browser — er vi dataansvarlige: det er os der har bestemt at de oplysninger skal findes. For alt hvad jeres team skriver på tavlen er I dataansvarlige, og vi er databehandlere: vi opbevarer det, viser det for jer, tager en krypteret sikkerhedskopi om natten, og sender det til en sprogmodel i de tilfælde afsnittet om AI beskriver — og ellers ikke andet. Vi læser ikke med, og vi bruger det ikke til noget af vores eget. Rammen om den del er en databehandleraftale; skabelonen ligger i kodearkivet, og vi skriver den gerne under."
+      "body": "Tjenesten på tavle.haij.dk drives af Vinther Consulting, Jens Bornøs Vej 1, CVR 30769201, martin@vintherconsulting.dk. Vi har to roller, og de er ikke den samme. For din konto og din ansøgning — navn, e-mail, IP-adresse, browser — er vi dataansvarlige: det er os der har bestemt at de oplysninger skal findes. For alt hvad jeres team skriver på tavlen er I dataansvarlige, og vi er databehandlere: vi opbevarer det, viser det for jer, tager en krypteret sikkerhedskopi om natten, og sender det til en sprogmodel i de tilfælde afsnittet om AI beskriver — og ellers ikke andet. Vi læser ikke med, og vi bruger det ikke til noget af vores eget. Rammen om den del er en databehandleraftale; skabelonen ligger i kodearkivet, og vi skriver den gerne under."
     },
     "basis": {
       "title": "Hvad vi må, og hvorfor",

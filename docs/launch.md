@@ -155,14 +155,17 @@ you actually do.
 > Intet af det vi selv har bygget kommer i vinduet før det har kørt
 > rigtigt arbejde.
 
-Pick a real team and run its board in Tavle. Not a test board, not a copy
-of one — work with a stand-up around it, where a card stuck in "I gang"
-costs somebody something. A few sprints is enough to learn what a v1 is
-missing; a public read-only link to the board and mail when a card is
-assigned are the likeliest first answers, and they should be findings
-rather than guesses.
+**Done, 2026-09-22.** A real team ran a whole sprint on a real board —
+not a test board and not a copy of one — before any of this was shown to
+anybody. The dogma is met and step 9 is no longer waiting on it.
 
-Until that has happened, the tool card on haij.dk waits.
+What the step asked for, and what it is still worth doing with: a few
+sprints teach what a v1 is missing, and a public read-only link to the
+board and mail when a card is assigned are the likeliest first answers.
+They should be findings from that team rather than guesses, so the list
+of omissions in CLAUDE.md stays a set of decisions rather than an
+oversight. One sprint is the dogma satisfied; it is not yet the whole
+lesson.
 
 ## 9. The tool card
 

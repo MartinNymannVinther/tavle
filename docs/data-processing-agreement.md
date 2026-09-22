@@ -13,8 +13,8 @@ all: nothing reaches us, and the operator is the controller.
 
 - **Controller:** the customer organisation — the workspace's own
   company, team or association.
-- **Processor:** Vinther Consulting, martin@vintherconsulting.dk.
-  _Postal address and CVR number to be filled in._
+- **Processor:** Vinther Consulting, Jens Bornøs Vej 1, CVR 30769201,
+  martin@vintherconsulting.dk.
 - **Version:** 2026-09-21.
 
 ## 1. What this covers, and what it does not

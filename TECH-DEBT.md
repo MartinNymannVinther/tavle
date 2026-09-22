@@ -223,14 +223,6 @@ stray-URL check walks all of `src` rather than the two files the offer
 lives in. This is the one that needs a change to the rate limiter first,
 which is why it is still here.
 
-### The postal address and CVR number are missing from the privacy notice
-
-`/terms` names Vinther Consulting as the entity and gives an e-mail, which
-is identity and contact enough for the letter of Article 13. Danish
-practice is to give a registered address and a CVR number as well, and
-the notice has an obvious slot for both. It is a fact only the owner can
-supply, not a code change.
-
 ## Waiting for a real team
 
 Not debt: product questions the tool refuses to answer from the armchair
@@ -274,6 +266,15 @@ in review" is a question the transition log can already answer and the
 insight page does not ask. ADR 0010 names it as the likely next metric.
 
 ## Paid
+
+### ~~The postal address and CVR number were missing from the privacy notice~~
+
+`/terms` named Vinther Consulting and gave an e-mail, which is identity
+and contact enough for the letter of Article 13, but Danish practice is a
+registered address and a CVR number too — and the notice, the record of
+processing and the data processing agreement each carried a marked slot
+waiting for them. Filled 2026-09-22: Jens Bornøs Vej 1, CVR 30769201.
+The one thing here nobody could write from the code.
 
 ### ~~The Next build has not been run~~
 
