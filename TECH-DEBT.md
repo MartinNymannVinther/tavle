@@ -273,8 +273,9 @@ insight page does not ask. ADR 0010 names it as the likely next metric.
 and contact enough for the letter of Article 13, but Danish practice is a
 registered address and a CVR number too — and the notice, the record of
 processing and the data processing agreement each carried a marked slot
-waiting for them. Filled 2026-09-22: Jens Bornøs Vej 1, CVR 30769201.
-The one thing here nobody could write from the code.
+waiting for them. Filled 2026-09-22 with the CVR number. The name, the
+CVR number and the e-mail identify the controller, so the three carry no
+street address. The one thing here nobody could write from the code.
 
 ### ~~The Next build has not been run~~
 
