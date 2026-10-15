@@ -147,9 +147,14 @@ const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
   // Dev only: `next dev` refuses to serve its own assets to any host but
-  // localhost, and a dev server reached from another machine (motor.local)
-  // otherwise renders as script-less HTML. Ignored by `next build`.
-  allowedDevOrigins: ["motor.local", "motor"],
+  // localhost, and a dev server reached from another machine otherwise
+  // renders as script-less HTML. The hostnames come from TAVLE_DEV_HOSTS
+  // in .env, so no machine's name is written into the repository.
+  // Ignored by `next build`.
+  allowedDevOrigins: (process.env.TAVLE_DEV_HOSTS ?? "")
+    .split(",")
+    .map((host) => host.trim())
+    .filter(Boolean),
   env: {
     TAVLE_VERSION: pkg.version,
     TAVLE_COMMIT: commit,

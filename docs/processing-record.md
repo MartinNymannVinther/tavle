@@ -12,7 +12,7 @@ one describes what the code does, so most of it will be true there too —
 but the entity, the subprocessors and the retention practice are the
 operator's, not ours.
 
-- **Controller:** Vinther Consulting, Jens Bornøs Vej 1, CVR 30769201,
+- **Controller:** Vinther Consulting, CVR 30769201,
   martin@vintherconsulting.dk.
 - **Last reviewed:** 2026-09-21.
 - **Data protection officer:** none. The processing is neither large
